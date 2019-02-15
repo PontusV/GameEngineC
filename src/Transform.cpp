@@ -1,4 +1,5 @@
 #include "Transform.h"
+using namespace GameEngine;
 
 
 
@@ -22,6 +23,8 @@ Transform* Transform::load(std::istream& is) {
 }
 
 void Transform::serialize(std::ostream& os) const {
+	//Save component ID; loaded in GameObject.cpp to identify which kind of Component to load
+	os << TYPE_ID;
 	os << position;
 }
 

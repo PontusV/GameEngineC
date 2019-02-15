@@ -3,12 +3,14 @@
 
 #include <iostream>
 
-class SaveData {
-public:
-	~SaveData();
-	//Save
-	virtual void writeObject(std::ostream& os) const = 0;
-protected:
-	SaveData();
-};
+namespace GameEngine {
+	class SaveData {
+	public:
+		~SaveData();
+		//Save
+		virtual void writeObject(std::ostream& os) const = 0;
+	protected:
+		SaveData();
+	};
+}
 #endif

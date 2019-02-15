@@ -1,6 +1,6 @@
 #include <SDL.h>
-#include "RenderComponent.h"
 #include "Window.h"
+using namespace GameEngine;
 
 Window::Window(const char *title, int x, int y, int width, int height, Uint32 flags) {
 	win = SDL_CreateWindow(title, x, y, width, height, flags);
@@ -10,10 +10,6 @@ Window::Window(const char *title, int x, int y, int width, int height, Uint32 fl
 Window::~Window() {
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
-}
-
-void Window::addGraphics(RenderComponent* g) {
-
 }
 
 SDL_Window* Window::getWindow() const {

@@ -1,5 +1,6 @@
 #include "Image.h"
 #include "Texture.h"
+using namespace GameEngine;
 
 
 
@@ -29,7 +30,7 @@ TexturePtr Image::getTexture() {
 /* Save */
 void Image::serialize(std::ostream& os) const {
 	//Save component ID; loaded in Graphics.cpp to identify which kind of Component to load
-	os << Component::componentTypes::Image;
+	os << TYPE_ID;
 	//---------------------
 
 	//Save address to image

@@ -1,4 +1,5 @@
 #include "Font.h"
+using namespace GameEngine;
 
 
 Font::Font(std::string fileName, int size) : fileName(fileName), size(size) {
@@ -43,13 +44,13 @@ void Font::deserialize(std::istream& is) {
 }
 
 /* Load class from input stream (ex: hard drive). */
-std::istream& operator>>(std::istream& is, Font& font) {
+std::istream& GameEngine::operator>>(std::istream& is, Font& font) {
 	font.deserialize(is);
 	return is;
 }
 
 /* Save class to output stream (ex: hard drive). */
-std::ostream& operator<<(std::ostream& os, const Font& font) {
+std::ostream& GameEngine::operator<<(std::ostream& os, const Font& font) {
 	font.serialize(os);
 	return os;
 }

@@ -8,6 +8,7 @@
 #include <thread>
 
 using namespace std;
+using namespace GameEngine;
 
 /* Saves current level. */
 void Engine::saveLevel() { //To be added: file location of level map (currently hard coded to the map Levels)
@@ -51,19 +52,29 @@ void Engine::terminate() {
 	running = false;
 }
 
+/* Starts the gameloop. */
 void Engine::initiate() {
 	running = true;
 	graphics.createWindow();
 
-	uint32_t setFPS = 60;
+	uint32_t setFPS = 200; //Setting it over 1000 removes the CAP (FIX THIS!). At higher deltaTime the fps goes down even if it doesnt have to. Recalculate wait time to make it more accurate!
 	float timePerFrame = (float)1000/setFPS;
 	uint32_t fpsCounter = 0;
+	float fpsPrintTimer = 0;
 	//Gameloop
 	auto lastTime = std::chrono::high_resolution_clock::now();
 	while (running) {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float deltaTime = float(std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime).count());
 		lastTime = currentTime;
+
+		fpsCounter++;
+		fpsPrintTimer += deltaTime;
+		if (fpsPrintTimer > 1000) {
+			fpsPrintTimer -= 1000;
+			std::cout << "Fps: " << fpsCounter << "\n";
+			fpsCounter = 0;
+		}
 
 		//Look for input events from SDL
 		SDL_Event event;
@@ -72,9 +83,10 @@ void Engine::initiate() {
 		}
 		graphics.update(deltaTime);
 
-		int sleepTime = int(timePerFrame - deltaTime);
-		if (sleepTime > 0)
+		int sleepTime = int(timePerFrame*2 - deltaTime);
+		if (sleepTime > 0) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+		}
 	}
 }
 

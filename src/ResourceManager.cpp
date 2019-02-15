@@ -1,10 +1,12 @@
 #include "ResourceManager.h"
 #include "Image.h"
-#include "Text.h"
+//#include "Text.h"
 #include "SDL.h"
 #include "SDL_ttf.h"
 #include <sstream>
+#include <stdexcept>
 #include <SDL_image.h>
+using namespace GameEngine;
 
 
 ResourceManager::ResourceManager() {
@@ -49,7 +51,11 @@ TexturePtr ResourceManager::loadText(const std::string& text, Font& font, SDL_Co
 
 	//No existing TexturePtr found with given key
 	//Creates a new TexturePtr and returns it
-	Texture* texture = Text::loadTexture(text, font, color, ren);
+
+	SDL_Surface* image = TTF_RenderText_Solid(font.getFont(), text.c_str(), color); //crash?
+	if (image == nullptr) throw std::invalid_argument("There was an error loading the text.");
+	Texture* texture = Texture::load(image, ren);	
+
 	TexturePtr tx(texture);
 	loadedTextures.insert(std::make_pair(key, tx)); //Stores newly created texture in map with given key
 	return tx;

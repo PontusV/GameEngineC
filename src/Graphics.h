@@ -4,37 +4,36 @@
 #include <vector>
 #include "Entity.h"
 
-#include "ComponentDataManager.h"
 #include "Image.h"
 #include "Text.h"
 #include "Transform.h"
 
-class HandleManager;
-class Handle;
-class Window;
+#include "ComponentArrayManager.h"
+#include "ComponentGroup.h"
 
-class Graphics {
-public:
-	Graphics(HandleManager& handleManager);
-	~Graphics();
+namespace GameEngine {
+	class HandleManager;
+	class Handle;
+	class Window;
 
-	void initiate();
-	void update(float dt);
-	void createWindow();
+	struct Renderables : public ComponentGroup<Transform, Image> {
+		ComponentArray<Transform>& transforms = getComponentArray<Transform>();
+		ComponentArray<Image>& images = getComponentArray<Image>();
+	};
 
-	//Handle createImage(Entity entity, std::string fileName);
-	//Handle createText(Entity entity, const std::string& text, std::string fontAddress, int fontSize, SDL_Color color);
+	class Graphics {
+	public:
+		Graphics(HandleManager& handleManager);
+		~Graphics();
 
-	//Save & Load
-	void write(std::ostream& os) const;
-	void read(std::istream& is, HandleManager* handleManager);
-private:
-	ComponentDataManager<1024, Image, Transform> renderables;
-	//ComponentDataManager<Text, Transform> renderableTexts;
+		void initiate();
+		void update(float dt);
+		void createWindow();
+	private:
 
-	//ComponentData<Image, Transform> data = new ComponentData<Image, Transform>(maxSize);
-
-	Window* window;
-	HandleManager& handleManager; //Initialize this
-};
+		Window* window;
+		HandleManager& handleManager; //Initialize this
+		Renderables renderables;
+	};
+}
 #endif

@@ -2,10 +2,8 @@
 #include "Engine.h"
 #include <iostream>
 #include "level.h"
-#include "EntityHandle.h"
-
-//TEST
-#include "ComponentListener.h"
+#include "EntityManager.h"
+using namespace GameEngine;
 
 Game::Game(Engine* engine) : engine(engine) {
 	initiate();
@@ -15,6 +13,14 @@ Game::Game(Engine* engine) : engine(engine) {
 Game::~Game()
 {
 }
+
+#include "Transform.h"
+#include "Image.h"
+#include "Text.h"
+
+//Test
+EntityManager manager;
+Entity object;
 
 void Game::initiate() {
 	//KeyListener
@@ -26,31 +32,30 @@ void Game::initiate() {
 	//Create test level
 	Level* level = engine->createLevel();
 
-	for (int i = 0; i < 1000; i++) {
-		std::string name = std::string("Test") + std::to_string(i);
-		EntityHandle entity = engine->getCurrentLevel()->createEntity(name);
-		entity.addComponent<Transform>((float)500, (float)100);
-		entity.addComponent<Image>("G:/c++/wtf/invaders.png");
-	}
+	//Test code
+	object = manager.createEntity(
+		new Transform(500, 500)
+	);
+	Entity object2 = manager.createEntity(
+		new Transform(5, 5),
+		new Image("D:/c++/wtf/invaders.png")
+	);
+	Entity object3 = manager.createEntity(
+		new Transform(5, 500),
+		new Image("D:/c++/wtf/invaders.png")
+	);
+	manager.addComponent(object, new Image("D:/c++/wtf/invaders.png"));
+	manager.removeComponent<Image>(object2);
 }
 
 void Game::keyPressed(std::string buttonName) {
 	if (buttonName == "Right") {
-		for (int i = 0; i < 1000; i++) {
-			std::string name = std::string("Test") + std::to_string(i);
-			EntityHandle entity = engine->getCurrentLevel()->getEntity(name);
-
-			Transform component = entity.getComponent<Transform>();
-			component.setX(component.getX() + 10);
-			entity.updateComponent<Transform>(component);
-		}
-
+		Transform* transform = static_cast<Transform*>(manager.getComponent<Transform>(object));
+		transform->setX(transform->getX() + 50);
 	}
 	if (buttonName == "Left") {
-		EntityHandle entity = engine->getCurrentLevel()->getEntity("Test3");
-		Transform component = entity.getComponent<Transform>();
-		component.setX(component.getX() - 10);
-		entity.updateComponent<Transform>(component);
+		Transform* transform = static_cast<Transform*>(manager.getComponent<Transform>(object));
+		transform->setX(transform->getX() - 50);
 	}
 }
 

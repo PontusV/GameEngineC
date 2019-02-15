@@ -1,8 +1,8 @@
 #include "EntityHandle.h"
+using namespace GameEngine;
 
 
-
-EntityHandle::EntityHandle(Entity entity, HandleManager& handleManager) : entity(entity), handleManager(handleManager)
+EntityHandle::EntityHandle(Entity entity) : entity(entity)
 {
 }
 

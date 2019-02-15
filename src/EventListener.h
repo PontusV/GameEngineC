@@ -3,12 +3,14 @@
 
 #include <string>
 
-class EventListener
-{
-public:
-	EventListener();
-	~EventListener();
+namespace GameEngine {
+	class EventListener
+	{
+	public:
+		EventListener();
+		~EventListener();
 
-	virtual void callEvent(std::string eventName) = 0;
-};
+		virtual void callEvent(std::string eventName) = 0;
+	};
+}
 #endif

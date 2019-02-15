@@ -1,5 +1,6 @@
 #include "Component.h"
 #include <iostream>
+using namespace GameEngine;
 
 
 
@@ -18,9 +19,9 @@ Handle Component::getID() const {
 }
 
 /* Load component type (enum) */
-std::istream& operator>> (std::istream& is, Component::componentTypes& e) {
-	int i;
-	if (!(is >> i)) { /* Handle error */ }
-	e = static_cast<Component::componentTypes>(i);
-	return is;
-}
+//std::istream& operator>> (std::istream& is, Component::componentTypes& e) {
+//	int i;
+//	if (!(is >> i)) { /* Handle error */ }
+//	e = static_cast<Component::componentTypes>(i);
+//	return is;
+//}

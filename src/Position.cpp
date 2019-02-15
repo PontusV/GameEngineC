@@ -1,4 +1,5 @@
 #include "Position.h"
+using namespace GameEngine;
 
 
 
@@ -37,13 +38,13 @@ void Position::deserialize(std::istream& is) {
 }
 
 /* Load class from input stream (ex: hard drive). */
-std::istream& operator>>(std::istream& is, Position& object) {
+std::istream& GameEngine::operator>>(std::istream& is, Position& object) {
 	object.deserialize(is);
 	return is;
 }
 
 /* Save class to output stream (ex: hard drive). */
-std::ostream& operator<<(std::ostream& os, const Position& object) {
+std::ostream& GameEngine::operator<<(std::ostream& os, const Position& object) {
 	object.serialize(os);
 	return os;
 }

@@ -2,14 +2,16 @@
 #define GAME_H
 #include "KeyListener.h"
 
-class Engine;
+namespace GameEngine {
+	class Engine;
+}
 
 //Will derive from Engine when it is ready
 class Game :
-	public KeyListener
+	public GameEngine::KeyListener
 {
 public:
-	Game(Engine* engine);
+	Game(GameEngine::Engine* engine);
 	~Game();
 
 	void initiate();
@@ -17,6 +19,6 @@ public:
 	void keyPressed(std::string buttonName);
 	void keyReleased(std::string buttonName);
 private:
-	Engine* engine;
+	GameEngine::Engine* engine;
 };
 #endif

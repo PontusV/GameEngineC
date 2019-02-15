@@ -3,17 +3,19 @@
 #include <string>
 #include <vector>
 
-class EventListener;
+namespace GameEngine {
+	class EventListener;
 
-class EventManager
-{
-public:
-	EventManager();
-	~EventManager();
+	class EventManager
+	{
+	public:
+		EventManager();
+		~EventManager();
 
-	void registerEventListener(EventListener* listener, std::string eventName);
-	void callEvent(std::string eventName);
-private:
-	std::vector<EventListener*> listeners;
-};
+		void registerEventListener(EventListener* listener, std::string eventName);
+		void callEvent(std::string eventName);
+	private:
+		std::vector<EventListener*> listeners;
+	};
+}
 #endif

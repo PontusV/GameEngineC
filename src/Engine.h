@@ -6,34 +6,37 @@
 #include "Input.h"
 #include "HandleManager.h"
 
-class Level;
 struct SDL_Renderer;
 
-class Engine {
-public:
-	Engine();
-	~Engine();
-	void initiate();
-	void terminate();
+namespace GameEngine {
+	class Level;
 
-	//Level
-	Level* createLevel();
-	void saveLevel();
-	void loadLevel();
-	Level* getCurrentLevel();
+	class Engine {
+	public:
+		Engine();
+		~Engine();
+		void initiate();
+		void terminate();
 
-	//Return system for testing in main.cpp (Should be removed later)
-	HandleManager& getHandleManager();
-	Input& getInput();
-private:
-	Level* currentLevel;
-	bool running;
+		//Level
+		Level* createLevel();
+		void saveLevel();
+		void loadLevel();
+		Level* getCurrentLevel();
 
-	//Other
-	HandleManager handleManager;
-	//Main Systems
-	Input input;
-	Graphics graphics = Graphics(handleManager);
-	Physics physics;
-};
+		//Return system for testing in main.cpp (Should be removed later)
+		HandleManager& getHandleManager();
+		Input& getInput();
+	private:
+		Level* currentLevel;
+		bool running;
+
+		//Other
+		HandleManager handleManager;
+		//Main Systems
+		Input input;
+		Graphics graphics = Graphics(handleManager);
+		Physics physics;
+	};
+}
 #endif

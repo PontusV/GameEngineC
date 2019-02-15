@@ -4,20 +4,22 @@
 #include "Engine.h"
 #include "Entity.h"
 #include "Transform.h"
-
+using namespace GameEngine;
 
 
 Text::Text(const std::string text, std::string fontAddress, int fontSize, SDL_Color color) : text(text), font(fontAddress, fontSize), color(color) {
-	std::cout << "\nConstructed";
+
 } //Constructor
+
+Text::Text(std::istream& is) {
+
+}
 
 /* Used when loading this component from instream. Passes the instream to the Component part. */
 Text::Text() {
 } //Constructor
 
 Text::~Text() {
-	std::cout << "sadfghjk";
-	delete &font;
 }
 
 /* Loads texture if TexturePtr is null. Draws the text on the given renderer */
@@ -25,24 +27,6 @@ void Text::reload(SDL_Renderer* ren) {
 	//Check if text is loaded
 	if (texture == nullptr)
 		texture = ResourceManager::getInstance().loadText(text, font, color, ren); //Attempt to load image
-}
-
-Text* Text::load(std::istream& is) {
-	Text* text = new Text();
-	text->deserialize(is);
-	return text;
-}
-
-Text* Text::getInstance(const std::string& text, std::string fontAddress, int fontSize, SDL_Color& color) {
-	return new Text(text, fontAddress, fontSize, color);
-}
-
-Texture* Text::loadTexture(const std::string& text, Font& font, SDL_Color color, SDL_Renderer* ren) {
-	SDL_Surface* image = TTF_RenderText_Solid(font.getFont(), text.c_str(), color); //crash?
-	if (image != nullptr)
-		return Texture::load(image, ren);
-	else
-		throw "There was an error loading text: ";
 }
 
 TexturePtr Text::getTexture() {
@@ -53,7 +37,7 @@ TexturePtr Text::getTexture() {
 /* Save */
 void Text::serialize(std::ostream& os) const {
 	//Save component ID; loaded in GameObject.cpp to identify which kind of Component to load
-	os << Component::componentTypes::Text;
+	os << TYPE_ID;
 	//------------------------
 	//Save text string
 	os.write(text.c_str(), text.size() + 1);
@@ -91,3 +75,17 @@ std::ostream& operator<<(std::ostream& os, const Text& object) {
 	object.serialize(os);
 	return os;
 }
+
+
+
+
+
+/*Text* Text::load(std::istream& is) {
+	Text* text = new Text();
+	text->deserialize(is);
+	return text;
+}
+
+Text* Text::getInstance(const std::string& text, std::string fontAddress, int fontSize, SDL_Color& color) {
+	return new Text(text, fontAddress, fontSize, color);
+}*/

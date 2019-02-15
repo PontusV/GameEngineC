@@ -5,27 +5,32 @@
 #include "HandleManager.h"
 #include "ResourceManager.h"
 
-class Texture;
+namespace GameEngine {
+	class Texture;
 
-class Image : public Component {
-public:
-	static const int TYPE_ID = HandleManager::HANDLE_TYPE_COMPONENT_IMAGE; //Variable used for Entity::GetComponent()
+	class Image : public Component {
+	public:
+		static constexpr ComponentTypeID TYPE_ID = 2;
+		Image(const std::string fileName);
+		Image(std::istream& is);
+		Image();
 
-	Image(const std::string fileName);
-	Image(std::istream& is);
+		~Image();
+		void reload(SDL_Renderer* ren);
+		TexturePtr getTexture();
+		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
-	~Image();
-	void reload(SDL_Renderer* ren);
-	TexturePtr getTexture();
+		//Save & Load operator
+		void serialize(std::ostream& os) const;
+		void deserialize(std::istream& is);
+	private:
 
-	//Save & Load operator
-	void serialize(std::ostream& os) const;
-	void deserialize(std::istream& is);
-private:
-	//static SDL_Texture* loadImage(const char* fileName, SDL_Renderer* ren);
-	Image();
-
-	std::string fileName; //std::string probably has varying size. Change type!!!
-	TexturePtr texture;
-};
+		std::string fileName;
+		TexturePtr texture;
+	};
+}
+#include "TypeList.h"
+typedef typename GameEngine::TypeList<TYPE_LIST, GameEngine::Image>::type TypeListImage;
+#undef TYPE_LIST
+#define TYPE_LIST TypeListImage
 #endif

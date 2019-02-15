@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include "Engine.h"
 #include "KeyListener.h"
+using namespace GameEngine;
 
 Input::Input(Engine* engine) : engine(engine) {}
 

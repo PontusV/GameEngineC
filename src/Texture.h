@@ -4,20 +4,22 @@
 struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Surface;
-class SaveData;
 
-class Texture {
-public:
-	~Texture();
-	const int& getWidth() const;
-	const int& getHeight() const;
-	SDL_Texture* getTexture() const;
+namespace GameEngine {
 
-	static Texture* load(SDL_Surface* image, SDL_Renderer* ren);
-protected:
-	Texture(SDL_Texture* tx, int width, int height);
+	class Texture {
+	public:
+		~Texture();
+		const int& getWidth() const;
+		const int& getHeight() const;
+		SDL_Texture* getTexture() const;
 
-	int width, height;
-	SDL_Texture* tx;
-};
+		static Texture* load(SDL_Surface* image, SDL_Renderer* ren);
+	protected:
+		Texture(SDL_Texture* tx, int width, int height);
+
+		int width, height;
+		SDL_Texture* tx;
+	};
+}
 #endif

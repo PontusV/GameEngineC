@@ -2,9 +2,9 @@
 #include "Entity.h"
 #include <iostream>
 #include "HandleManager.h"
-#include "EntityHandle.h"
 #include "Handle.h"
 #include <stdexcept>
+using namespace GameEngine;
 
 
 Level::Level(HandleManager& handleManager) : handleManager(handleManager) {
@@ -19,14 +19,12 @@ Level::~Level() {
 }
 
 /* Add game object to the back of the vector storing all objects within the level and gives it an ID number. */
-EntityHandle Level::createEntity(std::string name) {
+/*EntityHandle Level::createEntity(std::string name) {
 	Entity* entity = new Entity();
-	Handle handle = handleManager.add(entity, HandleManager::HANDLE_TYPE_ENTITY);
-	entity->setID(handle);
 	entities.insert(std::pair<std::string, Entity*>(name, entity));
 
-	return EntityHandle(*entity, handleManager);
-}
+	return EntityHandle(*entity);
+}*/
 
 /* Removes game object with given id. */
 void Level::removeEntity(Handle id) {
@@ -43,12 +41,12 @@ void Level::removeEntity(Handle id) {
 	}
 }
 
-EntityHandle Level::getEntity(std::string entityName) {
+/*EntityHandle Level::getEntity(std::string entityName) {
 	std::map<std::string, Entity*>::iterator it = entities.find(entityName);
 	if (it != entities.end())
-		return EntityHandle(*it->second, handleManager);
+		return EntityHandle(*it->second);
 	throw std::invalid_argument("Entity with given name does not exist!");
-}
+}*/
 
 /* Save */
 void Level::serialize(std::ostream& os) const {
