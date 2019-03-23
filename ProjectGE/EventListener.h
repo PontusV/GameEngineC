@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace GameEngine {
+namespace Core {
 	class EventListener
 	{
 	public:

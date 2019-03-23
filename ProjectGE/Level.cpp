@@ -1,13 +1,13 @@
 #include "Level.h"
+#include "Component.h"
 #include <iostream>
 #include <stdexcept>
-using namespace GameEngine;
+using namespace Core;
 
-#include "TypeList.h"
-namespace GameEngine {
+namespace Core {
 	namespace util {
 		//Load helpers
-		void loadComponent(EntityHandle entity, std::istream& is, const ComponentTypeID typeID, TypeList<>) {
+		/*void loadComponent(EntityHandle entity, std::istream& is, const ComponentTypeID typeID, TypeList<>) {
 			throw std::invalid_argument("Could not find ComponentType in TypeList when trying to load component.");
 		}
 
@@ -17,11 +17,11 @@ namespace GameEngine {
 				return entity.addComponent<T>(is);
 
 			return loadComponent(entity, is, typeID, TypeList<Types...>());
-		}
+		}*/
 
 		void loadComponent(EntityHandle entity, std::istream& is, const ComponentTypeID typeID) {
-			TYPE_LIST typeList;
-			return loadComponent(entity, is, typeID, typeList);
+			//TYPE_LIST typeList;
+			//return loadComponent(entity, is, typeID, typeList);
 		}
 	}
 }
@@ -54,7 +54,7 @@ void Level::serialize(std::ostream& os) const {
 	//Store Entities
 	std::size_t entityAmount = entities.size();
 	os.write((char*)&entityAmount, sizeof(std::size_t)); //Store amount of Entities to be loaded at load time
-	for (std::map<std::string, Entity>::const_iterator it = entities.begin(); it != entities.end(); ++it) {
+	for (std::map<std::string, Entity>::const_iterator it = entities.begin(); it != entities.end(); it++) {
 		os.write(it->first.c_str(), it->first.size() + 1); //Write name
 		//Write Entity ID--------------------------------------------------------------
 
@@ -85,7 +85,7 @@ void Level::deserialize(std::istream& is) {
 		for (std::size_t ii = 0; ii < componentAmount; ii++) {
 			ComponentTypeID typeID;
 			is.read((char*)&typeID, sizeof(ComponentTypeID));
-			loadComponent(object, is, typeID);
+			util::loadComponent(object, is, typeID);
 		}
 	}
 }

@@ -8,7 +8,10 @@
 #include "Renderable2D.h"
 #include <vector>
 
-namespace GameEngine {
+namespace Core {
+
+	class Window;
+
 	struct VertexData
 	{
 		glm::vec2 vertex;
@@ -30,11 +33,20 @@ namespace GameEngine {
 #define SHADER_TEXTURE_INDEX 2
 #define SHADER_TEXTURE_ID_INDEX 3
 
+	struct BatchSegment {
+		GLsizei		startIndex;
+		GLsizei		size;
+		BatchConfig config;
+	};
 
 	class BatchRenderer2D
 	{
 	public:
-		BatchRenderer2D();
+		void startNewSegment(BatchConfig config);
+	private:
+
+	public:
+		BatchRenderer2D(Window* window);
 		~BatchRenderer2D();
 		// Frees up memory
 		void cleanUp();
@@ -44,18 +56,19 @@ namespace GameEngine {
 		inline bool hasRoom();
 		inline bool hasBegun() { return begun; }
 
-		void init(BatchConfig config);
+		void init();
 		void begin();
-		void submit(const Renderable2D& sprite);
+		void submit(const RenderCopy2D& sprite);
 		void end();
 		void flush();
 	private:
-		bool begun;
-		bool initialized;
-		GLuint VAO, VBO, EBO;
-		GLsizei indexCount, verticiesCount;
-		VertexData* buffer;
-		BatchConfig config;
+		bool						begun, initialized;
+		GLuint						VAO, VBO, EBO;
+		GLsizei						indexCount, verticiesCount;
+		VertexData*					buffer;
+		BatchConfig*				config;
+		std::vector<BatchSegment>	segments;
+		Window* window;
 	};
 }
 #endif

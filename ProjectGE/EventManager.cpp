@@ -1,5 +1,5 @@
 #include "EventManager.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 

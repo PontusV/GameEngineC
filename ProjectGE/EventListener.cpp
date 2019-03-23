@@ -1,5 +1,5 @@
 #include "EventListener.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 EventListener::EventListener()

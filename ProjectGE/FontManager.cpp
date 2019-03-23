@@ -2,16 +2,21 @@
 #include "ResourceManager.h"
 #include <algorithm>
 
-using namespace GameEngine;
+using namespace Core;
 
 
 FontManager::FontManager(const GLchar* fontFile, GLushort textSize, FT_Library ft) : textSize(textSize)
 {
 	FT_Face face;
-	if (FT_New_Face(ft, fontFile, 0, &face))
+	if (FT_New_Face(ft, fontFile, 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return;
+	}
 
 	FT_Set_Pixel_Sizes(face, 0, textSize);
+
+	//textHeight = face->size->metrics.height >> 6;
+	textHeight = (int)(textSize * 0.6875f);
 
 
 	//------
@@ -19,22 +24,25 @@ FontManager::FontManager(const GLchar* fontFile, GLushort textSize, FT_Library f
 	unsigned int atlas_width = 0;
 	unsigned int atlas_height = 0;
 
+	// Calculate atlas size
 	for (std::size_t i = 0; i < 128; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			fprintf(stderr, "Loading character %c failed!\n", i);
 			continue;
 		}
 
-		atlas_width += g->bitmap.width;
+		atlas_width += g->bitmap.width + 1; // +1 to compensate for UV positions rounding down
 		atlas_height = std::max(atlas_height, g->bitmap.rows);
 	}
 	textureAtlas.size = glm::ivec2(atlas_width, atlas_height);
 
 
+	// Prepare new atlas texture
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &textureAtlas.ID);
 	glBindTexture(GL_TEXTURE_2D, textureAtlas.ID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlas_width, atlas_height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
 	// Set texture options
@@ -59,7 +67,7 @@ FontManager::FontManager(const GLchar* fontFile, GLushort textSize, FT_Library f
 		characters[i].uvPos = glm::vec2((float)x/atlas_width, (float)y/atlas_height);
 		characters[i].advance = g->advance.x >> 6;
 
-		x += g->bitmap.width;
+		x += g->bitmap.width + 1; // +1 to compensate for UV positions rounding down
 		//y = 0;
 	}
 
@@ -74,7 +82,7 @@ FontManager::~FontManager()
 }
 
 
-std::vector<CharTexture2D> FontManager::createText(std::string text, glm::vec4 color, GLushort size) {
+TextData2D FontManager::createText(std::string text, glm::vec4 color, GLushort size) {
 	float scale = ((float)size)/textSize;
 
 	//Offsets start at 0
@@ -84,13 +92,15 @@ std::vector<CharTexture2D> FontManager::createText(std::string text, glm::vec4 c
 	std::vector<CharTexture2D> textures;
 	textures.reserve(text.size());
 
+	float width;
+
 	// Iterate through all characters
 	for (std::size_t character : text) {
 		Character& ch = characters[character];
 		if (charTextures[character].texture.ID == 0) { // ID is zero if uninitialized
 
 			Texture2D tex = textureAtlas;
-			glm::vec2 offset(x + ch.bearing.x * scale, y - ch.bearing.y * scale);
+			glm::vec2 offset(x + ch.bearing.x, y - ch.bearing.y);
 
 			tex.size = ch.size;
 
@@ -113,8 +123,11 @@ std::vector<CharTexture2D> FontManager::createText(std::string text, glm::vec4 c
 		texture.texture.size.y = (int)(texture.texture.size.y * scale);
 		textures.push_back(texture);
 
-		x += ch.advance * scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+		width = x;
+		x += ch.advance * scale;
 	}
 
-	return textures;
+	int height = (int)(textHeight * scale);
+
+	return { textures, glm::ivec2(width,height) };
 }

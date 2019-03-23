@@ -13,5 +13,5 @@ void main()
 		color = texture(textures[int(tID-1)], TexCoords);
 	else
 		color = spriteColor;
-    //color = spriteColor * texture(image, TexCoords);
+	//color = spriteColor * texture(image, TexCoords);
 }  

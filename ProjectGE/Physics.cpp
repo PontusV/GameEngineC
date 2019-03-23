@@ -1,5 +1,5 @@
 #include "Physics.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 

@@ -1,30 +1,43 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "Serializable.h"
-#include "Handle.h"
+#include "Entity.h"
+#include "ChunkEntityHandle.h"
 
-namespace GameEngine {
-	class Entity;
-	class Engine;
+namespace Core {
 
 	typedef std::size_t ComponentTypeID;
 
-	class Component : public Serializable {
-	public:
-		virtual ~Component();
-		void setID(Handle handleID);
+	class IChunk; // Forward declare
 
-		virtual const ComponentTypeID getTypeID() const = 0;
-		Handle getID() const;
-		Component& operator=(const Component& rhs)
-		{
-			//Do not change ID
-			return *this;
-		}
+	class Component : public Serializable {
 	protected:
 		Component();
+	public:
+		virtual ~Component();
+
+		virtual const ComponentTypeID getTypeID() const = 0;
+		Component& operator=(const Component& other)
+		{
+			owner = other.owner;
+			return *this;
+		}
+
+		void setOwner(ChunkEntityHandle owner)	{ this->owner = owner; }
+
+		void destroy() { destruct = true; }
+		bool isDestroyed() { return destruct; }
+
+		// The components that need this will override
+		virtual void init() {}; // Called after setOwner()
+		virtual void end() {}; // Called before component values are copied in a move
+	protected:
+		// All the data needed to get the components from the same entity
+		ChunkEntityHandle owner;
 	private:
-		Handle componentID;
+		bool destruct = false;
+		//ComponentHandle handle;
+		//Handle handle;
 	};
 }
 

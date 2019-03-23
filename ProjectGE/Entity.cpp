@@ -1,6 +1,6 @@
 #include "Entity.h"
 #include <iostream>
-using namespace GameEngine;
+using namespace Core;
 
 Entity::Entity(std::size_t entityID) : id(entityID) {}
 
@@ -16,19 +16,6 @@ void Entity::setID(std::size_t entityID) {
 
 std::size_t Entity::getID() const {
 	return id;
-}
-
-/* Save */
-void Entity::serialize(std::ostream& os) const {
-	/*uint32_t handleValues = id; //Converts Handle to unint32_t
-	os.write((char*)&handleValues, sizeof(uint32_t));*/
-}
-
-/* Load */
-void Entity::deserialize(std::istream& is) {
-	/*uint32_t handleValues;
-	is.read((char*)&handleValues, sizeof(uint32_t));
-	Handle component = Handle(handleValues);*/
 }
 
 //Entity::Entity(Entity&& other) noexcept : id(other.id) {}

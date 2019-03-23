@@ -4,7 +4,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
 #include <map>
@@ -12,7 +12,7 @@
 
 #include "Texture2D.h"
 
-namespace GameEngine {
+namespace Core {
 	struct Character
 	{
 		glm::ivec2	size;		// Size of glyph
@@ -29,6 +29,11 @@ namespace GameEngine {
 		glm::vec2 offset;
 	};
 
+	struct TextData2D {
+		std::vector<CharTexture2D> textures;
+		glm::ivec2 size;
+	};
+
 	/* Manages a specified font. */
 	class FontManager
 	{
@@ -38,7 +43,7 @@ namespace GameEngine {
 		~FontManager();
 
 		// Creates and returns a vector of textures for each character in the text parameter
-		std::vector<CharTexture2D> createText(std::string text, glm::vec4 color, GLushort size);
+		TextData2D createText(std::string text, glm::vec4 color, GLushort size);
 
 	private:
 		unsigned short textSize;
@@ -47,6 +52,7 @@ namespace GameEngine {
 		Character characters[128];
 		CharTexture2D charTextures[128];
 		Texture2D textureAtlas;
+		int textHeight;
 	};
 }
 #endif

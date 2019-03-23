@@ -1,5 +1,5 @@
 #include "Serializable.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 Serializable::Serializable() {

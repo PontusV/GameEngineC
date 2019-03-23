@@ -6,7 +6,7 @@
 #include <sstream>
 #include <fstream>
 
-using namespace GameEngine;
+using namespace Core;
 
 
 ResourceManager::ResourceManager()
@@ -57,7 +57,7 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm:
 	return texture;
 }
 
-std::vector<CharTexture2D> ResourceManager::createText(std::string text, glm::vec4 color, Font font) {
+TextData2D ResourceManager::createText(std::string text, glm::vec4 color, Font font) {
 	FontManager& manager = loadFontManager(font.getFileName());
 	return manager.createText(text, color, font.getSize());
 }
@@ -109,7 +109,7 @@ Shader ResourceManager::loadShaderFromFile(const GLchar* vertexPath, const GLcha
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n" << vertexPath << "\n" << fragmentPath << std::endl;
 	}
 	const GLchar* vShaderCode = vertexCode.c_str();
 	const GLchar* fShaderCode = fragmentCode.c_str();
@@ -135,6 +135,7 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar* filePath)
 	glGenTextures(1, &texture.ID);
 
 	unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
+	texture.nrChannels = nrChannels;
 
 	if (nrChannels == 1) {
 		internalFormat = GL_RED;

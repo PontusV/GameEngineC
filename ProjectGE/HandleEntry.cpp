@@ -1,6 +1,6 @@
 #include "HandleEntry.h"
 #include "Handle.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 HandleEntry::HandleEntry() : nextFreeIndex(0), counter(0), active(false), endOfList(true), entry(nullptr) {}

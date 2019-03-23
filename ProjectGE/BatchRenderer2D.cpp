@@ -1,11 +1,12 @@
 #include "BatchRenderer2D.h"
 #include "Texture2D.h"
 #include "TransformMaths.h" //WIP not used atm
+#include "Window.h"
 
 #include <stdexcept>
 #include <cstddef>
 
-using namespace GameEngine;
+using namespace Core;
 
 
 static GLushort indices[RENDERER_INDICES_SIZE];
@@ -25,7 +26,7 @@ void initIndices() {
 	}
 }
 
-BatchRenderer2D::BatchRenderer2D() : initialized(false)
+BatchRenderer2D::BatchRenderer2D(Window* window) : initialized(false), window(window)
 {
 }
 
@@ -57,7 +58,7 @@ void BatchRenderer2D::cleanUp() {
 }
 
 BatchConfig& BatchRenderer2D::getConfig() {
-	return config;
+	return *config;
 }
 
 inline bool BatchRenderer2D::hasRoom() {
@@ -65,13 +66,7 @@ inline bool BatchRenderer2D::hasRoom() {
 	return (verticiesCount + vertices) <= RENDERER_MAX_VERTICES;
 }
 
-void BatchRenderer2D::init(BatchConfig config) {
-	this->config = config;
-
-	if (initialized)
-		return;
-	initialized = true;
-
+void BatchRenderer2D::init() {
 	indexCount = 0;
 	verticiesCount = 0;
 	glGetError(); //Clear errors
@@ -110,6 +105,7 @@ void BatchRenderer2D::init(BatchConfig config) {
 		std::cout << "Failed to create batch\n";
 	}
 	begun = false;
+	initialized = true;
 }
 
 void BatchRenderer2D::begin() {
@@ -118,16 +114,18 @@ void BatchRenderer2D::begin() {
 	buffer = (VertexData*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 }
 
-void BatchRenderer2D::submit(const Renderable2D& renderable) {
+void BatchRenderer2D::submit(const RenderCopy2D& renderable) {
 	if (!hasRoom())
 		throw std::length_error("Can not add anymore sprites to this batch!");
 
-	const glm::vec2& position = renderable.transform.getPosition();
-	const glm::vec2& size = renderable.size;
-	const glm::vec4& color = renderable.color;
-	//Add variable to change texture positions
 
-	const float& textureSlot = renderable.texture.ID == 0 ? 0 : (float)config.getTextureSlot(renderable.texture.ID);
+	const glm::vec2& position		= renderable.transform.getPosition();
+	const glm::vec2& size			= renderable.size;
+	const glm::vec4& color			= renderable.color;
+	const glm::vec2* uvPos			= renderable.texture.uvPos;
+	const glm::vec2& imageOffset	= renderable.imageOffset;
+
+	const float& textureSlot = renderable.texture.ID == 0 ? 0 : (float)config->getTextureSlot(renderable.texture.ID);
 
 	int r = (int)(color.x * 255.0f);
 	int g = (int)(color.y * 255.0f);
@@ -145,75 +143,99 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 	glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 	//*/
 
-	buffer[i].vertex = position;
+	//position = renderable.transform.getTruePosition(size);
+	//if (renderable.transform.getAnchor() == TransformAnchor::CENTER)
+	//	position = glm::vec2(position.x - (float)size.x/2, position.y - (float)size.y/2); // Image offset
+	//position += renderable.imagePosition;
+
+	//glm::vec2 imgPos = glm::vec2(size.x, size.y);
+
+	buffer[i].vertex = position + imageOffset;
 	buffer[i].color = c;
-	buffer[i].texture = renderable.texture.uvPos[0];
+	buffer[i].texture = uvPos[0];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x, position.y + size.y);
+	buffer[i].vertex = glm::vec2(position.x, position.y + size.y) + imageOffset;
 	buffer[i].color = c;
-	buffer[i].texture = renderable.texture.uvPos[1];
+	buffer[i].texture = uvPos[1];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x + size.x, position.y + size.y);
+	buffer[i].vertex = glm::vec2(position.x + size.x, position.y + size.y) + imageOffset;
 	buffer[i].color = c;
-	buffer[i].texture = renderable.texture.uvPos[2];
+	buffer[i].texture = uvPos[2];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x + size.x, position.y);
+	buffer[i].vertex = glm::vec2(position.x + size.x, position.y) + imageOffset;
 	buffer[i].color = c;
-	buffer[i].texture = renderable.texture.uvPos[3];
+	buffer[i].texture = uvPos[3];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-
+	segments.back().size += 6;
 	indexCount += 6;
 }
 
 void BatchRenderer2D::end() {
-	if (begun) {
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glUnmapBuffer(GL_ARRAY_BUFFER);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0); //Probably not needed
-		begun = false;
-	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	begun = false;
 }
 
 void BatchRenderer2D::flush() {
 	// Is there anything to draw?
 	if (indexCount == 0) return;
 
-	// Prepare transformations
+	for (BatchSegment& segment : segments) {
+		BatchConfig& config = segment.config;
 
-	const GLuint& shaderID = config.shaderID;
-	const GLfloat& rotate = config.rotation;
+		const GLuint& shaderID = config.shaderID;
+		const GLfloat& rotate = config.rotation;
 
-	glUseProgram(shaderID);
-	
-	if (rotate != 0) { //Check for rotation, WORK IN PROGRESS
-		glm::mat4 model;
-		model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUseProgram(shaderID);
+
+		/*if (rotate != 0) { //Check for rotation, WORK IN PROGRESS
+			glm::mat4 model;
+			model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 0.0f));
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		}*/
+
+		for (std::size_t i = 0; i < config.textureIDs.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, config.textureIDs[i]);
+		}
+
+		//-------------
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+		if (config.clipEnabled) {
+			glEnable(GL_SCISSOR_TEST);
+			glScissor((GLint)config.drawRect.x,(GLint)(window->getHeight() - config.drawRect.y - config.drawRect.w),(GLsizei)config.drawRect.z,(GLsizei)config.drawRect.w);
+		}
+
+		glDrawElements(GL_TRIANGLES, segment.size, GL_UNSIGNED_SHORT, (void*)(segment.startIndex * sizeof(GLushort)));
+		if (config.clipEnabled) {
+			glDisable(GL_SCISSOR_TEST);
+		}
+		config.textureIDs.clear();
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-
-	for (std::size_t i = 0; i < config.textureIDs.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, config.textureIDs[i]);
-	}
-
-	//-------------
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (void*)0);
 	indexCount = 0;
 	verticiesCount = 0;
-	config.textureIDs.clear();
+	segments.clear();
+}
 
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+void BatchRenderer2D::startNewSegment(BatchConfig config) {
+	BatchSegment segment{indexCount, 0, config};
+	segments.push_back(segment);
+	this->config = &segments.back().config;
+
+	if (!begun)	begin();
 }

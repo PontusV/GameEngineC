@@ -17,5 +17,5 @@ void main()
 	tID = textureID;
 	TexCoords = texture;
 	spriteColor = color;
-    gl_Position = projection * model * vec4(position.xy, 0.0, 1.0);
+	gl_Position = projection * model * vec4(position.xy, 0.0, 1.0);
 }

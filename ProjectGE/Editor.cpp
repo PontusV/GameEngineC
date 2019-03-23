@@ -1,6 +1,6 @@
 #include "Editor.h"
 using namespace LevelEditor;
-using namespace GameEngine;
+using namespace Core;
 
 Editor::Editor()
 {
@@ -16,7 +16,7 @@ Editor::~Editor()
 
 
 void Editor::initiate() {
-	engine.getGraphics().createWindow("Level Editor", 0, 0, 1680, 1050);
+	//engine.getGraphics().createWindow("Level Editor", 0, 0, 1680, 1050);
 	//KeyListener
 	engine.getInput().addKeyListener(this);
 	/*engine.getInput().addKeyBind(SDLK_ESCAPE, "Terminate");

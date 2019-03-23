@@ -49,9 +49,6 @@
     <Filter Include="Header Files\GameEngine\Systems\Graphics">
       <UniqueIdentifier>{45a5f0d1-2156-4711-ab5c-32812f34489c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\GameEngine\Systems\Handle">
-      <UniqueIdentifier>{b232774f-53f0-4689-851a-72c4a9c20661}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\GameEngine\Systems\Input">
       <UniqueIdentifier>{17eb9c8f-faef-43c8-adbd-c711bf4995de}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="Header Files\GameEngine\Utility">
       <UniqueIdentifier>{ad37fcfc-fdf5-404b-b55d-7e575f3b79a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameEngine\Utility\Maths">
+      <UniqueIdentifier>{e96e537d-3d6f-44bf-b91e-62927fdc1e82}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,9 +74,6 @@
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\GameEngine\Component\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="ArchetypeEntry.cpp">
-      <Filter>Source Files\GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
       <Filter>Source Files\GameEngine</Filter>
@@ -123,19 +120,10 @@
     <ClCompile Include="Physics.cpp">
       <Filter>Source Files\GameEngine</Filter>
     </ClCompile>
-    <ClCompile Include="Position.cpp">
-      <Filter>Source Files\GameEngine</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files\GameEngine</Filter>
     </ClCompile>
-    <ClCompile Include="SaveData.cpp">
-      <Filter>Source Files\GameEngine</Filter>
-    </ClCompile>
     <ClCompile Include="Serializable.cpp">
-      <Filter>Source Files\GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
       <Filter>Source Files\GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
@@ -171,6 +159,45 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Rect.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxComponent.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="FpsCounter.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildManager.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkEntityHandle.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentHandle.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicComponent.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="ParentEntity.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Panel.cpp">
+      <Filter>Source Files\GameEngine\Component\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceManager.h">
@@ -188,26 +215,8 @@
     <ClInclude Include="ComponentGroup.h">
       <Filter>Header Files\GameEngine\Component</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentType.h">
-      <Filter>Header Files\GameEngine\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Text.h">
-      <Filter>Header Files\GameEngine\Component\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>Header Files\GameEngine\Component\Types</Filter>
-    </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Header Files\GameEngine\Component\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>Header Files\GameEngine\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="SaveData.h">
-      <Filter>Header Files\GameEngine\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Position.h">
-      <Filter>Header Files\GameEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="EventListener.h">
       <Filter>Header Files\GameEngine\Event</Filter>
@@ -218,19 +227,10 @@
     <ClInclude Include="QuickSort.h">
       <Filter>Header Files\GameEngine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="TypeList.h">
-      <Filter>Header Files\GameEngine\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="TypeUtility.h">
-      <Filter>Header Files\GameEngine\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Serializable.h">
       <Filter>Header Files\GameEngine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Archetype.h">
-      <Filter>Header Files\GameEngine\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="ArchetypeEntry.h">
       <Filter>Header Files\GameEngine\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="Chunk.h">
@@ -250,18 +250,6 @@
     </ClInclude>
     <ClInclude Include="Graphics.h">
       <Filter>Header Files\GameEngine\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\GameEngine\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="HandleManager.h">
-      <Filter>Header Files\GameEngine\Systems\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="HandleEntry.h">
-      <Filter>Header Files\GameEngine\Systems\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="Handle.h">
-      <Filter>Header Files\GameEngine\Systems\Handle</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Header Files\GameEngine\Systems\Input</Filter>
@@ -319,6 +307,66 @@
     </ClInclude>
     <ClInclude Include="Texture2D.h">
       <Filter>Header Files\GameEngine\Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm.h">
+      <Filter>Header Files\GameEngine\Utility\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxComponent.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsCounter.h">
+      <Filter>Header Files\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Header Files\GameEngine\Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="InputEvent.h">
+      <Filter>Header Files\GameEngine\Systems\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files\GameEngine\Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactable.h">
+      <Filter>Header Files\GameEngine\Systems\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ParentEntity.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicComponent.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildManager.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Panel.h">
+      <Filter>Header Files\GameEngine\Component\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkEntityHandle.h">
+      <Filter>Header Files\GameEngine\Systems\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildListener.h">
+      <Filter>Header Files\GameEngine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentTypeInfo.h">
+      <Filter>Header Files\GameEngine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentHandle.h">
+      <Filter>Header Files\GameEngine\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

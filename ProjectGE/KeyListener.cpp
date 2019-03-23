@@ -1,5 +1,5 @@
 #include "KeyListener.h"
-using namespace GameEngine;
+using namespace Core;
 
 KeyListener::KeyListener() {}
 

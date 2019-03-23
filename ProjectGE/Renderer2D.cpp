@@ -4,12 +4,14 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
-using namespace GameEngine;
+using namespace Core;
 
-Renderer2D::Renderer2D()
+Renderer2D::Renderer2D(Window* window, std::size_t layerAmount)
 {
-	textShaderID = ResourceManager::getInstance().loadShader("resources/shaders/sprite.vs", "resources/shaders/sprite.fs").ID;
-	batches.reserve(MAX_BATCH_AMOUNT);
+	layers.reserve(layerAmount);
+	for (std::size_t i = 0; i < layerAmount; i++) {
+		layers.emplace_back(i, window);
+	}
 	push(glm::mat4(1.0f), true); //Push identity matrix
 }
 
@@ -32,50 +34,17 @@ void Renderer2D::pop() {
 	}
 }
 
-void Renderer2D::submit(const Renderable2D& renderable, const unsigned short layer) {
-	ConstBatchConfig config(layer, renderable.transform.getRotation(), renderable.texture.ID, renderable.shaderID);
-
-	for (std::size_t i = 0; i < MAX_BATCH_AMOUNT; i++) { //Check batch with matching config and if it has room
-		BatchRenderer2D& batch = batchStorage[i];
-		if (!batch.hasBegun()) { // Take unused
-			batch.init(config);
-
-			batch.begin();
-			batch.submit(renderable);
-			batches.push_back(&batch);
-			return;
-		} else if (batch.getConfig().compatible(config) && batch.hasRoom()) { // Match found
-			batch.submit(renderable);
-			return;
-		}
-	}
-	throw std::length_error("Not enough batches in storage!");
+void Renderer2D::submit(const Renderable2D& renderable, const unsigned short layerIndex) {
+	layers[layerIndex].submit(renderable);
 }
 
 /* Draws and clears list of batches. */
 void Renderer2D::flush() {
-	//SORT BATCHES BY LAYER
-	std::sort(batches.begin(), batches.end(), [](BatchRenderer2D* l, BatchRenderer2D* r) { //Highest layer infront
-		return l->getConfig().layer > r->getConfig().layer;
-	});
-	//End sumbit and flush
-	for (std::size_t i = 0; i < batches.size(); i++) {
-		batches[i]->end();
-		batches[i]->flush();
+	for (Layer& layer : layers) {
+		layer.flush();
 	}
-	//Clear active batch vec
-	batches.clear();
 }
 
-
-void Renderer2D::renderText(std::string text, Transform transform, Font font, glm::vec4 color, const unsigned int layer) {
-	Transform textTransform = transform; //Copy parent transform
-
-	std::vector<CharTexture2D> textTextures = ResourceManager::getInstance().createText(text, color, font);
-	for (CharTexture2D& c : textTextures) {
-		textTransform.setX(transform.getX() + c.offset.x);
-		textTransform.setY(transform.getY() + c.offset.y);
-		Renderable2D renderable{ c.texture, textTransform, c.texture.size, textShaderID, color };
-		submit(renderable, layer);
-	}
+void Renderer2D::renderText(std::string text, Transform transform, Font font, glm::vec4 color, bool clipEnabled, const glm::vec4 drawRect, const unsigned int layerIndex) {
+	layers[layerIndex].renderText(text, transform, font, color, clipEnabled, drawRect);
 }

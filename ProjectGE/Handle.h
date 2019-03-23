@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <tuple>
 
-namespace GameEngine {
+namespace Core {
 	class Handle {
 	public:
 		Handle();

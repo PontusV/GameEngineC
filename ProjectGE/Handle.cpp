@@ -1,6 +1,6 @@
 #include "Handle.h"
 #include "HandleManager.h"
-using namespace GameEngine;
+using namespace Core;
 
 
 Handle::Handle() : index(-1), counter(-1), type(HandleManager::INVALID_HANDLE) {}

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace GameEngine {
+namespace Core {
 	class Handle;
 
 	class HandleEntry {

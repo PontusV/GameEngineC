@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace GameEngine {
+namespace Core {
 	class EventListener;
 
 	class EventManager

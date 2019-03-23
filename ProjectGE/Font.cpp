@@ -1,12 +1,12 @@
 #include "Font.h"
 #include <stdexcept>
-using namespace GameEngine;
+using namespace Core;
 
 
-std::string Font::defaultAddress	= "G:/ttf/cambriab.ttf";
+const char* Font::defaultAddress	= "G:/ttf/cambriab.ttf";
 int Font::defaultSize				= 30;
 
-Font::Font(std::string fileName, int size) : fileName(fileName), size(size) {
+Font::Font(const char* fileName, int size) : fileName(fileName), size(size) {
 }
 
 Font::~Font() {
@@ -16,8 +16,8 @@ Font::Font() {
 	//Set a default font?
 }
 
-const std::string& Font::getFileName() const {
-	return fileName;
+const char* Font::getFileName() const {
+	return fileName.c_str();
 }
 
 const int& Font::getSize() const {

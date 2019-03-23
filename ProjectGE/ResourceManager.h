@@ -16,7 +16,7 @@
 #include "Font.h"
 #include <vector>
 
-namespace GameEngine {
+namespace Core {
 
 	class ResourceManager
 	{
@@ -28,7 +28,7 @@ namespace GameEngine {
 		}
 		Shader						loadShader(const GLchar* vShaderFile, const GLchar* fShaderFile);
 		Texture2D					loadTexture(const GLchar* file, glm::ivec2 size = glm::ivec2(0,0), glm::ivec2 uvStartPos = glm::ivec2(0,0));
-		std::vector<CharTexture2D>	createText(std::string text, glm::vec4 color, Font font);
+		TextData2D					createText(std::string text, glm::vec4 color, Font font);
 
 		// Properly de-allocates all loaded resources
 		void clear();

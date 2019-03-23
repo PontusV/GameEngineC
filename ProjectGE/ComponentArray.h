@@ -1,5 +1,6 @@
 #ifndef COMPONENT_ARRAY_H
 #define COMPONENT_ARRAY_H
+
 #include "Chunk.h"
 #include "Component.h"
 #include <vector>
@@ -10,24 +11,37 @@
 #include <memory>
 #include <map>
 
-namespace GameEngine {
-	template <typename T>
-	struct ChunkInfo {
-		ChunkInfo(T* data, IChunk* chunkPtr) : data(data), chunkPtr(chunkPtr) {}
-		T* data;
-		IChunk* chunkPtr;
+#include <iostream> //Test
 
-		ChunkInfo<T>& operator=(const ChunkInfo<T>& other) {
-			data = other.data;
+namespace Core {
+	struct ChunkInfo {
+		ChunkInfo(void* dataPtr, Chunk* chunkPtr) : dataPtr(dataPtr), chunkPtr(chunkPtr) {}
+		void* dataPtr;
+		Chunk* chunkPtr;
+
+		ChunkInfo& operator=(const ChunkInfo& other) {
+			dataPtr = other.dataPtr;
 			chunkPtr = other.chunkPtr;
 			return *this;
 		}
 	};
 
-	template <typename T>
-	class ComponentArray {
+	class IComponentArray {
 	public:
-		ComponentArray(std::initializer_list<ComponentTypeID> dependencies, std::initializer_list<ComponentTypeID> filter) : dependecyTypeIDs(dependencies), filterTypeIDs(filter) {
+		IComponentArray(ComponentTypeID typeID) : typeID(typeID) {}
+		ComponentTypeID getTypeID() { return typeID; }
+
+		virtual void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
+		virtual void chunkRemoved(std::size_t chunkID) = 0;
+
+	private:
+		ComponentTypeID typeID;
+	};
+
+	template <typename T>
+	class ComponentArray : public IComponentArray {
+	public:
+		ComponentArray(std::initializer_list<ComponentTypeID> dependencies, std::initializer_list<ComponentTypeID> filter) : IComponentArray(T::TYPE_ID), dependecyTypeIDs(dependencies), filterTypeIDs(filter) {
 			for (const ComponentTypeID& fTypeID : filter) {
 				if (T::TYPE_ID == fTypeID)
 					throw std::invalid_argument("You can not make a ComponentArray<T> filter the ComponentTypeID from T.");
@@ -39,11 +53,12 @@ namespace GameEngine {
 		}
 		~ComponentArray() {
 			data.clear();
+			chunkMap.clear();
 		}
 
 		std::size_t size() {
 			std::size_t sizeSum = 0;
-			for (ChunkInfo<T>& info : data) {
+			for (ChunkInfo& info : data) {
 				sizeSum += info.chunkPtr->getSize();
 			}
 			return sizeSum;
@@ -51,10 +66,23 @@ namespace GameEngine {
 
 		T& get(std::size_t index) {
 			std::size_t i = index;
-			for (ChunkInfo<T>& info : data) {
+			for (ChunkInfo& info : data) {
 				std::size_t size = info.chunkPtr->getSize();
 				if (i < size)
-					return info.data[i];
+					return static_cast<T*>(info.dataPtr)[i];
+				else
+					i -= (size);
+
+			}
+			throw std::out_of_range("Index out of range.");
+		}
+
+		Entity& getEntity(std::size_t index) {
+			std::size_t i = index;
+			for (ChunkInfo& info : data) {
+				std::size_t size = info.chunkPtr->getSize();
+				if (i < size)
+					return info.chunkPtr->getEntityArrayPtr()[i];
 				else
 					i -= (size);
 
@@ -66,13 +94,11 @@ namespace GameEngine {
 			return get(index);
 		}
 
-		template <typename... Ts>
-		void chunkAdded(Chunk<Ts...>* chunk) {
-			if (isFiltered({ Ts::TYPE_ID... })) return;
-			//Map ID to ChunkArrayInfo index
+		void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) {
+			if (isFiltered(chunkTypes)) return;
+
 			chunkMap.insert(std::make_pair(chunk->getID(), data.size()));
-			data.emplace_back(chunk->getArrayPtr<T>(), chunk);
-			//std::cout << "ComponentArray<" << typeid(T).name() << ">\tChunk was added: ID = " << chunk->getID() << "\n";
+			data.emplace_back(chunk->getComponentArrayPtr<T>(), chunk);
 		}
 
 		void chunkRemoved(std::size_t chunkID) {
@@ -80,14 +106,17 @@ namespace GameEngine {
 			if (iterator == chunkMap.end()) return;
 
 			std::size_t index = (*iterator).second;
-			std::iter_swap(data.begin() + index, data.end() - 1);
-			chunkMap.at(data[index].chunkPtr->getID()) = index; //Remap swapped object
+
+			if (index < data.size()-1) {
+				std::iter_swap(data.begin() + index, data.end() - 1);
+				chunkMap.at(data[index].chunkPtr->getID()) = index; //Remap swapped object
+			}
+			chunkMap.erase(iterator);
 			data.pop_back();
-			//std::cout << "ComponentArray<" << typeid(T).name() << ">\tChunk was removed: ID = " << chunkID << " : " << data.size() << "\n";
 		}
 
 	private:
-		bool isFiltered(std::initializer_list<ComponentTypeID> typeIDs) {
+		bool isFiltered(std::vector<ComponentTypeID> typeIDs) {
 			std::size_t count = 0;
 			for (const ComponentTypeID& typeID : typeIDs) {
 				for (ComponentTypeID& filterID : filterTypeIDs) {
@@ -105,10 +134,11 @@ namespace GameEngine {
 			return false;
 		}
 
-		std::vector<ChunkInfo<T>> data;
+		std::vector<ChunkInfo> data;
+		std::map <std::size_t, std::size_t> chunkMap; //ID, index
+
 		std::vector<ComponentTypeID> dependecyTypeIDs;
 		std::vector<ComponentTypeID> filterTypeIDs;
-		std::map <std::size_t, std::size_t> chunkMap; //ID, index
 	};
 }
 

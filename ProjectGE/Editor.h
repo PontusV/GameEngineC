@@ -5,7 +5,7 @@
 
 namespace LevelEditor {
 	class Editor :
-		public GameEngine::KeyListener
+		public Core::KeyListener
 	{
 	public:
 		Editor();
@@ -14,7 +14,7 @@ namespace LevelEditor {
 		void keyReleased(std::string buttonName);
 	private:
 		void initiate();
-		GameEngine::Engine engine;
+		Core::Engine engine;
 	};
 }
 #endif

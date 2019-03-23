@@ -23,7 +23,7 @@
     <ProjectGuid>{743277F7-3306-46A7-8E5E-755E8CE45DBD}</ProjectGuid>
     <RootNamespace>ProjectGE</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>ProjectGE</ProjectName>
+    <ProjectName>Core</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -93,7 +93,7 @@
       <BasicRuntimeChecks>StackFrameRuntimeCheck</BasicRuntimeChecks>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
@@ -124,7 +124,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -149,7 +149,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Archetype.cpp" />
-    <ClCompile Include="ArchetypeEntry.cpp" />
+    <ClCompile Include="BoxComponent.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="ChildCollection.cpp" />
+    <ClCompile Include="ChildManager.cpp" />
+    <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="ChunkEntityHandle.cpp" />
+    <ClCompile Include="ComponentHandle.cpp" />
+    <ClCompile Include="FpsCounter.cpp" />
+    <ClCompile Include="GraphicComponent.cpp" />
+    <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="ParentEntity.cpp" />
+    <ClCompile Include="Rect.cpp" />
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="BatchRenderer2D.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -175,20 +187,33 @@
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics.cpp" />
-    <ClCompile Include="Position.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Serializable.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Text.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithm.h" />
     <ClInclude Include="Archetype.h" />
-    <ClInclude Include="ArchetypeEntry.h" />
     <ClInclude Include="BatchConfig.h" />
+    <ClInclude Include="BoxComponent.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="ChildCollection.h" />
+    <ClInclude Include="ChildListener.h" />
+    <ClInclude Include="ChildManager.h" />
+    <ClInclude Include="ChunkEntityHandle.h" />
+    <ClInclude Include="ComponentHandle.h" />
+    <ClInclude Include="ComponentTypeInfo.h" />
+    <ClInclude Include="FpsCounter.h" />
+    <ClInclude Include="GraphicComponent.h" />
+    <ClInclude Include="InputEvent.h" />
+    <ClInclude Include="Interactable.h" />
+    <ClInclude Include="Layer.h" />
+    <ClInclude Include="Panel.h" />
+    <ClInclude Include="ParentEntity.h" />
+    <ClInclude Include="Rect.h" />
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="BatchRenderer2D.h" />
     <ClInclude Include="Chunk.h" />
@@ -196,7 +221,6 @@
     <ClInclude Include="ComponentArray.h" />
     <ClInclude Include="ComponentArrayManager.h" />
     <ClInclude Include="ComponentGroup.h" />
-    <ClInclude Include="ComponentType.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Entity.h" />
@@ -211,29 +235,21 @@
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Handle.h" />
-    <ClInclude Include="HandleEntry.h" />
-    <ClInclude Include="HandleManager.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="KeyListener.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Physics.h" />
-    <ClInclude Include="Position.h" />
     <ClInclude Include="QuickSort.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="resource2.h" />
     <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="SaveData.h" />
     <ClInclude Include="Serializable.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Text.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="TypeList.h" />
-    <ClInclude Include="TypeUtility.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

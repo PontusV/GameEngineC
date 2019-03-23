@@ -6,48 +6,40 @@
 #include <vector>
 #include <initializer_list>
 
-namespace GameEngine {
+namespace Core {
 	/* Notifies all ComponentArrays of creation and deletion of Chunks */
-	template <typename T>
 	class ComponentArrayManager {
 	public:
-		static ComponentArrayManager<T>& getInstance() {
+		static ComponentArrayManager& getInstance() {
 			static ComponentArrayManager instance;
 			return instance;
 		}
 		ComponentArrayManager() {}
 		~ComponentArrayManager() {
+			for (IComponentArray* cmpArray : arrays)
+				delete cmpArray;
 		}
 
-		ComponentArray<T>& createComponentArray() {
-			return createComponentArray({}, {});
+		template<typename T>
+		ComponentArray<T>* createComponentArray(std::initializer_list<ComponentTypeID> required = {}, std::initializer_list<ComponentTypeID> ignoreables = {}) {
+			ComponentArray<T>* cmpArray = new ComponentArray<T>(required, ignoreables);
+			arrays.push_back(cmpArray);
+			return cmpArray;
 		}
-		ComponentArray<T>& createComponentArray(std::initializer_list<ComponentTypeID> required) {
-			return createComponentArray(required, {});
-		}
-		ComponentArray<T>& createComponentArray(std::initializer_list<ComponentTypeID> required, std::initializer_list<ComponentTypeID> ignoreables) {
-			arrays.emplace_back(std::make_shared<ComponentArray<T>>(required, ignoreables));
-			return *arrays.back();
-		}
-		//--
-		template <typename... Ts>
-		void chunkAdded(Chunk<Ts...>* chunk) {
-			//std::cout << "ComponentArrayManager<" << typeid(T).name() << ">\tChunk was added: ID = " << chunk.getID() << "\n";
-			for (std::shared_ptr<ComponentArray<T>> a : arrays) {
-				a->chunkAdded(chunk);
+
+		void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) {
+			for (IComponentArray* a : arrays) {
+				a->chunkAdded(chunk, chunkTypes);
 			}
 		}
 
 		void chunkRemoved(std::size_t chunkID) {
-			//std::cout << "ComponentArrayManager<" << typeid(T).name() << ">\tChunk was removed: ID = " << chunkID << "\n";
-			for (std::shared_ptr<ComponentArray<T>> a : arrays) {
+			for (IComponentArray* a : arrays) {
 				a->chunkRemoved(chunkID);
 			}
 		}
-		//--
 	private:
-
-		std::vector< std::shared_ptr<ComponentArray<T>> > arrays; //Fix move in ComponentArray and switch from pointers to the real thing. ChunkPtr inside ComponentArray becomes invalid when ComponentArray is moved
+		std::vector<IComponentArray*> arrays;
 	};
 }
 #endif

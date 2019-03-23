@@ -1,6 +1,6 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
-namespace GameEngine {
+namespace Core {
 	class Physics
 	{
 	public:

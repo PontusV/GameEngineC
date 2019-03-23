@@ -2,9 +2,10 @@
 #include "Engine.h"
 #include "Entity.h"
 #include "Transform.h"
-using namespace GameEngine;
+using namespace Core;
 
-Text::Text(const std::string text, std::string fontAddress, int fontSize, glm::vec4 color) : text(text), font(fontAddress, fontSize), color(color) {
+Text::Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex) : GraphicComponent(layerIndex), font(fontAddress, fontSize), color(color) {
+	setText(text);
 } //Constructor
 
 /* Used when loading this component from instream. Passes the instream to the Component part. */
@@ -20,13 +21,18 @@ Text::Text() {
 Text::~Text() {
 }
 
-std::string& Text::getText() {
-	return text;
+const char* Text::getText() const {
+	return text.c_str();
 }
-Font& Text::getFont() {
+
+void Text::setText(std::string nText) {
+	text = nText;
+}
+
+const Font& Text::getFont() const {
 	return font;
 }
-glm::vec4& Text::getColor() {
+const glm::vec4& Text::getColor() const {
 	return color;
 }
 
