@@ -18,14 +18,9 @@ namespace Core {
 		static constexpr ComponentTypeID TYPE_ID = 1;
 
 		Transform(float x, float y, float z = 0.0f, TransformAnchor anchorPoint = TransformAnchor::CENTER, float rotation = 0.0f, float scale = 1.0f);
-		Transform(std::istream& is);
 		Transform();
 		~Transform();
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
-
-		//Save & Load
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
 
 		//Get & Set
 		const float&		getRotation() const;
@@ -41,15 +36,19 @@ namespace Core {
 		void				setAnchor(TransformAnchor anchor);
 		const glm::vec2&	getAnchor() const;
 
-		// Test
 		glm::vec2			calculateOffset(const glm::vec2& size) const;
+
+		// Serializable
+		virtual void		serialize(std::ostream& os) const;
+		virtual void		deserialize(std::istream& is);
+
 	private:
 		glm::vec2	position;
 		float		z;			//Depth for drawing order
 		float		rotation;
 		float		scale;
 
-		glm::vec2	anchor; // Determines where the position is relative to the components
+		glm::vec2	anchor; // Determines where the position is relative to BoxComponents
 	};
 }
 #endif

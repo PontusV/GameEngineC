@@ -26,7 +26,9 @@ namespace Core {
 		template <typename... Ts> bool		addEntity(Entity entity, Ts*... components);
 		void								removeEntity(Entity entity, bool destroy = true);
 
+		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		template <typename T> T*			getComponent(Entity entity);
+		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		Component*							getComponent(Entity entity, ComponentTypeID id);
 		template <typename T> void			addComponent(Entity entity, T* component);
 		template <typename T> void			removeComponent(Entity entity);

@@ -1,7 +1,9 @@
 #include "Button.h"
-#include "Chunk.h"
 
 using namespace Core;
+
+#include "ComponentLoader.h"
+REGISTER_LOADABLE_COMPONENT(Button);
 
 
 Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : images{defaultImage, pressedImage, hoverImage} {
@@ -9,10 +11,6 @@ Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : image
 
 Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, unsigned int width, unsigned int height) : images{ Image(defaultImage, 0, width, height), Image(pressedImage, 0, width, height), Image(hoverImage, 0, width, height) } {
 } // Constructor
-
-Button::Button(std::istream& is) {
-	deserialize(is);
-} // Load Constructor
 
 Button::~Button() {
 } // Destructor
@@ -74,10 +72,25 @@ void Button::setButtonReleaseCallback(ui::LeftClickReleaseFun fun) {
 	Interactable::setLeftClickReleasedCallback(fun);
 }
 
-void Button::serialize(std::ostream& os) const {
+// ------------------------------- Serializable ----------------------------------------
 
+void Button::serialize(std::ostream& os) const {
+	Component::serialize(os);
+
+	images[0].serialize(os);
+	images[1].serialize(os);
+	images[2].serialize(os);
 }
 
 void Button::deserialize(std::istream& is) {
+	Component::deserialize(is);
 
+	ComponentTypeID typeID;
+
+	is.read((char*)&typeID, sizeof(ComponentTypeID));
+	images[0].deserialize(is);
+	is.read((char*)&typeID, sizeof(ComponentTypeID));
+	images[1].deserialize(is);
+	is.read((char*)&typeID, sizeof(ComponentTypeID));
+	images[2].deserialize(is);
 }

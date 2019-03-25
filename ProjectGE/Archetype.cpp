@@ -120,7 +120,7 @@ std::vector<ComponentDataBlock> Archetype::getComponentDataBlocks(Entity entity)
 
 void Archetype::createChunk() {
 	chunks.push_back(std::make_shared<Chunk>(types));
-	ComponentArrayManager::getInstance().chunkAdded(chunks.back().get(), getTypeIDs());
+	ComponentArrayManager::getInstance().chunkAdded(chunks.back(), getTypeIDs());
 }
 
 void Archetype::removeChunk(std::size_t index) {

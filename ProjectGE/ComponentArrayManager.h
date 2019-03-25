@@ -5,6 +5,7 @@
 #include "ComponentArray.h"
 #include <vector>
 #include <initializer_list>
+#include <memory>
 
 namespace Core {
 	/* Notifies all ComponentArrays of creation and deletion of Chunks */
@@ -27,7 +28,7 @@ namespace Core {
 			return cmpArray;
 		}
 
-		void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) {
+		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
 			for (IComponentArray* a : arrays) {
 				a->chunkAdded(chunk, chunkTypes);
 			}
@@ -38,6 +39,7 @@ namespace Core {
 				a->chunkRemoved(chunkID);
 			}
 		}
+
 	private:
 		std::vector<IComponentArray*> arrays;
 	};

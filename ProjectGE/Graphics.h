@@ -19,23 +19,23 @@ namespace Core {
 	class Renderer2D;
 
 	struct RenderableRects : public ComponentGroup<Transform, Rect> {
-		ComponentArray<Transform>& transforms = getComponentArray<Transform>();
-		ComponentArray<Rect>& rects = getComponentArray<Rect>();
+		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+		ComponentArray<Rect>&		rects		= getComponentArray<Rect>();
 	};
 
 	struct RenderableImages : public ComponentGroup<Transform, Image> {
-		ComponentArray<Transform>& transforms = getComponentArray<Transform>();
-		ComponentArray<Image>& images = getComponentArray<Image>();
+		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+		ComponentArray<Image>&		images		= getComponentArray<Image>();
 	};
 
 	struct RenderableTexts : public ComponentGroup<Transform, Text> {
-		ComponentArray<Transform>& transforms = getComponentArray<Transform>();
-		ComponentArray<Text>& texts = getComponentArray<Text>();
+		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+		ComponentArray<Text>&		texts		= getComponentArray<Text>();
 	};
 
 	struct PanelGroup : public ComponentGroup<Transform, Panel> {
-		ComponentArray<Transform>& transforms = getComponentArray<Transform>();
-		ComponentArray<Panel>& panels = getComponentArray<Panel>();
+		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+		ComponentArray<Panel>&		panels		= getComponentArray<Panel>();
 	};
 
 	class Graphics {

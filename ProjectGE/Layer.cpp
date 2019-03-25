@@ -17,8 +17,14 @@ Layer::~Layer()
 }
 
 void Layer::submit(const Renderable2D& renderable) {
-	renderables[renderablesSize] = renderable;
-	renderablesSize++;
+	if (renderablesSize < MAX_RENDERABLES_PER_LAYER) {
+		renderables[renderablesSize] = renderable;
+		renderablesSize++;
+	}
+	else {
+		std::cout << "Layer renderable buffer is full. Cannot add any more renderables!\n";
+		throw std::invalid_argument("Layer renderable buffer is full. Cannot add any more renderables!");
+	}
 }
 
 void Layer::flush() {

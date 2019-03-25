@@ -14,18 +14,18 @@ namespace Core {
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Panel(unsigned int width, unsigned int height);
-		Panel(std::istream& is);
-		Panel() {}
+		Panel();
 		~Panel();
-		// Save & Load operator
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
 
-		std::vector<GraphicComponent*> getGraphicChildren();
-
-	public:
 		void init();
 		void end();
+
+		std::vector<GraphicComponent*> getGraphicChildren();
+		
+		// Serializable
+		virtual void		serialize(std::ostream& os) const;
+		virtual void		deserialize(std::istream& is);
+
 	private:
 		ComponentHandle transformHandle;
 		ChildCollection<GraphicComponent> graphicChildren;

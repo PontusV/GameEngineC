@@ -27,12 +27,12 @@ const int& Font::getSize() const {
 
 /* Save */
 void Font::serialize(std::ostream& os) const {
-	os.write(fileName.c_str(), fileName.size() + 1);	//Write name
-	os.write((char*)&size, sizeof(decltype(size)));		//Write size
+	os.write(fileName.c_str(), fileName.size() + 1);	// File name
+	os.write((char*)&size, sizeof(size));				// Text size
 }
 
 /* Load */
 void Font::deserialize(std::istream& is) {
-	std::getline(is, fileName, '\0');					//Read name
-	is.read((char*)&size, sizeof(decltype(size)));		//Read size
+	std::getline(is, fileName, '\0');					// File name
+	is.read((char*)&size, sizeof(size));				// Text size
 }

@@ -36,3 +36,18 @@ void GraphicComponent::disableClipping() {
 bool GraphicComponent::isClipEnabled() {
 	return clipEnabled;
 }
+
+// ------------------------------- Serializable ----------------------------------------
+
+void GraphicComponent::serialize(std::ostream& os) const {
+	BoxComponent::serialize(os);
+
+
+	os.write((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
+}
+
+void GraphicComponent::deserialize(std::istream& is) {
+	BoxComponent::deserialize(is);
+
+	is.read((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
+}

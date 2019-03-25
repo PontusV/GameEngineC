@@ -12,16 +12,12 @@ namespace Core {
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		ParentEntity(Entity parent);
-		ParentEntity(std::istream& is);
-		ParentEntity() {}
+		ParentEntity();
 		~ParentEntity();
 
 		void	setParent(Entity parent);
 		Entity	getParent() const;
 
-		// Save & Load operator
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
 	private:
 		Entity parent;
 	};

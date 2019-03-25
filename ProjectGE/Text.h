@@ -14,7 +14,6 @@ namespace Core {
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex = 0);
-		Text(std::istream& is);
 		Text();
 		~Text();
 
@@ -24,9 +23,10 @@ namespace Core {
 
 		void setText(std::string text);
 
-		//Save & Load operator
-		void serialize(std::ostream &os) const;
-		void deserialize(std::istream &is);
+		// Serializable
+		virtual void		serialize(std::ostream& os) const;
+		virtual void		deserialize(std::istream& is);
+
 	private:
 		std::string		text;
 		Font			font;	//Font address + size

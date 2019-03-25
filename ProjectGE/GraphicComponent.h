@@ -19,8 +19,14 @@ namespace Core {
 		void				enableClipping();
 		void				disableClipping();
 		bool				isClipEnabled();
+		
+		// Serializable
+		virtual void		serialize(std::ostream& os) const;
+		virtual void		deserialize(std::istream& is);
+
 	protected:
 		GraphicComponent(unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
+
 	private:
 		unsigned short	layerIndex;
 		bool			clipEnabled;

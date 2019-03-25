@@ -5,13 +5,14 @@
 #include "Transform.h"
 
 using namespace Core;
-#include <iostream>
+
+#include "ComponentLoader.h"
+REGISTER_LOADABLE_COMPONENT(Image);
+
 
 Image::Image(const char* fileName, unsigned short layerIndex, unsigned int width, unsigned int height) : GraphicComponent(layerIndex, width, height), fileName(fileName) {
 } // Constructor
-Image::Image(std::istream& is) {
-	deserialize(is);
-}
+
 Image::Image() {
 } 
 
@@ -43,16 +44,15 @@ const char* Image::getFileName() const {
 	return fileName.c_str();
 }
 
-// Save & Load operator
-void Image::serialize(std::ostream& os) const {
-	//Save component ID; loaded in Graphics.cpp to identify which kind of Component to load
-	os.write((char*)&TYPE_ID, sizeof(decltype(TYPE_ID)));
-	//---------------------
+// ------------------------------- Serializable ----------------------------------------
 
-	//Save address to image
-	os.write(fileName.c_str(), fileName.size() + 1);
+void Image::serialize(std::ostream& os) const {
+	GraphicComponent::serialize(os);
+
+	os.write(fileName.c_str(), fileName.size() + 1);		// File name
 }
 void Image::deserialize(std::istream& is) {
-	//Load address to image
-	std::getline(is, fileName, '\0');
+	GraphicComponent::deserialize(is);
+
+	std::getline(is, fileName, '\0');						// File name
 }

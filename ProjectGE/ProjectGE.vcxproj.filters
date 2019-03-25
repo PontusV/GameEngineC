@@ -198,6 +198,9 @@
     <ClCompile Include="ChildCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentLoader.cpp">
+      <Filter>Source Files\GameEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceManager.h">
@@ -367,6 +370,9 @@
     </ClInclude>
     <ClInclude Include="ComponentHandle.h">
       <Filter>Header Files\GameEngine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentLoader.h">
+      <Filter>Header Files\GameEngine\Systems\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,26 +2,21 @@
 #include "GraphicComponent.h"
 #include "ChildManager.h"
 #include "Transform.h"
+
 using namespace Core;
+
+#include "ComponentLoader.h"
+REGISTER_LOADABLE_COMPONENT(Panel);
 
 
 Panel::Panel(unsigned int width, unsigned int height) : BoxComponent(width, height) {
 }
 
-Panel::Panel(std::istream& is) {}
-
+Panel::Panel() {
+}
 
 Panel::~Panel()
 {
-}
-
-// Save & Load operator
-void Panel::serialize(std::ostream& os) const {
-
-}
-
-void Panel::deserialize(std::istream& is) {
-
 }
 
 void Panel::init() {
@@ -42,4 +37,14 @@ void Panel::end() {
 
 std::vector<GraphicComponent*> Panel::getGraphicChildren() {
 	return graphicChildren.getCollection();
+}
+
+// ------------------------------- Serializable ----------------------------------------
+
+void Panel::serialize(std::ostream& os) const {
+	BoxComponent::serialize(os);
+}
+
+void Panel::deserialize(std::istream& is) {
+	BoxComponent::deserialize(is);
 }

@@ -17,6 +17,7 @@ namespace Core {
 
 		template<typename T> T*						getComponent();
 		template<typename T, class... Args> void	addComponent(Args&&... args);
+		template<typename T> void					addComponent(T* component);
 		template<typename T> void					removeComponent();
 		void										destroy();
 
@@ -46,6 +47,13 @@ namespace Core {
 	void EntityHandle::addComponent(Args&&... args) {
 		if (auto spt = manager.lock())
 			return spt->addComponent(entity, new T(args...));
+		throw std::invalid_argument("The EntityHandle is no longer valid! EntityHandle does not have a valid pointer to an EntityManager.");
+	}
+
+	template<typename T>
+	void EntityHandle::addComponent(T* component) {
+		if (auto spt = manager.lock())
+			return spt->addComponent(entity, component);
 		throw std::invalid_argument("The EntityHandle is no longer valid! EntityHandle does not have a valid pointer to an EntityManager.");
 	}
 

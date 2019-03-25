@@ -2,9 +2,10 @@
 
 using namespace Core;
 
+#include "ComponentLoader.h"
+REGISTER_LOAD_COMPONENT_IGNORE(ChildManager);
 
-ChildManager::ChildManager(std::istream& is) {
-}
+
 ChildManager::~ChildManager()
 {
 }
@@ -57,13 +58,4 @@ ChunkEntityHandle* ChildManager::getChild(std::size_t index) {
 
 std::vector<ChunkEntityHandle>& ChildManager::getChildren() {
 	return children;
-}
-
-// Save & Load operator
-void ChildManager::serialize(std::ostream& os) const {
-
-}
-
-void ChildManager::deserialize(std::istream& is) {
-
 }

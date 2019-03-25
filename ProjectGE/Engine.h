@@ -17,24 +17,33 @@ namespace Core {
 	public:
 		Engine();
 		~Engine();
-		int initiate();
-		void terminate();
 
-		//Level
-		LevelPtr createLevel();
-		void saveLevel();
-		void loadLevel();
-		LevelPtr getCurrentLevel();
+		// Game loop
+		int			initiate();
+		void		terminate();
 
-		//Return system for testing in main.cpp (Should be removed later)
-		Input& getInput();
-		Graphics& getGraphics();
+		// Level
+		LevelPtr	createLevel();
+		void		setCurrentLevel(LevelPtr level);
+		LevelPtr	getCurrentLevel();
+		/* Saves current level to file */
+		void		saveLevel(const char* fileName);
+		/* Loads level from file and returns new level */
+		LevelPtr	loadLevel(const char* fileName);
+
+		// Systems
+		Input&		getInput();
+		Graphics&	getGraphics();
+
 	private:
-		//
-		LevelPtr currentLevel;
-		bool running;
+		// Game loop
+		bool		running;
 
-		//Main Systems
+		// Level
+		LevelPtr	currentLevel;
+		LevelPtr	debugLevel;		// Where you put entities showing debugging data. These will not be loaded/saved
+
+		// Main Systems
 		Graphics*	graphics;
 		Input*		input;
 		Physics*	physics;

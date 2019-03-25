@@ -14,7 +14,6 @@ namespace Core {
 		static constexpr ComponentTypeID TYPE_ID = 7;
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
-		ChildManager(std::istream& is);
 		ChildManager() {}
 		~ChildManager();
 
@@ -27,10 +26,6 @@ namespace Core {
 
 		void registerListener(ChildListener* listener);
 		void unregisterListener(ChildListener* listener);
-
-		// Save & Load operator
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
 
 	private:
 		std::vector<ChunkEntityHandle> children;

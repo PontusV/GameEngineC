@@ -28,10 +28,10 @@ void Editor::initiate() {
 }
 void Editor::keyPressed(std::string buttonName) {
 	if (buttonName == "Save") {
-		engine.saveLevel();
+		engine.saveLevel("level.dat");
 	}
 	if (buttonName == "Load") {
-		engine.loadLevel();
+		engine.loadLevel("level.dat");
 	}
 }
 void Editor::keyReleased(std::string buttonName) {

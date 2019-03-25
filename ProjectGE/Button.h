@@ -25,7 +25,6 @@ namespace Core {
 		// Constructor / Destructor
 		Button(Image defaultImage, Image pressedImage, Image hoverImage);																// Different sized images
 		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, unsigned int width, unsigned int height);	// Same sized images
-		Button(std::istream& is);
 		Button() {}
 		~Button();
 		//

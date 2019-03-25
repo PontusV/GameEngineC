@@ -15,7 +15,6 @@ namespace Core {
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Image(const char* fileName, unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
-		Image(std::istream& is);
 		Image();
 
 		~Image();
@@ -25,11 +24,11 @@ namespace Core {
 		void				setTexture(const char* fileName, Texture2D& texture);
 		const char*			getFileName() const;
 
-		// Save & Load operator
+		// Serializable
 		void serialize(std::ostream& os) const;
 		void deserialize(std::istream& is);
-	private:
 
+	private:
 		std::string 	fileName;
 		Texture2D		texture;
 	};

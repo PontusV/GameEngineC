@@ -7,15 +7,14 @@
 #include <cstddef>
 #include <stdexcept>
 #include <algorithm>
-#include <array>
-#include <memory>
 #include <map>
+#include <memory>
 
 #include <iostream> //Test
 
 namespace Core {
 	struct ChunkInfo {
-		ChunkInfo(void* dataPtr, Chunk* chunkPtr) : dataPtr(dataPtr), chunkPtr(chunkPtr) {}
+		ChunkInfo(void* dataPtr, std::shared_ptr<Chunk> chunkPtr) : dataPtr(dataPtr), chunkPtr(chunkPtr.get()) {}
 		void* dataPtr;
 		Chunk* chunkPtr;
 
@@ -31,7 +30,7 @@ namespace Core {
 		IComponentArray(ComponentTypeID typeID) : typeID(typeID) {}
 		ComponentTypeID getTypeID() { return typeID; }
 
-		virtual void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
+		virtual void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
 		virtual void chunkRemoved(std::size_t chunkID) = 0;
 
 	private:
@@ -94,7 +93,7 @@ namespace Core {
 			return get(index);
 		}
 
-		void chunkAdded(Chunk* chunk, std::vector<ComponentTypeID> chunkTypes) {
+		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
 			if (isFiltered(chunkTypes)) return;
 
 			chunkMap.insert(std::make_pair(chunk->getID(), data.size()));
@@ -135,7 +134,7 @@ namespace Core {
 		}
 
 		std::vector<ChunkInfo> data;
-		std::map <std::size_t, std::size_t> chunkMap; //ID, index
+		std::map<std::size_t, std::size_t> chunkMap; //ID, index
 
 		std::vector<ComponentTypeID> dependecyTypeIDs;
 		std::vector<ComponentTypeID> filterTypeIDs;

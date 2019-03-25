@@ -11,14 +11,15 @@ namespace Core {
 		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Rect(int width, int height, glm::vec4 color, unsigned short layerIndex = 0);
-		Rect() {}
+		Rect();
 		~Rect();
 
 		const glm::vec4& getColor() const;
 
-		// Save & Load operator
-		void serialize(std::ostream &os) const;
-		void deserialize(std::istream &is);
+		// Serializable
+		virtual void		serialize(std::ostream& os) const;
+		virtual void		deserialize(std::istream& is);
+
 	private:
 		glm::vec4 color;
 	};

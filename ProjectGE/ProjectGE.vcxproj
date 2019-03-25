@@ -159,6 +159,7 @@
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GraphicComponent.cpp" />
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="ComponentLoader.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParentEntity.cpp" />
     <ClCompile Include="Rect.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="InputEvent.h" />
     <ClInclude Include="Interactable.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="ComponentLoader.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParentEntity.h" />
     <ClInclude Include="Rect.h" />

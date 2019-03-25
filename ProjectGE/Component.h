@@ -16,28 +16,25 @@ namespace Core {
 	public:
 		virtual ~Component();
 
-		virtual const ComponentTypeID getTypeID() const = 0;
-		Component& operator=(const Component& other)
-		{
-			owner = other.owner;
-			return *this;
-		}
+		virtual const ComponentTypeID	getTypeID() const = 0;
 
-		void setOwner(ChunkEntityHandle owner)	{ this->owner = owner; }
-
-		void destroy() { destruct = true; }
-		bool isDestroyed() { return destruct; }
+		void			setOwner(ChunkEntityHandle owner);
+		void			destroy();
+		bool			isDestroyed();
 
 		// The components that need this will override
-		virtual void init() {}; // Called after setOwner()
-		virtual void end() {}; // Called before component values are copied in a move
+		virtual void	init() {};	// Called after setOwner()
+		virtual void	end() {};	// Called before component values are copied in a move
+
+		// Serializable
+		virtual void	serialize(std::ostream& os) const;
+		virtual void	deserialize(std::istream& is);
+
 	protected:
-		// All the data needed to get the components from the same entity
 		ChunkEntityHandle owner;
+
 	private:
 		bool destruct = false;
-		//ComponentHandle handle;
-		//Handle handle;
 	};
 }
 
