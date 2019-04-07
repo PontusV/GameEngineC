@@ -5,9 +5,6 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Panel);
-
 
 Panel::Panel(unsigned int width, unsigned int height) : BoxComponent(width, height) {
 }
@@ -20,24 +17,15 @@ Panel::~Panel()
 }
 
 void Panel::init() {
-	ChildManager* manager = owner.getComponent<ChildManager>();
-	if (manager) {
-		manager->registerListener(&graphicChildren);
-	}
-
-	transformHandle = ComponentHandle(owner, Transform::TYPE_ID);
+	//childGraphics.registerListener(owner);
 }
 void Panel::end() {
-	// Remove soon to be invalid pointer from ChildManager
-	ChildManager* manager = owner.getComponent<ChildManager>();
-	if (manager) {
-		manager->unregisterListener(&graphicChildren);
-	}
+	//childGraphics.unregisterListener(owner);
 }
 
-std::vector<GraphicComponent*> Panel::getGraphicChildren() {
-	return graphicChildren.getCollection();
-}
+/*std::vector<GraphicComponent*> Panel::getChildGraphics() {
+	return childGraphics.getCollection();
+}*/
 
 // ------------------------------- Serializable ----------------------------------------
 

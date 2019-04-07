@@ -4,6 +4,8 @@
 #include "Archetype.h"
 #include "Entity.h"
 #include "ComponentTypeInfo.h"
+#include "EntityLocation.h"
+#include "Handle.h"
 
 #include <map>
 #include <vector>
@@ -22,9 +24,9 @@ namespace Core {
 			clear();
 		}
 
-		template <typename... Ts> Entity	createEntity(Ts*... components);
-		template <typename... Ts> bool		addEntity(Entity entity, Ts*... components);
-		void								removeEntity(Entity entity, bool destroy = true);
+		template <typename... Ts> Handle	createEntity(Ts*... components);
+		template <typename... Ts> Handle	addEntity(Entity entity, Ts*... components);
+		void								destroyEntity(Entity entity);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		template <typename T> T*			getComponent(Entity entity);
@@ -38,13 +40,18 @@ namespace Core {
 
 		std::vector<Component*>				getComponents(Entity entity);
 
-		Entity*								getParent(Entity entity);
-		ChunkEntityHandle*					getChild(Entity entity, int index);
+		Handle								getParent(Entity entity);
+		Handle*								getChild(Entity entity, int index);
 		std::size_t							getChildCount(Entity entity);
+
+		Handle								getEntityHandle(Entity entity);
+		EntityLocation						getLocation(Entity entity);
 
 		void								clear();
 
 	private:
+		void								removeEntity(Entity entity, bool destroy = true);
+
 		void								removeArchetype(Archetype* archetype);
 		Archetype*							createArchetype(std::vector<ComponentTypeInfo> types);
 		template<typename... Ts> Archetype*	getArchetype();
@@ -52,10 +59,10 @@ namespace Core {
 
 
 		/* Inits components and notifies parent Entities. */
-		void prepEntity(Entity entity, ChunkEntityHandle owner, Archetype* target);
+		void prepEntity(Entity entity, Handle owner, Archetype* target);
 
 		/* Helper function for RemoveComponent and AddComponent */
-		inline ChunkEntityHandle moveEntity(Entity entity, Archetype* src, Archetype* dest);
+		inline Handle moveEntity(Entity entity, Archetype* src, Archetype* dest);
 
 	private:
 		std::map<Entity, Archetype*> entityMap;
@@ -69,27 +76,25 @@ namespace Core {
 
 	/* Creates an entity and adds it and its components to a matching Archetype. Returns a handle to the Entity. */
 	template <typename... Ts>
-	Entity EntityManager::createEntity(Ts*... components) {
+	Handle EntityManager::createEntity(Ts*... components) {
 		Entity entity(entityIDCounter++);
-		if (addEntity(entity, components...))
-			return entity;
-		else
-			return Entity(Entity::INVALID_ID); // Returns entity with invalid ID
+		return addEntity(entity, components...);
 	}
 
 	/* Adds entity and its components to matching Archetype. */
 	template <typename... Ts>
-	bool EntityManager::addEntity(Entity entity, Ts*... components) {
-		bool success = true;
+	Handle EntityManager::addEntity(Entity entity, Ts*... components) {
+		Handle owner;
 		// Call implementation
 		try {
 			Archetype* archetype = getArchetype<Ts...>();
 			entityMap.insert(std::make_pair(entity, archetype));
-			ChunkEntityHandle owner = archetype->addEntity(entity, components...);
+			owner = Handle(entity, this);
+			EntityLocation location = archetype->addEntity(entity, components...);
+			owner.updateLocation(location);
 			prepEntity(entity, owner, archetype);
 		}
 		catch (const std::exception& e) {
-			success = false;
 			std::cout << "Failed to add Entity.\n";
 			std::cout << "Exception: " << e.what() << "\n";
 		}
@@ -99,12 +104,16 @@ namespace Core {
 		for (Component* component : componentList) {
 			delete component;
 		}
-		return success;
+		return owner;
 	}
 
 	template <typename T>
 	T* EntityManager::getComponent(Entity entity) {
-		return static_cast<T*>(getComponent(entity, T::TYPE_ID));
+		auto it = entityMap.find(entity);
+		if (it == entityMap.end()) return nullptr;
+
+		Archetype* archetype = it->second;
+		return archetype->getComponent<T>(entity);
 	}
 
 
@@ -121,7 +130,7 @@ namespace Core {
 		destTypes.push_back({ sizeof(T), T::TYPE_ID });
 
 		Archetype* dest = getArchetype(destTypes);
-		ChunkEntityHandle owner = moveEntity(entity, src, dest);
+		Handle owner = moveEntity(entity, src, dest);
 
 		dest->setComponent(entity, component);
 		prepEntity(entity, owner, dest);

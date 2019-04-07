@@ -10,9 +10,8 @@ namespace Core {
 	class Texture;
 
 	class Image : public GraphicComponent {
+		REGISTER_COMPONENT_TYPE_WITH_BASE(2, GraphicComponent);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 2;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Image(const char* fileName, unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
 		Image();

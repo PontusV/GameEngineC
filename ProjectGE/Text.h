@@ -9,9 +9,8 @@
 
 namespace Core {
 	class Text : public GraphicComponent {
+		REGISTER_COMPONENT_TYPE_WITH_BASE(3, GraphicComponent);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 3;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex = 0);
 		Text();

@@ -8,6 +8,7 @@
 #include "Texture2D.h"
 #include "Rect.h"
 #include "Panel.h"
+#include "Border.h"
 
 #include "ComponentArrayManager.h"
 #include "ComponentGroup.h"
@@ -33,6 +34,11 @@ namespace Core {
 		ComponentArray<Text>&		texts		= getComponentArray<Text>();
 	};
 
+	struct RenderableBorders : public ComponentGroup<Transform, Border> {
+		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+		ComponentArray<Border>&		borders		= getComponentArray<Border>();
+	};
+
 	struct PanelGroup : public ComponentGroup<Transform, Panel> {
 		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
 		ComponentArray<Panel>&		panels		= getComponentArray<Panel>();
@@ -48,17 +54,20 @@ namespace Core {
 		void update(float dt);
 		void render();
 
+		unsigned short createLayer();
 
 		Window& getWindow();
-	private:
+		Renderer2D& getRenderer();
 
+	private:
 		Window window;
 		Renderer2D* renderer;
 
+	private:
 		RenderableRects renderableRects;
 		RenderableImages renderableImages;
 		RenderableTexts renderableTexts;
-
+		RenderableBorders renderableBorders;
 		PanelGroup panelGroup;
 	};
 }

@@ -6,9 +6,6 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Image);
-
 
 Image::Image(const char* fileName, unsigned short layerIndex, unsigned int width, unsigned int height) : GraphicComponent(layerIndex, width, height), fileName(fileName) {
 } // Constructor

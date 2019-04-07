@@ -19,23 +19,22 @@ namespace Core {
 	class Renderer2D
 	{
 	public:
-		Renderer2D(Window* window, std::size_t layerAmount);
+		Renderer2D(Window* window);
 		~Renderer2D();
-		// Transformation Stack
-		void push(glm::mat4 matrix, bool override = false);
-		void pop();
+
+		// Layer
+		unsigned short createLayer();
 
 		// Render sprite
 		void submit(const Renderable2D& renderable, const unsigned short layerIndex);
 		void flush();
 
 		// Render text
-		void renderText(std::string text, Transform transform, Font font, glm::vec4 color, bool clipEnabled, const glm::vec4 drawRect, const unsigned int layerIndex);
-	private:
-		std::vector<Layer> layers;
+		void renderText(std::string text, Transform transform, Font font, glm::vec4 color, bool clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int layerIndex);
 
-		std::vector<glm::mat4> transformationStack;
-		glm::mat4* transformationStackBack;
+	private:
+		std::vector<Layer*> layers;
+		Window* window;
 	};
 }
 #endif

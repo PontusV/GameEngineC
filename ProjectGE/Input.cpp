@@ -18,8 +18,8 @@ Input::~Input() {
 }
 
 void Input::update(float dt) {
-	if (!mouseMoved && events.size() == 0) return;
-	mouseMoved = false;
+	//if (!mouseMoved && events.size() == 0) return;
+	//mouseMoved = false;
 
 	Interactable* interactable = nullptr;
 
@@ -27,7 +27,7 @@ void Input::update(float dt) {
 	if (entity.isValid()) {
 		interactable = entity.getComponent<Button>();
 	}
-	// Check for hover update
+	// Check for hover in/out update
 	if (interactable != hoverPtr) {
 		if (hoverPtr)
 			hoverPtr->onHoverout();
@@ -149,8 +149,8 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 
 void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
 	// Escape key is by default set for closing the application
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+	//if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	//	glfwSetWindowShouldClose(window, true);
 
 	if (key >= 0 && key < 1024)
 	{
@@ -206,17 +206,18 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		maths::RectTransform rect{transform, image.getTexture().size};
 		int cameraX = 0;
 		int cameraY = 0;
-		if (maths::isInsideWindow(cameraX, cameraY, engine->getGraphics().getWindow().getWidth(), engine->getGraphics().getWindow().getHeight(), rect))
-			allRects.push_back({ image.getTexture(), { transform, image.getTexture().size, image.getOffset() }, (int)i });
+		if (maths::isInsideWindow(cameraX, cameraY, engine->getGraphics().getWindow().getWidth(), engine->getGraphics().getWindow().getHeight(), rect)) {
+			allRects.push_back({ image.getTexture(), { transform, image.getTexture().size, (glm::vec2)image.getSize() * transform.getAnchor() }, (int)i });
+		}
 	}
 
 	// Filter out interactables that are not on mousePosition
 	int index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects);
 	if (index == -1) return EntityHandle();
-	std::weak_ptr<EntityManager>	manager	= engine->getCurrentLevel()->getEntityManager();
+	LevelPtr						level	= engine->getCurrentLevel();
 	Entity							entity	= texturedEntities.images.getEntity(index);
 
-	return EntityHandle(entity, manager);
+	return level->getEntityHandle(entity);
 }
 
 // -------------- ADD/SET/GET ------------------

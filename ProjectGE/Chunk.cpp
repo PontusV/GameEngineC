@@ -23,7 +23,7 @@ Chunk::Chunk(std::vector<ComponentTypeInfo> types) : size(0), id(idCounter++), t
 Chunk::~Chunk() {
 	// Call destructors
 	while (!isEmpty()) {
-		remove(size - 1);
+		remove(size - 1, true);
 	}
 	delete[] buffer;
 }
@@ -34,7 +34,6 @@ void Chunk::remove(Entity entity, bool destruct) {
 }
 
 void Chunk::remove(std::size_t index, bool destruct) {
-
 	std::vector<Component*> iComponents = getComponents(index);
 
 	if (destruct) {
@@ -64,14 +63,17 @@ Component* Chunk::getComponent(Entity entity, ComponentTypeID componentTypeID) {
 }
 
 Component* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeID) {
-	char* componentArrayPtr = getComponentArrayPtr(componentTypeID);
-	if (!componentArrayPtr) return nullptr;
-
 	for (ComponentTypeInfo& type : types) {
 		if (componentTypeID == type.id)
-			return (Component*)(&componentArrayPtr[type.size * index]);
+			return getComponent(index, type);
 	}
 	return nullptr;
+}
+
+Component* Chunk::getComponent(std::size_t index, ComponentTypeInfo& type) {
+	char* componentArrayPtr = getComponentArrayPtr(type.id);
+	if (!componentArrayPtr) return nullptr;
+	return (Component*)(&componentArrayPtr[type.size * index]);
 }
 
 std::vector<Component*> Chunk::getComponents(Entity entity) {
@@ -84,7 +86,7 @@ std::vector<Component*> Chunk::getComponents(std::size_t index) {
 	components.reserve(types.size());
 
 	for (ComponentTypeInfo& type : types) {
-		components.push_back(getComponent(index, type.id));
+		components.push_back(getComponent(index, type));
 	}
 
 	return components;

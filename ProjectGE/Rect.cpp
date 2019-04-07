@@ -2,9 +2,6 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Rect);
-
 
 Rect::Rect(int width, int height, glm::vec4 color, unsigned short layerIndex) : GraphicComponent(layerIndex, width, height), color(color) {
 } // Constructor

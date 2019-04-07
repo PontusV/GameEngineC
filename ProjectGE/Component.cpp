@@ -1,4 +1,6 @@
 #include "Component.h"
+#include "ParentEntity.h"
+#include "ChildManager.h"
 #include <iostream>
 
 using namespace Core;
@@ -10,8 +12,36 @@ Component::Component() {
 Component::~Component() {
 }
 
-void Component::setOwner(ChunkEntityHandle owner) {
+Handle* Component::getParent() {
+	ParentEntity* parentCmp = owner.getComponent<ParentEntity>();
+	if (parentCmp) {
+		return parentCmp->getParent();
+	}
+	return nullptr;
+}
+
+Handle* Component::getChild(std::size_t index) {
+	ChildManager* childManager = owner.getComponent<ChildManager>();
+	if (childManager) {
+		return childManager->getChild(index);
+	}
+	return nullptr;
+}
+
+std::size_t Component::getChildCount() {
+	ChildManager* childManager = owner.getComponent<ChildManager>();
+	if (childManager) {
+		return childManager->getChildCount();
+	}
+	return 0;
+}
+
+void Component::setOwner(Handle owner) {
 	this->owner = owner;
+}
+
+Handle Component::getOwner() {
+	return owner;
 }
 
 void Component::destroy() {

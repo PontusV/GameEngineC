@@ -1,8 +1,11 @@
 #include "BatchRenderer2D.h"
 #include "Texture2D.h"
-#include "TransformMaths.h" //WIP not used atm
+#include "TransformMaths.h"
 #include "Window.h"
 
+#include "ResourceManager.h"
+
+#include <glad/glad.h>
 #include <stdexcept>
 #include <cstddef>
 
@@ -26,13 +29,12 @@ void initIndices() {
 	}
 }
 
-BatchRenderer2D::BatchRenderer2D(Window* window) : initialized(false), window(window)
-{
+BatchRenderer2D::BatchRenderer2D(Window* window) : window(window) {
+	maskShaderID = ResourceManager::getInstance().loadShader("resources/shaders/sprite.vert", "resources/shaders/sprite.frag").ID;
 }
 
 
-BatchRenderer2D::~BatchRenderer2D()
-{
+BatchRenderer2D::~BatchRenderer2D() {
 	cleanUp();
 }
 
@@ -53,8 +55,6 @@ void BatchRenderer2D::cleanUp() {
 	}
 	indexCount = 0;
 	verticiesCount = 0;
-	initialized = false;
-	begun = false;
 }
 
 BatchConfig& BatchRenderer2D::getConfig() {
@@ -104,12 +104,9 @@ void BatchRenderer2D::init() {
 	if (GL_NO_ERROR != glGetError()) {
 		std::cout << "Failed to create batch\n";
 	}
-	begun = false;
-	initialized = true;
 }
 
 void BatchRenderer2D::begin() {
-	begun = true;
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	buffer = (VertexData*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 }
@@ -120,10 +117,11 @@ void BatchRenderer2D::submit(const RenderCopy2D& renderable) {
 
 
 	const glm::vec2& position		= renderable.transform.getPosition();
+	const glm::vec2& anchor			= renderable.transform.getAnchor();
+	const glm::mat4	model			= renderable.transform.getWorldModelMatrix();
 	const glm::vec2& size			= renderable.size;
 	const glm::vec4& color			= renderable.color;
 	const glm::vec2* uvPos			= renderable.texture.uvPos;
-	const glm::vec2& imageOffset	= renderable.imageOffset;
 
 	const float& textureSlot = renderable.texture.ID == 0 ? 0 : (float)config->getTextureSlot(renderable.texture.ID);
 
@@ -134,54 +132,79 @@ void BatchRenderer2D::submit(const RenderCopy2D& renderable) {
 
 	unsigned int c = a << 24 | b << 16 | g << 8 | r;
 
-	GLsizei& i = verticiesCount;
-	/*//
-	glm::mat4 transformationStack;
-	glm::vec4 pos(1, 1, 1, 1);
-	transformationStack * pos;
+	std::size_t& i = verticiesCount;
 
-	glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-	//*/
-
-	//position = renderable.transform.getTruePosition(size);
-	//if (renderable.transform.getAnchor() == TransformAnchor::CENTER)
-	//	position = glm::vec2(position.x - (float)size.x/2, position.y - (float)size.y/2); // Image offset
-	//position += renderable.imagePosition;
-
-	//glm::vec2 imgPos = glm::vec2(size.x, size.y);
-
-	buffer[i].vertex = position + imageOffset;
+	buffer[i].vertex = model * (size * anchor);
+	//buffer[i].vertex = model * (position + size * anchor);
 	buffer[i].color = c;
 	buffer[i].texture = uvPos[0];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x, position.y + size.y) + imageOffset;
+	buffer[i].vertex = model * (glm::vec2(0, size.y) + size * anchor);
+	//buffer[i].vertex = model * (glm::vec2(position.x, position.y + size.y) + size * anchor);
 	buffer[i].color = c;
 	buffer[i].texture = uvPos[1];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x + size.x, position.y + size.y) + imageOffset;
+	buffer[i].vertex = model * (size + size * anchor);
+	//buffer[i].vertex = model * (glm::vec2(position.x + size.x, position.y + size.y) + size * anchor);
 	buffer[i].color = c;
 	buffer[i].texture = uvPos[2];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = glm::vec2(position.x + size.x, position.y) + imageOffset;
+	buffer[i].vertex = model * (glm::vec2(size.x, 0) + size * anchor);
+	//buffer[i].vertex = model * (glm::vec2(position.x + size.x, position.y) + size * anchor);
 	buffer[i].color = c;
 	buffer[i].texture = uvPos[3];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	segments.back().size += 6;
+	segmentBack->size += 6;
+	indexCount += 6;
+}
+
+void BatchRenderer2D::submitMask(glm::vec2 vertex1, glm::vec2 vertex2, glm::vec2 vertex3, glm::vec2 vertex4) {
+	if (!hasRoom())
+		throw std::length_error("Can not add anymore sprites to this batch!");
+
+	int r = 255;
+	int g = 255;
+	int b = 255;
+	int a = 255;
+	unsigned int c = a << 24 | b << 16 | g << 8 | r;
+
+	std::size_t& i = verticiesCount;
+
+	buffer[i].vertex = vertex1;
+	buffer[i].color = c;
+	buffer[i].textureID = 0;
+	i++;
+
+	buffer[i].vertex = vertex2;
+	buffer[i].color = c;
+	buffer[i].textureID = 0;
+	i++;
+
+	buffer[i].vertex = vertex3;
+	buffer[i].color = c;
+	buffer[i].textureID = 0;
+	i++;
+
+	buffer[i].vertex = vertex4;
+	buffer[i].color = c;
+	buffer[i].textureID = 0;
+	i++;
+
+	segmentBack->size += 6;
 	indexCount += 6;
 }
 
 void BatchRenderer2D::end() {
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	begun = false;
 }
 
 void BatchRenderer2D::flush() {
@@ -189,18 +212,10 @@ void BatchRenderer2D::flush() {
 	if (indexCount == 0) return;
 
 	for (BatchSegment& segment : segments) {
+		// Is there anything to draw in this segment?
+		if (segment.size == 0) return;
 		BatchConfig& config = segment.config;
-
 		const GLuint& shaderID = config.shaderID;
-		const GLfloat& rotate = config.rotation;
-
-		glUseProgram(shaderID);
-
-		/*if (rotate != 0) { //Check for rotation, WORK IN PROGRESS
-			glm::mat4 model;
-			model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 0.0f));
-			glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		}*/
 
 		for (std::size_t i = 0; i < config.textureIDs.size(); i++)
 		{
@@ -213,13 +228,29 @@ void BatchRenderer2D::flush() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 		if (config.clipEnabled) {
-			glEnable(GL_SCISSOR_TEST);
-			glScissor((GLint)config.drawRect.x,(GLint)(window->getHeight() - config.drawRect.y - config.drawRect.w),(GLsizei)config.drawRect.z,(GLsizei)config.drawRect.w);
-		}
+			glStencilMask(0xFF);				// Enable stencil writes
+			glClear(GL_STENCIL_BUFFER_BIT);		// Clear old masks
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);	// Always draw
 
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // Disables drawing to color buffer
+			// Draw mask
+			glUseProgram(maskShaderID);
+			for (std::size_t i = 1; i <= segment.clipMaskCount; i++) {
+				std::size_t maskIndex = segment.startIndex - (6 * i);
+				if (maskIndex > 0)
+					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)(maskIndex * sizeof(GLushort)));
+			}
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);	// Enable drawing to color buffer
+
+			glStencilMask(0x00);				// Disable stencil writes
+			glStencilFunc(GL_LEQUAL, 1, 0xFF);	// Only draw on mask
+		}
+		glUseProgram(shaderID);
+
+		//Draw
 		glDrawElements(GL_TRIANGLES, segment.size, GL_UNSIGNED_SHORT, (void*)(segment.startIndex * sizeof(GLushort)));
 		if (config.clipEnabled) {
-			glDisable(GL_SCISSOR_TEST);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);	// Always draw
 		}
 		config.textureIDs.clear();
 
@@ -233,9 +264,22 @@ void BatchRenderer2D::flush() {
 
 
 void BatchRenderer2D::startNewSegment(BatchConfig config) {
-	BatchSegment segment{indexCount, 0, config};
+	// Start segment
+	BatchSegment segment{ indexCount, 0, 0, config };
 	segments.push_back(segment);
-	this->config = &segments.back().config;
+	segmentBack = &segments.back();
+	this->config = &segmentBack->config;
 
-	if (!begun)	begin();
+	// Add clip mask for segments with clipping enabled
+	if (config.clipEnabled) {
+
+		for (std::size_t i = 0; i < config.clipMaskVertices.size(); i += 4) {
+			submitMask(config.clipMaskVertices[i], config.clipMaskVertices[i+1], config.clipMaskVertices[i+2], config.clipMaskVertices[i+3]);
+
+			// Shift segment start (Puts this mask right before segment start)
+			segmentBack->startIndex += 6;
+			segmentBack->size -= 6;
+			segmentBack->clipMaskCount++;
+		}
+	}
 }

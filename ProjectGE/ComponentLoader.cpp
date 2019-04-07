@@ -2,6 +2,26 @@
 
 using namespace Core;
 
+// Register all components
+#include "Button.h"
+REGISTER_LOADABLE_COMPONENT(Button);
+#include "Image.h"
+REGISTER_LOADABLE_COMPONENT(Image);
+#include "Panel.h"
+REGISTER_LOADABLE_COMPONENT(Panel);
+#include "Rect.h"
+REGISTER_LOADABLE_COMPONENT(Rect);
+#include "Text.h"
+REGISTER_LOADABLE_COMPONENT(Text);
+#include "Transform.h"
+REGISTER_LOADABLE_COMPONENT(Transform);
+#include "Border.h"
+REGISTER_LOADABLE_COMPONENT(Border);
+#include "ParentEntity.h"
+REGISTER_LOAD_COMPONENT_IGNORE(ParentEntity);
+#include "ChildManager.h"
+REGISTER_LOAD_COMPONENT_IGNORE(ChildManager);
+// End of registry
 
 ComponentLoader::ComponentLoader()
 {
@@ -23,7 +43,7 @@ void ComponentLoader::addComponentFromFile(std::istream& is, EntityHandle& go) {
 		for (std::size_t i = 0; i < ignoreList.size(); i++) {
 			if (typeID == ignoreList[i]) return; // Ignored
 		}
-		std::cout << "ComponentLoader::loadComponentFromFile::ERROR Invalid typeID read from file. The component might not be registered or the next variable in file may not have been a ComponentTypeID.\n";
+		std::cout << "ComponentLoader::loadComponentFromFile::ERROR Invalid typeID(" << typeID << ") read from file. The component might not be registered or the next variable in file may not have been a ComponentTypeID.\n";
 		throw std::invalid_argument("ComponentLoader::loadComponentFromFile::ERROR Invalid typeID read from file. The component might be unregistered or the next variable in file may not have been a ComponentTypeID.");
 	}
 

@@ -17,7 +17,7 @@ namespace Core {
 		Layer(int layerIndex, Window* window);
 		~Layer();
 
-		void renderText(std::string text, Transform transform, Font font, glm::vec4 color, bool clipEnabled, const glm::vec4 drawRect);
+		void renderText(std::string text, Transform transform, Font font, glm::vec4 color, bool clipEnabled, const std::vector<glm::vec2>& clipMaskVertices);
 		void submit(const Renderable2D& renderable);
 		void flush();
 

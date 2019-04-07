@@ -27,13 +27,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -100,6 +100,15 @@
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -132,6 +141,15 @@
       <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,15 +167,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Archetype.cpp" />
+    <ClCompile Include="Border.cpp" />
     <ClCompile Include="BoxComponent.cpp" />
     <ClCompile Include="Button.cpp" />
-    <ClCompile Include="ChildCollection.cpp" />
     <ClCompile Include="ChildManager.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkEntityHandle.cpp" />
     <ClCompile Include="ComponentHandle.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GraphicComponent.cpp" />
+    <ClCompile Include="Handle.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="ComponentLoader.cpp" />
     <ClCompile Include="Panel.cpp" />
@@ -166,7 +185,6 @@
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="BatchRenderer2D.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
@@ -175,40 +193,37 @@
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="Handle.cpp" />
-    <ClCompile Include="HandleEntry.cpp" />
-    <ClCompile Include="HandleManager.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KeyListener.cpp" />
     <ClCompile Include="Level.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Serializable.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="TransformMaths.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="Archetype.h" />
     <ClInclude Include="BatchConfig.h" />
+    <ClInclude Include="Border.h" />
     <ClInclude Include="BoxComponent.h" />
     <ClInclude Include="Button.h" />
-    <ClInclude Include="ChildCollection.h" />
-    <ClInclude Include="ChildListener.h" />
     <ClInclude Include="ChildManager.h" />
     <ClInclude Include="ChunkEntityHandle.h" />
     <ClInclude Include="ComponentHandle.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
+    <ClInclude Include="EntityLocation.h" />
     <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="GraphicComponent.h" />
+    <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
     <ClInclude Include="Interactable.h" />
     <ClInclude Include="Layer.h" />
@@ -223,7 +238,6 @@
     <ClInclude Include="ComponentArray.h" />
     <ClInclude Include="ComponentArrayManager.h" />
     <ClInclude Include="ComponentGroup.h" />
-    <ClInclude Include="Editor.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
@@ -232,7 +246,6 @@
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="TransformMaths.h" />
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />
@@ -256,10 +269,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ProjectGE.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\shader.fs" />
-    <None Include="Shaders\shader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Level.h"
+#include "Window.h"
 #include "FpsCounter.h"
 #include <iostream>
 #include <fstream>
@@ -8,9 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-//#include "ResourceManager.h"
-#include "Window.h"
 
 using namespace std;
 using namespace Core;
@@ -27,6 +25,8 @@ void Engine::saveLevel(const char* fileName) { //To be added: file location of l
 	file.open(levelDir, ios::out | ios::binary | ios::trunc);
 	currentLevel->serialize(file);
 	file.close();
+
+	std::cout << "Saved level to: " << levelDir << "\n";
 }
 
 /* Loads level from file. */
@@ -41,6 +41,7 @@ LevelPtr Engine::loadLevel(const char* fileName) { //To be added: file location 
 	level->deserialize(file);
 	//
 	file.close();
+
 	return level;
 }
 
@@ -51,6 +52,9 @@ LevelPtr Engine::createLevel() {
 
 void Engine::setCurrentLevel(LevelPtr level) {
 	std::cout << "Changing level...\n";
+	if (currentLevel)
+		currentLevel->clear();
+
 	currentLevel = level;
 }
 
@@ -61,8 +65,8 @@ void Engine::terminate() {
 
 /* Starts the gameloop. */
 int Engine::initiate() {
-	// Create Debug level
-	debugLevel = createLevel(); // Creates empty level to put debug Entities into
+	// Create Empty Debug level
+	debugLevel = createLevel();
 
 	// Initialize systems
 	// Graphics
@@ -71,21 +75,26 @@ int Engine::initiate() {
 	Window& window = graphics->getWindow();
 	// Physics
 	// Input
-	glfwSetWindowUserPointer(window.getWindow(), input);
+	glfwSetWindowUserPointer(window.getWindow(), input); // TODO: Change user to Engine
 	glfwSetKeyCallback(window.getWindow(), Input::keyCallback);
 	glfwSetCursorPosCallback(window.getWindow(), Input::cursorPositionCallback);
 	glfwSetMouseButtonCallback(window.getWindow(), Input::mouseButtonCallback);
-	// etc...
 	// End of system initialization
+
+	return 0;
+}
+int Engine::start() {
+	Window& window = graphics->getWindow();
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
 	GLfloat lastFrame = 0.0f;
 
 	FpsCounter fpsCounter;
+	unsigned short debugLayer = graphics->createLayer();
 	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
-		new Text("FPS: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-		new Transform(5, 5, 0, TransformAnchor::TOP_LEFT)
+		new Text("FPS: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
+		new Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
 	);
 
 	// Game loop
@@ -106,13 +115,16 @@ int Engine::initiate() {
 		// Update systems
 		input->update(deltaTime);
 		graphics->update(deltaTime);
+		physics->update(deltaTime);
 
 		// Render
 		graphics->render();
+
+		// 1ms sleep
+		Sleep(1);
 	}
 
 	glfwTerminate();
-
 	return 0;
 }
 
@@ -143,4 +155,7 @@ Graphics& Engine::getGraphics() {
 
 LevelPtr Engine::getCurrentLevel() {
 	return currentLevel;
+}
+LevelPtr Engine::getDebugLevel() {
+	return debugLevel;
 }

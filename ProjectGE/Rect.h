@@ -6,9 +6,8 @@
 
 namespace Core {
 	class Rect : public GraphicComponent {
+		REGISTER_COMPONENT_TYPE_WITH_BASE(5, GraphicComponent);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 5;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
 		Rect(int width, int height, glm::vec4 color, unsigned short layerIndex = 0);
 		Rect();

@@ -3,6 +3,7 @@
 #include "ResourceManager.h"
 #include "Renderer2D.h"
 #include "Renderable2D.h"
+#include "TransformMaths.h"
 
 #include <algorithm>
 #include <array>
@@ -52,10 +53,8 @@ bool Graphics::initiate() {
 	textShader.setIntegerV("textures", 32, texIDs, true);
 	textShader.setMatrix4("projection", projection);
 	
-
 	// Initialize renderer
-	const int amountofLayers = 2;				//Game layer, UI layer
-	renderer = new Renderer2D(&window, amountofLayers);
+	renderer = new Renderer2D(&window);
 
 	// Succesfull initialization
 	return true;
@@ -66,73 +65,158 @@ void Graphics::render() {
 	std::size_t sizeRectangles	= renderableRects.rects.size();
 	std::size_t sizeImages		= renderableImages.images.size();
 	std::size_t sizeTexts		= renderableTexts.texts.size();
+	std::size_t sizeBorders		= renderableBorders.borders.size();
 
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
 	// Rectangles
 	for (std::size_t i = 0; i < sizeRectangles; i++) {
-		const Texture2D		texture			= Texture2D(); // No texture
+		const Rect&			rect			= renderableRects.rects[i];
 		const Transform&	transform		= renderableRects.transforms[i];
-		const glm::vec4&	color			= renderableRects.rects[i].getColor();
-		const glm::ivec2&	size			= renderableRects.rects[i].getSize();
-		const glm::vec2&	figureOffset	= renderableRects.rects[i].getOffset();
-		bool				clipEnabled		= renderableRects.rects[i].isClipEnabled();
-		const glm::vec4&	drawRect		= renderableRects.rects[i].getDrawRect();
-		unsigned short		layerIndex		= renderableRects.rects[i].getLayerIndex();
+		const Texture2D		texture			= Texture2D(); // No texture
+		const glm::vec4&	color			= rect.getColor();
+		const glm::ivec2&	size			= rect.getSize();
+		bool				clipEnabled		= rect.isClipEnabled();
+		unsigned short		layerIndex		= rect.getLayerIndex();
+		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
 
-		renderer->submit({ texture, transform, size, spriteShader.ID, color, figureOffset, clipEnabled, drawRect }, layerIndex);
+		renderer->submit({ texture, transform, size, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+		// Reset clipping
+		renderableRects.rects[i].resetClipping();
 	}
+
 	// Images
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
+		// Test rotation
+		//renderableImages.transforms[i].rotate(0.05f);
 
-		const Texture2D&	texture		= renderableImages.images[i].getTexture();
+		Image&				image		= renderableImages.images[i];
 		const Transform&	transform	= renderableImages.transforms[i];
+		const Texture2D&	texture		= image.getTexture();
 		const glm::vec4		color		= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		const glm::vec2&	imageOffset	= renderableImages.images[i].getOffset();
-		bool				clipEnabled = renderableImages.images[i].isClipEnabled();
-		const glm::vec4&	drawRect	= renderableImages.images[i].getDrawRect();
-		unsigned short		layerIndex	= renderableImages.images[i].getLayerIndex();
+		bool				clipEnabled = image.isClipEnabled();
+		unsigned short		layerIndex	= image.getLayerIndex();
+		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
 
-		renderer->submit({ texture, transform, texture.size, spriteShader.ID, color, imageOffset, clipEnabled, drawRect }, layerIndex);
+		renderer->submit({ texture, transform, texture.size, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+		// Reset clipping
+		renderableImages.images[i].resetClipping();
 	}
 
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		bool				clipEnabled = renderableTexts.texts[i].isClipEnabled();
-		const glm::vec4&	drawRect	= renderableTexts.texts[i].getDrawRect();
-		unsigned short		layerIndex	= renderableTexts.texts[i].getLayerIndex();
+		const Text&			text		= renderableTexts.texts[i];
+		bool				clipEnabled = text.isClipEnabled();
+		unsigned short		layerIndex	= text.getLayerIndex();
+		const std::vector<glm::vec2>& clipMaskVertices = text.getClipMaskVertices();
 
-		renderer->renderText(renderableTexts.texts[i].getText(), renderableTexts.transforms[i], renderableTexts.texts[i].getFont(), renderableTexts.texts[i].getColor(), clipEnabled, drawRect, layerIndex);
+		renderer->renderText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
+		// Reset clipping
+		renderableTexts.texts[i].resetClipping();
+	}
+
+	// Borders
+	for (std::size_t i = 0; i < sizeBorders; i++) {
+		const Border&		border			= renderableBorders.borders[i];
+		const Transform&	transform		= renderableBorders.transforms[i];
+		const Texture2D		texture			= Texture2D(); // No texture
+		const glm::vec4&	color			= border.getColor();
+		const std::size_t&	borderThickness	= border.getBorderThickness();
+		bool				inner			= border.isInner();
+		const glm::ivec2&	size			= border.getSize();
+		bool				clipEnabled		= border.isClipEnabled();
+		unsigned short		layerIndex		= border.getLayerIndex();
+		const std::vector<glm::vec2>& clipMaskVertices = border.getClipMaskVertices();
+
+
+		for (std::size_t side = 0; side < 4; side++) { // 4 lines
+			if (border.sideEnabled(side)) { // Check if this side is enabled (0 = top, 1 = right, 2 = bottom, 3 = left)
+
+				glm::ivec2 rectSize = size;
+				if (!inner) {
+					rectSize.x += borderThickness * 2;
+					rectSize.y += borderThickness * 2;
+				}
+
+				float localPosX = rectSize.x * transform.getAnchor().x; // Init with offset
+				float localPosY = rectSize.y * transform.getAnchor().y; // Initi with offset
+
+
+				if (side == 1) {		// Right
+					localPosX += (float)rectSize.x - borderThickness;
+					localPosY += borderThickness;
+				}
+				else if (side == 2) {	// Bottom
+					localPosY += (float)rectSize.y - borderThickness;
+				}
+				else if (side == 3) {	// Left
+					localPosY += borderThickness;
+				}
+
+				glm::ivec2 borderSize;
+				if (side == 0 || side == 2) {	// Vertical line
+					borderSize.x = rectSize.x;
+					borderSize.y = borderThickness;
+				} else {						// Horizontal line
+					borderSize.x = borderThickness;
+					borderSize.y = rectSize.y - borderThickness * 2;
+				}
+
+				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
+				lineTransform.updateWorldModelMatrix(transform.getWorldModelMatrix() * lineTransform.getLocalModelMatrix());
+
+				renderer->submit({ texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+			}
+		}
+		// Reset clipping
+		renderableTexts.texts[i].resetClipping();
 	}
 
 	// Clear, Draw & Update window
-	glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	window.clear();
 	renderer->flush();
 	window.update();
 }
 
-
 void Graphics::update(float dt) {
 	// Update all panels
 	for (std::size_t i = 0; i < panelGroup.panels.size(); i++) {
+		//std::cout << "panel update" << i << "\n";
 		Panel&		panel		= panelGroup.panels[i];
 		Transform&	transform	= panelGroup.transforms[i];
 
-		float x = transform.getX() + panel.getOffset().x;
-		float y = transform.getY() + panel.getOffset().y;
-		int w = panel.getSize().x;
-		int h = panel.getSize().y;
+		const glm::vec2& size = panel.getSize();
+		float x = size.x * transform.getAnchor().x;
+		float y = size.y * transform.getAnchor().y;
+		const glm::mat4& localToWorldMatrix = transform.getWorldModelMatrix();
 
-		std::vector<GraphicComponent*> children = panel.getGraphicChildren();
+		std::vector<GraphicComponent*> children = panel.getOwner().getComponentsInChildren<GraphicComponent>();
+
+		glm::vec2 clipMaskVertices[4] = {
+			glm::vec2(x,y),
+			glm::vec2(x+size.x,y),
+			glm::vec2(x+size.x,y+size.y),
+			glm::vec2(x,y+size.y)
+		};
+
+		for (std::size_t i = 0; i < 4; i++) {
+			clipMaskVertices[i] = localToWorldMatrix * clipMaskVertices[i];
+		}
 
 		for (GraphicComponent* child : children) {
-			child->enableClipping();
-			child->setDrawRect(glm::vec4(x, y, w, h));
-		}
+			child->clip(clipMaskVertices);
+		}//*/
 	}
+}
+
+unsigned short Graphics::createLayer() {
+	return renderer->createLayer();
 }
 
 Window& Graphics::getWindow() {
 	return window;
+}
+
+Renderer2D& Graphics::getRenderer() {
+	return *renderer;
 }

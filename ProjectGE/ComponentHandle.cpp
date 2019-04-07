@@ -1,11 +1,18 @@
 #include "ComponentHandle.h"
-#include "HandleManager.h"
+#include <iostream>
 
 using namespace Core;
 
-ComponentHandle::ComponentHandle(ChunkEntityHandle owner, ComponentTypeID typeID) : owner(owner), typeID(typeID) {
-	if (!owner.isValid())
+ComponentHandle::ComponentHandle(ComponentTypeID typeID, Entity entity, EntityManager* manager) : typeID(typeID), Handle(entity, manager) {
+	if (!isValid())
 		std::cout << "ComponentHandle::Error The ChunkEntityHandle is invalid!\n";
+}
+
+ComponentHandle::ComponentHandle(ComponentTypeID typeID, Handle owner) : typeID(typeID), Handle(owner) {
+	if (!isValid())
+		std::cout << "ComponentHandle::Error The ChunkEntityHandle is invalid!\n";
+}
+ComponentHandle::ComponentHandle() {
 }
 
 ComponentHandle::~ComponentHandle() {
@@ -13,21 +20,6 @@ ComponentHandle::~ComponentHandle() {
 
 /* Will return nullptr if ChunkEntityHandle is invalid, which means the Entity has been moved to another Chunk or got destroyed. */
 Component* ComponentHandle::getComponent() {
-	// Check if entity has moved
-	//if (entityPtr && *entityPtr == owner.getEntity()) { // This code is faulty
-	//	return componentPtr;
-	//}
-	// The entity has moved, reinit ptrs
-	entityPtr = owner.getEntityPtr();
-	componentPtr = owner.getComponent(typeID);
-	return componentPtr;
-}
-
-bool ComponentHandle::isValid() {
-	// If owner is valid the ptrs can be initialized & validated
-	return owner.isValid();
-}
-
-Entity ComponentHandle::getOwner() {
-	return owner.getEntity();
+	std::vector<Component*> components = getComponents();
+	return getFirstDerivingComponent(components, typeID);
 }

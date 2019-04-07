@@ -1,8 +1,11 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
+#include "Texture2D.h"
 #include "Transform.h"
 #include "Interactable.h"
+#include "TransformMaths.h"
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -20,12 +23,15 @@ namespace Core {
 			int id;
 		};
 
-		bool hitCheck(float xPoint, float yPoint, const RectTransform& rect) {
+		/* Returns true if the position is inside the rect. */
+		bool hitCheck(float posX, float posY, const RectTransform& rect) {
+			glm::vec2 localPosition = rect.transform.getWorldToLocalMatrix() * glm::vec2(posX, posY);
 			return (
-				xPoint > rect.transform.getX() + rect.offset.x &&
-				xPoint < rect.transform.getX() + rect.offset.x + rect.size.x &&
-				yPoint > rect.transform.getY() + rect.offset.y &&
-				yPoint < rect.transform.getY() + rect.offset.y + rect.size.y);
+				localPosition.x > rect.offset.x &&
+				localPosition.x < rect.offset.x + rect.size.x &&
+				localPosition.y > rect.offset.y &&
+				localPosition.y < rect.offset.y + rect.size.y
+			);
 		}
 
 		/* Returns the id of the TexturedRectTransform that is infront if there are any at the position. Returns -1 if none was found. */

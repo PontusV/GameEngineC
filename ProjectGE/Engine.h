@@ -20,12 +20,14 @@ namespace Core {
 
 		// Game loop
 		int			initiate();
+		int			start();
 		void		terminate();
 
 		// Level
 		LevelPtr	createLevel();
 		void		setCurrentLevel(LevelPtr level);
 		LevelPtr	getCurrentLevel();
+		LevelPtr	getDebugLevel();
 		/* Saves current level to file */
 		void		saveLevel(const char* fileName);
 		/* Loads level from file and returns new level */

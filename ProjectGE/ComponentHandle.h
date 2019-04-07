@@ -1,34 +1,20 @@
 #ifndef COMPONENT_HANDLE_H
 #define COMPONENT_HANDLE_H
 
-#include "ChunkEntityHandle.h"
+#include "Handle.h"
 
 namespace Core {
-
-	class ComponentHandle {
+	class ComponentHandle : public Handle {
 	public:
-		ComponentHandle(ChunkEntityHandle owner, ComponentTypeID typeID);
-		ComponentHandle() {}
+		ComponentHandle(ComponentTypeID typeID, Entity entity, EntityManager* manager);
+		ComponentHandle(ComponentTypeID typeID, Handle owner);
+		ComponentHandle();
 		~ComponentHandle();
 
-		template <typename T> T* getComponent();
-		Component*	getComponent();
-		Entity		getOwner();
-		bool		isValid();
+		Component*		getComponent();
+
 	private:
-		bool initialized;
-		// Data to retrieve valid ptrs
-		ChunkEntityHandle owner;
 		ComponentTypeID typeID;
-
-		// Ptrs
-		Component* componentPtr;
-		Entity* entityPtr;
 	};
-
-	template <typename T>
-	T* ComponentHandle::getComponent() {
-		return static_cast<T*>(getComponent());
-	}
 }
 #endif

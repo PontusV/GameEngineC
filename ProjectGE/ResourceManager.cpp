@@ -167,7 +167,7 @@ FontManager& ResourceManager::loadFontManager(const std::string file) {
 	if (it != fontManagers.end())
 		return *it->second;
 
-	static GLushort textSize = 48;
+	static GLushort textSize = 100;
 
 	fontManagers[file] = new FontManager(file.c_str(), textSize, ft);
 	return *fontManagers[file];

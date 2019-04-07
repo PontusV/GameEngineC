@@ -1,8 +1,10 @@
 #ifndef GL_TEXTURE_H
 #define GL_TEXTURE_H
-#include <glad/glad.h> // include glad to get all the required OpenGL headers
+
 #include <glm/glm.hpp>
+
 namespace Core {
+	typedef unsigned int GLuint;
 	class Texture2D
 	{
 	public:

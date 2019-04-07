@@ -13,10 +13,9 @@ namespace Core {
 		const glm::ivec2	&size;
 		const GLuint		&shaderID;
 		const glm::vec4		&color;
-		const glm::vec2		&imageOffset;
 
 		bool				clipEnabled = false;
-		const glm::vec4		&drawRect;
+		const std::vector<glm::vec2>	&clipMaskVertices;
 	};
 
 	/* Holds copied data required for rendering. */
@@ -28,9 +27,8 @@ namespace Core {
 			size			= renderable.size;
 			shaderID		= renderable.shaderID;
 			color			= renderable.color;
-			imageOffset		= renderable.imageOffset;
 			clipEnabled		= renderable.clipEnabled;
-			drawRect		= renderable.drawRect;
+			clipMaskVertices = renderable.clipMaskVertices;
 		}
 
 		Texture2D	texture;
@@ -38,10 +36,9 @@ namespace Core {
 		glm::ivec2	size;
 		GLuint		shaderID;
 		glm::vec4	color;
-		glm::vec2	imageOffset;
 
 		bool		clipEnabled;
-		glm::vec4	drawRect;
+		std::vector<glm::vec2>	clipMaskVertices;
 
 		RenderCopy2D& operator=(const Renderable2D& other) {
 			texture			= other.texture;
@@ -49,9 +46,8 @@ namespace Core {
 			size			= other.size;
 			shaderID		= other.shaderID;
 			color			= other.color;
-			imageOffset		= other.imageOffset;
 			clipEnabled		= other.clipEnabled;
-			drawRect		= other.drawRect;
+			clipMaskVertices = other.clipMaskVertices;
 
 			return *this;
 		}

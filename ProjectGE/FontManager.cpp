@@ -1,11 +1,12 @@
 #include "FontManager.h"
 #include "ResourceManager.h"
+#include <glad/glad.h>
 #include <algorithm>
 
 using namespace Core;
 
 
-FontManager::FontManager(const GLchar* fontFile, GLushort textSize, FT_Library ft) : textSize(textSize)
+FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Library ft) : textSize(textSize)
 {
 	FT_Face face;
 	if (FT_New_Face(ft, fontFile, 0, &face)) {
@@ -82,7 +83,7 @@ FontManager::~FontManager()
 }
 
 
-TextData2D FontManager::createText(std::string text, glm::vec4 color, GLushort size) {
+TextData2D FontManager::createText(std::string text, glm::vec4 color, unsigned short size) {
 	float scale = ((float)size)/textSize;
 
 	//Offsets start at 0
@@ -117,14 +118,14 @@ TextData2D FontManager::createText(std::string text, glm::vec4 color, GLushort s
 
 		//Copy texture from storage and modify offset and size to scale
 		CharTexture2D texture = charTextures[character];
-		texture.offset.x = x + ch.bearing.x * scale;
-		texture.offset.y = y - ch.bearing.y * scale;
+		texture.offset.x = x + (float)ch.bearing.x * scale;
+		texture.offset.y = y - (float)ch.bearing.y * scale;
 		texture.texture.size.x = (int)(texture.texture.size.x * scale);
 		texture.texture.size.y = (int)(texture.texture.size.y * scale);
 		textures.push_back(texture);
 
 		width = x;
-		x += ch.advance * scale;
+		x += (float)ch.advance * scale;
 	}
 
 	int height = (int)(textHeight * scale);

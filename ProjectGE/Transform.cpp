@@ -1,13 +1,18 @@
 #include "Transform.h"
+#include <glm/gtc/matrix_transform.hpp>
+
+#define M_PI 3.14159265358979323846
+static float RADIANS_MAX = M_PI * 2;
 
 using namespace Core;
-
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Transform);
 
 
 Transform::Transform(float x, float y, float z, TransformAnchor anchorPoint, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale) {
 	setAnchor(anchorPoint);
+	changed = true;
+}
+Transform::Transform(float x, float y, float z, glm::vec2 anchorPoint, float rotation, float scale) : position(x, y), z(z), anchor(anchorPoint), rotation(rotation), scale(scale) {
+	changed = true;
 }
 
 Transform::Transform() : position(0, 0) {
@@ -45,9 +50,74 @@ void Transform::deserialize(std::istream& is) {
 	is.read((char*)&scale, sizeof(scale));					// Scale
 	is.read((char*)&anchor.x, sizeof(anchor.x));			// Anchor x
 	is.read((char*)&anchor.y, sizeof(anchor.y));			// Anchor y
+
+	changed = true;
 }
 
 // ----------------------- Getters and Setters -----------------------------------------
+
+void Transform::rotate(float degrees) {
+	float radians = glm::radians(degrees);
+	rotation += radians;
+	if (rotation > RADIANS_MAX)
+		rotation -= RADIANS_MAX;
+	else if (rotation < 0)
+		rotation += RADIANS_MAX;
+	changed = true;
+}
+
+void Transform::moveX(float value) {
+	position.x += value;
+	changed = true;
+}
+
+void Transform::moveY(float value) {
+	position.y += value;
+	changed = true;
+}
+
+void Transform::setX(float value) {
+	position.x = value;
+	//moveX(value - position.x);
+	changed = true;
+}
+
+void Transform::setY(float value) {
+	position.y = value;
+	//moveY(value - position.y);
+	changed = true;
+}
+
+void Transform::pushModelMatrix(const glm::mat4& model) {
+	worldModelMatrix *= model;
+}
+
+void Transform::updateWorldModelMatrix(const glm::mat4& model) {
+	worldModelMatrix = model;
+	worldToLocalMatrix = glm::inverse(model);
+	changed = false;
+}
+
+void Transform::resetWorldModelMatrix() {
+	worldModelMatrix = glm::mat4(1.0f);
+}
+
+const glm::mat4& Transform::getWorldToLocalMatrix() const {
+	return worldToLocalMatrix;
+}
+
+/* Calculates Local Model Matrix from local properties (position, rotation, scale). */
+glm::mat4 Transform::getLocalModelMatrix() const {
+	glm::mat4 matrix = glm::mat4(1.0f);
+	matrix = glm::translate(matrix, glm::vec3(position.x, position.y, 0.0f)); // Anchor position
+	matrix = glm::rotate(matrix, rotation, glm::vec3(0, 0, 1)); // Rotate around Anchor position
+	matrix = glm::scale(matrix, glm::vec3(scale, scale, 1));
+	return matrix;
+}
+
+const glm::mat4& Transform::getWorldModelMatrix() const {
+	return worldModelMatrix;
+}
 
 const float& Transform::getRotation() const {
 	return rotation;
@@ -69,16 +139,11 @@ const float& Transform::getZ() const {
 	return z;
 }
 
-void Transform::setX(float x) {
-	position.x = x;
+void Transform::setZ(float value) {
+	z = value;
 }
-
-void Transform::setY(float y) {
-	position.y = y;
-}
-
-void Transform::setZ(float z) {
-	this->z = z;
+bool Transform::hasChanged() {
+	return changed;
 }
 
 const glm::vec2& Transform::getAnchor() const {
@@ -92,3 +157,17 @@ void Transform::setAnchor(TransformAnchor anchorPoint) {
 	float yOffset = -(float)((int)anchorPoint / 3) / 2;
 	anchor = glm::vec2(xOffset, yOffset);
 }
+
+/*void Transform::refreshModelMatrix() {
+	resetModelMatrix();
+
+	ChunkEntityHandle* parent = getParent();
+	if (parent) {
+		Transform* pTransform = parent->getComponent<Transform>();
+		if (pTransform) {
+			model = pTransform->getModelMatrix();
+		}
+	}
+
+	pushModelMatrix(getLocalModelMatrix());
+}*/

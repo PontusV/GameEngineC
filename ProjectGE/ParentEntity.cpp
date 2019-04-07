@@ -2,11 +2,8 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOAD_COMPONENT_IGNORE(ParentEntity);
 
-
-ParentEntity::ParentEntity(Entity parent) : parent(parent) {
+ParentEntity::ParentEntity(Handle parent) : parent(parent) {
 } // Constructor
 
 ParentEntity::ParentEntity() {
@@ -16,10 +13,10 @@ ParentEntity::~ParentEntity() {
 } // Destructor
 
 
-void ParentEntity::setParent(Entity parent) {
+void ParentEntity::setParent(Handle parent) {
 	this->parent = parent;
 }
 
-Entity ParentEntity::getParent() const {
-	return parent;
+Handle* ParentEntity::getParent() {
+	return &parent;
 }

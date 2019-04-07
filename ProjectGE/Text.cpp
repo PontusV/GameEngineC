@@ -2,9 +2,6 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Text);
-
 
 Text::Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex) : GraphicComponent(layerIndex), font(fontAddress, fontSize), color(color) {
 	setText(text);

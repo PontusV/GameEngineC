@@ -7,18 +7,19 @@
 namespace Core {
 	/* Enables clipping; removes graphic drawn outside the given rect. */
 	class GraphicComponent : public BoxComponent {
+		REGISTER_COMPONENT_TYPE_WITH_BASE(11, BoxComponent);
 	public:
 		virtual ~GraphicComponent();
 	public:
 		void				setLayerIndex(unsigned short index);
-		unsigned short		getLayerIndex();
+		unsigned short		getLayerIndex() const;
 
-		const glm::vec4&	getDrawRect();
-		void				setDrawRect(glm::vec4 rect);
+		const std::vector<glm::vec2>& getClipMaskVertices() const;
 
-		void				enableClipping();
-		void				disableClipping();
-		bool				isClipEnabled();
+		/* Cuts away Drawable area that is outside of the rect parameter. */
+		void				clip(glm::vec2 clipVertices[4]);
+		void				resetClipping();
+		bool				isClipEnabled() const;
 		
 		// Serializable
 		virtual void		serialize(std::ostream& os) const;
@@ -28,9 +29,10 @@ namespace Core {
 		GraphicComponent(unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
 
 	private:
-		unsigned short	layerIndex;
-		bool			clipEnabled;
-		glm::vec4		drawRect;
+		unsigned short			layerIndex;
+		bool					clipEnabled;
+		std::vector<glm::vec2>	clipMaskVertices;
+		//glm::vec4		drawRect;
 	};
 }
 #endif

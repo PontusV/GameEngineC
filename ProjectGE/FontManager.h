@@ -4,7 +4,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
-//#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
 #include <map>
@@ -15,10 +14,10 @@
 namespace Core {
 	struct Character
 	{
-		glm::ivec2	size;		// Size of glyph
-		glm::ivec2	bearing;	// Offset from baseline to left/top of glyph
-		glm::vec2	uvPos;		// UV position in texture atlas
-		GLuint		advance;	// Offset to advance to next glyph
+		glm::ivec2		size;		// Size of glyph
+		glm::ivec2		bearing;	// Offset from baseline to left/top of glyph
+		glm::vec2		uvPos;		// UV position in texture atlas
+		unsigned int	advance;	// Offset to advance to next glyph
 	};
 
 	//Texture2D with an offset position
@@ -39,16 +38,16 @@ namespace Core {
 	{
 	public:
 		FontManager() {}
-		FontManager(const GLchar* fontFile, GLushort textSize, FT_Library ft);
+		FontManager(const char* fontFile, unsigned short textSize, FT_Library ft);
 		~FontManager();
 
 		// Creates and returns a vector of textures for each character in the text parameter
-		TextData2D createText(std::string text, glm::vec4 color, GLushort size);
+		TextData2D createText(std::string text, glm::vec4 color, unsigned short size);
 
 	private:
 		unsigned short textSize;
 		//std::map<GLchar, Character>	characters;
-		std::map<GLchar, CharTexture2D> textureMap;
+		std::map<char, CharTexture2D> textureMap;
 		Character characters[128];
 		CharTexture2D charTextures[128];
 		Texture2D textureAtlas;

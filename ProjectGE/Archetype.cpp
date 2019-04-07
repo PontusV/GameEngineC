@@ -10,8 +10,10 @@ Archetype::Archetype(std::vector<ComponentTypeInfo> types) : types(types) {
 	if (types.size() > 0) {
 		for (std::size_t i = 0; i < types.size() - 1; i++) {
 			for (std::size_t ii = i + 1; ii < types.size(); ii++) {
-				if (types[i].id == types[ii].id)
+				if (types[i].id == types[ii].id) {
+					std::cout << "Archetype::Constructor::ERROR The list of types given to Archetype contains multiple of the same component type.Types must be unique! Types: " << types[i].id << "\n";
 					throw std::invalid_argument("Archetype::Constructor::ERROR The list of types given to Archetype contains multiple of the same component type. Types must be unique!");
+				}
 			}
 		}
 	}
@@ -112,6 +114,17 @@ std::shared_ptr<Chunk> Archetype::getContainer(Entity entity) {
 		}
 	}
 	throw std::invalid_argument("Archetype::getContainer::ERROR The entity is not contained by this Archetype!");
+}
+
+EntityLocation Archetype::getLocation(Entity entity) {
+	try {
+		std::shared_ptr<Chunk> chunk = getContainer(entity);
+		std::size_t index = chunk->getIndex(entity);
+		return EntityLocation{index, chunk};
+	} catch (std::exception&) {
+		std::cout << "Archetype::getLocation::ERROR could not find location for Entity.\n";
+		return EntityLocation(); // Returns invalid location
+	}
 }
 
 std::vector<ComponentDataBlock> Archetype::getComponentDataBlocks(Entity entity) {

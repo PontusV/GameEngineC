@@ -10,25 +10,25 @@ ChunkEntityHandle::~ChunkEntityHandle()
 {
 }
 
-Component* ChunkEntityHandle::getComponent(ComponentTypeID typeID) {
+Component* ChunkEntityHandle::getComponent(ComponentTypeID typeID) const {
 	if (auto ptr = chunkPtr.lock()) {
 		return ptr->getComponent(entity, typeID);
 	}
 	return nullptr; // Chunkptr was invalid
 }
 
-std::vector<Component*> ChunkEntityHandle::getComponents() {
+std::vector<Component*> ChunkEntityHandle::getComponents() const {
 	if (auto ptr = chunkPtr.lock()) {
 		return ptr->getComponents(entity);
 	}
-	throw std::invalid_argument("ChunkEntityHandle::getComponents()::error Chunkptr was invalid");
+	throw std::invalid_argument("ChunkEntityHandle::getComponents()::Error Chunkptr was invalid");
 	//return nullptr; // Chunkptr was invalid
 }
 
-Entity ChunkEntityHandle::getEntity() {
+Entity ChunkEntityHandle::getEntity() const {
 	return entity;
 }
-Entity* ChunkEntityHandle::getEntityPtr() {
+Entity* ChunkEntityHandle::getEntityPtr() const {
 	if (auto ptr = chunkPtr.lock()) {
 		return ptr->getEntityPtr(entity);
 	}

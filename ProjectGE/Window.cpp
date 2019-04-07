@@ -8,7 +8,7 @@
 using namespace Core;
 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
@@ -35,7 +35,7 @@ bool Window::init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	//glfwWindowHint(GLFW_SAMPLES, 16); //Anti-alias
+	glfwWindowHint(GLFW_SAMPLES, 16); //Anti-alias
 
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 	if (!window) {
@@ -46,7 +46,7 @@ bool Window::init() {
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0); //0 = DISABLES VSYNC, 1 = ENABLES VSYNC
 	//
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, Window::framebuffer_size_callback);
 
 
 	// glad: load all OpenGL function pointers
@@ -59,15 +59,22 @@ bool Window::init() {
 
 	// OpenGL configuration
 	glViewport(0, 0, width, height);
-	//Enable transparently
+	// Enable transparently
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// Enable scissor for panels
-	//glEnable(GL_SCISSOR_TEST);
+	// Stencil (Test)
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0x00); // Disable stencil writes
 	// End of config
 
 	active = true;
 	return true;
+}
+
+void Window::clear() const {
+	glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::update() const {
@@ -78,6 +85,9 @@ bool Window::isActive() const {
 	return active && !glfwWindowShouldClose(window);
 }
 
+void Window::setBackgroundColor(glm::vec3 color) {
+	backgroundColor = color;
+}
 
 GLFWwindow* Window::getWindow() {
 	return window;
@@ -88,16 +98,11 @@ void Window::close() {
 }
 
 int Window::getWidth() {
+	glfwGetWindowSize(window, &width, &height);
 	return width;
 }
 
 int Window::getHeight() {
+	glfwGetWindowSize(window, &width, &height);
 	return height;
 }
-/*void Window::setKeyCallBack(GLFWkeyfun fun) {
-	glfwSetKeyCallback(window, fun);
-}
-
-void Window::setFramebufferSizeCallback(GLFWframebuffersizefun fun) {
-	glfwSetFramebufferSizeCallback(window, fun);
-}*/

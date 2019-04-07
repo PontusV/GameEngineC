@@ -2,8 +2,7 @@
 #define TRANSFORM_COMPONENT_H
 
 #include "Component.h"
-#include "HandleManager.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 namespace Core {
 
@@ -14,25 +13,36 @@ namespace Core {
 	};
 
 	class Transform : public Component {
+		REGISTER_COMPONENT_TYPE(1);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 1;
-
 		Transform(float x, float y, float z = 0.0f, TransformAnchor anchorPoint = TransformAnchor::CENTER, float rotation = 0.0f, float scale = 1.0f);
+		Transform(float x, float y, float z = 0.0f, glm::vec2 anchorPoint = glm::vec2(0,0), float rotation = 0.0f, float scale = 1.0f);
 		Transform();
 		~Transform();
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
-		//Get & Set
+		void				rotate(float degrees);
+		void				moveX(float value);
+		void				moveY(float value);
+
+		/* Pushes model matrix into worldModelMatrix */
+		void				pushModelMatrix(const glm::mat4& model);
+		void				updateWorldModelMatrix(const glm::mat4& model);
+		void				resetWorldModelMatrix();
+		const glm::mat4&	getWorldModelMatrix() const;
+		const glm::mat4&	getWorldToLocalMatrix() const;
+		glm::mat4			getLocalModelMatrix() const;
+
 		const float&		getRotation() const;
 		const glm::vec2&	getPosition() const;
 
 		const float&		getX() const;
 		const float&		getY() const;
 		const float&		getZ() const;
-		void				setX(float y);
-		void				setY(float x);
-		void				setZ(float z);
+		void				setX(float value);
+		void				setY(float value);
+		void				setZ(float value);
 
+		bool				hasChanged();
 		void				setAnchor(TransformAnchor anchor);
 		const glm::vec2&	getAnchor() const;
 
@@ -43,12 +53,15 @@ namespace Core {
 		virtual void		deserialize(std::istream& is);
 
 	private:
-		glm::vec2	position;
-		float		z;			//Depth for drawing order
-		float		rotation;
-		float		scale;
+		glm::mat4	worldModelMatrix;		// World Model Matrix
+		glm::mat4	worldToLocalMatrix;		// Inverse of worldModelMatrix. Multiply with a world position to get local position
+		glm::vec2	position;				// Local position
+		float		z;						// Depth for drawing order
+		float		rotation;				// Local rotation in radians
+		float		scale;					// Local scale (both width and height atm)
 
-		glm::vec2	anchor; // Determines where the position is relative to BoxComponents
+		bool		changed;				// Defines if the transform has moved
+		glm::vec2	anchor;					// Determines where the position is relative to BoxComponents
 	};
 }
 #endif

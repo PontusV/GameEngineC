@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
-#include <string>
 #include "Serializable.h"
+#include <string>
 
 namespace Core {
 	/* Stores an address to a ttf font and font size. Used to save and load font from file */

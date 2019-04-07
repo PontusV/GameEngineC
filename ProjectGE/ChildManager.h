@@ -3,33 +3,27 @@
 
 #include "Component.h"
 #include "Entity.h"
-#include "ChildListener.h"
 #include <vector>
 #include <cstddef>
 
 namespace Core {
 
-	class ChildManager : public Component, public ChildListener {
+	class ChildManager : public Component {
+		REGISTER_COMPONENT_TYPE(7);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 7;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
-
 		ChildManager() {}
 		~ChildManager();
 
-		void childAdded(ChunkEntityHandle entity);
+		/* Adds entity to collection if no reference to the child already exists; otherwise the reference held to the child will be replace with the parameter value. */
+		void childAdded(Handle entity);
 		void childRemoved(Entity entity);
 
-		std::size_t			getChildCount();
-		ChunkEntityHandle*	getChild(std::size_t index);
-		std::vector<ChunkEntityHandle>& getChildren();
-
-		void registerListener(ChildListener* listener);
-		void unregisterListener(ChildListener* listener);
+		std::size_t				getChildCount();
+		Handle*					getChild(std::size_t index);
+		std::vector<Handle>&	getChildren();
 
 	private:
-		std::vector<ChunkEntityHandle> children;
-		std::vector<ChildListener*> listeners;
+		std::vector<Handle> children;
 	};
 }
 #endif

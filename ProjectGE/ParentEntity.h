@@ -2,24 +2,23 @@
 #define PARENT_ENTITY_H
 
 #include "Component.h"
-#include "Entity.h"
+#include "Handle.h"
 
 namespace Core {
 
 	class ParentEntity : public Component {
+		REGISTER_COMPONENT_TYPE(6);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 6;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
 
-		ParentEntity(Entity parent);
+		ParentEntity(Handle parent);
 		ParentEntity();
 		~ParentEntity();
 
-		void	setParent(Entity parent);
-		Entity	getParent() const;
+		void	setParent(Handle parent);
+		Handle*	getParent();
 
 	private:
-		Entity parent;
+		Handle parent;
 	};
 }
 #endif

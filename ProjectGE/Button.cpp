@@ -2,9 +2,6 @@
 
 using namespace Core;
 
-#include "ComponentLoader.h"
-REGISTER_LOADABLE_COMPONENT(Button);
-
 
 Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : images{defaultImage, pressedImage, hoverImage} {
 } // Constructor
@@ -18,7 +15,7 @@ Button::~Button() {
 
 /* Initializes handle to image component with same owner. */
 void Button::init() {
-	imageHandle = ComponentHandle(owner, Image::TYPE_ID);
+	changeState(ButtonState::DEFAULT);
 }
 
 void Button::onLeftClickPressed() {
@@ -48,8 +45,7 @@ void Button::changeState(ButtonState state) {
 	this->state = state;
 
 	// Change image
-	Image* image = imageHandle.getComponent<Image>();
-	//Image* image = owner.getComponent<Image>();
+	Image* image = owner.getComponent<Image>();
 	if (image) {
 		images[state].reload();
 		image->setTexture(images[state].getFileName(), images[state].getTexture());
@@ -77,9 +73,11 @@ void Button::setButtonReleaseCallback(ui::LeftClickReleaseFun fun) {
 void Button::serialize(std::ostream& os) const {
 	Component::serialize(os);
 
-	images[0].serialize(os);
-	images[1].serialize(os);
-	images[2].serialize(os);
+	images[0].serialize(os);							// Image 1
+	images[1].serialize(os);							// Image 2
+	images[2].serialize(os);							// Image 3
+
+	os.write((char*)&state, sizeof(state));				// State
 }
 
 void Button::deserialize(std::istream& is) {
@@ -88,9 +86,11 @@ void Button::deserialize(std::istream& is) {
 	ComponentTypeID typeID;
 
 	is.read((char*)&typeID, sizeof(ComponentTypeID));
-	images[0].deserialize(is);
+	images[0].deserialize(is);							// Image 1
 	is.read((char*)&typeID, sizeof(ComponentTypeID));
-	images[1].deserialize(is);
+	images[1].deserialize(is);							// Image 2
 	is.read((char*)&typeID, sizeof(ComponentTypeID));
-	images[2].deserialize(is);
+	images[2].deserialize(is);							// Image 3
+
+	is.read((char*)&state, sizeof(state));				// State
 }

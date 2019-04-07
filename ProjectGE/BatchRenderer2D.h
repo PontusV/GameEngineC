@@ -1,11 +1,10 @@
 #ifndef BATCH_RENDERER_2D
 #define BATCH_RENDERER_2D
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "BatchConfig.h"
 #include "Renderable2D.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
 namespace Core {
@@ -14,11 +13,10 @@ namespace Core {
 
 	struct VertexData
 	{
-		glm::vec2 vertex;
-		//glm::vec4 color;
-		GLuint color;
-		glm::vec2 texture;
-		float textureID;
+		glm::vec2		vertex;
+		unsigned int	color;
+		glm::vec2		texture;
+		float			textureID;
 	};
 
 #define RENDERER_MAX_SPRITES	10000
@@ -34,8 +32,9 @@ namespace Core {
 #define SHADER_TEXTURE_ID_INDEX 3
 
 	struct BatchSegment {
-		GLsizei		startIndex;
-		GLsizei		size;
+		std::size_t	startIndex;
+		std::size_t size;
+		std::size_t clipMaskCount;
 		BatchConfig config;
 	};
 
@@ -54,20 +53,25 @@ namespace Core {
 		// Reuse VBO buffer
 		BatchConfig& getConfig();
 		inline bool hasRoom();
-		inline bool hasBegun() { return begun; }
 
 		void init();
 		void begin();
 		void submit(const RenderCopy2D& sprite);
 		void end();
 		void flush();
+
+		void submitMask(glm::vec2 vertex1, glm::vec2 vertex2, glm::vec2 vertex3, glm::vec2 vertex4);
+
 	private:
-		bool						begun, initialized;
-		GLuint						VAO, VBO, EBO;
-		GLsizei						indexCount, verticiesCount;
+		unsigned int maskShaderID;
+
+	private:
+		unsigned int				VAO, VBO, EBO;
+		std::size_t					indexCount, verticiesCount;
 		VertexData*					buffer;
 		BatchConfig*				config;
 		std::vector<BatchSegment>	segments;
+		BatchSegment*				segmentBack;
 		Window* window;
 	};
 }

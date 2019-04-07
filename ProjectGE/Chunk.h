@@ -33,6 +33,7 @@ namespace Core {
 
 		template<typename T> void			setComponent(Entity entity, T* component);
 		template<typename T> void			setComponent(std::size_t index, T* component);
+		template<typename T> T*		getComponent(Entity entity);
 		Component*							getComponent(Entity entity, ComponentTypeID componentTypeID);
 		std::vector<Component*>				getComponents(Entity entity);
 		std::vector<ComponentDataBlock>		getComponentDataBlocks(Entity entity);
@@ -50,12 +51,14 @@ namespace Core {
 		std::size_t							getID();
 		std::size_t							getSize();
 
-	private:
 		std::size_t							getIndex(Entity entity);
+		std::vector<Component*>				getComponents(std::size_t index);
+
+	private:
 		void								remove(std::size_t index, bool destroy = true);
 		char*								getComponentArrayPtr(ComponentTypeID typeID);
 		Component*							getComponent(std::size_t index, ComponentTypeID componentTypeID);
-		std::vector<Component*>				getComponents(std::size_t index);
+		Component*							getComponent(std::size_t index, ComponentTypeInfo& type);
 
 	private:
 		std::size_t MAX_SIZE; // Size of entries
@@ -93,6 +96,12 @@ namespace Core {
 		// Force copy-constructor to copy the given component into memory
 		T* newComponent = new(componentPtr) T();
 		*newComponent = *component;
+	}
+
+	template<typename T>
+	T* Chunk::getComponent(Entity entity) {
+		ComponentTypeInfo type(sizeof(T), T::TYPE_ID);
+		return static_cast<T*>(getComponent(getIndex(entity), type));
 	}
 
 	template <typename T>

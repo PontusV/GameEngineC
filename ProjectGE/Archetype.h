@@ -3,8 +3,8 @@
 
 #include "Entity.h"
 #include "Chunk.h"
-#include "ChunkEntityHandle.h"
 #include "ComponentTypeInfo.h"
+#include "EntityLocation.h"
 
 #include <vector>
 #include <memory>
@@ -20,11 +20,12 @@ namespace Core {
 		~Archetype();
 
 		template <typename... Ts>
-		ChunkEntityHandle					addEntity(Entity entity, Ts*... components);
+		EntityLocation						addEntity(Entity entity, Ts*... components);
 		void								removeEntity(Entity entity, bool destruct = true);					// Destruct decides if the destructor of its components should be called or not
 		void								copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
 		template<typename T> void			setComponent(Entity entity, T* component);
+		template<typename T> T*				getComponent(Entity entity);
 		Component*							getComponent(Entity entity, ComponentTypeID componentTypeID);
 		std::vector<Component*>				getComponents(Entity entity);
 
@@ -36,12 +37,13 @@ namespace Core {
 		std::vector<ComponentTypeInfo>		getTypes();
 		std::vector<ComponentTypeID>		getTypeIDs();
 		std::vector<ComponentDataBlock>		getComponentDataBlocks(Entity entity);
+		EntityLocation						getLocation(Entity entity);
 
 		void								clear();
 		bool								operator==(Archetype& other);
 
-	private:
 		std::shared_ptr<Chunk>				getContainer(Entity entity);
+	private:
 		void								createChunk();
 		void								removeChunk(std::size_t index);
 
@@ -53,12 +55,12 @@ namespace Core {
 	// --------------------------- Template Function Definitions --------------------------------
 
 	template <typename... Ts>
-	ChunkEntityHandle Archetype::addEntity(Entity entity, Ts*... components) {
+	EntityLocation Archetype::addEntity(Entity entity, Ts*... components) {
 		//Checking for space in existing chunks
 		for (std::shared_ptr<Chunk> chunk : chunks) {
 			if (!chunk->isFull()) {
 				chunk->add(entity, components...);
-				return ChunkEntityHandle(chunk, entity);
+				return EntityLocation(chunk->getIndex(entity), chunk); // TODO: Get index from chunk::add
 			}
 		}
 
@@ -66,12 +68,17 @@ namespace Core {
 		createChunk();
 		std::shared_ptr<Chunk> chunk = chunks.back();
 		chunk->add(entity, components...);
-		return ChunkEntityHandle(chunk, entity);
+		return EntityLocation(chunk->getIndex(entity), chunk); // TODO: Get index from chunk::add
 	}
 
 	template<typename T>
 	void Archetype::setComponent(Entity entity, T* component) {
 		getContainer(entity)->setComponent(entity, component);
+	}
+
+	template<typename T>
+	T* Archetype::getComponent(Entity entity) {
+		return getContainer(entity)->getComponent<T>(entity);
 	}
 }
 #endif

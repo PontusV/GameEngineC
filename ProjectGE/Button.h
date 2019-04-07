@@ -18,10 +18,8 @@ namespace Core {
 
 	/* A button which manipulates the image component in the same Entity. A button does not function without an image. */
 	class Button : public Component, public ui::Interactable {
+		REGISTER_COMPONENT_TYPE(4);
 	public:
-		static constexpr ComponentTypeID TYPE_ID = 4;
-		const ComponentTypeID getTypeID() const override { return TYPE_ID; }
-
 		// Constructor / Destructor
 		Button(Image defaultImage, Image pressedImage, Image hoverImage);																// Different sized images
 		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, unsigned int width, unsigned int height);	// Same sized images
@@ -51,9 +49,6 @@ namespace Core {
 	private:
 		Image			images[3];
 		ButtonState		state;
-
-		// Ref to component with same owner
-		ComponentHandle	imageHandle;
 	};
 }
 #endif

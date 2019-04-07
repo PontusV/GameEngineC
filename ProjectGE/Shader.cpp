@@ -1,6 +1,7 @@
 #include "Shader.h"
+#include <glad/glad.h>
 
-
+using namespace Core;
 
 Shader::Shader() {
 
