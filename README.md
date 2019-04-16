@@ -5,7 +5,7 @@ This Game Engine in currently a work in progress and is intented to become a hig
 
 Compiles with C++ 17
 
-Externals:
+Externals:  
 OpenGL		- Graphics  
 Glad		- OpenGL Loading Library  
 GLFW		- Window and input  
