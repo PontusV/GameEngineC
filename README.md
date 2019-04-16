@@ -6,9 +6,9 @@ This Game Engine in currently a work in progress and is intented to become a hig
 Compiles with C++ 17
 
 Externals:
-OpenGL		- Graphics
-Glad		- OpenGL Loading Library
-GLFW		- Window and input
-OpenGL Mathematics(GLM)
-stbh_image		- For loading images
-Freetype		- For loading ttf text font files
+OpenGL		- Graphics  
+Glad		- OpenGL Loading Library  
+GLFW		- Window and input  
+OpenGL Mathematics(GLM)  
+stbh_image		- For loading images  
+Freetype		- For loading ttf text font files  
