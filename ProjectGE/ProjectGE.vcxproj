@@ -168,17 +168,20 @@
   <ItemGroup>
     <ClCompile Include="Archetype.cpp" />
     <ClCompile Include="Border.cpp" />
+    <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="BoxComponent.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="ChildManager.cpp" />
     <ClCompile Include="Chunk.cpp" />
-    <ClCompile Include="ChunkEntityHandle.cpp" />
     <ClCompile Include="ComponentHandle.cpp" />
+    <ClCompile Include="ComponentType.cpp" />
+    <ClCompile Include="ComponentTypeInfo.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GraphicComponent.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="ComponentLoader.cpp" />
+    <ClCompile Include="LayoutElement.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParentEntity.cpp" />
     <ClCompile Include="Rect.cpp" />
@@ -194,6 +197,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -214,11 +218,14 @@
     <ClInclude Include="Archetype.h" />
     <ClInclude Include="BatchConfig.h" />
     <ClInclude Include="Border.h" />
+    <ClInclude Include="Bounds.h" />
     <ClInclude Include="BoxComponent.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="ChildManager.h" />
-    <ClInclude Include="ChunkEntityHandle.h" />
     <ClInclude Include="ComponentHandle.h" />
+    <ClInclude Include="ComponentMetaInfo.h" />
+    <ClInclude Include="ComponentRegistry.h" />
+    <ClInclude Include="ComponentType.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
     <ClInclude Include="EntityLocation.h" />
     <ClInclude Include="FpsCounter.h" />
@@ -228,6 +235,7 @@
     <ClInclude Include="Interactable.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="ComponentLoader.h" />
+    <ClInclude Include="LayoutElement.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParentEntity.h" />
     <ClInclude Include="Rect.h" />
@@ -265,6 +273,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="TypeList.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

@@ -65,11 +65,15 @@ void Level::serialize(std::ostream& os) const {
 		os.write(entityName.c_str(), entityName.size() + 1);		// Entity name
 
 		std::vector<Component*> components = manager->getComponents(*it);
+		std::vector<IComponentTypeInfo> componentTypeInfoVec = manager->getComponentTypes(*it);
 		std::size_t componentAmount = components.size();
 		os.write((char*)&componentAmount, sizeof(std::size_t));		// Component amount
 
-		for (Component* component : components) {					// Loop through Components
-			component->serialize(os);								// Component Data
+		for (std::size_t i = 0; i < components.size(); i++) {		// Loop through Components
+			std::string typeName = componentTypeInfoVec[i].name;
+			os.write(typeName.c_str(), typeName.size() + 1);		// Component Type name
+			components[i]->serialize(os);	// Component Data
+			//os.write((char*)&components[i], componentTypeInfoVec[i].size);	// Component Data
 		}
 	}
 
@@ -99,7 +103,7 @@ void Level::serialize(std::ostream& os) const {
 				}
 			}
 		}
-		/*ParentEntity* component = manager->getComponent<ParentEntity>(*it);
+		ParentEntity* component = manager->getComponent<ParentEntity>(*it);
 		if (component) { // If the entity has a parent
 			std::string childName = getEntityName(*it);
 
@@ -107,7 +111,7 @@ void Level::serialize(std::ostream& os) const {
 			std::string parentName = getEntityName(parentID);
 
 			parentChildPairs.push_back(std::make_pair(childName, parentName));
-		}*/
+		}
 	}
 
 	std::size_t parentAmount = parentChildPairs.size();
@@ -118,25 +122,27 @@ void Level::serialize(std::ostream& os) const {
 
 		std::string parentName = pair.second;
 		os.write(parentName.c_str(), parentName.size() + 1);		// Parent name
-	}
+	}//*/
 }
 
 /* Load from instream */
 void Level::deserialize(std::istream& is) {
 	// Entities
 	std::size_t entityAmount;
-	is.read((char*)&entityAmount, sizeof(std::size_t));				// Entity amount
+	is.read((char*)&entityAmount, sizeof(std::size_t));					// Entity amount
 
-	for (std::size_t i = 0; i < entityAmount; i++) {				// Loop through Entities
+	for (std::size_t i = 0; i < entityAmount; i++) {					// Loop through Entities
 		std::string entityName;
-		std::getline(is, entityName, '\0');							// Entity name
+		std::getline(is, entityName, '\0');								// Entity name
 		EntityHandle object = createEntity(entityName);
 
 		std::size_t componentAmount;
-		is.read((char*)&componentAmount, sizeof(std::size_t));		// Component amount
+		is.read((char*)&componentAmount, sizeof(std::size_t));			// Component amount
 
-		for (std::size_t ii = 0; ii < componentAmount; ii++) {		// Loop through Components
-			ComponentLoader::addComponentFromFile(is, object);		// Component Data
+		for (std::size_t ii = 0; ii < componentAmount; ii++) {			// Loop through Components
+			std::string typeName;
+			std::getline(is, typeName, '\0');							// Component Type name
+			ComponentLoader::addComponentFromFile(is, typeName, object);// Component Data
 		}
 	}
 
@@ -151,11 +157,11 @@ void Level::deserialize(std::istream& is) {
 		std::getline(is, parentName, '\0');							// Parent name
 
 		// Add ParentEntity component
-		std::size_t parentID = getEntity(parentName).getEntity().getID();
-		if (parentID == Entity::INVALID_ID) {
+		Entity parent = getEntity(parentName).getEntity();
+		if (parent.getID() == Entity::INVALID_ID) {
 			getEntity(childName).destroy();
 		} else {
-			getEntity(childName).setParent(Entity(parentID));
+			getEntity(childName).setParent(parent);
 		}
-	}
+	}//*/
 }

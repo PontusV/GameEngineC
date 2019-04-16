@@ -7,7 +7,6 @@
 namespace Core {
 
 	class ParentEntity : public Component {
-		REGISTER_COMPONENT_TYPE(6);
 	public:
 
 		ParentEntity(Handle parent);

@@ -1,5 +1,4 @@
 #include "BoxComponent.h"
-#include "Chunk.h"
 #include "Transform.h"
 
 using namespace Core;
@@ -27,6 +26,19 @@ void BoxComponent::setSize(glm::ivec2 size) {
 
 const glm::ivec2& BoxComponent::getSize() const {
 	return size;
+}
+
+void BoxComponent::updateBounds() {
+	Transform* transform = owner.getComponent<Transform>();
+	if (transform) {
+		const glm::mat4& model = transform->getLocalModelMatrix();
+		const glm::vec2& position = transform->getPosition();
+		bounds = Bounds::create(model, position, size);
+	}
+}
+
+Bounds& BoxComponent::getBounds() {
+	return bounds;
 }
 
 // ------------------------------- Serializable ----------------------------------------

@@ -24,21 +24,21 @@ namespace Core {
 			clear();
 		}
 
-		template <typename... Ts> Handle	createEntity(Ts*... components);
-		template <typename... Ts> Handle	addEntity(Entity entity, Ts*... components);
+		template <typename... Ts> Handle	createEntity(Ts&... components);
 		void								destroyEntity(Entity entity);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		template <typename T> T*			getComponent(Entity entity);
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
-		Component*							getComponent(Entity entity, ComponentTypeID id);
-		template <typename T> void			addComponent(Entity entity, T* component);
+		Component*							getComponent(Entity entity, ComponentType type);
+		template <typename T> void			addComponent(Entity entity, T& component);
+		/* If the Entity has a component of type T it is removed. It does not removed components deriving from T. */
 		template <typename T> void			removeComponent(Entity entity);
-		void								removeComponent(Entity entity, ComponentTypeInfo type);
 		template <typename T> bool			hasComponent(Entity entity);
-		bool								hasComponent(Entity entity, ComponentTypeID id);
+		bool								hasComponent(Entity entity, ComponentType type);
 
 		std::vector<Component*>				getComponents(Entity entity);
+		std::vector<IComponentTypeInfo>		getComponentTypes(Entity entity);
 
 		Handle								getParent(Entity entity);
 		Handle*								getChild(Entity entity, int index);
@@ -50,12 +50,14 @@ namespace Core {
 		void								clear();
 
 	private:
+		template <typename... Ts> Handle	addEntity(Entity entity, Ts&... components);
 		void								removeEntity(Entity entity, bool destroy = true);
+		void								removeComponent(Entity entity, ComponentTypeID type);
 
 		void								removeArchetype(Archetype* archetype);
-		Archetype*							createArchetype(std::vector<ComponentTypeInfo> types);
+		Archetype*							createArchetype(std::vector<IComponentTypeInfo> types);
 		template<typename... Ts> Archetype*	getArchetype();
-		Archetype*							getArchetype(std::vector<ComponentTypeInfo> types);
+		Archetype*							getArchetype(std::vector<IComponentTypeInfo> types);
 
 
 		/* Inits components and notifies parent Entities. */
@@ -76,14 +78,14 @@ namespace Core {
 
 	/* Creates an entity and adds it and its components to a matching Archetype. Returns a handle to the Entity. */
 	template <typename... Ts>
-	Handle EntityManager::createEntity(Ts*... components) {
+	Handle EntityManager::createEntity(Ts&... components) {
 		Entity entity(entityIDCounter++);
 		return addEntity(entity, components...);
 	}
 
 	/* Adds entity and its components to matching Archetype. */
 	template <typename... Ts>
-	Handle EntityManager::addEntity(Entity entity, Ts*... components) {
+	Handle EntityManager::addEntity(Entity entity, Ts&... components) {
 		Handle owner;
 		// Call implementation
 		try {
@@ -97,12 +99,6 @@ namespace Core {
 		catch (const std::exception& e) {
 			std::cout << "Failed to add Entity.\n";
 			std::cout << "Exception: " << e.what() << "\n";
-		}
-
-		// Clean up
-		std::vector<Component*> componentList{ components... };
-		for (Component* component : componentList) {
-			delete component;
 		}
 		return owner;
 	}
@@ -119,37 +115,34 @@ namespace Core {
 
 	template <typename T>
 	bool EntityManager::hasComponent(Entity entity) {
-		return hasComponent(entity, T::TYPE_ID);
+		return hasComponent(entity, typeof(T));
 	}
 
 	/* Adds given components to the given Entity. */
 	template <typename T>
-	void EntityManager::addComponent(Entity entity, T* component) {
+	void EntityManager::addComponent(Entity entity, T& component) {
 		Archetype* src = entityMap.at(entity);
-		std::vector<ComponentTypeInfo> destTypes = src->getTypes();
-		destTypes.push_back({ sizeof(T), T::TYPE_ID });
+		std::vector<IComponentTypeInfo> destTypes = src->getTypes();
+		destTypes.push_back(IComponentTypeInfo(typeof(T), nameof(T), sizeof(T)));
 
 		Archetype* dest = getArchetype(destTypes);
 		Handle owner = moveEntity(entity, src, dest);
 
 		dest->setComponent(entity, component);
 		prepEntity(entity, owner, dest);
-
-		// Clean up
-		delete component;
 	}
 
 	/* Removes components with types (specified in template) from the given Entity. */
 	template <typename T>
 	void EntityManager::removeComponent(Entity entity) {
-		removeComponent(entity, ComponentTypeInfo(sizeof(T), T::TYPE_ID));
+		removeComponent(entity, typeIDof(T));
 	}
 
 	/* Returns reference to ArchetypeEntry containing Archetype with specified types. Creates a new Archetype (and entry) if no match was found. */
 	template<typename... Ts>
 	Archetype* EntityManager::getArchetype() {
 		// Look for archetype with matching template
-		std::vector<ComponentTypeInfo> types = { {sizeof(Ts), Ts::TYPE_ID}... }; // Initialize list with TypeIDs from template
+		std::vector<IComponentTypeInfo> types = { IComponentTypeInfo(Core::ComponentTypeInfo<Ts>::getType(), Core::ComponentTypeInfo<Ts>::getName(), sizeof(Ts))... }; // Initialize list with TypeIDs from template
 		return getArchetype(types);
 	}
 } // End of namespace

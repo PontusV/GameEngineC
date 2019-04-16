@@ -15,6 +15,20 @@ namespace Core {
 		typedef void(*ScrollFun)(float, float);
 
 		class Interactable {
+		protected:
+			Interactable() {
+				// These function pointers are not always nullptr by default for some reason.
+				leftClickPressFun		= nullptr;
+				leftClickReleaseFun		= nullptr;
+				rightClickPressFun		= nullptr;
+				rightClickReleaseFun	= nullptr;
+				middleClickPressFun		= nullptr;
+				middleClickReleaseFun	= nullptr;
+				doubleClickFun			= nullptr;
+				hoverOverFun			= nullptr;
+				hoverOutFun				= nullptr;
+				scrollFun				= nullptr;
+			}
 		public:
 			virtual ~Interactable() {}
 		public:
@@ -30,8 +44,8 @@ namespace Core {
 			virtual void onHoverout()							{ if (hoverOutFun)hoverOutFun(); }
 			virtual void onScroll(float xoffset, float yoffset) { if (scrollFun)scrollFun(xoffset, yoffset); }
 
-			void  setClickTime(float time)	{ clickTime = time; }
-			float getClickTime()			{ if (doubleClickFun) return clickTime; return 0.0f; }
+			void  setTimeSinceLastClick(float time)	{ timeSinceLastClick = time; }
+			float getTimeSinceLastClick()			{ if (doubleClickFun) return timeSinceLastClick; return 0.0f; }
 		protected:
 			// Callback function set
 			void setLeftClickPressedCallback(LeftClickPressFun fun)			{ leftClickPressFun		= fun; }
@@ -58,7 +72,7 @@ namespace Core {
 			HoverOutFun				hoverOutFun;
 			ScrollFun				scrollFun;
 
-			float clickTime;
+			float timeSinceLastClick;
 		};
 	}
 }

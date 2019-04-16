@@ -3,23 +3,28 @@
 
 #include "Chunk.h"
 #include "Component.h"
+#include "ComponentTypeInfo.h"
+#include "ComponentType.h"
+
 #include <vector>
 #include <cstddef>
 #include <stdexcept>
-#include <algorithm>
+#include <algorithm> //?
 #include <map>
 #include <memory>
 
 #include <iostream> //Test
 
 namespace Core {
-	struct ChunkInfo {
-		ChunkInfo(void* dataPtr, std::shared_ptr<Chunk> chunkPtr) : dataPtr(dataPtr), chunkPtr(chunkPtr.get()) {}
-		void* dataPtr;
+	struct ChunkDataArray {
+		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : dataPtr(info.ptr), sizePerEntry(info.sizePerEntry), chunkPtr(chunkPtr.get()) {}
+		char* dataPtr;
+		std::size_t sizePerEntry;
 		Chunk* chunkPtr;
 
-		ChunkInfo& operator=(const ChunkInfo& other) {
+		ChunkDataArray& operator=(const ChunkDataArray& other) {
 			dataPtr = other.dataPtr;
+			sizePerEntry = other.sizePerEntry;
 			chunkPtr = other.chunkPtr;
 			return *this;
 		}
@@ -27,25 +32,25 @@ namespace Core {
 
 	class IComponentArray {
 	public:
-		IComponentArray(ComponentTypeID typeID) : typeID(typeID) {}
-		ComponentTypeID getTypeID() { return typeID; }
+		IComponentArray(ComponentType type) : type(type) {}
+		const ComponentType& getType() const { return type; }
 
 		virtual void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
 		virtual void chunkRemoved(std::size_t chunkID) = 0;
 
-	private:
-		ComponentTypeID typeID;
+	protected:
+		ComponentType type;
 	};
 
 	template <typename T>
 	class ComponentArray : public IComponentArray {
 	public:
-		ComponentArray(std::initializer_list<ComponentTypeID> dependencies, std::initializer_list<ComponentTypeID> filter) : IComponentArray(T::TYPE_ID), dependecyTypeIDs(dependencies), filterTypeIDs(filter) {
-			for (const ComponentTypeID& fTypeID : filter) {
-				if (T::TYPE_ID == fTypeID)
+		ComponentArray(std::initializer_list<ComponentType> dependencies, std::initializer_list<ComponentType> filter) : IComponentArray(typeof(T)), dependecyTypes(dependencies), filterTypes(filter) {
+			for (const ComponentType& fType : filter) {
+				if (type == fType)
 					throw std::invalid_argument("You can not make a ComponentArray<T> filter the ComponentTypeID from T.");
-				for (const ComponentTypeID& dTypeID : dependencies) {
-					if (dTypeID == fTypeID)
+				for (const ComponentType& dType : dependencies) {
+					if (dType == fType)
 						throw std::invalid_argument("You can not both filter and be dependent on a ComponentType in ComponentArray<T>.");
 				}
 			}
@@ -57,7 +62,7 @@ namespace Core {
 
 		std::size_t size() {
 			std::size_t sizeSum = 0;
-			for (ChunkInfo& info : data) {
+			for (ChunkDataArray& info : data) {
 				sizeSum += info.chunkPtr->getSize();
 			}
 			return sizeSum;
@@ -65,12 +70,14 @@ namespace Core {
 
 		T& get(std::size_t index) {
 			std::size_t i = index;
-			for (ChunkInfo& info : data) {
+			for (ChunkDataArray& info : data) {
 				std::size_t size = info.chunkPtr->getSize();
-				if (i < size)
-					return static_cast<T*>(info.dataPtr)[i];
-				else
+				if (i < size) {
+					return *((T*)(&(info.dataPtr[i*info.sizePerEntry])));
+				}
+				else {
 					i -= (size);
+				}
 
 			}
 			throw std::out_of_range("Index out of range.");
@@ -78,7 +85,7 @@ namespace Core {
 
 		Entity& getEntity(std::size_t index) {
 			std::size_t i = index;
-			for (ChunkInfo& info : data) {
+			for (ChunkDataArray& info : data) {
 				std::size_t size = info.chunkPtr->getSize();
 				if (i < size)
 					return info.chunkPtr->getEntityArrayPtr()[i];
@@ -94,10 +101,13 @@ namespace Core {
 		}
 
 		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
-			if (isFiltered(chunkTypes)) return;
+			if (filter(chunkTypes)) return;
 
 			chunkMap.insert(std::make_pair(chunk->getID(), data.size()));
-			data.emplace_back(chunk->getComponentArrayPtr<T>(), chunk);
+			std::vector<ComponentDataArrayInfo> infoVec = chunk->getComponentArrayInfo(typeof(T));
+			for (ComponentDataArrayInfo& info : infoVec) { // Add all matches
+				data.push_back(ChunkDataArray(info, chunk));
+			}
 		}
 
 		void chunkRemoved(std::size_t chunkID) {
@@ -115,29 +125,29 @@ namespace Core {
 		}
 
 	private:
-		bool isFiltered(std::vector<ComponentTypeID> typeIDs) {
+		bool filter(std::vector<ComponentTypeID> typeIDs) {
 			std::size_t count = 0;
 			for (const ComponentTypeID& typeID : typeIDs) {
-				for (ComponentTypeID& filterID : filterTypeIDs) {
-					if (typeID == filterID)
+				for (ComponentType& filterType : filterTypes) {
+					if (filterType == typeID)
 						return true; //Filter
 				}
-				for (ComponentTypeID& dependencyID : dependecyTypeIDs) {
-					if (dependencyID == typeID) {
+				for (ComponentType& dependencyType : dependecyTypes) {
+					if (dependencyType == typeID) {
 						count++;
 						break;
 					}
 				}
 			}
-			if (dependecyTypeIDs.size() != count) return true;
+			if (dependecyTypes.size() != count) return true;
 			return false;
 		}
 
-		std::vector<ChunkInfo> data;
+		std::vector<ChunkDataArray> data;
 		std::map<std::size_t, std::size_t> chunkMap; //ID, index
 
-		std::vector<ComponentTypeID> dependecyTypeIDs;
-		std::vector<ComponentTypeID> filterTypeIDs;
+		std::vector<ComponentType> dependecyTypes;
+		std::vector<ComponentType> filterTypes;
 	};
 }
 

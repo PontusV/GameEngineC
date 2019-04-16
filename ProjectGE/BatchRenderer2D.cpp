@@ -118,7 +118,7 @@ void BatchRenderer2D::submit(const RenderCopy2D& renderable) {
 
 	const glm::vec2& position		= renderable.transform.getPosition();
 	const glm::vec2& anchor			= renderable.transform.getAnchor();
-	const glm::mat4	model			= renderable.transform.getWorldModelMatrix();
+	const glm::mat4	model			= renderable.transform.getLocalToWorldMatrix();
 	const glm::vec2& size			= renderable.size;
 	const glm::vec4& color			= renderable.color;
 	const glm::vec2* uvPos			= renderable.texture.uvPos;

@@ -13,6 +13,10 @@
 using namespace std;
 using namespace Core;
 
+// Register all component types
+#include "ComponentRegistry.h"
+static bool registered = Core::ComponentRegistry::registerComponentTypes();
+
 /* Saves current level. */
 void Engine::saveLevel(const char* fileName) { //To be added: file location of level map (currently hard coded to the map Levels)
 	if (!currentLevel) {
@@ -93,8 +97,8 @@ int Engine::start() {
 	FpsCounter fpsCounter;
 	unsigned short debugLayer = graphics->createLayer();
 	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
-		new Text("FPS: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
-		new Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
+		Text("FPS: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
+		Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
 	);
 
 	// Game loop
@@ -114,8 +118,8 @@ int Engine::start() {
 
 		// Update systems
 		input->update(deltaTime);
-		graphics->update(deltaTime);
 		physics->update(deltaTime);
+		graphics->update(deltaTime);
 
 		// Render
 		graphics->render();

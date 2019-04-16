@@ -12,20 +12,8 @@ Panel::Panel(unsigned int width, unsigned int height) : BoxComponent(width, heig
 Panel::Panel() {
 }
 
-Panel::~Panel()
-{
+Panel::~Panel() {
 }
-
-void Panel::init() {
-	//childGraphics.registerListener(owner);
-}
-void Panel::end() {
-	//childGraphics.unregisterListener(owner);
-}
-
-/*std::vector<GraphicComponent*> Panel::getChildGraphics() {
-	return childGraphics.getCollection();
-}*/
 
 // ------------------------------- Serializable ----------------------------------------
 

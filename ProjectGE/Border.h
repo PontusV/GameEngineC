@@ -7,7 +7,6 @@
 
 namespace Core {
 	class Border : public GraphicComponent {
-		REGISTER_COMPONENT_TYPE_WITH_BASE(9, GraphicComponent);
 	public:
 
 		Border(unsigned int width, unsigned int height, std::size_t thickness, glm::vec4 color, bool inner = false, unsigned int layerIndex = 0, bool top = true, bool right = true, bool bottom = true, bool left = true);

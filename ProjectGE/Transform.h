@@ -13,7 +13,6 @@ namespace Core {
 	};
 
 	class Transform : public Component {
-		REGISTER_COMPONENT_TYPE(1);
 	public:
 		Transform(float x, float y, float z = 0.0f, TransformAnchor anchorPoint = TransformAnchor::CENTER, float rotation = 0.0f, float scale = 1.0f);
 		Transform(float x, float y, float z = 0.0f, glm::vec2 anchorPoint = glm::vec2(0,0), float rotation = 0.0f, float scale = 1.0f);
@@ -26,10 +25,11 @@ namespace Core {
 
 		/* Pushes model matrix into worldModelMatrix */
 		void				pushModelMatrix(const glm::mat4& model);
-		void				updateWorldModelMatrix(const glm::mat4& model);
-		void				resetWorldModelMatrix();
-		const glm::mat4&	getWorldModelMatrix() const;
+		void				updateLocalToWorldMatrix(const glm::mat4& model);
+		void				resetLocalToWorldMatrix();
+		const glm::mat4&	getLocalToWorldMatrix() const;
 		const glm::mat4&	getWorldToLocalMatrix() const;
+		/* Calculates and returns a new model matrix from local position, rotation and scale */
 		glm::mat4			getLocalModelMatrix() const;
 
 		const float&		getRotation() const;
@@ -53,7 +53,7 @@ namespace Core {
 		virtual void		deserialize(std::istream& is);
 
 	private:
-		glm::mat4	worldModelMatrix;		// World Model Matrix
+		glm::mat4	localToWorldMatrix;		// World Model Matrix
 		glm::mat4	worldToLocalMatrix;		// Inverse of worldModelMatrix. Multiply with a world position to get local position
 		glm::vec2	position;				// Local position
 		float		z;						// Depth for drawing order

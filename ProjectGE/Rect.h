@@ -6,7 +6,6 @@
 
 namespace Core {
 	class Rect : public GraphicComponent {
-		REGISTER_COMPONENT_TYPE_WITH_BASE(5, GraphicComponent);
 	public:
 
 		Rect(int width, int height, glm::vec4 color, unsigned short layerIndex = 0);

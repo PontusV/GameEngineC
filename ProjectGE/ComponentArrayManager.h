@@ -22,7 +22,7 @@ namespace Core {
 		}
 
 		template<typename T>
-		ComponentArray<T>* createComponentArray(std::initializer_list<ComponentTypeID> required = {}, std::initializer_list<ComponentTypeID> ignoreables = {}) {
+		ComponentArray<T>* createComponentArray(std::initializer_list<ComponentType> required = {}, std::initializer_list<ComponentType> ignoreables = {}) {
 			ComponentArray<T>* cmpArray = new ComponentArray<T>(required, ignoreables);
 			arrays.push_back(cmpArray);
 			return cmpArray;

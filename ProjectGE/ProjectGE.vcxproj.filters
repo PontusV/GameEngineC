@@ -55,6 +55,12 @@
     <Filter Include="Header Files\Systems\Entity\Handle">
       <UniqueIdentifier>{ea21e4f7-7f55-47ba-b3b6-6408c39a6614}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Systems\Entity\Meta">
+      <UniqueIdentifier>{07ed82ee-5260-4260-b6d8-3af82de17808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems\Entity\Component\Scripts">
+      <UniqueIdentifier>{596c150a-de2b-4324-b7a3-d0e6104bde4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
@@ -67,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Chunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ChunkEntityHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ComponentHandle.cpp">
@@ -183,6 +186,21 @@
     <ClCompile Include="Handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LayoutElement.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Bounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentTypeInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EventListener.h">
@@ -224,9 +242,6 @@
     <ClInclude Include="Component.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
     </ClInclude>
-    <ClInclude Include="ChunkEntityHandle.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="ComponentGroup.h">
       <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
@@ -244,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="Button.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentLoader.h">
-      <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="ComponentTypeInfo.h">
       <Filter>Header Files\Systems\Entity</Filter>
@@ -352,6 +364,27 @@
     </ClInclude>
     <ClInclude Include="ComponentHandle.h">
       <Filter>Header Files\Systems\Entity\Handle</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutElement.h">
+      <Filter>Header Files\Systems\Entity\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Bounds.h">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeList.h">
+      <Filter>Header Files\Systems\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentLoader.h">
+      <Filter>Header Files\Systems\Entity\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentMetaInfo.h">
+      <Filter>Header Files\Systems\Entity\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentRegistry.h">
+      <Filter>Header Files\Systems\Entity\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

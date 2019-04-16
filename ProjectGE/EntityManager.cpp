@@ -92,8 +92,6 @@ void EntityManager::removeEntity(Entity entity, bool destroy) {
 
 	std::vector<Component*> components = archetype->getComponents(entity);
 	for (Component* component : components) {
-		// Notify components that they are about to be removed from its current location
-		component->end();
 		// If the Entity is being destroyed, destroy its components
 		// The chunk will call the destructors of all components if the whole Entity is being destroyed
 		if (!destroy && component->isDestroyed()) {
@@ -133,14 +131,16 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
 	if (parentCmp) {
 		Handle parent = *parentCmp->getParent();
-		if (!parent.isValid()) { // If parent is invalid. Remove the Entity
-			destroyEntity(entity);
+		if (!parent.refresh()) { // If parent is invalid. Throw exception
+			throw std::invalid_argument("EntityManager::prepEntity::ERROR Cannot add invalid Parent!");
+			std::cout << "EntityManager::prepEntity::ERROR Cannot add invalid Parent to Entity(" << entity.getID() << ")\n";
 		}
 		else {
 			while (parent.isValid()) {
 				Entity currentParent = parent.getEntity();
 				if (!hasComponent<ChildManager>(currentParent)) { // Check if childManager exists
-					addComponent(currentParent, new ChildManager());
+					ChildManager childManager;
+					addComponent(currentParent, childManager);
 					parentCmp->setParent(getEntityHandle(currentParent));
 				}
 				ChildManager* childManager = getComponent<ChildManager>(currentParent);
@@ -159,50 +159,66 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	}
 }
 
-void EntityManager::removeComponent(Entity entity, ComponentTypeInfo type) {
+void EntityManager::removeComponent(Entity entity, ComponentTypeID typeID) {
 	Archetype* src = entityMap.at(entity);
-	std::vector<ComponentTypeInfo> destTypes = src->getTypes();
+	std::vector<IComponentTypeInfo> srcTypes = src->getTypes();
 
-	auto it = std::find(destTypes.begin(), destTypes.end(), type);
-	if (it != destTypes.end()) {
-		destTypes.erase(it);
+	auto it = std::find(srcTypes.begin(), srcTypes.end(), typeID);
+	if (it != srcTypes.end()) {
+		srcTypes.erase(it);
 
-		Archetype* dest = getArchetype(destTypes);
+		Archetype* dest = getArchetype(srcTypes);
 		Handle owner = moveEntity(entity, src, dest);
 		prepEntity(entity, owner, dest);
 	}
 }
 
-Component* EntityManager::getComponent(Entity entity, ComponentTypeID id) {
+Component* EntityManager::getComponent(Entity entity, ComponentType type) {
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) return nullptr;
 
 	Archetype* archetype = it->second;
-	return archetype->getComponent(entity, id);
+	return archetype->getComponent(entity, type);
 }
 
-bool EntityManager::hasComponent(Entity entity, ComponentTypeID id) {
+bool EntityManager::hasComponent(Entity entity, ComponentType type) {
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) return false;
 
 	Archetype* archetype = it->second;
 	std::vector<ComponentTypeID> typeIDs = archetype->getTypeIDs();
 	for (ComponentTypeID& typeID : typeIDs) {
-		if (typeID == id) return true;
+		if (type == typeID) return true;
 	}
 	return false;
 }
 
+std::vector<IComponentTypeInfo> EntityManager::getComponentTypes(Entity entity) {
+	auto it = entityMap.find(entity);
+	if (it == entityMap.end()) return std::vector<IComponentTypeInfo>();
 
-Archetype* EntityManager::getArchetype(std::vector<ComponentTypeInfo> types) {
+	return it->second->getTypes();
+}
+
+
+Archetype* EntityManager::getArchetype(std::vector<IComponentTypeInfo> types) {
+	// Type ID List
+	std::vector<ComponentTypeID> typeIDs;
+	typeIDs.reserve(types.size());
+
+	for (IComponentTypeInfo& info : types) {
+		typeIDs.push_back(info.type.getTypeID());
+	}
+
+	// Match check
 	for (Archetype* archetype : archetypes) {
-		if (archetype->match(types))
+		if (archetype->match(typeIDs))
 			return archetype;
 	}
 	return createArchetype(types);
 }
 
-Archetype* EntityManager::createArchetype(std::vector<ComponentTypeInfo> types) {
+Archetype* EntityManager::createArchetype(std::vector<IComponentTypeInfo> types) {
 	archetypes.emplace_back(new Archetype(types));
 	return archetypes.back();
 }

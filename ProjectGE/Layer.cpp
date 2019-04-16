@@ -98,7 +98,7 @@ void Layer::renderText(std::string text, Transform transform, Font font, glm::ve
 		// Create new Transform for Character Sprite
 		Transform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
-		spriteTransform.updateWorldModelMatrix(transform.getWorldModelMatrix() * spriteTransform.getLocalModelMatrix());
+		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * spriteTransform.getLocalModelMatrix());
 
 		Renderable2D renderable{ c.texture, spriteTransform, c.texture.size, textShaderID, color, clipEnabled, clipMaskVertices };
 		submit(renderable);

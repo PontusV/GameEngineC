@@ -24,9 +24,10 @@ void Button::onLeftClickPressed() {
 }
 
 void Button::onLeftClickReleased() {
-	if (state == ButtonState::PRESSED_DOWN)
+	if (state == ButtonState::PRESSED_DOWN) {
 		Interactable::onLeftClickReleased();
-	changeState(ButtonState::HOVER_OVER);
+		changeState(ButtonState::HOVER_OVER);
+	}
 }
 
 void Button::onHoverover() {
@@ -83,13 +84,8 @@ void Button::serialize(std::ostream& os) const {
 void Button::deserialize(std::istream& is) {
 	Component::deserialize(is);
 
-	ComponentTypeID typeID;
-
-	is.read((char*)&typeID, sizeof(ComponentTypeID));
 	images[0].deserialize(is);							// Image 1
-	is.read((char*)&typeID, sizeof(ComponentTypeID));
 	images[1].deserialize(is);							// Image 2
-	is.read((char*)&typeID, sizeof(ComponentTypeID));
 	images[2].deserialize(is);							// Image 3
 
 	is.read((char*)&state, sizeof(state));				// State

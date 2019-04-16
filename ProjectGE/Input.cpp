@@ -61,14 +61,14 @@ void Input::processInputEvent(const InputEvent& event, Interactable* interactabl
 		// TODO: ADD MouseListener
 		if (interactable && event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_LEFT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				float clickTime = (float)glfwGetTime() - interactable->getClickTime();
+				float clickTime = (float)glfwGetTime() - interactable->getTimeSinceLastClick();
 				if (clickTime > DOUBLE_CLICK_THRESHOLD) {
 					interactable->onLeftClickPressed();
-					interactable->setClickTime((float)glfwGetTime());
+					interactable->setTimeSinceLastClick((float)glfwGetTime());
 				}
 				else {
 					interactable->onDoubleClick();
-					interactable->setClickTime(0.0f);
+					interactable->setTimeSinceLastClick(0.0f);
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {

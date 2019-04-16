@@ -18,9 +18,17 @@ EntityHandle::~EntityHandle() {
 }
 
 void EntityHandle::destroy() {
-	return manager->destroyEntity(entity);
+	manager->destroyEntity(entity);
 }
 
+#include "Transform.h"
 void EntityHandle::setParent(const Entity& entity) {
-	addComponent<ParentEntity>(manager->getEntityHandle(entity));
+	update();
+	ParentEntity* parentComponent = getComponent<ParentEntity>();
+	if (parentComponent) {
+		parentComponent->setParent(manager->getEntityHandle(entity));
+	}
+	else {
+		addComponent<ParentEntity>(manager->getEntityHandle(entity));
+	}
 }

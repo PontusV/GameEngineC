@@ -17,7 +17,7 @@ namespace Core {
 		Level();
 		~Level();
 
-		template <typename... Ts> EntityHandle	createEntity(std::string name, Ts*... components); //Creates an entity and maps the given name to it
+		template <typename... Ts> EntityHandle	createEntity(std::string name, Ts... components); //Creates an entity and maps the given name to it
 		void									destroyEntity(Entity entity);
 		EntityHandle							getEntity(std::string entityName);
 		EntityHandle							getEntityHandle(Entity entity);
@@ -42,7 +42,7 @@ namespace Core {
 	// --------------------------- Template Function Definitions --------------------------------
 
 	template <typename... Ts>
-	EntityHandle Level::createEntity(std::string name, Ts*... components) {
+	EntityHandle Level::createEntity(std::string name, Ts... components) {
 		if (entityNameMap.find(name) != entityNameMap.end()) {
 			std::cout << "Level::createEntity::ERROR The name(" << name << ") is already mapped to another Entity!\n";
 			throw std::invalid_argument("Level::createEntity::ERROR The name(" + name + ") is already mapped to another Entity!");

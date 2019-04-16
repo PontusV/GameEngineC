@@ -16,7 +16,7 @@ namespace Core {
 		void										setParent(const Entity& entity);
 
 		template<typename T, class... Args> void	addComponent(Args&&... args);
-		template<typename T> void					addComponent(T* component);
+		template<typename T> void					addComponent(T component);
 		template<typename T> void					removeComponent();
 		void										destroy();
 	};
@@ -24,17 +24,21 @@ namespace Core {
 	// --------------------------- Template Function Definitions --------------------------------
 	template<typename T, class... Args>
 	void EntityHandle::addComponent(Args&&... args) {
-		return manager->addComponent(entity, new T(args...));
+		T component(args...);
+		manager->addComponent(entity, component);
+		update();
 	}
 
 	template<typename T>
-	void EntityHandle::addComponent(T* component) {
-		return manager->addComponent(entity, component);
+	void EntityHandle::addComponent(T component) {
+		manager->addComponent(entity, component);
+		update();
 	}
 
 	template<typename T>
 	void EntityHandle::removeComponent() {
-		return manager->removeComponent<T>(entity);
+		manager->removeComponent<T>(entity);
+		update();
 	}
 }
 #endif

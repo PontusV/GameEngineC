@@ -3,6 +3,7 @@
 
 #include "Entity.h"
 #include "EntityLocation.h"
+#include "ComponentTypeInfo.h"
 #include <vector>
 
 typedef std::size_t ComponentTypeID;
@@ -23,15 +24,22 @@ namespace Core {
 
 		/* Checks if the handle is still pointing to the same Entity. */
 		bool isValid();
+		/* Returns true if Handle is valid. If not, the handle is updated and returns true if the update was successful. */
+		bool refresh();
 
 		/* Updates the Handle so it points towards the target Entity. */
 		void update();
 		void updateLocation(EntityLocation location);
 		const EntityLocation& getLocation() const;
 
+		template<typename T> bool				hasComponent();
+
 		template<typename T> T*					getComponent();
+		Component*								getComponent(ComponentType type);
+		Component*								getComponent(ComponentTypeID typeID);
 		std::vector<Component*>					getComponents();
 		template<typename T> std::vector<T*>	getComponents();
+		std::vector<Component*>					getComponents(ComponentType type);
 
 		template<typename T> T*					getComponentInChildren();
 		std::vector<Component*>					getComponentsInChildren();
@@ -40,11 +48,6 @@ namespace Core {
 		template<typename T> T*					getComponentInParent();
 		std::vector<Component*>					getComponentsInParent();
 		template<typename T> std::vector<T*>	getComponentsInParent();
-
-		/* Creates a new vector containing all the components from the paramater who were deriving from T. */
-		template<typename T> std::vector<T*>	filterComponents(std::vector<Component*> components);
-		/* Returns nullptr if no match was found. */
-		Component*								getFirstDerivingComponent(std::vector<Component*> components, ComponentTypeID typeID);
 
 		Handle*									getParent();
 		Handle*									getChild(std::size_t index);
@@ -57,54 +60,78 @@ namespace Core {
 	private:
 		EntityLocation locationData;
 	};
+	template<typename T>
+	bool Handle::hasComponent() {
+		return manager->hasComponent<T>(entity);
+	}
 
 	template<typename T>
 	T* Handle::getComponent() {
-		std::vector<Component*> components = getComponents();
-		return static_cast<T*>(getFirstDerivingComponent(components, T::TYPE_ID));
+		return static_cast<T*>(getComponent(typeof(T)));
 	}
 
 	template<typename T>
 	std::vector<T*> Handle::getComponents() {
-		std::vector<Component*> components = getComponents();
-		return filterComponents<T>(components);
+		std::vector<Component*> components = getComponents(typeof(T));
+		std::vector<T*> castedPtrs; // Copying
+		castedPtrs.reserve(components.size());
+		for (Component* ptr : components) {
+			castedPtrs.push_back(static_cast<T*>(ptr));
+		}
+		return castedPtrs;
 	}
 
 	template<typename T>
 	T* Handle::getComponentInChildren() {
-		std::vector<Component*> components = getComponentsInChildren();
-		return static_cast<T*>(getFirstDerivingComponent(components, T::TYPE_ID));
+		std::size_t childCount = getChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			Handle* child = getChild(i);
+			if (T* ptr = child->getComponent<T>()) // Check if child has the component
+				return ptr;
+		}
 	}
 
 	template<typename T>
 	std::vector<T*> Handle::getComponentsInChildren() {
-		std::vector<Component*> components = getComponentsInChildren();
-		return filterComponents<T>(components);
+		std::vector<T*> components;
+		if (refresh()) {
+			std::size_t childCount = getChildCount();
+			for (std::size_t i = 0; i < childCount; i++) {
+				Handle* child = getChild(i);
+				std::vector<T*> childComponents = child->getComponents<T>();
+				components.insert(components.end(), childComponents.begin(), childComponents.end());
+			}
+		}
+		return components;
 	}
 
 	template<typename T>
 	T* Handle::getComponentInParent() {
-		std::vector<Component*> components = getComponentsInParent();
-		return static_cast<T*>(getFirstDerivingComponent(components, T::TYPE_ID));
+		if (refresh()) {
+			Handle* parent = getParent();
+			while (parent) {
+				if (T* ptr = parent->getComponent<T>()) // Check if parent has the component
+					return ptr;
+
+				parent = parent->getParent(); // Check next parent
+			}
+		}
+		return nullptr;
 	}
 
 	template<typename T>
 	std::vector<T*> Handle::getComponentsInParent() {
-		std::vector<Component*> components = getComponentsInParent();
-		return filterComponents<T>(components);
-	}
-
-	template<typename T>
-	std::vector<T*> Handle::filterComponents(std::vector<Component*> components) {
-		std::vector<T*> componentsWithEqualType; // Fill collection with components deriving from T
-		// Filter out components that do not derive from T
-		for (Component* component : components) {
-			// Push components with same type as T
-			if (component->equalType(T::TYPE_ID)) {
-				componentsWithEqualType.push_back(static_cast<T*>(component));
+		std::vector<Component*> components;
+		if (refresh()) {
+			Handle* parent = getParent();
+			if (parent) {
+				std::vector<Component*> parentComponents = parent->getComponents<T>();
+				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
+				parentComponents = parent->getComponentsInParent();
+				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 			}
 		}
-		return componentsWithEqualType;
+		return components;
 	}
 }
 #endif

@@ -87,8 +87,6 @@ void Graphics::render() {
 	// Images
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
-		// Test rotation
-		//renderableImages.transforms[i].rotate(0.05f);
 
 		Image&				image		= renderableImages.images[i];
 		const Transform&	transform	= renderableImages.transforms[i];
@@ -163,7 +161,7 @@ void Graphics::render() {
 				}
 
 				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
-				lineTransform.updateWorldModelMatrix(transform.getWorldModelMatrix() * lineTransform.getLocalModelMatrix());
+				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * lineTransform.getLocalModelMatrix());
 
 				renderer->submit({ texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
 			}
@@ -188,7 +186,7 @@ void Graphics::update(float dt) {
 		const glm::vec2& size = panel.getSize();
 		float x = size.x * transform.getAnchor().x;
 		float y = size.y * transform.getAnchor().y;
-		const glm::mat4& localToWorldMatrix = transform.getWorldModelMatrix();
+		const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
 
 		std::vector<GraphicComponent*> children = panel.getOwner().getComponentsInChildren<GraphicComponent>();
 

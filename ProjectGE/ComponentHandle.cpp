@@ -20,6 +20,5 @@ ComponentHandle::~ComponentHandle() {
 
 /* Will return nullptr if ChunkEntityHandle is invalid, which means the Entity has been moved to another Chunk or got destroyed. */
 Component* ComponentHandle::getComponent() {
-	std::vector<Component*> components = getComponents();
-	return getFirstDerivingComponent(components, typeID);
+	return Handle::getComponent(typeID);
 }

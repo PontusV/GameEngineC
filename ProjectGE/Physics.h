@@ -5,11 +5,12 @@
 #include "ComponentArray.h"
 #include "Transform.h"
 #include "ParentEntity.h"
+#include "ComponentTypeInfo.h"
 
 namespace Core {
 
 	struct RootTransforms : public ComponentGroup<Transform> {
-		RootTransforms() : ComponentGroup<Transform>({ParentEntity::TYPE_ID}) {}
+		RootTransforms() : ComponentGroup<Transform>({typeof(ParentEntity)}) {}
 		ComponentArray<Transform>&	transforms = getComponentArray<Transform>();
 	};
 

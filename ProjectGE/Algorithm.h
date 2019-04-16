@@ -15,7 +15,7 @@ namespace Core {
 		struct RectTransform {
 			Transform transform;
 			glm::vec2 size;
-			glm::vec2 offset;
+			glm::vec2 offset; // size * transform.anchor
 		};
 		struct TexturedRectTransform {
 			Texture2D texture;

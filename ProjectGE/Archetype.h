@@ -16,25 +16,26 @@ namespace Core {
 	/* Contains entities with the archetype specified by the given types. If the types of components contained by an Entity matches the template it is added to the first chunk with room. */
 	class Archetype {
 	public:
-		Archetype(std::vector<ComponentTypeInfo> types);
+		Archetype(std::vector<IComponentTypeInfo> types);
 		~Archetype();
 
 		template <typename... Ts>
-		EntityLocation						addEntity(Entity entity, Ts*... components);
+		EntityLocation						addEntity(Entity entity, Ts&... components);
 		void								removeEntity(Entity entity, bool destruct = true);					// Destruct decides if the destructor of its components should be called or not
 		void								copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
-		template<typename T> void			setComponent(Entity entity, T* component);
+		template<typename T> void			setComponent(Entity entity, T& component);
 		template<typename T> T*				getComponent(Entity entity);
-		Component*							getComponent(Entity entity, ComponentTypeID componentTypeID);
+		/* Returns first match. */
+		Component*							getComponent(Entity entity, ComponentType componentType);
 		std::vector<Component*>				getComponents(Entity entity);
 
 		bool								isEmpty();
-		bool								match(std::vector<ComponentTypeInfo> otherTypes);
 		bool								match(std::vector<ComponentTypeID> typeIDs);
+		/* Returns true if exact type is contained. Will return false if not exact type */
 		bool								containsType(ComponentTypeID typeID);
 
-		std::vector<ComponentTypeInfo>		getTypes();
+		std::vector<IComponentTypeInfo>		getTypes();
 		std::vector<ComponentTypeID>		getTypeIDs();
 		std::vector<ComponentDataBlock>		getComponentDataBlocks(Entity entity);
 		EntityLocation						getLocation(Entity entity);
@@ -49,13 +50,13 @@ namespace Core {
 
 	private:
 		std::vector<std::shared_ptr<Chunk>> chunks;
-		std::vector<ComponentTypeInfo> types;
+		std::vector<IComponentTypeInfo> types;
 	};
 
 	// --------------------------- Template Function Definitions --------------------------------
 
 	template <typename... Ts>
-	EntityLocation Archetype::addEntity(Entity entity, Ts*... components) {
+	EntityLocation Archetype::addEntity(Entity entity, Ts&... components) {
 		//Checking for space in existing chunks
 		for (std::shared_ptr<Chunk> chunk : chunks) {
 			if (!chunk->isFull()) {
@@ -72,7 +73,7 @@ namespace Core {
 	}
 
 	template<typename T>
-	void Archetype::setComponent(Entity entity, T* component) {
+	void Archetype::setComponent(Entity entity, T& component) {
 		getContainer(entity)->setComponent(entity, component);
 	}
 

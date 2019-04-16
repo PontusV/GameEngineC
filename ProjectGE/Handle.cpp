@@ -23,10 +23,17 @@ const Entity& Handle::getEntity() const {
 }
 
 bool Handle::isValid() {
-	// If not valid call update and check for validity again
 	if (auto chunk = locationData.chunk.lock())
 		return chunk->getEntityArrayPtr()[locationData.index] == entity;
 	return false;
+}
+
+bool Handle::refresh() {
+	if (!isValid()) {
+		update();
+		return isValid();
+	}
+	return true;
 }
 
 void Handle::update() {
@@ -42,8 +49,34 @@ const EntityLocation& Handle::getLocation() const {
 	return locationData;
 }
 
+Component* Handle::getComponent(ComponentTypeID typeID) {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock())
+			return chunk->getComponent(locationData.index, typeID);
+	}
+	return nullptr;
+}
+
+Component* Handle::getComponent(ComponentType type) {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock())
+			return chunk->getComponent(locationData.index, type);
+	}
+	return nullptr;
+}
+
+std::vector<Component*> Handle::getComponents(ComponentType type) {
+	std::vector<Component*> components;
+
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock())
+			return chunk->getComponents(locationData.index, type);
+	}
+	return components;
+}
+
 std::vector<Component*> Handle::getComponents() {
-	if (isValid()) {
+	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index);
 	}
@@ -52,7 +85,7 @@ std::vector<Component*> Handle::getComponents() {
 
 std::vector<Component*> Handle::getComponentsInChildren() {
 	std::vector<Component*> components;
-	if (isValid()) {
+	if (refresh()) {
 		std::size_t childCount = getChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
 			Handle* child = getChild(i);
@@ -65,7 +98,7 @@ std::vector<Component*> Handle::getComponentsInChildren() {
 
 std::vector<Component*> Handle::getComponentsInParent() {
 	std::vector<Component*> components;
-	if (isValid()) {
+	if (refresh()) {
 		Handle* parent = getParent();
 		if (parent) {
 			std::vector<Component*> parentComponents = parent->getComponents();
@@ -78,7 +111,7 @@ std::vector<Component*> Handle::getComponentsInParent() {
 }
 
 Handle* Handle::getParent() {
-	ParentEntity* parentCmp = getComponent<ParentEntity>();
+	ParentEntity* parentCmp = static_cast<ParentEntity*>(getComponent(typeIDof(ParentEntity))); // Get component with ComponentTypeID is much faster
 	if (parentCmp) {
 		return parentCmp->getParent();
 	}
@@ -86,7 +119,7 @@ Handle* Handle::getParent() {
 }
 
 Handle* Handle::getChild(std::size_t index) {
-	ChildManager* childManager = getComponent<ChildManager>();
+	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
 	if (childManager) {
 		return childManager->getChild(index);
 	}
@@ -94,19 +127,9 @@ Handle* Handle::getChild(std::size_t index) {
 }
 
 std::size_t Handle::getChildCount() {
-	ChildManager* childManager = getComponent<ChildManager>();
+	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
 	if (childManager) {
 		return childManager->getChildCount();
 	}
 	return 0;
-}
-
-/* Makes use of Component::equalType to get component deriving from T as well. */
-Component* Handle::getFirstDerivingComponent(std::vector<Component*> components, ComponentTypeID typeID) {
-	for (Component* component : components) {
-		if (component->equalType(typeID)) {
-			return component;
-		}
-	}
-	return nullptr;
 }

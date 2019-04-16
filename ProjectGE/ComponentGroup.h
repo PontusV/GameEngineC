@@ -3,6 +3,7 @@
 
 #include "ComponentArrayManager.h"
 #include "ComponentArray.h"
+#include "ComponentTypeInfo.h"
 
 #include <tuple>
 #include <initializer_list>
@@ -12,8 +13,8 @@ namespace Core {
 	template <typename... Ts>
 	class ComponentGroup {
 	public:
-		ComponentGroup() : componentArrays{ ComponentArrayManager::getInstance().createComponentArray<Ts>({ Ts::TYPE_ID... }, {})... } {}
-		ComponentGroup(std::initializer_list<ComponentTypeID> filterIDs) : componentArrays({ ComponentArrayManager::getInstance().createComponentArray<Ts>({ Ts::TYPE_ID... }, filterIDs)... }) {}
+		ComponentGroup() : componentArrays{ ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<Ts>::getType()... }, {})... } {}
+		ComponentGroup(std::initializer_list<ComponentType> filterTypes) : componentArrays({ ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<Ts>::getType()... }, filterTypes)... }) {}
 		virtual ~ComponentGroup() {}
 
 		template <typename T>

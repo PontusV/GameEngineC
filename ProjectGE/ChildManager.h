@@ -9,7 +9,6 @@
 namespace Core {
 
 	class ChildManager : public Component {
-		REGISTER_COMPONENT_TYPE(7);
 	public:
 		ChildManager() {}
 		~ChildManager();

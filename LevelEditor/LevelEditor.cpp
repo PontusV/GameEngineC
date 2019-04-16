@@ -3,8 +3,7 @@
 
 
 #include "../ProjectGE/Level.h"
-#include "../ProjectGE/ParentEntity.h"
-#include "../ProjectGE/Renderer2D.h"
+//#include <sstream> // For testing massive amounts of Entities
 
 using namespace Core;
 
@@ -35,35 +34,50 @@ int LevelEditor::initiate() {
 	unsigned short layer = engine.getGraphics().createLayer();
 
 	engine.setCurrentLevel(level);
-	EntityHandle menubar = level->createEntity("Menu_Bar",
-		new Rect(1080, 20, themeColor, layer),
-		new Panel(1080, 20),
-		new Transform(0, 0, 0.0f, TransformAnchor::TOP_LEFT)
+	EntityHandle menuBar = level->createEntity("Menu_Bar",
+		Rect(1080, 20, themeColor, layer),
+		Panel(1080, 20),
+		Transform(0, 0, 0.0f, TransformAnchor::TOP_LEFT)
 	);
-	// Drop menu bar
+	// Drop menu
 	EntityHandle menuFile = level->createEntity("Menu_Item_File",
-		new Text("File", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f,1.0f,1.0f,1.0f), layer),
-		new Transform(15, 10, 0.0f, TransformAnchor::CENTER)
+		Text("File", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f,1.0f,1.0f,1.0f), layer),
+		Transform(15, 10, 0.0f, TransformAnchor::CENTER)
 	);
-	// Drop menu bar
+	// Drop menu
 	EntityHandle menuEdit = level->createEntity("Menu_Item_Edit",
-		new Text("Edit", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
-		new Transform(50, 10, 0.0f, TransformAnchor::CENTER)
+		Text("Edit", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
+		Transform(50, 10, 0.0f, TransformAnchor::CENTER)
 	);
-	// Drop menu bar
+	// Drop menu
 	EntityHandle menuCreate = level->createEntity("Menu_Item_Create",
-		new Text("Create", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
-		new Transform(95, 10, 0.0f, TransformAnchor::CENTER)
+		Text("Create", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
+		Transform(95, 10, 0.0f, TransformAnchor::CENTER)
 	);
 
+	/*for (std::size_t i = 0; i < 9500; i++) {
+		std::stringstream ss;
+		ss << "Test" << i;
+		EntityHandle menuCreate = level->createEntity(ss.str(),
+			Image("resources/images/invaders.png", 0, 300, 300),
+			Transform(0+i, 550, 0.1f, TransformAnchor::CENTER)
+		);
+	}*/
+
+	// Button
 	EntityHandle button = level->createEntity("Test_Button",
-		new Image("resources/images/invaders.png", 0, 300, 300),
-		new Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png", 300, 300),
-		new Transform(250, 250, 0.1f, TransformAnchor::CENTER)
+		Image("resources/images/invaders.png", 0, 300, 300),
+		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png", 300, 300),
+		Transform(250, 250, 0.1f, TransformAnchor::CENTER)
 	);
-	menuFile.setParent(menubar.getEntity());
-	menuEdit.setParent(menubar.getEntity());
-	menuCreate.setParent(menubar.getEntity());
+	menuFile.setParent(menuBar.getEntity());
+	menuEdit.setParent(menuBar.getEntity());
+	menuCreate.setParent(menuBar.getEntity());
+
+
+	/*EntityHandle entity = level->getEntity("Test_Button");
+	Button* bbutton = entity.getComponent<Button>();
+	if (bbutton) bbutton->setButtonPressCallback(buttonPressTest);//*/
 
 	// Create test level
 	/*LevelPtr level = engine.createLevel();
@@ -93,10 +107,6 @@ int LevelEditor::initiate() {
 	child.setParent(parent.getEntity());
 	child.addComponent<Text>("This is just a test text!", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	parent.addComponent<Text>("Rectangle Text", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));*/
-
-	/*EntityHandle entity = level->getEntity("Test_Button");
-	Button* button = entity.getComponent<Button>();
-	if (button) button->setButtonPressCallback(buttonPressTest);//*/
 
 	// Keybinds
 	engine.getInput().addKeyBind(GLFW_KEY_ESCAPE, "Terminate");

@@ -5,23 +5,23 @@
 
 using namespace Core;
 
-Archetype::Archetype(std::vector<ComponentTypeInfo> types) : types(types) {
+Archetype::Archetype(std::vector<IComponentTypeInfo> types) : types(types) {
 	// Make sure types are unique
 	if (types.size() > 0) {
 		for (std::size_t i = 0; i < types.size() - 1; i++) {
 			for (std::size_t ii = i + 1; ii < types.size(); ii++) {
-				if (types[i].id == types[ii].id) {
-					std::cout << "Archetype::Constructor::ERROR The list of types given to Archetype contains multiple of the same component type.Types must be unique! Types: " << types[i].id << "\n";
-					throw std::invalid_argument("Archetype::Constructor::ERROR The list of types given to Archetype contains multiple of the same component type. Types must be unique!");
+				if (types[i].type == types[ii].type) {
+					std::cout << "Archetype::Constructor::ERROR The list of types given to Archetype contains ComponentTypes matching with each other. Types must be unique! Types: " << types[i].type.getTypeID() << " & " << types[ii].type.getTypeID() << "\n";
+					throw std::invalid_argument("Archetype::Constructor::ERROR The list of types given to Archetype contains ComponentTypes matching with each other. Types must be unique!");
 				}
 			}
 		}
 	}
 
 	// Make sure types are sorted
-	std::sort(this->types.begin(), this->types.end(), [](ComponentTypeInfo& l, ComponentTypeInfo& r) {
-		return l.id < r.id;
-	});
+	/*std::sort(this->types.begin(), this->types.end(), [](ComponentTypeSizePair& l, ComponentTypeSizePair& r) {
+		return l.type.getTypeID() < r.type.getTypeID();
+	});*/
 }
 
 Archetype::~Archetype() {
@@ -53,8 +53,8 @@ void Archetype::copyEntity(Entity entity, std::vector<ComponentDataBlock> source
 }
 
 
-Component* Archetype::getComponent(Entity entity, ComponentTypeID componentTypeID) {
-	return getContainer(entity)->getComponent(entity, componentTypeID);
+Component* Archetype::getComponent(Entity entity, ComponentType componentType) {
+	return getContainer(entity)->getComponent(entity, componentType);
 }
 
 
@@ -66,7 +66,7 @@ bool Archetype::isEmpty() {
 	return chunks.empty();
 }
 
-std::vector<ComponentTypeInfo> Archetype::getTypes() {
+std::vector<IComponentTypeInfo> Archetype::getTypes() {
 	return types;
 }
 
@@ -74,17 +74,9 @@ std::vector<ComponentTypeID> Archetype::getTypeIDs() {
 	std::vector<ComponentTypeID> typeIDs;
 	typeIDs.reserve(types.size());
 	for (std::size_t i = 0; i < types.size(); i++) {
-		typeIDs.push_back(types[i].id);
+		typeIDs.push_back(types[i].type.getTypeID());
 	}
 	return typeIDs;
-}
-
-bool Archetype::match(std::vector<ComponentTypeInfo> otherTypes) {
-	if (otherTypes.size() != types.size()) return false;
-	for (ComponentTypeInfo& type : otherTypes) {
-		if (!containsType(type.id)) return false;
-	}
-	return true;
 }
 
 bool Archetype::match(std::vector<ComponentTypeID> typeIDs) {
@@ -96,8 +88,8 @@ bool Archetype::match(std::vector<ComponentTypeID> typeIDs) {
 }
 
 bool Archetype::containsType(ComponentTypeID typeID) {
-	for (ComponentTypeInfo& type : types) {
-		if (type.id == typeID) return true;
+	for (IComponentTypeInfo& pair : types) {
+		if (pair.type.getTypeID() == typeID) return true;
 	}
 	return false;
 }

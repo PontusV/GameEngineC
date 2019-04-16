@@ -89,17 +89,17 @@ void Transform::setY(float value) {
 }
 
 void Transform::pushModelMatrix(const glm::mat4& model) {
-	worldModelMatrix *= model;
+	localToWorldMatrix *= model;
 }
 
-void Transform::updateWorldModelMatrix(const glm::mat4& model) {
-	worldModelMatrix = model;
+void Transform::updateLocalToWorldMatrix(const glm::mat4& model) {
+	localToWorldMatrix = model;
 	worldToLocalMatrix = glm::inverse(model);
 	changed = false;
 }
 
-void Transform::resetWorldModelMatrix() {
-	worldModelMatrix = glm::mat4(1.0f);
+void Transform::resetLocalToWorldMatrix() {
+	localToWorldMatrix = glm::mat4(1.0f);
 }
 
 const glm::mat4& Transform::getWorldToLocalMatrix() const {
@@ -115,8 +115,8 @@ glm::mat4 Transform::getLocalModelMatrix() const {
 	return matrix;
 }
 
-const glm::mat4& Transform::getWorldModelMatrix() const {
-	return worldModelMatrix;
+const glm::mat4& Transform::getLocalToWorldMatrix() const {
+	return localToWorldMatrix;
 }
 
 const float& Transform::getRotation() const {

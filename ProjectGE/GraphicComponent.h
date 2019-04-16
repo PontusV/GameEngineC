@@ -7,10 +7,9 @@
 namespace Core {
 	/* Enables clipping; removes graphic drawn outside the given rect. */
 	class GraphicComponent : public BoxComponent {
-		REGISTER_COMPONENT_TYPE_WITH_BASE(11, BoxComponent);
 	public:
-		virtual ~GraphicComponent();
-	public:
+		virtual ~GraphicComponent() = 0; // Abstract
+
 		void				setLayerIndex(unsigned short index);
 		unsigned short		getLayerIndex() const;
 
