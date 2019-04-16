@@ -1,15 +1,14 @@
 # GameEngineC
 C++ Game Engine
 
-This Game Engine in currently a work in progress and is intented to become a high performance 2D game engine.
+This Game Engine in currently a work in progress and is intented to become a high performance 2D game engine. I have created my own Entity Component System (ECS) for this engine and it is still a work in progress.
 
 Compiles with C++ 17
 
 Externals:
-Uses OpenGL with Glad and GLFW
-OpenGL Mathematics (GLM)
-stbh_image for loading images
-Freetype for loading ttf text font files
-
-
-This game engine is far from completed and is currently a work in progress.
+OpenGL		- Graphics
+Glad		- OpenGL Loading Library
+GLFW		- Window and input
+OpenGL Mathematics(GLM)
+stbh_image		- For loading images
+Freetype		- For loading ttf text font files
