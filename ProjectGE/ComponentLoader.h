@@ -3,6 +3,7 @@
 
 #include "EntityHandle.h"
 #include "ComponentTypeInfo.h"
+#include "ComponentType.h"
 #include "ParentEntity.h"
 #include <string>
 #include <iostream>

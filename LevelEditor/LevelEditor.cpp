@@ -31,7 +31,7 @@ int LevelEditor::initiate() {
 	// Create Level Editor
 	glm::vec4 themeColor = glm::vec4(0.25f,0.25f,0.25f,1.0f);
 	LevelPtr level = engine.createLevel();
-	unsigned short layer = engine.getGraphics().createLayer();
+	unsigned char layer = engine.getGraphics().createLayer();
 
 	engine.setCurrentLevel(level);
 	EntityHandle menuBar = level->createEntity("Menu_Bar",

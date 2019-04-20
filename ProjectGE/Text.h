@@ -11,7 +11,7 @@ namespace Core {
 	class Text : public GraphicComponent {
 	public:
 
-		Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex = 0);
+		Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned char layerIndex = 0);
 		Text();
 		~Text();
 

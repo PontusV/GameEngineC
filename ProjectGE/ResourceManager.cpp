@@ -30,7 +30,7 @@ Shader ResourceManager::loadShader(const GLchar* vShaderFile, const GLchar* fSha
 	return shaders[name];
 }
 
-Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartPos)
+Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartCoords)
 {
 	//Copy value from storage
 	Texture2D texture;
@@ -49,16 +49,16 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm:
 	float uvWidth = (float)size.x / texture.size.x;
 	float uvHeight = (float)size.y / texture.size.y;
 
-	texture.uvPos[0] = uvStartPos;
-	texture.uvPos[1] = glm::ivec2(uvStartPos.x, uvStartPos.y + uvHeight);
-	texture.uvPos[2] = glm::ivec2(uvStartPos.x + uvWidth, uvStartPos.y + uvHeight);
-	texture.uvPos[3] = glm::ivec2(uvStartPos.x + uvWidth, uvStartPos.y);
+	texture.uvCoords[0] = uvStartCoords;
+	texture.uvCoords[1] = glm::ivec2(uvStartCoords.x, uvStartCoords.y + uvHeight);
+	texture.uvCoords[2] = glm::ivec2(uvStartCoords.x + uvWidth, uvStartCoords.y + uvHeight);
+	texture.uvCoords[3] = glm::ivec2(uvStartCoords.x + uvWidth, uvStartCoords.y);
 
 	return texture;
 }
 
 TextData2D ResourceManager::createText(std::string text, glm::vec4 color, Font font) {
-	FontManager& manager = loadFontManager(font.getFileName());
+	FontManager& manager = loadFontManager(font.getFileName(), font.getSize());
 	return manager.createText(text, color, font.getSize());
 }
 
@@ -162,13 +162,15 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar* filePath)
 	return texture;
 }
 
-FontManager& ResourceManager::loadFontManager(const std::string file) {
-	auto it = fontManagers.find(file);
+FontManager& ResourceManager::loadFontManager(const std::string file, GLushort textSize) {
+	std::stringstream fontID;
+	fontID << file << "_" << textSize;
+	std::string fontIDString = fontID.str();
+
+	auto it = fontManagers.find(fontIDString);
 	if (it != fontManagers.end())
 		return *it->second;
 
-	static GLushort textSize = 100;
-
-	fontManagers[file] = new FontManager(file.c_str(), textSize, ft);
-	return *fontManagers[file];
+	fontManagers[fontIDString] = new FontManager(file.c_str(), textSize, ft);
+	return *fontManagers[fontIDString];
 }

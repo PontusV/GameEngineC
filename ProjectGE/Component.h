@@ -10,7 +10,7 @@ namespace Core {
 	protected:
 		Component();
 	public:
-		virtual ~Component();
+		virtual ~Component() = 0; // Abstract
 
 		Handle&							getOwner();
 		void							setOwner(Handle owner);
@@ -18,9 +18,6 @@ namespace Core {
 		void							destroy();
 		/* Looks if the Component is marked for destruction. */
 		bool							isDestroyed();
-
-		// The components that need this will override
-		virtual void					init() {};	// Called after setOwner()
 
 		// Serializable
 		virtual void					serialize(std::ostream& os) const;

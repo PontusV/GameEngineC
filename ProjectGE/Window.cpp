@@ -8,13 +8,6 @@
 using namespace Core;
 
 
-void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
-	ResourceManager::getInstance().updateShaders(projection);
-}
-
 Window::Window(const char* title, int width, int height) : title(title), width(width), height(height) {
 }
 Window::Window() : active(false) {
@@ -35,7 +28,7 @@ bool Window::init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, 16); //Anti-alias
+	//glfwWindowHint(GLFW_SAMPLES, 16); // Anti-alias (Makes Sprites blurry)
 
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 	if (!window) {
@@ -45,9 +38,6 @@ bool Window::init() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0); //0 = DISABLES VSYNC, 1 = ENABLES VSYNC
-	//
-	glfwSetFramebufferSizeCallback(window, Window::framebuffer_size_callback);
-
 
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------

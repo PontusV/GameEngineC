@@ -1,6 +1,7 @@
 #include "FontManager.h"
 #include "ResourceManager.h"
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <algorithm>
 
 using namespace Core;
@@ -14,6 +15,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 		return;
 	}
 
+	FT_Set_Char_Size(face, 0, textSize*64, 1960, 1080);
 	FT_Set_Pixel_Sizes(face, 0, textSize);
 
 	//textHeight = face->size->metrics.height >> 6;
@@ -27,13 +29,13 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 
 	// Calculate atlas size
 	for (std::size_t i = 0; i < 128; i++) {
-		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
+		if (FT_Load_Char(face, i, FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)) {
 			fprintf(stderr, "Loading character %c failed!\n", i);
 			continue;
 		}
 
-		atlas_width += g->bitmap.width + 1; // +1 to compensate for UV positions rounding down
-		atlas_height = std::max(atlas_height, g->bitmap.rows);
+		atlas_width += g->bitmap.width;
+		atlas_height = std::max(atlas_height, g->bitmap.rows+1);
 	}
 	textureAtlas.size = glm::ivec2(atlas_width, atlas_height);
 
@@ -43,17 +45,19 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 	glGenTextures(1, &textureAtlas.ID);
 	glBindTexture(GL_TEXTURE_2D, textureAtlas.ID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
+	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlas_width, atlas_height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
 	// Set texture options
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Makes it blurry
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Makes it blurry
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Makes the text look weird (Texture cut off)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Makes the text look weird (Texture cut off)
 
-	int x = 0;
-	int y = 0;
+	float x = 0;
+	float y = 0;
 
 	for (std::size_t i = 0; i < 128; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
@@ -61,14 +65,14 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 			continue;
 		}
 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (GLuint)x, (GLuint)y, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 
 		characters[i].size = glm::ivec2(g->bitmap.width, g->bitmap.rows);
 		characters[i].bearing = glm::ivec2(g->bitmap_left, g->bitmap_top);
-		characters[i].uvPos = glm::vec2((float)x/atlas_width, (float)y/atlas_height);
+		characters[i].uvPos = glm::vec2((x+0.5f)/atlas_width, 0.0f);
 		characters[i].advance = g->advance.x >> 6;
 
-		x += g->bitmap.width + 1; // +1 to compensate for UV positions rounding down
+		x += g->bitmap.width;
 		//y = 0;
 	}
 
@@ -84,7 +88,8 @@ FontManager::~FontManager()
 
 
 TextData2D FontManager::createText(std::string text, glm::vec4 color, unsigned short size) {
-	float scale = ((float)size)/textSize;
+	//float scale = ((float)size)/textSize;
+	//float scale = 1.0f;
 
 	//Offsets start at 0
 	GLfloat x = 0;
@@ -108,27 +113,28 @@ TextData2D FontManager::createText(std::string text, glm::vec4 color, unsigned s
 			float uvWidth = (float)ch.size.x / textureAtlas.size.x;
 			float uvHeight = (float)ch.size.y / textureAtlas.size.y;
 
-			tex.uvPos[0] = glm::vec2(ch.uvPos.x, ch.uvPos.y);
-			tex.uvPos[1] = glm::vec2(ch.uvPos.x, ch.uvPos.y + uvHeight);
-			tex.uvPos[2] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y + uvHeight);
-			tex.uvPos[3] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y);
+			tex.uvCoords[0] = glm::vec2(ch.uvPos.x, ch.uvPos.y);
+			tex.uvCoords[1] = glm::vec2(ch.uvPos.x, ch.uvPos.y + uvHeight);
+			tex.uvCoords[2] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y + uvHeight);
+			tex.uvCoords[3] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y);
 
 			charTextures[character] = CharTexture2D(tex, offset);
 		}
 
 		//Copy texture from storage and modify offset and size to scale
 		CharTexture2D texture = charTextures[character];
-		texture.offset.x = x + (float)ch.bearing.x * scale;
-		texture.offset.y = y - (float)ch.bearing.y * scale;
-		texture.texture.size.x = (int)(texture.texture.size.x * scale);
-		texture.texture.size.y = (int)(texture.texture.size.y * scale);
+		texture.offset.x = x + (float)ch.bearing.x /* scale*/;
+		texture.offset.y = y - (float)ch.bearing.y /* scale*/;
+		texture.texture.size.x = (int)(texture.texture.size.x /* scale*/);
+		texture.texture.size.y = (int)(texture.texture.size.y /* scale*/);
 		textures.push_back(texture);
 
 		width = x;
-		x += (float)ch.advance * scale;
+		x += (float)ch.advance /* scale*/;
 	}
 
-	int height = (int)(textHeight * scale);
+	//int height = (int)(textHeight * scale);
+	int height = textHeight;
 
 	return { textures, glm::ivec2(width,height) };
 }

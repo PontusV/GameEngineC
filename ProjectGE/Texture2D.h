@@ -20,7 +20,7 @@ namespace Core {
 		int			nrChannels;
 		glm::ivec2	size; // Size of destination draw area
 		glm::ivec2	sourceSize;
-		glm::vec2	uvPos[4];
+		glm::vec2	uvCoords[4];
 	};
 }
 #endif

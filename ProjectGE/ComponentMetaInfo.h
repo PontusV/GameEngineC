@@ -12,6 +12,7 @@
 #include "Rect.h"
 #include "Text.h"
 #include "Transform.h"
+#include "Script.h"
 namespace Core {
 	Core::TypeList<
 		Core::Border,
@@ -25,6 +26,7 @@ namespace Core {
 		Core::ParentEntity,
 		Core::Rect,
 		Core::Text,
-		Core::Transform
+		Core::Transform,
+		Core::Script
 	> componentTypeList;
 }

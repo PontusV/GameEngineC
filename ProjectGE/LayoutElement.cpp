@@ -32,5 +32,4 @@ Bounds LayoutElement::getBounds() {
 		return elementBounds;
 	}
 	return Bounds(glm::vec2(0,0), glm::ivec2(0,0));
-	//return AxisAlignedBoundingBox::createAABB();
 }

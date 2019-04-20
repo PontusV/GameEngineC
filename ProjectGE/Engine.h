@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "Physics.h"
 #include "Input.h"
+#include "ScriptManager.h"
 #include <memory>
 
 struct SDL_Renderer;
@@ -34,8 +35,10 @@ namespace Core {
 		LevelPtr	loadLevel(const char* fileName);
 
 		// Systems
-		Input&		getInput();
-		Graphics&	getGraphics();
+		Input&			getInput();
+		Graphics&		getGraphics();
+		Physics&		getPhysics();
+		ScriptManager&	getScriptManager();
 
 	private:
 		// Game loop
@@ -46,9 +49,11 @@ namespace Core {
 		LevelPtr	debugLevel;		// Where you put entities showing debugging data. These will not be loaded/saved
 
 		// Main Systems
-		Graphics*	graphics;
-		Input*		input;
-		Physics*	physics;
+		Graphics		graphics;
+		Input			input;
+		Physics			physics;
+
+		ScriptManager	scriptManager;
 	};
 }
 #endif

@@ -28,9 +28,6 @@ namespace Core {
 		GLFWwindow* getWindow();
 
 	private:
-		static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-	private:
 		const char* title;
 		int width, height;
 		GLFWwindow* window;

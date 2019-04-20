@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "InputEvent.h"
 
 using namespace Core;
 
@@ -14,29 +15,26 @@ Button::~Button() {
 
 
 /* Initializes handle to image component with same owner. */
-void Button::init() {
+void Button::start() {
 	changeState(ButtonState::DEFAULT);
 }
 
-void Button::onLeftClickPressed() {
-	Interactable::onLeftClickPressed();
-	changeState(ButtonState::PRESSED_DOWN);
+void Button::onMouseButtonPressed(int buttoncode, int mods) {
+	if (buttoncode == MOUSE_BUTTON_LEFT) {
+		changeState(ButtonState::PRESSED_DOWN);
+	}
 }
-
-void Button::onLeftClickReleased() {
-	if (state == ButtonState::PRESSED_DOWN) {
-		Interactable::onLeftClickReleased();
+void Button::onMouseButtonReleased(int buttoncode, int mods) {
+	if (buttoncode == MOUSE_BUTTON_LEFT) {
 		changeState(ButtonState::HOVER_OVER);
 	}
 }
 
 void Button::onHoverover() {
-	Interactable::onHoverover();
 	changeState(ButtonState::HOVER_OVER);
 }
 
 void Button::onHoverout() {
-	Interactable::onHoverout();
 	if (state == ButtonState::PRESSED_DOWN || state == ButtonState::HOVER_OVER)
 		changeState(ButtonState::DEFAULT);
 }
@@ -59,14 +57,6 @@ void Button::changeState(ButtonState state) {
 
 Image* Button::getImages() {
 	return images;
-}
-
-void Button::setButtonPressCallback(ui::LeftClickPressFun fun) {
-	Interactable::setLeftClickPressedCallback(fun);
-}
-
-void Button::setButtonReleaseCallback(ui::LeftClickReleaseFun fun) {
-	Interactable::setLeftClickReleasedCallback(fun);
 }
 
 // ------------------------------- Serializable ----------------------------------------

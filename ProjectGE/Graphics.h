@@ -52,9 +52,9 @@ namespace Core {
 		bool createWindow(const char* windowTitle, int width, int height);
 		bool initiate();
 		void update(float dt);
-		void render();
+		void render(float deltaTime);
 
-		unsigned short createLayer();
+		unsigned char createLayer();
 
 		Window& getWindow();
 		Renderer2D& getRenderer();

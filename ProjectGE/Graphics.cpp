@@ -61,7 +61,7 @@ bool Graphics::initiate() {
 }
 
 /* Loops through Renderable vector and draws them.*/
-void Graphics::render() {
+void Graphics::render(float deltaTime) {
 	std::size_t sizeRectangles	= renderableRects.rects.size();
 	std::size_t sizeImages		= renderableImages.images.size();
 	std::size_t sizeTexts		= renderableTexts.texts.size();
@@ -76,10 +76,10 @@ void Graphics::render() {
 		const glm::vec4&	color			= rect.getColor();
 		const glm::ivec2&	size			= rect.getSize();
 		bool				clipEnabled		= rect.isClipEnabled();
-		unsigned short		layerIndex		= rect.getLayerIndex();
+		unsigned char		layerIndex		= rect.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
 
-		renderer->submit({ texture, transform, size, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+		renderer->submit(texture, transform, size, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableRects.rects[i].resetClipping();
 	}
@@ -93,37 +93,37 @@ void Graphics::render() {
 		const Texture2D&	texture		= image.getTexture();
 		const glm::vec4		color		= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		bool				clipEnabled = image.isClipEnabled();
-		unsigned short		layerIndex	= image.getLayerIndex();
+		unsigned char		layerIndex	= image.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
 
-		renderer->submit({ texture, transform, texture.size, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+		renderer->submit( texture, transform, texture.size, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableImages.images[i].resetClipping();
 	}
 
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const Text&			text		= renderableTexts.texts[i];
-		bool				clipEnabled = text.isClipEnabled();
-		unsigned short		layerIndex	= text.getLayerIndex();
-		const std::vector<glm::vec2>& clipMaskVertices = text.getClipMaskVertices();
+		const Text&						text				= renderableTexts.texts[i];
+		bool							clipEnabled			= text.isClipEnabled();
+		const unsigned char&			layerIndex			= text.getLayerIndex();
+		const std::vector<glm::vec2>&	clipMaskVertices	= text.getClipMaskVertices();
 
-		renderer->renderText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
+		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableTexts.texts[i].resetClipping();
 	}
 
 	// Borders
 	for (std::size_t i = 0; i < sizeBorders; i++) {
-		const Border&		border			= renderableBorders.borders[i];
-		const Transform&	transform		= renderableBorders.transforms[i];
-		const Texture2D		texture			= Texture2D(); // No texture
-		const glm::vec4&	color			= border.getColor();
-		const std::size_t&	borderThickness	= border.getBorderThickness();
-		bool				inner			= border.isInner();
-		const glm::ivec2&	size			= border.getSize();
-		bool				clipEnabled		= border.isClipEnabled();
-		unsigned short		layerIndex		= border.getLayerIndex();
+		const Border&			border			= renderableBorders.borders[i];
+		const Transform&		transform		= renderableBorders.transforms[i];
+		const Texture2D			texture			= Texture2D(); // No texture
+		const glm::vec4&		color			= border.getColor();
+		const std::size_t&		borderThickness	= border.getBorderThickness();
+		bool					inner			= border.isInner();
+		const glm::ivec2&		size			= border.getSize();
+		bool					clipEnabled		= border.isClipEnabled();
+		const unsigned char&	layerIndex		= border.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = border.getClipMaskVertices();
 
 
@@ -163,16 +163,16 @@ void Graphics::render() {
 				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * lineTransform.getLocalModelMatrix());
 
-				renderer->submit({ texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices }, layerIndex);
+				renderer->submit(texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 			}
 		}
 		// Reset clipping
-		renderableTexts.texts[i].resetClipping();
+		renderableBorders.borders[i].resetClipping();
 	}
 
 	// Clear, Draw & Update window
 	window.clear();
-	renderer->flush();
+	renderer->render(deltaTime);
 	window.update();
 }
 
@@ -207,7 +207,7 @@ void Graphics::update(float dt) {
 	}
 }
 
-unsigned short Graphics::createLayer() {
+unsigned char Graphics::createLayer() {
 	return renderer->createLayer();
 }
 

@@ -17,6 +17,9 @@ namespace Core {
 		unsigned int	color;
 		glm::vec2		texture;
 		float			textureID;
+
+		//float x, y; // Position
+		//float u, v; // Texture
 	};
 
 #define RENDERER_MAX_SPRITES	10000
@@ -56,7 +59,7 @@ namespace Core {
 
 		void init();
 		void begin();
-		void submit(const RenderCopy2D& sprite);
+		void submit(const Renderable2D& sprite);
 		void end();
 		void flush();
 

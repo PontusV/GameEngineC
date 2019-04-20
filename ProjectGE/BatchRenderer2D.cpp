@@ -6,6 +6,7 @@
 #include "ResourceManager.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <cstddef>
 
@@ -101,6 +102,7 @@ void BatchRenderer2D::init() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
+
 	if (GL_NO_ERROR != glGetError()) {
 		std::cout << "Failed to create batch\n";
 	}
@@ -111,54 +113,47 @@ void BatchRenderer2D::begin() {
 	buffer = (VertexData*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 }
 
-void BatchRenderer2D::submit(const RenderCopy2D& renderable) {
+void BatchRenderer2D::submit(const Renderable2D& renderable) {
 	if (!hasRoom())
 		throw std::length_error("Can not add anymore sprites to this batch!");
 
 
-	const glm::vec2& position		= renderable.transform.getPosition();
-	const glm::vec2& anchor			= renderable.transform.getAnchor();
-	const glm::mat4	model			= renderable.transform.getLocalToWorldMatrix();
-	const glm::vec2& size			= renderable.size;
-	const glm::vec4& color			= renderable.color;
-	const glm::vec2* uvPos			= renderable.texture.uvPos;
+	const glm::vec2*	vertices	= renderable.vertices;
+	const glm::vec2*	uvCoords	= renderable.uvCoords;
+	const Color&		color		 = renderable.color;
 
-	const float& textureSlot = renderable.texture.ID == 0 ? 0 : (float)config->getTextureSlot(renderable.texture.ID);
+	const float& textureSlot = renderable.textureID == 0 ? 0 : (float)config->getTextureSlot(renderable.textureID);
 
-	int r = (int)(color.x * 255.0f);
-	int g = (int)(color.y * 255.0f);
-	int b = (int)(color.z * 255.0f);
-	int a = (int)(color.w * 255.0f);
+	int r = (int)(color.r);
+	int g = (int)(color.g);
+	int b = (int)(color.b);
+	int a = (int)(color.a);
 
 	unsigned int c = a << 24 | b << 16 | g << 8 | r;
 
 	std::size_t& i = verticiesCount;
 
-	buffer[i].vertex = model * (size * anchor);
-	//buffer[i].vertex = model * (position + size * anchor);
+	buffer[i].vertex = vertices[0];
 	buffer[i].color = c;
-	buffer[i].texture = uvPos[0];
+	buffer[i].texture = uvCoords[0];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = model * (glm::vec2(0, size.y) + size * anchor);
-	//buffer[i].vertex = model * (glm::vec2(position.x, position.y + size.y) + size * anchor);
+	buffer[i].vertex = vertices[1];
 	buffer[i].color = c;
-	buffer[i].texture = uvPos[1];
+	buffer[i].texture = uvCoords[1];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = model * (size + size * anchor);
-	//buffer[i].vertex = model * (glm::vec2(position.x + size.x, position.y + size.y) + size * anchor);
+	buffer[i].vertex = vertices[2];
 	buffer[i].color = c;
-	buffer[i].texture = uvPos[2];
+	buffer[i].texture = uvCoords[2];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = model * (glm::vec2(size.x, 0) + size * anchor);
-	//buffer[i].vertex = model * (glm::vec2(position.x + size.x, position.y) + size * anchor);
+	buffer[i].vertex = vertices[3];
 	buffer[i].color = c;
-	buffer[i].texture = uvPos[3];
+	buffer[i].texture = uvCoords[3];
 	buffer[i].textureID = textureSlot;
 	i++;
 
@@ -252,7 +247,6 @@ void BatchRenderer2D::flush() {
 		if (config.clipEnabled) {
 			glStencilFunc(GL_ALWAYS, 1, 0xFF);	// Always draw
 		}
-		config.textureIDs.clear();
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

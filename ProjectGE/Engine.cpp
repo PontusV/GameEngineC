@@ -2,6 +2,9 @@
 #include "Level.h"
 #include "Window.h"
 #include "FpsCounter.h"
+#include "ResourceManager.h"
+#include "Renderer2D.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -16,6 +19,71 @@ using namespace Core;
 // Register all component types
 #include "ComponentRegistry.h"
 static bool registered = Core::ComponentRegistry::registerComponentTypes();
+
+// -------------------------------Callbacks----------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+	// Viewport
+	glViewport(0, 0, width, height);
+	// Updates projection matrix of all shaders
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
+	ResourceManager::getInstance().updateShaders(projection);
+	// Resize draw area
+	engine->getGraphics().getRenderer().updateSize(width, height);
+}
+
+
+
+// ------------------------------- Input callbacks -----------------------------------
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key >= 0 && key < 1024)
+	{
+		Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+		InputEvent event;
+		event.type = INPUT_EVENT_KEY;
+		event.key.keycode = key;
+		event.key.scancode = scancode;
+		event.key.action = action;
+		event.key.mods = mods;
+
+		engine->getInput().addInputEvent(event);
+	}
+}
+
+void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+	engine->getInput().setMousePos(glm::vec2(xpos, ypos));
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+	InputEvent event;
+	event.type = INPUT_EVENT_MOUSEBUTTON;
+	event.mouseButton.buttoncode = button;
+	event.mouseButton.action = action;
+	event.mouseButton.mods = mods;
+
+	engine->getInput().addInputEvent(event);
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+	InputEvent event;
+	event.type = INPUT_EVENT_SCROLL;
+	event.scroll.xoffset = (float)xoffset;
+	event.scroll.yoffset = (float)yoffset;
+
+	engine->getInput().addInputEvent(event);
+}
+
+// -------------------------------End of Callbacks----------------------------------
+
 
 /* Saves current level. */
 void Engine::saveLevel(const char* fileName) { //To be added: file location of level map (currently hard coded to the map Levels)
@@ -74,32 +142,35 @@ int Engine::initiate() {
 
 	// Initialize systems
 	// Graphics
-	graphics->createWindow("Test", 800, 600);
-	if (!graphics->initiate()) return -1;
-	Window& window = graphics->getWindow();
+	graphics.createWindow("Test", 800, 600);
+	if (!graphics.initiate()) return -1;
+	Window& window = graphics.getWindow();
 	// Physics
 	// Input
-	glfwSetWindowUserPointer(window.getWindow(), input); // TODO: Change user to Engine
-	glfwSetKeyCallback(window.getWindow(), Input::keyCallback);
-	glfwSetCursorPosCallback(window.getWindow(), Input::cursorPositionCallback);
-	glfwSetMouseButtonCallback(window.getWindow(), Input::mouseButtonCallback);
+	glfwSetWindowUserPointer(window.getWindow(), this); // TODO: Change user to Engine
+	glfwSetKeyCallback(window.getWindow(), keyCallback);
+	glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
+	glfwSetMouseButtonCallback(window.getWindow(), mouseButtonCallback);
 	// End of system initialization
 
 	return 0;
 }
 int Engine::start() {
-	Window& window = graphics->getWindow();
+	Window& window = graphics.getWindow();
+
+	//Callbacks
+	glfwSetFramebufferSizeCallback(window.getWindow(), framebuffer_size_callback);
+
+	FpsCounter fpsCounter;
+	unsigned char debugLayer = graphics.createLayer();
+	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
+		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
+		Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
+	);
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
-	GLfloat lastFrame = 0.0f;
-
-	FpsCounter fpsCounter;
-	unsigned short debugLayer = graphics->createLayer();
-	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
-		Text("FPS: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
-		Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
-	);
+	GLfloat lastFrame = (GLfloat)glfwGetTime();
 
 	// Game loop
 	running = true;
@@ -117,12 +188,13 @@ int Engine::start() {
 		glfwPollEvents();
 
 		// Update systems
-		input->update(deltaTime);
-		physics->update(deltaTime);
-		graphics->update(deltaTime);
+		input.update(deltaTime);
+		scriptManager.update(deltaTime);
+		physics.update(deltaTime);
+		graphics.update(deltaTime);
 
 		// Render
-		graphics->render();
+		graphics.render(deltaTime);
 
 		// 1ms sleep
 		Sleep(1);
@@ -132,29 +204,28 @@ int Engine::start() {
 	return 0;
 }
 
-Engine::Engine() {
-	graphics = new Graphics();
-	input = new Input(this);
-	physics = new Physics();
+Engine::Engine() : graphics(), input(this), physics() {
 }
-
-
 Engine::~Engine() {
-	delete input;
-	delete physics;
-	delete graphics;
-
 	//Unload all entities and components
 	if (currentLevel)
 		currentLevel->clear();
 }
 
 Input& Engine::getInput() {
-	return *input;
+	return input;
 }
 
 Graphics& Engine::getGraphics() {
-	return *graphics;
+	return graphics;
+}
+
+Physics& Engine::getPhysics() {
+	return physics;
+}
+
+ScriptManager& Engine::getScriptManager() {
+	return scriptManager;
 }
 
 LevelPtr Engine::getCurrentLevel() {

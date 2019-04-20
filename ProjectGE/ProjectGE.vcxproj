@@ -179,11 +179,11 @@
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GraphicComponent.cpp" />
     <ClCompile Include="Handle.cpp" />
-    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="ComponentLoader.cpp" />
     <ClCompile Include="LayoutElement.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParentEntity.cpp" />
+    <ClCompile Include="PostProcessor.cpp" />
     <ClCompile Include="Rect.cpp" />
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="BatchRenderer2D.cpp" />
@@ -198,6 +198,8 @@
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="ComponentRegistry.cpp" />
+    <ClCompile Include="Script.cpp" />
+    <ClCompile Include="ScriptManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -233,11 +235,11 @@
     <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
     <ClInclude Include="Interactable.h" />
-    <ClInclude Include="Layer.h" />
     <ClInclude Include="ComponentLoader.h" />
     <ClInclude Include="LayoutElement.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParentEntity.h" />
+    <ClInclude Include="PostProcessor.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="BatchRenderer2D.h" />
@@ -254,6 +256,8 @@
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
+    <ClInclude Include="Script.h" />
+    <ClInclude Include="ScriptManager.h" />
     <ClInclude Include="TransformMaths.h" />
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />

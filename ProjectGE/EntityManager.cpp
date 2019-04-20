@@ -112,7 +112,6 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	std::vector<Component*> components = target->getComponents(entity);
 	for (Component* component : components) {
 		component->setOwner(owner);
-		component->init();
 	}
 
 	// Update parent ref in Children
@@ -132,8 +131,8 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	if (parentCmp) {
 		Handle parent = *parentCmp->getParent();
 		if (!parent.refresh()) { // If parent is invalid. Throw exception
-			throw std::invalid_argument("EntityManager::prepEntity::ERROR Cannot add invalid Parent!");
 			std::cout << "EntityManager::prepEntity::ERROR Cannot add invalid Parent to Entity(" << entity.getID() << ")\n";
+			throw std::invalid_argument("EntityManager::prepEntity::ERROR Cannot add invalid Parent!");
 		}
 		else {
 			while (parent.isValid()) {

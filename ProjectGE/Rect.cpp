@@ -3,7 +3,7 @@
 using namespace Core;
 
 
-Rect::Rect(int width, int height, glm::vec4 color, unsigned short layerIndex) : GraphicComponent(layerIndex, width, height), color(color) {
+Rect::Rect(int width, int height, glm::vec4 color, unsigned char layerIndex) : GraphicComponent(layerIndex, width, height), color(color) {
 } // Constructor
 
 Rect::Rect() {

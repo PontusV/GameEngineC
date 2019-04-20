@@ -20,6 +20,19 @@ namespace Core {
 		unsigned int	advance;	// Offset to advance to next glyph
 	};
 
+	struct Glyph {
+		unsigned char advance;
+
+		unsigned short width;
+		unsigned short height;
+
+		char bearingX;
+		char bearingY;
+
+		unsigned short textureX;
+		unsigned short textureY;
+	};
+
 	//Texture2D with an offset position
 	struct CharTexture2D {
 		CharTexture2D() {}
@@ -45,13 +58,11 @@ namespace Core {
 		TextData2D createText(std::string text, glm::vec4 color, unsigned short size);
 
 	private:
-		unsigned short textSize;
-		//std::map<GLchar, Character>	characters;
-		std::map<char, CharTexture2D> textureMap;
 		Character characters[128];
 		CharTexture2D charTextures[128];
 		Texture2D textureAtlas;
-		int textHeight;
+		unsigned short textSize;
+		unsigned short textHeight;
 	};
 }
 #endif

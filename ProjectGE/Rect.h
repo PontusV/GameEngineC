@@ -8,7 +8,7 @@ namespace Core {
 	class Rect : public GraphicComponent {
 	public:
 
-		Rect(int width, int height, glm::vec4 color, unsigned short layerIndex = 0);
+		Rect(int width, int height, glm::vec4 color, unsigned char layerIndex = 0);
 		Rect();
 		~Rect();
 

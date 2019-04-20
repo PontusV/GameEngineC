@@ -26,6 +26,10 @@ namespace Core {
 		{
 			return id == rhs.id;
 		}
+		bool operator!=(const Entity& rhs) const
+		{
+			return id != rhs.id;
+		}
 	private:
 		std::size_t id;
 	};

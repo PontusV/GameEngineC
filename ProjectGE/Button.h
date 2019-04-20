@@ -1,8 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "Component.h"
-#include "Interactable.h"
+#include "Script.h"
 #include "Image.h"
 #include <iostream>
 #include <glm/glm.hpp>
@@ -16,7 +15,7 @@ namespace Core {
 	};
 
 	/* A button which manipulates the image component in the same Entity. A button does not function without an image. */
-	class Button : public Component, public ui::Interactable {
+	class Button : public Script {
 	public:
 		// Constructor / Destructor
 		Button(Image defaultImage, Image pressedImage, Image hoverImage);																// Different sized images
@@ -24,20 +23,13 @@ namespace Core {
 		Button() {}
 		~Button();
 
-		void	init();
+		void	start() override;
+		void	onMouseButtonPressed(int buttoncode, int mods) override;
+		void	onMouseButtonReleased(int buttoncode, int mods) override;
+		void	onHoverover() override;
+		void	onHoverout() override;
+
 		Image*	getImages();
-
-		// UI
-		void	onLeftClickPressed() override;
-		void	onLeftClickReleased();
-		void	onHoverover();
-		void	onHoverout();
-
-		// Callback
-		void	setButtonPressCallback(ui::LeftClickPressFun fun);
-		void	setButtonReleaseCallback(ui::LeftClickReleaseFun fun);
-
-		// Serializable
 		void	serialize(std::ostream& os) const;
 		void	deserialize(std::istream& is);
 	private:

@@ -45,9 +45,19 @@ namespace Core {
 		std::vector<Component*>					getComponentsInChildren();
 		template<typename T> std::vector<T*>	getComponentsInChildren();
 
-		template<typename T> T*					getComponentInParent();
-		std::vector<Component*>					getComponentsInParent();
-		template<typename T> std::vector<T*>	getComponentsInParent();
+		template<typename T> T*					getComponentInParents();
+		std::vector<Component*>					getComponentsInParents();
+		template<typename T> std::vector<T*>	getComponentsInParents();
+
+		/* Returns all components attached to the entity and its parents. */
+		std::vector<Component*>					getComponentsUpwards();
+		/* Returns all components (deriving from T) attached to the entity and its parents. */
+		template<typename T> std::vector<T*>	getComponentsUpwards();
+
+		/* Returns all components attached to the entity and its children. */
+		std::vector<Component*>					getComponentsDownwards();
+		/* Returns all components (deriving from T) attached to the entity and its children. */
+		template<typename T> std::vector<T*>	getComponentsDownwards();
 
 		Handle*									getParent();
 		Handle*									getChild(std::size_t index);
@@ -106,7 +116,7 @@ namespace Core {
 	}
 
 	template<typename T>
-	T* Handle::getComponentInParent() {
+	T* Handle::getComponentInParents() {
 		if (refresh()) {
 			Handle* parent = getParent();
 			while (parent) {
@@ -120,17 +130,33 @@ namespace Core {
 	}
 
 	template<typename T>
-	std::vector<T*> Handle::getComponentsInParent() {
-		std::vector<Component*> components;
+	std::vector<T*> Handle::getComponentsInParents() {
+		std::vector<T*> components;
 		if (refresh()) {
 			Handle* parent = getParent();
 			if (parent) {
-				std::vector<Component*> parentComponents = parent->getComponents<T>();
+				std::vector<T*> parentComponents = parent->getComponents<T>();
 				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
-				parentComponents = parent->getComponentsInParent();
+				parentComponents = parent->getComponentsInParents<T>();
 				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 			}
 		}
+		return components;
+	}
+
+	template<typename T>
+	std::vector<T*> Handle::getComponentsUpwards() {
+		std::vector<T*> components = getComponents<T>();
+		std::vector<T*> parentComponents = getComponentsInParents<T>();
+		components.insert(components.end(), parentComponents.begin(), parentComponents.end());
+		return components;
+	}
+
+	template<typename T>
+	std::vector<T*> Handle::getComponentsDownwards() {
+		std::vector<T*> components = getComponents<T>();
+		std::vector<T*> childComponents = getComponentsInChildren<T>();
+		components.insert(components.end(), childComponents.begin(), childComponents.end());
 		return components;
 	}
 }

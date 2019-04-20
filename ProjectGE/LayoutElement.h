@@ -10,7 +10,7 @@ namespace Core {
 		LayoutElement();
 		~LayoutElement();
 
-		/* Creates an Axis Aligned Bounding Box surrounding the Entity this component is attached to. */
+		/* Creates a new Axis Aligned Bounding Box surrounding the whole Entity this component is attached to. */
 		Bounds getBounds();
 
 	private:

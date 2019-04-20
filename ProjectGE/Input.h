@@ -53,14 +53,14 @@ namespace Core {
 		void setMousePos(glm::vec2 position);
 
 		// Callback functions
-		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+		/*static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 		static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);*/
 
 	private:
 		EntityHandle		getEntityAtPos(float x, float y);
-		void				processInputEvent(const InputEvent& event, ui::Interactable* interactable = nullptr) const;
+		void				processInputEvent(const InputEvent& event, EntityHandle& target);
 
 		// KEY
 		void				keyPressed(const KeyEvent& event) const;
@@ -73,11 +73,8 @@ namespace Core {
 
 	private:
 		Engine*						engine;
-		glm::vec2					mousePosition;
 		std::vector<KeyListener*>	keyListeners;
 		std::map<int, std::string>	keyBinds;
-		bool						mouseMoved;
-		ui::Interactable*			hoverPtr;
 
 		// Input cache
 		std::vector<InputEvent> events;
@@ -90,6 +87,14 @@ namespace Core {
 		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges
 		//std::map<int, std::string> keyBindsPressed;
 		//std::map<int, std::string> keyBindsReleased;
+
+	private:
+		glm::vec2					mousePosition;
+		bool						mouseMoved;
+		EntityHandle				hoverTarget;
+		EntityHandle				lastClickTarget;
+		float						timeSinceLastClick;
+		bool						leftMouseButtonPressed;
 	};
 }
 #endif

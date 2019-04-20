@@ -6,48 +6,58 @@
 #include "EntityManager.h"
 #include "Level.h"
 #include "Component.h"
+#include "Script.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>
 using namespace Core;
 using namespace Core::ui;
 
-Input::Input(Engine* engine) : engine(engine), mouseMoved(true) {}
+Input::Input(Engine* engine) : engine(engine) {
+	mouseMoved = true;
+	leftMouseButtonPressed = false;
+	timeSinceLastClick = 0.0f;
+}
 
 Input::~Input() {
 }
 
 void Input::update(float dt) {
-	//if (!mouseMoved && events.size() == 0) return;
-	//mouseMoved = false;
-
-	Interactable* interactable = nullptr;
-
-	EntityHandle entity = getEntityAtPos(mousePosition.x, mousePosition.y);
-	if (entity.isValid()) {
-		interactable = entity.getComponent<Button>();
+	// Mouse Drag
+	if (mouseMoved && leftMouseButtonPressed) {
+		std::vector<Script*> scripts = lastClickTarget.getComponentsUpwards<Script>();
+		for (Script* script : scripts) {
+			script->onMouseDrag(mousePosition.x, mousePosition.y);
+		}
 	}
-	// Check for hover in/out update
-	if (interactable != hoverPtr) {
-		if (hoverPtr)
-			hoverPtr->onHoverout();
-		// Switch current hover ptr
-		hoverPtr = interactable;
 
-		if (hoverPtr)
-			hoverPtr->onHoverover();
+	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);
+	// Mouse Hover
+	if (target.getEntity() != hoverTarget.getEntity()) {
+		std::vector<Script*> scripts = hoverTarget.getComponentsUpwards<Script>();
+		for (Script* script : scripts) {
+			script->onHoverout();
+		}
+		// Switch current hover ptr
+		hoverTarget = target;
+
+		scripts = hoverTarget.getComponentsUpwards<Script>();
+		for (Script* script : scripts) {
+			script->onHoverover();
+		}
 	}
 	
 	// Process input events
 	for (InputEvent& event : events) {
-		processInputEvent(event, interactable);
+		processInputEvent(event, target);
 	}
 
 	// Clear input events
 	events.clear();
 }
+
 /* Process input event */
-void Input::processInputEvent(const InputEvent& event, Interactable* interactable) const {
+void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 	switch (event.type) {
 	case INPUT_EVENT_KEY:
 		if (event.key.action == GLFW_PRESS) {
@@ -57,43 +67,67 @@ void Input::processInputEvent(const InputEvent& event, Interactable* interactabl
 			keyReleased(event.key);
 		}
 		break;
-	case INPUT_EVENT_MOUSEBUTTON: //TODO: ADD SHIFT-CLICK, CTRL-CLICK, ALT-CLICK
-		// TODO: ADD MouseListener
-		if (interactable && event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_LEFT) {
+	case INPUT_EVENT_MOUSEBUTTON:
+		if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_LEFT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				float clickTime = (float)glfwGetTime() - interactable->getTimeSinceLastClick();
-				if (clickTime > DOUBLE_CLICK_THRESHOLD) {
-					interactable->onLeftClickPressed();
-					interactable->setTimeSinceLastClick((float)glfwGetTime());
+				float clickTime = (float)glfwGetTime() - timeSinceLastClick;
+
+				lastClickTarget = target;
+				leftMouseButtonPressed = true;
+				timeSinceLastClick = (float)glfwGetTime();
+
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
-				else {
-					interactable->onDoubleClick();
-					interactable->setTimeSinceLastClick(0.0f);
+				if (clickTime <= DOUBLE_CLICK_THRESHOLD && lastClickTarget.getEntity() == target.getEntity()) {
+					std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+					for (Script* script : scripts) {
+						script->onDoubleClick();
+					}
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
-				interactable->onLeftClickReleased();
-			}
-		} else if (interactable && event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
-			if (event.mouseButton.action == GLFW_PRESS) {
-				interactable->onRightClickPressed();
-			}
-			else if (event.mouseButton.action == GLFW_RELEASE) {
-				interactable->onRightClickReleased();
+				leftMouseButtonPressed = false;
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+				}
 			}
 		}
-		else if (interactable && event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
+		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				interactable->onMiddleClickPressed();
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
-				interactable->onMiddleClickReleased();
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+				}
+			}
+		}
+		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
+			if (event.mouseButton.action == GLFW_PRESS) {
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+				}
+			}
+			else if (event.mouseButton.action == GLFW_RELEASE) {
+				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+				for (Script* script : scripts) {
+					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+				}
 			}
 		}
 		break;
 	case INPUT_EVENT_SCROLL:
-		if (interactable) {
-			interactable->onScroll(event.scroll.xoffset, event.scroll.yoffset);
+		std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
+		for (Script* script : scripts) {
+			script->onScroll(event.scroll.xoffset, event.scroll.yoffset);
 		}
 		break;
 	}
@@ -143,56 +177,6 @@ void Input::addKeyListener(KeyListener* listener) {
 
 void Input::addKeyBind(int keyCode, std::string buttonName) {
 	keyBinds[keyCode] = buttonName;
-}
-
-// ------------------------------- CALLBACK -----------------------------------
-
-void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-	// Escape key is by default set for closing the application
-	//if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	//	glfwSetWindowShouldClose(window, true);
-
-	if (key >= 0 && key < 1024)
-	{
-		Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
-		InputEvent event;
-		event.type			= INPUT_EVENT_KEY;
-		event.key.keycode	= key;
-		event.key.scancode	= scancode;
-		event.key.action	= action;
-		event.key.mode		= mode;
-
-		input->addInputEvent(event);
-	}
-}
-
-void Input::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-	input->setMousePos(glm::vec2(xpos, ypos));
-}
-
-void Input::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
-	InputEvent event;
-	event.type						= INPUT_EVENT_MOUSEBUTTON;
-	event.mouseButton.buttoncode	= button;
-	event.mouseButton.action		= action;
-	event.mouseButton.mods			= mods;
-
-	input->addInputEvent(event);
-}
-
-void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
-	InputEvent event;
-	event.type				= INPUT_EVENT_SCROLL;
-	event.scroll.xoffset	= (float)xoffset;
-	event.scroll.yoffset	= (float)yoffset;
-
-	input->addInputEvent(event);
 }
 
 // -------------- HELPERS ------------------

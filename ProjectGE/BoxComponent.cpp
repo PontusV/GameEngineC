@@ -21,7 +21,7 @@ void BoxComponent::setSize(unsigned int width, unsigned int height) {
 }
 
 void BoxComponent::setSize(glm::ivec2 size) {
-	this->size = size;
+	setSize(size.x, size.y);
 }
 
 const glm::ivec2& BoxComponent::getSize() const {

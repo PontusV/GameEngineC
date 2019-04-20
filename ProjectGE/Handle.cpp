@@ -96,17 +96,32 @@ std::vector<Component*> Handle::getComponentsInChildren() {
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsInParent() {
+std::vector<Component*> Handle::getComponentsInParents() {
 	std::vector<Component*> components;
 	if (refresh()) {
 		Handle* parent = getParent();
 		if (parent) {
 			std::vector<Component*> parentComponents = parent->getComponents();
 			components.insert(components.end(), parentComponents.begin(), parentComponents.end());
-			parentComponents = parent->getComponentsInParent();
+			parentComponents = parent->getComponentsInParents();
 			components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 		}
 	}
+	return components;
+}
+
+
+std::vector<Component*> Handle::getComponentsUpwards() {
+	std::vector<Component*> components = getComponents();
+	std::vector<Component*> parentComponents = getComponentsInParents();
+	components.insert(components.end(), parentComponents.begin(), parentComponents.end());
+	return components;
+}
+
+std::vector<Component*> Handle::getComponentsDownwards() {
+	std::vector<Component*> components = getComponents();
+	std::vector<Component*> childComponents = getComponentsInChildren();
+	components.insert(components.end(), childComponents.begin(), childComponents.end());
 	return components;
 }
 

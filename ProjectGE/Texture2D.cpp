@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-Texture2D::Texture2D() : size(0, 0), uvPos{ glm::vec2(0,0), glm::vec2(0,1), glm::vec2(1,1), glm::vec2(1,0) }, ID(0) {
+Texture2D::Texture2D() : size(0, 0), uvCoords{ glm::vec2(0,0), glm::vec2(0,1), glm::vec2(1,1), glm::vec2(1,0) }, ID(0) {
 }
 
 
@@ -38,7 +38,7 @@ float Texture2D::getAlphaAtPoint(int x, int y) const {
 void Texture2D::generate(GLuint width, GLuint height, GLuint internalFormat, GLuint imageFormat, GLuint wrapS, GLuint wrapT, GLuint filterMin, GLuint filterMax, unsigned char* data) {
 	size = glm::vec2(width, height);
 	sourceSize = glm::vec2(width, height);
-	this->format = imageFormat;
+	format = imageFormat;
 	// Create Texture
 	glBindTexture(GL_TEXTURE_2D, ID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //Makes sure all images get loaded properly

@@ -10,25 +10,25 @@ namespace Core {
 	public:
 		virtual ~GraphicComponent() = 0; // Abstract
 
-		void				setLayerIndex(unsigned short index);
-		unsigned short		getLayerIndex() const;
+		void					setLayerIndex(unsigned char index);
+		const unsigned char&	getLayerIndex() const;
 
 		const std::vector<glm::vec2>& getClipMaskVertices() const;
 
 		/* Cuts away Drawable area that is outside of the rect parameter. */
-		void				clip(glm::vec2 clipVertices[4]);
-		void				resetClipping();
-		bool				isClipEnabled() const;
+		void					clip(glm::vec2 clipVertices[4]);
+		void					resetClipping();
+		bool					isClipEnabled() const;
 		
 		// Serializable
-		virtual void		serialize(std::ostream& os) const;
-		virtual void		deserialize(std::istream& is);
+		virtual void			serialize(std::ostream& os) const;
+		virtual void			deserialize(std::istream& is);
 
 	protected:
-		GraphicComponent(unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
+		GraphicComponent(unsigned char layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
 
 	private:
-		unsigned short			layerIndex;
+		unsigned char			layerIndex;
 		bool					clipEnabled;
 		std::vector<glm::vec2>	clipMaskVertices;
 		//glm::vec4		drawRect;

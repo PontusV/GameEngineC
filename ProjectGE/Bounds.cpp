@@ -8,7 +8,9 @@ Bounds::Bounds(glm::vec2 position, glm::ivec2 size) : pos(position), size(size) 
 }
 Bounds::~Bounds() {
 }
-/* Creates an AABB in world space */
+/* Creates an AABB in world space. The AABB will surround a rectangle with the specified size and position of top left vertex.
+ * @param localPosition defines the local position of the top left vertex of a Box/Rectangle
+*/
 Bounds Bounds::create(const glm::mat4& localToWorldMatrix, const glm::vec2& localPosition, const glm::ivec2& size) {
 	glm::vec2 vertices[4] = {
 		localToWorldMatrix * localPosition,

@@ -12,7 +12,7 @@ namespace Core {
 	class Image : public GraphicComponent {
 	public:
 
-		Image(const char* fileName, unsigned short layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
+		Image(const char* fileName, unsigned char layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
 		Image();
 
 		~Image();

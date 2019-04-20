@@ -27,7 +27,7 @@ namespace Core {
 			return instance;
 		}
 		Shader						loadShader(const GLchar* vShaderFile, const GLchar* fShaderFile);
-		Texture2D					loadTexture(const GLchar* file, glm::ivec2 size = glm::ivec2(0,0), glm::ivec2 uvStartPos = glm::ivec2(0,0));
+		Texture2D					loadTexture(const GLchar* file, glm::ivec2 size = glm::ivec2(0,0), glm::ivec2 uvStartCoords = glm::ivec2(0,0));
 		TextData2D					createText(std::string text, glm::vec4 color, Font font);
 
 		// Properly de-allocates all loaded resources
@@ -42,7 +42,7 @@ namespace Core {
 		static Texture2D	loadTextureFromFile(const GLchar* file);
 
 		// Private Loader functions
-		FontManager&		loadFontManager(const std::string file);
+		FontManager&		loadFontManager(const std::string file, GLushort textSize);
 
 		//
 		FT_Library ft;

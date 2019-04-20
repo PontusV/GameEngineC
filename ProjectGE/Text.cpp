@@ -3,7 +3,7 @@
 using namespace Core;
 
 
-Text::Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned short layerIndex) : GraphicComponent(layerIndex), font(fontAddress, fontSize), color(color) {
+Text::Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned char layerIndex) : GraphicComponent(layerIndex), font(fontAddress, fontSize), color(color) {
 	setText(text);
 } // Constructor
 

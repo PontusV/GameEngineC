@@ -7,7 +7,7 @@
 using namespace Core;
 
 
-Image::Image(const char* fileName, unsigned short layerIndex, unsigned int width, unsigned int height) : GraphicComponent(layerIndex, width, height), fileName(fileName) {
+Image::Image(const char* fileName, unsigned char layerIndex, unsigned int width, unsigned int height) : GraphicComponent(layerIndex, width, height), fileName(fileName) {
 } // Constructor
 
 Image::Image() {

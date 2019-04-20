@@ -117,9 +117,6 @@
     <ClCompile Include="KeyListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -199,6 +196,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ComponentTypeInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -296,9 +302,6 @@
     <ClInclude Include="KeyListener.h">
       <Filter>Header Files\Systems\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Layer.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
@@ -385,6 +388,15 @@
     </ClInclude>
     <ClInclude Include="ComponentRegistry.h">
       <Filter>Header Files\Systems\Entity\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptManager.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Header Files\Systems\Entity\Component\Scripts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

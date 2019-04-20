@@ -3,17 +3,17 @@
 using namespace Core;
 
 
-GraphicComponent::GraphicComponent(unsigned short layerIndex, unsigned int width, unsigned int height) : BoxComponent(width, height), layerIndex(layerIndex) {
+GraphicComponent::GraphicComponent(unsigned char layerIndex, unsigned int width, unsigned int height) : BoxComponent(width, height), layerIndex(layerIndex), clipEnabled(false) {
 } // Constructor
 
 GraphicComponent::~GraphicComponent() {
 } // Destructor
 
-void GraphicComponent::setLayerIndex(unsigned short index) {
+void GraphicComponent::setLayerIndex(unsigned char index) {
 	layerIndex = index;
 }
 
-unsigned short GraphicComponent::getLayerIndex() const {
+const unsigned char& GraphicComponent::getLayerIndex() const {
 	return layerIndex;
 }
 
