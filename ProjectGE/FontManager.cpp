@@ -87,7 +87,7 @@ FontManager::~FontManager()
 }
 
 
-TextData2D FontManager::createText(std::string text, glm::vec4 color, unsigned short size) {
+TextData2D FontManager::createText(std::string text, unsigned short size) {
 	//float scale = ((float)size)/textSize;
 	//float scale = 1.0f;
 
@@ -129,8 +129,8 @@ TextData2D FontManager::createText(std::string text, glm::vec4 color, unsigned s
 		texture.texture.size.y = (int)(texture.texture.size.y /* scale*/);
 		textures.push_back(texture);
 
-		width = x;
 		x += (float)ch.advance /* scale*/;
+		width = x;
 	}
 
 	//int height = (int)(textHeight * scale);

@@ -3,8 +3,20 @@
 using namespace Core;
 
 
-Script::Script() : active(false), enabled(true) {
+Input* Script::input;
+Window* Script::window;
+
+Script::Script() : started(false), enabled(true) {
 }
 
 Script::~Script() {
+}
+
+void Script::enable() {
+	enabled = true;
+}
+
+void Script::disable() {
+	started = false;
+	enabled = false;
 }

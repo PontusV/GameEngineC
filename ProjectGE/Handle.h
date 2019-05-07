@@ -54,13 +54,14 @@ namespace Core {
 		/* Returns all components (deriving from T) attached to the entity and its parents. */
 		template<typename T> std::vector<T*>	getComponentsUpwards();
 
-		/* Returns all components attached to the entity and its children. */
+		/* Returns all components attached to the entity, its children and the childrens children, etc... */
 		std::vector<Component*>					getComponentsDownwards();
-		/* Returns all components (deriving from T) attached to the entity and its children. */
+		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
 		template<typename T> std::vector<T*>	getComponentsDownwards();
 
 		Handle*									getParent();
 		Handle*									getChild(std::size_t index);
+		std::size_t								getImmediateChildCount();
 		std::size_t								getChildCount();
 	protected:
 		// Data required to update itself

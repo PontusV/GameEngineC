@@ -1,2 +1,8 @@
 ProjectGE/Debug/*
 ProjectGE/Release/*
+LevelEditor/Debug/*
+LevelEditor/Release/*
+LevelEditor/resources/*
+ProjectGE.sln
+Debug/*
+Release/*

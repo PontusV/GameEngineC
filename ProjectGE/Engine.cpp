@@ -56,7 +56,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-	engine->getInput().setMousePos(glm::vec2(xpos, ypos));
+	engine->getInput().setMousePosition(glm::vec2(xpos, ypos));
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -113,6 +113,7 @@ LevelPtr Engine::loadLevel(const char* fileName) { //To be added: file location 
 	level->deserialize(file);
 	//
 	file.close();
+	level->awake();
 
 	return level;
 }
@@ -162,10 +163,10 @@ int Engine::start() {
 	glfwSetFramebufferSizeCallback(window.getWindow(), framebuffer_size_callback);
 
 	FpsCounter fpsCounter;
-	unsigned char debugLayer = graphics.createLayer();
+	//unsigned char debugLayer = graphics.createLayer();
 	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
-		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), debugLayer),
-		Transform(500, 5, 0, TransformAnchor::TOP_LEFT)
+		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255), 0),
+		Transform(500, 5, 30, Alignment::TOP_LEFT)
 	);
 
 	// DeltaTime variables
@@ -190,6 +191,7 @@ int Engine::start() {
 		// Update systems
 		input.update(deltaTime);
 		scriptManager.update(deltaTime);
+		currentLevel->getEntityManager().lock()->processQueue(); // Process Queued
 		physics.update(deltaTime);
 		graphics.update(deltaTime);
 
@@ -204,12 +206,14 @@ int Engine::start() {
 	return 0;
 }
 
-Engine::Engine() : graphics(), input(this), physics() {
+Engine::Engine() : graphics(), input(this), physics(), scriptManager(this) {
 }
 Engine::~Engine() {
 	//Unload all entities and components
 	if (currentLevel)
 		currentLevel->clear();
+	if (debugLevel)
+		debugLevel->clear();
 }
 
 Input& Engine::getInput() {

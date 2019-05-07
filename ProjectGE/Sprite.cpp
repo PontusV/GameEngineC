@@ -1,27 +1,35 @@
-#include "GraphicComponent.h"
+#include "Sprite.h"
 
 using namespace Core;
 
 
-GraphicComponent::GraphicComponent(unsigned char layerIndex, unsigned int width, unsigned int height) : BoxComponent(width, height), layerIndex(layerIndex), clipEnabled(false) {
+Sprite::Sprite(unsigned char layerIndex, unsigned int width, unsigned int height, Color color) : BoxComponent(width, height), layerIndex(layerIndex), color(color), clipEnabled(false) {
 } // Constructor
 
-GraphicComponent::~GraphicComponent() {
+Sprite::~Sprite() {
 } // Destructor
 
-void GraphicComponent::setLayerIndex(unsigned char index) {
+void Sprite::setLayerIndex(unsigned char index) {
 	layerIndex = index;
 }
 
-const unsigned char& GraphicComponent::getLayerIndex() const {
+const unsigned char& Sprite::getLayerIndex() const {
 	return layerIndex;
 }
 
-const std::vector<glm::vec2>& GraphicComponent::getClipMaskVertices() const {
+const Color& Sprite::getColor() const {
+	return color;
+}
+
+void Sprite::setColor(Color value) {
+	color = value;
+}
+
+const std::vector<glm::vec2>& Sprite::getClipMaskVertices() const {
 	return clipMaskVertices;
 }
 
-void GraphicComponent::clip(glm::vec2 clipVertices[4]) {
+void Sprite::clip(glm::vec2 clipVertices[4]) {
 	clipEnabled = true;
 	// Add mask to list
 	for (int i = 0; i < 4; i++) {
@@ -29,28 +37,30 @@ void GraphicComponent::clip(glm::vec2 clipVertices[4]) {
 	}
 }
 
-void GraphicComponent::resetClipping() {
+void Sprite::resetClipping() {
 	clipEnabled = false;
 	clipMaskVertices.clear();
 }
 
-bool GraphicComponent::isClipEnabled() const {
+bool Sprite::isClipEnabled() const {
 	return clipEnabled;
 }
 
 // ------------------------------- Serializable ----------------------------------------
 
-void GraphicComponent::serialize(std::ostream& os) const {
+void Sprite::serialize(std::ostream& os) const {
 	BoxComponent::serialize(os);
 
 
 	os.write((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
+	color.serialize(os);												// Color
 }
 
-void GraphicComponent::deserialize(std::istream& is) {
+void Sprite::deserialize(std::istream& is) {
 	BoxComponent::deserialize(is);
 
 	is.read((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
+	color.deserialize(is);												// Color
 }
 
 

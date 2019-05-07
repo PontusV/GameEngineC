@@ -6,7 +6,7 @@ using namespace Core;
 BoxComponent::BoxComponent() : size(0,0) {
 } // Constructor
 
-BoxComponent::BoxComponent(unsigned int width, unsigned int height) : size(width, height) {
+BoxComponent::BoxComponent(int width, int height) : size(width, height) {
 } // Constructor
 
 BoxComponent::BoxComponent(glm::ivec2 size) : size(size) {
@@ -16,12 +16,20 @@ BoxComponent::BoxComponent(glm::ivec2 size) : size(size) {
 BoxComponent::~BoxComponent() {
 } // Destructor
 
-void BoxComponent::setSize(unsigned int width, unsigned int height) {
+void BoxComponent::setSize(int width, int height) {
 	size = glm::ivec2(width, height);
 }
 
 void BoxComponent::setSize(glm::ivec2 size) {
 	setSize(size.x, size.y);
+}
+
+void BoxComponent::setWidth(int width) {
+	size.x = width;
+}
+
+void BoxComponent::setHeight(int height) {
+	size.y = height;
 }
 
 const glm::ivec2& BoxComponent::getSize() const {

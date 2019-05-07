@@ -66,13 +66,11 @@ Component* Handle::getComponent(ComponentType type) {
 }
 
 std::vector<Component*> Handle::getComponents(ComponentType type) {
-	std::vector<Component*> components;
-
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index, type);
 	}
-	return components;
+	return std::vector<Component*>();
 }
 
 std::vector<Component*> Handle::getComponents() {
@@ -110,7 +108,6 @@ std::vector<Component*> Handle::getComponentsInParents() {
 	return components;
 }
 
-
 std::vector<Component*> Handle::getComponentsUpwards() {
 	std::vector<Component*> components = getComponents();
 	std::vector<Component*> parentComponents = getComponentsInParents();
@@ -136,15 +133,40 @@ Handle* Handle::getParent() {
 Handle* Handle::getChild(std::size_t index) {
 	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
 	if (childManager) {
-		return childManager->getChild(index);
+		std::size_t immediateChildCount = childManager->getChildCount();
+		// Check if child is immediate
+		if (index < immediateChildCount) {
+			return childManager->getChild(index);
+		} // Otherwise check for the child in immediate children
+		else {
+			index -= immediateChildCount;
+			for (std::size_t i = 0; i < immediateChildCount; i++) {
+				Handle* child = getChild(i);
+				std::size_t childChildCount = child->getChildCount();
+				if (index < childChildCount) {
+					return child->getChild(index);
+				}
+				else {
+					index -= childChildCount;
+				}
+			}
+		}
 	}
 	return nullptr;
 }
-
-std::size_t Handle::getChildCount() {
+std::size_t Handle::getImmediateChildCount() {
 	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
 	if (childManager) {
 		return childManager->getChildCount();
 	}
 	return 0;
+}
+
+std::size_t Handle::getChildCount() {
+	std::size_t immediateChildCount = getImmediateChildCount();
+	std::size_t childCount = immediateChildCount;
+	for (std::size_t i = 0; i < immediateChildCount; i++) {
+		childCount += getChild(i)->getChildCount();
+	}
+	return childCount;
 }

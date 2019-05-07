@@ -8,7 +8,7 @@
 using namespace Core;
 
 
-Window::Window(const char* title, int width, int height) : title(title), width(width), height(height) {
+Window::Window(const char* title, int width, int height) : title(title), resolution(width, height) {
 }
 Window::Window() : active(false) {
 
@@ -30,7 +30,7 @@ bool Window::init() {
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	//glfwWindowHint(GLFW_SAMPLES, 16); // Anti-alias (Makes Sprites blurry)
 
-	window = glfwCreateWindow(width, height, title, NULL, NULL);
+	window = glfwCreateWindow(resolution.x, resolution.y, title, NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		std::cout << "Failed to create GLFW window!" << std::endl;
@@ -48,7 +48,7 @@ bool Window::init() {
 	}
 
 	// OpenGL configuration
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, resolution.x, resolution.y);
 	// Enable transparently
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -88,11 +88,16 @@ void Window::close() {
 }
 
 int Window::getWidth() {
-	glfwGetWindowSize(window, &width, &height);
-	return width;
+	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	return resolution.x;
 }
 
 int Window::getHeight() {
-	glfwGetWindowSize(window, &width, &height);
-	return height;
+	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	return resolution.y;
+}
+
+const glm::ivec2& Window::getResolution() {
+	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	return resolution;
 }

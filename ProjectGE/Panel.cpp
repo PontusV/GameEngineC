@@ -1,5 +1,5 @@
 #include "Panel.h"
-#include "GraphicComponent.h"
+#include "Sprite.h"
 #include "ChildManager.h"
 #include "Transform.h"
 

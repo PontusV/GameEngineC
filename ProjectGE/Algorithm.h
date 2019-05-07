@@ -17,10 +17,9 @@ namespace Core {
 			glm::vec2 size;
 			glm::vec2 offset; // size * transform.anchor
 		};
-		struct TexturedRectTransform {
+		struct TexturedRectTransform : public RectTransform {
 			Texture2D texture;
-			RectTransform rectTransform;
-			int id;
+			std::size_t id;
 		};
 
 		/* Returns true if the position is inside the rect. */
@@ -34,25 +33,24 @@ namespace Core {
 			);
 		}
 
-		/* Returns the id of the TexturedRectTransform that is infront if there are any at the position. Returns -1 if none was found. */
-		int hitDetect(const float xPoint, const float yPoint, const std::vector<TexturedRectTransform>& rects, bool alpha = false) {
+		/* Returns the id of the TexturedRectTransform that is infront if there are any at the position. Returns 0 if none was found. */
+		std::size_t hitDetect(const float xPoint, const float yPoint, const std::vector<TexturedRectTransform>& rects, bool alpha = false) {
 			std::vector<TexturedRectTransform> interactables;
 
 			for (const TexturedRectTransform& rect : rects) {
 				// Simple hit detection
-				if (hitCheck(xPoint, yPoint, rect.rectTransform))
+				if (hitCheck(xPoint, yPoint, rect))
 				{
-					if (!alpha || rect.texture.getAlphaAtPoint((int)(xPoint - rect.rectTransform.transform.getX()), (int)(yPoint - rect.rectTransform.transform.getY())) > 0.0f) // Expensive
+					if (!alpha || rect.texture.getAlphaAtPoint((int)(xPoint - rect.transform.getX()), (int)(yPoint - rect.transform.getY())) > 0.0f) // Expensive
 						interactables.push_back(rect);
 				}
 			}
 
-			if (interactables.size() == 0) return -1;
+			if (interactables.size() == 0) return 0;
 			// Sort Interactables by transform.z to see which is infront
 			std::sort(interactables.begin(), interactables.end(), [](TexturedRectTransform& l, TexturedRectTransform& r) {
-				return l.rectTransform.transform.getZ() < r.rectTransform.transform.getZ();
+				return l.transform.getZ() > r.transform.getZ();
 			});
-
 			return interactables[0].id;
 		}
 

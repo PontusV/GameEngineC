@@ -19,10 +19,12 @@ namespace Core {
 
 		template <typename... Ts> EntityHandle	createEntity(std::string name, Ts... components); //Creates an entity and maps the given name to it
 		void									destroyEntity(Entity entity);
-		EntityHandle							getEntity(std::string entityName);
+		EntityHandle							getEntityHandle(std::string entityName);
 		EntityHandle							getEntityHandle(Entity entity);
 		std::weak_ptr<EntityManager>			getEntityManager();
 
+		/* Calls awake on all Entities in this Level and awakes the EntityManager; new Scripts will be awaken right after creation. Does nothing if the level has already been awaken. */
+		void awake();
 		/* Destroys all Entities. */
 		void clear();
 
@@ -35,7 +37,6 @@ namespace Core {
 
 	private:
 		std::vector<Entity>				entities;		// A list of entities in order of the Hierarchy	
-		std::map<std::string, Entity>	entityNameMap;	// Name of Entity, Entity
 		std::shared_ptr<EntityManager>	manager;		// Manages the Entities in this level
 	};
 
@@ -43,15 +44,9 @@ namespace Core {
 
 	template <typename... Ts>
 	EntityHandle Level::createEntity(std::string name, Ts... components) {
-		if (entityNameMap.find(name) != entityNameMap.end()) {
-			std::cout << "Level::createEntity::ERROR The name(" << name << ") is already mapped to another Entity!\n";
-			throw std::invalid_argument("Level::createEntity::ERROR The name(" + name + ") is already mapped to another Entity!");
-		}
-		Handle handle = manager->createEntity(components...);
+		Handle handle = manager->createEntity(name, components...);
 		if (handle.isValid() && handle.getEntity().getID() != Entity::INVALID_ID) {
 			entities.push_back(handle.getEntity());
-			entityNameMap.insert(std::pair<std::string, Entity>(name, handle.getEntity()));
-
 			return handle;
 		}
 		return EntityHandle(); // If returned Entity was invalid, returns an invalid handle

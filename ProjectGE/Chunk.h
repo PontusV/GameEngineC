@@ -117,10 +117,10 @@ namespace Core {
 	template<typename T>
 	void Chunk::setComponent(std::size_t index, T& component) {
 		T* componentArrayPtr = getComponentArrayPtr<T>();
-		T* componentPtr = &componentArrayPtr[index];
+		T* dest = &componentArrayPtr[index];
 
-		// Force copy-constructor to copy the given component into memory
-		T* newComponent = new(componentPtr) T(component);
+		// Copy-constructor to copy the given component into memory
+		T* newComponent = new(dest) T(component);
 	}
 
 	template<typename T>

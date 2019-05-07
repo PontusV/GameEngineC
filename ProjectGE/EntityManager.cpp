@@ -2,15 +2,57 @@
 #include "ParentEntity.h"
 #include "ChildManager.h"
 #include "Handle.h"
+#include "Script.h"
 
 using namespace Core;
 
+
+Entity EntityManager::generateEntity(std::string name) {
+	Entity entity(entityIDCounter++);
+	// Check if name is already taken
+	auto it = entityNameMap.find(name);
+	if (it != entityNameMap.end()) {
+		std::cout << "Entity with the name " << name << " already exists!\n";
+		throw std::invalid_argument("Entity with given name already exist!");
+	}
+	entityNameMap[name] = entity;
+	return entity;
+}
+
+void EntityManager::awake() {
+	if (isAwake) return;
+	isAwake = true;
+	// Loop through all entities
+	for (auto it = entityMap.begin(); it != entityMap.end(); it++) {
+		awakeEntity(it->first);
+	}
+}
+
+void EntityManager::awakeEntity(Entity entity) {
+	if (!isAwake) return; // This instance has to be awake first
+	std::vector<Script*> scripts = getComponents<Script>(entity);
+	for (Script* script : scripts) {
+		script->awake();
+	}
+}
+
+void EntityManager::awakeComponent(Entity entity, ComponentType type) {
+	if (!isAwake) return; // This instance has to be awake first
+	// Awake script
+	if (type == typeof(Script)) {
+		Script* script = static_cast<Script*>(getComponent(entity, type));
+		if (script) {
+			script->awake();
+		}
+	}
+}
+
 /* Returns invalid handle if entity does not have ParentEntity component or if the parent is nullptr. */
 Handle EntityManager::getParent(Entity entity) {
-	ParentEntity* parent = getComponent<ParentEntity>(entity);
-	if (parent) { // If component exists
-		if (parent->getParent()->isValid()) {
-			return *parent->getParent();
+	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
+	if (parentCmp) { // If component exists
+		if (parentCmp->getParent()->refresh()) {
+			return *parentCmp->getParent();
 		}
 	}
 	return Handle();
@@ -25,7 +67,7 @@ Handle* EntityManager::getChild(Entity entity, int index) {
 	return nullptr;
 }
 
-std::size_t	EntityManager::getChildCount(Entity entity) {
+std::size_t	EntityManager::getImmediateChildCount(Entity entity) {
 	ChildManager* childRefs = getComponent<ChildManager>(entity);
 	if (childRefs) { // If component exists
 		return childRefs->getChildCount();
@@ -45,6 +87,19 @@ Handle EntityManager::getEntityHandle(Entity entity) {
 	handle.update();
 	return handle;
 }
+Handle EntityManager::getEntityHandle(std::string entityName) {
+	Entity& entity = entityNameMap[entityName];
+	return getEntityHandle(entity);
+}
+std::string EntityManager::getEntityName(Entity entity) {
+	auto it = entityNameMap.begin();
+	while (it != entityNameMap.end()) {
+		if (it->second == entity) return it->first;
+		it++;
+	}
+	std::cout << "EntityManager::getEntityName::ERROR There is no such entity stored in this Level!\n";
+	throw std::invalid_argument("EntityManager::getEntityName::ERROR There is no such entity stored in this Level!");
+}
 
 void EntityManager::destroyEntity(Entity entity) {
 	removeEntity(entity, true);
@@ -61,29 +116,29 @@ void EntityManager::removeEntity(Entity entity, bool destroy) {
 
 	// Destroy children first. The children will destroy their own children.
 	if (destroy) {
-		std::size_t childCount = getChildCount(entity);
-		for (std::size_t i = childCount; i-- != 0;) { // Destroy from back to start
-			Handle* child = getChild(entity, i);
-			if (child) {
-				destroyEntity(child->getEntity());
-			}
+		bool updateIterator = getImmediateChildCount(entity) > 0;
+		while (getImmediateChildCount(entity) > 0) {
+			destroyEntity(getChild(entity, 0)->getEntity());
+		}
+		// Update the iterator if children were removed.
+		if (updateIterator) {
+			it = entityMap.find(entity);
 		}
 
-		// Notify parents
-		Handle parent = getParent(entity);
-		while (parent.isValid()) {
-			Entity currentParent = parent.getEntity();
+		// Erase Entity name
+		auto iterator = entityNameMap.find(getEntityName(entity));
+		if (iterator == entityNameMap.end()) throw "EntityManager::removeEntity::ERROR The Entity does not have a name!";
+		entityNameMap.erase(iterator);
+	}
 
-			ChildManager* childManager = getComponent<ChildManager>(currentParent);
-			if (childManager) childManager->childRemoved(entity);
-
-			// Prep for next iteration
-			parent = getParent(currentParent);
-
-			// Remove child ref container if no children exist
-			if (getChildCount(currentParent) == 0) {
-				removeComponent<ChildManager>(currentParent);
-			}
+	// Notify parent
+	Handle parent = getParent(entity);
+	ChildManager* childManager = parent.getComponent<ChildManager>();
+	if (childManager) {
+		childManager->childRemoved(entity);
+		// Remove child ref container if no children exist
+		if (childManager->getChildCount() == 0) {
+			removeComponent<ChildManager>(parent.getEntity());
 		}
 	}
 
@@ -115,7 +170,7 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	}
 
 	// Update parent ref in Children
-	std::size_t childCount = getChildCount(entity);
+	std::size_t childCount = getImmediateChildCount(entity);
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle* child = getChild(entity, i);
 		if (child) {
@@ -126,34 +181,24 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 		}
 	}
 
-	// Notify parents
+	// Notify parent
 	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
 	if (parentCmp) {
 		Handle parent = *parentCmp->getParent();
-		if (!parent.refresh()) { // If parent is invalid. Throw exception
+		if (parent.refresh()) {
+			Entity currentParent = parent.getEntity();
+			ChildManager* childManager = getComponent<ChildManager>(currentParent);
+			if (childManager == nullptr) {
+				ChildManager newChildManager;
+				addComponent(currentParent, newChildManager);
+				childManager = getComponent<ChildManager>(currentParent);
+				parentCmp->getParent()->update();
+			}
+			childManager->childAdded(owner); // Notify parent
+		}
+		else { // If parent is invalid. Throw exception
 			std::cout << "EntityManager::prepEntity::ERROR Cannot add invalid Parent to Entity(" << entity.getID() << ")\n";
 			throw std::invalid_argument("EntityManager::prepEntity::ERROR Cannot add invalid Parent!");
-		}
-		else {
-			while (parent.isValid()) {
-				Entity currentParent = parent.getEntity();
-				if (!hasComponent<ChildManager>(currentParent)) { // Check if childManager exists
-					ChildManager childManager;
-					addComponent(currentParent, childManager);
-					parentCmp->setParent(getEntityHandle(currentParent));
-				}
-				ChildManager* childManager = getComponent<ChildManager>(currentParent);
-				if (childManager) {
-					childManager->childAdded(owner); // Notify parent
-					std::size_t childCount = getChildCount(currentParent);
-				}
-				else {
-					std::cout << "EntityManager::prepEntity::ERROR Failed to add ChildManager!" << "\n";
-					throw std::invalid_argument("EntityManager::prepEntity::ERROR Failed to add ChildManager!");
-				}
-				// Prep for next iteration
-				parent = getParent(currentParent);
-			}
 		}
 	}
 }
@@ -250,6 +295,11 @@ Handle EntityManager::moveEntity(Entity entity, Archetype* src, Archetype* dest)
 }
 
 void EntityManager::clear() {
+	// Clears and deletes all stored function calls
+	for (IFunctionCaller* caller : functionQueue) {
+		delete caller;
+	}
+	functionQueue.clear();
 	// Clears and deletes all archetypes
 	for (Archetype* archetype : archetypes) {
 		archetype->clear();
@@ -258,4 +308,17 @@ void EntityManager::clear() {
 	// Clears all collections
 	archetypes.clear();
 	entityMap.clear();
+	entityNameMap.clear();
+}
+
+void EntityManager::processQueue() {
+	for (IFunctionCaller* caller : functionQueue) {
+		caller->call();
+		delete caller;
+	}
+	functionQueue.clear();
+}
+
+void EntityManager::destroyEntityQueued(Entity entity) {
+	functionQueue.push_back(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
 }

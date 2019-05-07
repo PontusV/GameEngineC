@@ -5,38 +5,43 @@ using namespace Core;
 
 
 Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : images{defaultImage, pressedImage, hoverImage} {
+	for (std::size_t i = 0; i < 3; i++) {
+		colors[i] = Color(255,255,255,255);
+	}
 } // Constructor
 
-Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, unsigned int width, unsigned int height) : images{ Image(defaultImage, 0, width, height), Image(pressedImage, 0, width, height), Image(hoverImage, 0, width, height) } {
+Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, int width, int height) : images{ Image(defaultImage, 0, width, height), Image(pressedImage, 0, width, height), Image(hoverImage, 0, width, height) } {
+	for (std::size_t i = 0; i < 3; i++) {
+		colors[i] = Color(255, 255, 255, 255);
+	}
 } // Constructor
 
 Button::~Button() {
 } // Destructor
 
 
-/* Initializes handle to image component with same owner. */
-void Button::start() {
-	changeState(ButtonState::DEFAULT);
+void Button::awake() {
+	changeState(DEFAULT);
 }
 
-void Button::onMouseButtonPressed(int buttoncode, int mods) {
+void Button::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(ButtonState::PRESSED_DOWN);
+		changeState(PRESSED_DOWN);
 	}
 }
-void Button::onMouseButtonReleased(int buttoncode, int mods) {
+void Button::onMouseButtonReleasedAsButton(int buttoncode, int mods) {
 	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(ButtonState::HOVER_OVER);
+		changeState(HOVER_OVER);
 	}
 }
 
 void Button::onHoverover() {
-	changeState(ButtonState::HOVER_OVER);
+	changeState(HOVER_OVER);
 }
 
 void Button::onHoverout() {
-	if (state == ButtonState::PRESSED_DOWN || state == ButtonState::HOVER_OVER)
-		changeState(ButtonState::DEFAULT);
+	if (state == PRESSED_DOWN || state == HOVER_OVER)
+		changeState(DEFAULT);
 }
 
 void Button::changeState(ButtonState state) {
@@ -47,8 +52,11 @@ void Button::changeState(ButtonState state) {
 	Image* image = owner.getComponent<Image>();
 	if (image) {
 		images[state].reload();
+		// Change image
 		image->setTexture(images[state].getFileName(), images[state].getTexture());
 		image->setSize(images[state].getSize());
+		// Change color
+		image->setColor(colors[state]);
 	}
 	else {
 		std::cout << "Button: Could not find Image component!\n";
@@ -62,21 +70,23 @@ Image* Button::getImages() {
 // ------------------------------- Serializable ----------------------------------------
 
 void Button::serialize(std::ostream& os) const {
-	Component::serialize(os);
+	Script::serialize(os);
 
-	images[0].serialize(os);							// Image 1
-	images[1].serialize(os);							// Image 2
-	images[2].serialize(os);							// Image 3
+	for (std::size_t i = 0; i < 3; i++) {
+		images[i].serialize(os);								// Images
+		colors[i].serialize(os);								// Colors
+	}
 
-	os.write((char*)&state, sizeof(state));				// State
+	os.write((char*)&state, sizeof(state));						// State
 }
 
 void Button::deserialize(std::istream& is) {
-	Component::deserialize(is);
+	Script::deserialize(is);
 
-	images[0].deserialize(is);							// Image 1
-	images[1].deserialize(is);							// Image 2
-	images[2].deserialize(is);							// Image 3
+	for (std::size_t i = 0; i < 3; i++) {
+		images[i].deserialize(is);								// Images
+		colors[i].deserialize(is);								// Colors
+	}
 
-	is.read((char*)&state, sizeof(state));				// State
+	is.read((char*)&state, sizeof(state));						// State
 }

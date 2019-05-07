@@ -21,6 +21,7 @@ namespace Core {
 
 		int getWidth();
 		int getHeight();
+		const glm::ivec2& getResolution();
 		bool isActive() const;
 
 		void setBackgroundColor(glm::vec3 color);
@@ -29,12 +30,12 @@ namespace Core {
 
 	private:
 		const char* title;
-		int width, height;
-		GLFWwindow* window;
-
+		glm::ivec2 resolution;
 		glm::vec3 backgroundColor;
 
 		bool active;
+
+		GLFWwindow* window;
 	};
 }
 #endif

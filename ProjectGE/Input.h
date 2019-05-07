@@ -3,14 +3,12 @@
 
 #define DOUBLE_CLICK_THRESHOLD 0.2f
 
-#include "Button.h"
-#include "Image.h"
+#include "Sprite.h"
 #include "Transform.h"
 #include "ComponentGroup.h"
 #include "ComponentArray.h"
 
 #include "EntityHandle.h"
-#include "Interactable.h"
 #include "InputEvent.h"
 
 #include <map>
@@ -25,15 +23,8 @@ namespace Core {
 	class KeyListener;
 
 	// Component Group for getEntityAtPos(x,y)
-	struct TexturedEntities : public ComponentGroup<Image, Transform> {
-		ComponentArray<Image>&		images		= getComponentArray<Image>();
-		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
-	};
-
-	// Interactable Component Groups
-	struct InteractableButtons : public ComponentGroup<Button, Image, Transform> {
-		ComponentArray<Button>&		buttons		= getComponentArray<Button>();
-		ComponentArray<Image>&		images		= getComponentArray<Image>();
+	struct SpriteGroup : public ComponentGroup<Sprite, Transform> {
+		ComponentArray<Sprite>&		sprites		= getComponentArray<Sprite>();
 		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
 	};
 
@@ -50,7 +41,10 @@ namespace Core {
 		void addKeyBind(int keyCode, std::string buttonName);
 
 		// Helper
-		void setMousePos(glm::vec2 position);
+		void setMousePosition(glm::vec2 position);
+		const glm::vec2& getMousePosition() const;
+
+		EntityHandle getHoverTarget();
 
 		// Callback functions
 		/*static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -80,8 +74,7 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		TexturedEntities	texturedEntities;
-		InteractableButtons interactableButtons;
+		SpriteGroup	spriteGroup;
 
 		//TODO: List of contexts, A context contains a list of keybinds.
 		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges

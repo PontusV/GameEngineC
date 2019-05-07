@@ -4,20 +4,20 @@
 
 #include <string>
 #include "Font.h"
-#include "GraphicComponent.h"
-#include "glm/glm.hpp"
+#include "Sprite.h"
+#include "Color.h"
+#include <glm/glm.hpp>
 
 namespace Core {
-	class Text : public GraphicComponent {
+	class Text : public Sprite {
 	public:
 
-		Text(const char* text, const char* fontAddress, int fontSize, glm::vec4 color, unsigned char layerIndex = 0);
+		Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0);
 		Text();
 		~Text();
 
 		const char* getText() const;
 		const Font& getFont() const;
-		const glm::vec4& getColor() const;
 
 		void setText(std::string text);
 
@@ -26,9 +26,8 @@ namespace Core {
 		virtual void		deserialize(std::istream& is);
 
 	private:
-		std::string		text;
+		std::string		text;	// Replace with vector of Images?
 		Font			font;	//Font address + size
-		glm::vec4		color;
 	};
 }
 #endif

@@ -4,6 +4,7 @@
 #include "Renderer2D.h"
 #include "Renderable2D.h"
 #include "TransformMaths.h"
+#include "Sprite.h"
 
 #include <algorithm>
 #include <array>
@@ -73,7 +74,7 @@ void Graphics::render(float deltaTime) {
 		const Rect&			rect			= renderableRects.rects[i];
 		const Transform&	transform		= renderableRects.transforms[i];
 		const Texture2D		texture			= Texture2D(); // No texture
-		const glm::vec4&	color			= rect.getColor();
+		const Color&		color			= rect.getColor();
 		const glm::ivec2&	size			= rect.getSize();
 		bool				clipEnabled		= rect.isClipEnabled();
 		unsigned char		layerIndex		= rect.getLayerIndex();
@@ -91,7 +92,7 @@ void Graphics::render(float deltaTime) {
 		Image&				image		= renderableImages.images[i];
 		const Transform&	transform	= renderableImages.transforms[i];
 		const Texture2D&	texture		= image.getTexture();
-		const glm::vec4		color		= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		const Color&		color		= image.getColor();
 		bool				clipEnabled = image.isClipEnabled();
 		unsigned char		layerIndex	= image.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
@@ -109,7 +110,7 @@ void Graphics::render(float deltaTime) {
 		const std::vector<glm::vec2>&	clipMaskVertices	= text.getClipMaskVertices();
 
 		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
-		// Reset clipping
+		// Reset clippingcolor
 		renderableTexts.texts[i].resetClipping();
 	}
 
@@ -118,7 +119,7 @@ void Graphics::render(float deltaTime) {
 		const Border&			border			= renderableBorders.borders[i];
 		const Transform&		transform		= renderableBorders.transforms[i];
 		const Texture2D			texture			= Texture2D(); // No texture
-		const glm::vec4&		color			= border.getColor();
+		const Color&			color			= border.getColor();
 		const std::size_t&		borderThickness	= border.getBorderThickness();
 		bool					inner			= border.isInner();
 		const glm::ivec2&		size			= border.getSize();
@@ -160,8 +161,8 @@ void Graphics::render(float deltaTime) {
 					borderSize.y = rectSize.y - borderThickness * 2;
 				}
 
-				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
-				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * lineTransform.getLocalModelMatrix());
+				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
+				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
 
 				renderer->submit(texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 			}
@@ -179,7 +180,6 @@ void Graphics::render(float deltaTime) {
 void Graphics::update(float dt) {
 	// Update all panels
 	for (std::size_t i = 0; i < panelGroup.panels.size(); i++) {
-		//std::cout << "panel update" << i << "\n";
 		Panel&		panel		= panelGroup.panels[i];
 		Transform&	transform	= panelGroup.transforms[i];
 
@@ -188,7 +188,7 @@ void Graphics::update(float dt) {
 		float y = size.y * transform.getAnchor().y;
 		const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
 
-		std::vector<GraphicComponent*> children = panel.getOwner().getComponentsInChildren<GraphicComponent>();
+		std::vector<Sprite*> children = panel.getOwner().getComponentsInChildren<Sprite>();
 
 		glm::vec2 clipMaskVertices[4] = {
 			glm::vec2(x,y),
@@ -201,9 +201,9 @@ void Graphics::update(float dt) {
 			clipMaskVertices[i] = localToWorldMatrix * clipMaskVertices[i];
 		}
 
-		for (GraphicComponent* child : children) {
+		for (Sprite* child : children) {
 			child->clip(clipMaskVertices);
-		}//*/
+		}
 	}
 }
 

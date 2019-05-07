@@ -7,7 +7,7 @@
 #include <algorithm>
 using namespace Core;
 
-Renderer2D::Renderer2D(Window* window) : window(window), batch(window), postProcessor(window) {
+Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
 	batch.init();
 	textShaderID = ResourceManager::getInstance().loadShader("resources/shaders/text.vert", "resources/shaders/text.frag").ID;
 }
@@ -19,7 +19,7 @@ unsigned char Renderer2D::createLayer() {
 	return layerAmount++;
 }
 
-void Renderer2D::submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const glm::vec4& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex) {
 	if (clipMaskVertices.size() % 4 != 0) throw std::invalid_argument("Invalid amount of Clip Mask vertices!");
 	if (clipEnabled && clipMaskVertices.size() < 4) throw std::invalid_argument("Too few Clip Mask vertices!");
 
@@ -38,7 +38,7 @@ void Renderer2D::submit(const Texture2D& texture, const Transform& transform, co
 	std::copy(std::begin(texture.uvCoords), std::end(texture.uvCoords), std::begin(renderable.uvCoords)); // uv coords
 	renderable.z = transform.getZ();
 	renderable.shaderID = shaderID;
-	renderable.color = Color(color.x, color.y, color.z, color.a);
+	renderable.color = color;
 	renderable.layerIndex = layerIndex;
 
 	renderable.clipEnabled = clipEnabled;
@@ -62,8 +62,8 @@ void Renderer2D::flush() {
 	// Sort list of renderable copies
 	std::sort(std::begin(renderableBuffer), &renderableBuffer[renderablesSize], [](Renderable2D& l, Renderable2D& r) {
 
-		if (l.layerIndex < r.layerIndex) return true;
-		if (r.layerIndex < l.layerIndex) return false;
+		if (l.layerIndex > r.layerIndex) return true;
+		if (r.layerIndex > l.layerIndex) return false;
 
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
@@ -127,8 +127,8 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::string& text, const Transform& transform, const Font& font, const glm::vec4& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
-	TextData2D textData = ResourceManager::getInstance().createText(text, color, font);
+void Renderer2D::submitText(const std::string& text, const Transform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
+	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 
 	// Calculate offset
@@ -138,12 +138,9 @@ void Renderer2D::submitText(const std::string& text, const Transform& transform,
 
 	for (CharTexture2D& c : textTextures) {
 		// Create new Transform for Character Sprite
-		Transform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, transform.getZ(), TransformAnchor::TOP_LEFT, 0.0f, 1.0f);
+		Transform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
-		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * spriteTransform.getLocalModelMatrix());
-
-		//Renderable2D renderable{ c.texture, spriteTransform, c.texture.size, textShaderID, color, clipEnabled, clipMaskVertices };
-		//submit(renderable, layerIndex);
+		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
 		submit(c.texture, spriteTransform, c.texture.size, textShaderID, color, clipEnabled, clipMaskVertices, layerIndex);
 	}
 }

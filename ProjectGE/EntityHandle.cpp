@@ -19,10 +19,9 @@ EntityHandle::~EntityHandle() {
 }
 
 void EntityHandle::destroy() {
-	manager->destroyEntity(entity);
+	manager->destroyEntityQueued(entity);
 }
 
-#include "Transform.h"
 void EntityHandle::setParent(const Entity& entity) {
 	update();
 	ParentEntity* parentComponent = getComponent<ParentEntity>();
@@ -32,4 +31,16 @@ void EntityHandle::setParent(const Entity& entity) {
 	else {
 		addComponent<ParentEntity>(manager->getEntityHandle(entity));
 	}
+}
+bool EntityHandle::isChild(Entity entity) {
+	std::size_t childCount = getChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		EntityHandle child = *getChild(i);
+		if (child.getEntity() == entity || child.isChild(entity))
+			return true;
+	}
+	return false;
+}
+std::string EntityHandle::getEntityName() {
+	return manager->getEntityName(entity);
 }

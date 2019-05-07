@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "Serializable.h"
-#include "Handle.h"
+#include "EntityHandle.h"
 
 typedef std::size_t ComponentTypeID; // Should not be needed here. Remove
 
@@ -12,7 +12,7 @@ namespace Core {
 	public:
 		virtual ~Component() = 0; // Abstract
 
-		Handle&							getOwner();
+		EntityHandle&					getOwner();
 		void							setOwner(Handle owner);
 		/* Marks the Component for destruction. */
 		void							destroy();
@@ -24,7 +24,7 @@ namespace Core {
 		virtual void					deserialize(std::istream& is);
 
 	protected:
-		Handle owner;
+		EntityHandle owner;
 
 	private:
 		bool destruct = false;

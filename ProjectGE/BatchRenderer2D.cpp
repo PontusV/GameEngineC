@@ -120,7 +120,7 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 
 	const glm::vec2*	vertices	= renderable.vertices;
 	const glm::vec2*	uvCoords	= renderable.uvCoords;
-	const Color&		color		 = renderable.color;
+	const Color&		color		= renderable.color;
 
 	const float& textureSlot = renderable.textureID == 0 ? 0 : (float)config->getTextureSlot(renderable.textureID);
 

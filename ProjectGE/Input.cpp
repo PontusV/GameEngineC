@@ -34,22 +34,51 @@ void Input::update(float dt) {
 	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);
 	// Mouse Hover
 	if (target.getEntity() != hoverTarget.getEntity()) {
-		std::vector<Script*> scripts = hoverTarget.getComponentsUpwards<Script>();
-		for (Script* script : scripts) {
-			script->onHoverout();
+		std::vector<Script*> scripts;
+		// Hover out
+		if (!hoverTarget.isChild(target.getEntity())) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
+			scripts = hoverTarget.getComponents<Script>();
+			for (Script* script : scripts) {
+				script->onHoverout();
+			}
+			// Hover out - parents
+			Handle* parent;
+			while (parent = hoverTarget.getParent()) {
+				hoverTarget = *parent;
+				if (hoverTarget.getEntity() == target.getEntity()) break;
+				scripts = hoverTarget.getComponents<Script>();
+				for (Script* script : scripts) {
+					script->onHoverout();
+				}
+			}
 		}
+
 		// Switch current hover ptr
+		EntityHandle prevTarget = hoverTarget;
 		hoverTarget = target;
 
-		scripts = hoverTarget.getComponentsUpwards<Script>();
-		for (Script* script : scripts) {
-			script->onHoverover();
+		// Hover over
+		if (!target.isChild(prevTarget.getEntity())) { // Is the previous hoverTarget a child of the new one? If true, no onHoverOver is called
+			scripts = target.getComponents<Script>();
+			for (Script* script : scripts) {
+				script->onHoverover();
+			}
+			// Hover over - parents
+			Handle* parent;
+			while (parent = target.getParent()) {
+				target = *parent;
+				if (target.getEntity() == prevTarget.getEntity()) break;
+				scripts = target.getComponents<Script>();
+				for (Script* script : scripts) {
+					script->onHoverover();
+				}
+			}
 		}
 	}
 	
 	// Process input events
 	for (InputEvent& event : events) {
-		processInputEvent(event, target);
+		processInputEvent(event, hoverTarget);
 	}
 
 	// Clear input events
@@ -78,7 +107,11 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 
 				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
 				for (Script* script : scripts) {
-					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+				}
+				ComponentArray<Script>& scriptArray = engine->getScriptManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
 				if (clickTime <= DOUBLE_CLICK_THRESHOLD && lastClickTarget.getEntity() == target.getEntity()) {
 					std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
@@ -90,8 +123,14 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 			else if (event.mouseButton.action == GLFW_RELEASE) {
 				leftMouseButtonPressed = false;
 				std::vector<Script*> scripts = target.getComponentsUpwards<Script>();
-				for (Script* script : scripts) {
-					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+				if (target.getEntity() == lastClickTarget.getEntity()) {
+					for (Script* script : scripts) {
+						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+					}
+				}
+				ComponentArray<Script>& scriptArray = engine->getScriptManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++){
+					scriptArray[i].onMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
 			}
 		}
@@ -182,35 +221,47 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::vector<maths::TexturedRectTransform> allRects;
-	for (std::size_t i = 0; i < texturedEntities.transforms.size(); i++) {
-		Image&		image		= texturedEntities.images[i];
-		Transform&	transform	= texturedEntities.transforms[i];
+
+	for (std::size_t i = 0; i < spriteGroup.transforms.size(); i++) {
+		Sprite&		sprite		= spriteGroup.sprites[i];
+		Transform&	transform	= spriteGroup.transforms[i];
 
 		// Add rectangles in view of window
-		maths::RectTransform rect{transform, image.getTexture().size};
+		maths::RectTransform rect{transform, sprite.getSize()};
 		int cameraX = 0;
 		int cameraY = 0;
 		if (maths::isInsideWindow(cameraX, cameraY, engine->getGraphics().getWindow().getWidth(), engine->getGraphics().getWindow().getHeight(), rect)) {
-			allRects.push_back({ image.getTexture(), { transform, image.getTexture().size, (glm::vec2)image.getSize() * transform.getAnchor() }, (int)i });
+			allRects.push_back({ transform, sprite.getSize(), (glm::vec2)sprite.getSize() * transform.getAnchor(), Texture2D(), i+1 });
 		}
 	}
 
 	// Filter out interactables that are not on mousePosition
-	int index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects);
-	if (index == -1) return EntityHandle();
-	LevelPtr						level	= engine->getCurrentLevel();
-	Entity							entity	= texturedEntities.images.getEntity(index);
+	std::size_t index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects);
+	if (index == 0) return EntityHandle();
+	index -= 1;
+	LevelPtr level = engine->getCurrentLevel();
+	Entity entity;
+	if (index < spriteGroup.transforms.size()) {
+		entity = spriteGroup.sprites.getEntity(index);
+	}
 
 	return level->getEntityHandle(entity);
 }
 
 // -------------- ADD/SET/GET ------------------
 
-void Input::setMousePos(glm::vec2 position) {
+void Input::setMousePosition(glm::vec2 position) {
 	mouseMoved = true;
 	mousePosition = position;
 }
 
 void Input::addInputEvent(const InputEvent& event) {
 	events.push_back(event);
+}
+
+EntityHandle Input::getHoverTarget() {
+	return hoverTarget;
+}
+const glm::vec2& Input::getMousePosition() const {
+	return mousePosition;
 }

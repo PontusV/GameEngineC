@@ -17,15 +17,18 @@ namespace Core {
 		void				updateBounds();
 		Bounds&				getBounds();
 		const glm::ivec2&	getSize() const;
-		void				setSize(unsigned int width, unsigned int height);
+
+		void				setSize(int width, int height);
 		void				setSize(glm::ivec2 size);
+		void				setWidth(int width);
+		void				setHeight(int height);
 
 		// Serializable
 		virtual void		serialize(std::ostream& os) const;
 		virtual void		deserialize(std::istream& is);
 
 	protected:
-		BoxComponent(unsigned int width, unsigned int height);
+		BoxComponent(int width, int height);
 		BoxComponent(glm::ivec2 size);
 		BoxComponent();
 

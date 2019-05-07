@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cstring>
 
 using namespace Core;
 
@@ -67,10 +68,9 @@ void Chunk::remove(std::size_t index, bool destruct) {
 		// Copy data from last entry to the removed entry
 		getEntityArrayPtr()[index] = getEntityArrayPtr()[size - 1];
 	}
-	getEntityArrayPtr()[size - 1].setID(0); // Makes the back entry invalid
 	size--;
+	getEntityArrayPtr()[size].setID(0); // Makes the back entry invalid
 }
-
 
 Component* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeID) {
 	for (ComponentDataArrayInfo& info : types) {
@@ -94,6 +94,7 @@ Component* Chunk::getComponent(std::size_t index, ComponentType componentType) {
 }
 
 Component* Chunk::getComponent(std::size_t index, ComponentDataArrayInfo& info) {
+	if (index > size) throw std::out_of_range("Chunk::getComponent::ERROR!");
 	return (Component*)(&info.ptr[info.sizePerEntry * index]);
 }
 
@@ -133,7 +134,7 @@ std::vector<ComponentDataBlock> Chunk::getComponentDataBlocks(Entity entity) {
 	int index = getIndex(entity);
 	std::vector<ComponentDataBlock> blocks;
 	for (ComponentDataArrayInfo& info : types) {
-		void* ptr = &getComponentArrayPtr(info.typeID)[info.sizePerEntry * index]; // Wrong
+		void* ptr = &info.ptr[info.sizePerEntry * index]; // Wrong
 		blocks.push_back({ ptr, info.typeID });
 	}
 

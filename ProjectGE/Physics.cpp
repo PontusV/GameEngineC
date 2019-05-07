@@ -27,15 +27,13 @@ void updateTransformModel(Transform& root, glm::mat4 modelMatrix, bool matrixCha
 		matrixChanged = true;
 
 	if (matrixChanged) {
-		modelMatrix *= root.getLocalModelMatrix();
 		root.updateLocalToWorldMatrix(modelMatrix);
 		onTransformChange(root);
-	} else {
-		modelMatrix = root.getLocalToWorldMatrix();
 	}
+	modelMatrix = root.getLocalToWorldMatrix();
 
-	// Iterate through all children
-	std::size_t childCount = root.getOwner().getChildCount();
+	// Iterate through all children (immediate children iterate through their immediate children)
+	std::size_t childCount = root.getOwner().getImmediateChildCount();
 	for (std::size_t childIndex = 0; childIndex < childCount; childIndex++) {
 		Transform* childTransform = root.getOwner().getChild(childIndex)->getComponent<Transform>();
 		if (childTransform) {

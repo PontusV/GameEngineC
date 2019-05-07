@@ -8,7 +8,7 @@ namespace Core {
 	public:
 		static constexpr std::size_t INVALID_ID = 0;
 
-		Entity(std::size_t entityID);
+		explicit Entity(std::size_t entityID);
 		Entity(const Entity& other) {
 			id = other.id;
 		}

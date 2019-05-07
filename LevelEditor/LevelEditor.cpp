@@ -3,7 +3,10 @@
 
 
 #include "../ProjectGE/Level.h"
-//#include <sstream> // For testing massive amounts of Entities
+#include "../ProjectGE/DropDown.h"
+#include "../ProjectGE/Button.h"
+#include "../ProjectGE/WindowAlignment.h"
+#include "../ProjectGE/MouseDrag.h"
 
 using namespace Core;
 
@@ -26,87 +29,115 @@ int LevelEditor::initiate() {
 	if (result != 0) {
 		return result;
 	}
-	engine.getGraphics().getWindow().setBackgroundColor(glm::vec3(0.2f, 0.2f, 0.2f));
+	Window& window = engine.getGraphics().getWindow();
+	window.setBackgroundColor(glm::vec3(50, 50, 50));
 
 	// Create Level Editor
-	glm::vec4 themeColor = glm::vec4(0.25f,0.25f,0.25f,1.0f);
 	LevelPtr level = engine.createLevel();
-	unsigned char layer = engine.getGraphics().createLayer();
-
+	unsigned char editorLayer = engine.getGraphics().createLayer();
 	engine.setCurrentLevel(level);
+
+	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
-		Rect(1080, 20, themeColor, layer),
-		Panel(1080, 20),
-		Transform(0, 0, 0.0f, TransformAnchor::TOP_LEFT)
+		Rect(1920, 20, { 60, 60, 60, 255 }, editorLayer),
+		Transform(0, 0, 10.0f, Alignment::TOP_LEFT)
 	);
 	// Drop menu
 	EntityHandle menuFile = level->createEntity("Menu_Item_File",
-		Text("File", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f,1.0f,1.0f,1.0f), layer),
-		Transform(15, 10, 0.0f, TransformAnchor::CENTER)
+		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
+		Transform(26, 10, 10.1f, Alignment::CENTER)
 	);
+	DropDown* file = menuFile.getComponent<DropDown>();
+	file->boxPaddingX = 5;
+	file->boxPaddingY = 5;
+	file->optionHeight = 25;
+	file->boxWidth = 300;
+	file->addOption("New", Core::bind(file, &DropDown::test));
+	file->addOption("Open", Core::bind(file, &DropDown::test));
+	file->addOption("Save", Core::bind(file, &DropDown::test));
+	file->addOption("Build", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuEdit = level->createEntity("Menu_Item_Edit",
-		Text("Edit", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
-		Transform(50, 10, 0.0f, TransformAnchor::CENTER)
+		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
+		Transform(77, 10, 10.1f, Alignment::CENTER)
 	);
+	file = menuEdit.getComponent<DropDown>();
+	file->boxPaddingX = 5;
+	file->boxPaddingY = 5;
+	file->optionHeight = 25;
+	file->boxWidth = 300;
+	file->addOption("Undo", Core::bind(file, &DropDown::test));
+	file->addOption("Redo", Core::bind(file, &DropDown::test));
 	// Drop menu
-	EntityHandle menuCreate = level->createEntity("Menu_Item_Create",
-		Text("Create", "resources/fonts/segoeui.ttf", 14, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), layer),
-		Transform(95, 10, 0.0f, TransformAnchor::CENTER)
+	EntityHandle menuView = level->createEntity("Menu_Item_View",
+		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
+		Transform(128, 10, 10.1f, Alignment::CENTER)
 	);
+	file = menuView.getComponent<DropDown>();
+	file->boxPaddingX = 5;
+	file->boxPaddingY = 5;
+	file->optionHeight = 25;
+	file->boxWidth = 300;
+	file->addOption("Test", Core::bind(file, &DropDown::test));
+	// Drop menu
+	EntityHandle menuObject = level->createEntity("Menu_Item_Object",
+		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
+		Transform(179, 10, 10.1f, Alignment::CENTER)
+	);
+	file = menuObject.getComponent<DropDown>();
+	file->boxPaddingX = 5;
+	file->boxPaddingY = 5;
+	file->optionHeight = 25;
+	file->boxWidth = 300;
+	file->addOption("Create Empty Object", Core::bind(file, &DropDown::test));
 
-	/*for (std::size_t i = 0; i < 9500; i++) {
-		std::stringstream ss;
-		ss << "Test" << i;
-		EntityHandle menuCreate = level->createEntity(ss.str(),
-			Image("resources/images/invaders.png", 0, 300, 300),
-			Transform(0+i, 550, 0.1f, TransformAnchor::CENTER)
-		);
-	}*/
+	// ---------------------------------------------------Inspector-----------------------------------------------------------------
+	// Right Panel.
+	int inspectorWidth = 400;
+	int inspectorHeight = 1000;
+	EntityHandle rightPanel = level->createEntity("Right_Panel",
+		Rect(inspectorWidth, inspectorHeight, Color(60,60,60,255), editorLayer),
+		WindowAlignment(Alignment::TOP_RIGHT, 0, 20),
+		Transform(0, 0, 1.0f, Alignment::TOP_RIGHT)
+	);
+	int textPadding = 5;
+	int backgroundPadding = 3;
+	// Inspector label
+	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
+		Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255), editorLayer),
+		Transform(textPadding+backgroundPadding-inspectorWidth, textPadding+backgroundPadding, 1.1f, Alignment::TOP_LEFT)
+	);
+	inspectorLabel.setParent(rightPanel.getEntity());
+	// Inspector label background
+	Text* inspectorLabelText = inspectorLabel.getComponent<Text>();
+	const glm::ivec2& inspectorLabelTextSize = inspectorLabelText->getSize();
+	int labelRectWidth = inspectorLabelTextSize.x + textPadding * 2;
+	int labelRectHeight = inspectorLabelTextSize.y + textPadding * 2;
+	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
+		Rect(labelRectWidth, labelRectHeight, Color(100,100,100,255), editorLayer),
+		Transform((float)-textPadding, (float)-textPadding, 1.05f, Alignment::TOP_LEFT)
+	);
+	inspectorLabelRect.setParent(inspectorLabel.getEntity());
 
+	// Inspector background
+	EntityHandle inspectorBackground = level->createEntity("Inspector_background",
+		Rect(inspectorWidth - backgroundPadding*2, inspectorHeight - backgroundPadding*2 - labelRectHeight, Color(100,100,100,255), editorLayer),
+		Transform(0, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
+	);
+	inspectorBackground.setParent(inspectorLabelRect.getEntity());
+
+	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = level->createEntity("Test_Button",
 		Image("resources/images/invaders.png", 0, 300, 300),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png", 300, 300),
-		Transform(250, 250, 0.1f, TransformAnchor::CENTER)
-	);
-	menuFile.setParent(menuBar.getEntity());
-	menuEdit.setParent(menuBar.getEntity());
-	menuCreate.setParent(menuBar.getEntity());
-
-
-	/*EntityHandle entity = level->getEntity("Test_Button");
-	Button* bbutton = entity.getComponent<Button>();
-	if (bbutton) bbutton->setButtonPressCallback(buttonPressTest);//*/
-
-	// Create test level
-	/*LevelPtr level = engine.createLevel();
-	engine.setCurrentLevel(level);
-
-	EntityHandle parent = level->createEntity("Test_Button",
-		new Image("resources/images/invaders.png", 0, 300, 300),
-		//new Text("Rectangle Text", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-		new Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png", 300, 300),
-		new Panel(800, 800),
-		new Transform(250, 250, 0.1f, TransformAnchor::CENTER)
+		MouseDrag(),
+		Border(300, 300, 1, Color(255,255,255,255), false, editorLayer),
+		Transform(250, 250, 0.0f, Alignment::CENTER)
 	);
 
-	EntityHandle test = level->createEntity("Box",
-		new Rect(300, 50, glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		new Border(300, 50, 1, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), false),
-		new Text("Rectangle Text", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-		new Transform(200, 500, 0, TransformAnchor::CENTER)
-	);
-
-	EntityHandle child = level->createEntity("Test_Text",
-		new Image("resources/images/invaders.png", 0, 300, 300),
-		//new Text("This is just a test text!", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-		new Transform(200, 200, 0.1f, TransformAnchor::TOP_LEFT)
-	);
-
-	child.setParent(parent.getEntity());
-	child.addComponent<Text>("This is just a test text!", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	parent.addComponent<Text>("Rectangle Text", "resources/fonts/cambriab.ttf", 24, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));*/
+	// Level created, calling awake
+	level->awake();
 
 	// Keybinds
 	engine.getInput().addKeyBind(GLFW_KEY_ESCAPE, "Terminate");

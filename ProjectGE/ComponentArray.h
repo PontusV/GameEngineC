@@ -9,18 +9,16 @@
 #include <vector>
 #include <cstddef>
 #include <stdexcept>
-#include <algorithm> //?
 #include <map>
 #include <memory>
-
-#include <iostream> //Test
+#include <iostream>
 
 namespace Core {
 	struct ChunkDataArray {
-		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : dataPtr(info.ptr), sizePerEntry(info.sizePerEntry), chunkPtr(chunkPtr.get()) {}
+		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : dataPtr(info.ptr), sizePerEntry(info.sizePerEntry), chunkPtr(chunkPtr) {}
 		char* dataPtr;
 		std::size_t sizePerEntry;
-		Chunk* chunkPtr;
+		std::shared_ptr<Chunk> chunkPtr;
 
 		ChunkDataArray& operator=(const ChunkDataArray& other) {
 			dataPtr = other.dataPtr;
@@ -45,7 +43,7 @@ namespace Core {
 	template <typename T>
 	class ComponentArray : public IComponentArray {
 	public:
-		ComponentArray(std::initializer_list<ComponentType> dependencies, std::initializer_list<ComponentType> filter) : IComponentArray(typeof(T)), dependecyTypes(dependencies), filterTypes(filter) {
+		ComponentArray(std::initializer_list<ComponentType> dependencies, std::initializer_list<ComponentType> filter) : IComponentArray(typeof(T)), dependencyTypes(dependencies), filterTypes(filter) {
 			for (const ComponentType& fType : filter) {
 				if (type == fType)
 					throw std::invalid_argument("You can not make a ComponentArray<T> filter the ComponentTypeID from T.");
@@ -69,28 +67,27 @@ namespace Core {
 		}
 
 		T& get(std::size_t index) {
-			std::size_t i = index;
 			for (ChunkDataArray& info : data) {
-				std::size_t size = info.chunkPtr->getSize();
-				if (i < size) {
-					return *((T*)(&(info.dataPtr[i*info.sizePerEntry])));
+				std::size_t chunkSize = info.chunkPtr->getSize();
+				if (index < chunkSize) {
+					return *(T*)&info.dataPtr[info.sizePerEntry * index];
 				}
 				else {
-					i -= (size);
+					index -= chunkSize;
 				}
 
 			}
+			std::cout << "Index out of range: " << index << ", size is: " << size() << "\n";
 			throw std::out_of_range("Index out of range.");
 		}
 
 		Entity& getEntity(std::size_t index) {
-			std::size_t i = index;
 			for (ChunkDataArray& info : data) {
-				std::size_t size = info.chunkPtr->getSize();
-				if (i < size)
-					return info.chunkPtr->getEntityArrayPtr()[i];
+				std::size_t chunkSize = info.chunkPtr->getSize();
+				if (index < chunkSize)
+					return info.chunkPtr->getEntityArrayPtr()[index];
 				else
-					i -= (size);
+					index -= chunkSize;
 
 			}
 			throw std::out_of_range("Index out of range.");
@@ -103,50 +100,84 @@ namespace Core {
 		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
 			if (filter(chunkTypes)) return;
 
-			chunkMap.insert(std::make_pair(chunk->getID(), data.size()));
 			std::vector<ComponentDataArrayInfo> infoVec = chunk->getComponentArrayInfo(typeof(T));
+			std::vector<std::size_t> indices;
 			for (ComponentDataArrayInfo& info : infoVec) { // Add all matches
-				data.push_back(ChunkDataArray(info, chunk));
+				ChunkDataArray chunkData(info, chunk);
+				std::size_t repeat = calculateRepeat(chunkTypes);
+				for (std::size_t i = 0; i < repeat; i++) {
+					indices.push_back(data.size());
+					data.push_back(chunkData);
+				}
 			}
+			chunkMap.insert(std::make_pair(chunk->getID(), indices));
 		}
 
 		void chunkRemoved(std::size_t chunkID) {
 			auto iterator = chunkMap.find(chunkID);
 			if (iterator == chunkMap.end()) return;
 
-			std::size_t index = (*iterator).second;
-
-			if (index < data.size()-1) {
-				std::iter_swap(data.begin() + index, data.end() - 1);
-				chunkMap.at(data[index].chunkPtr->getID()) = index; //Remap swapped object
+			// Iterate through indices from chunkMap
+			for (std::size_t& index : (*iterator).second) {
+				if (index < data.size() - 1) {
+					std::iter_swap(data.begin() + index, data.end() - 1);
+					data[index].chunkPtr->getID();
+					std::vector<std::size_t>& otherIndices = chunkMap.at(data[index].chunkPtr->getID());
+					for (std::size_t& otherIndex : otherIndices) {
+						if (otherIndex == data.size() - 1) {
+							otherIndex = index;
+							break;
+						}
+					}
+				}
+				data.pop_back();
 			}
 			chunkMap.erase(iterator);
-			data.pop_back();
 		}
 
 	private:
 		bool filter(std::vector<ComponentTypeID> typeIDs) {
-			std::size_t count = 0;
+			if (typeIDs.empty()) return true;
+			// Check FilterTypes
 			for (const ComponentTypeID& typeID : typeIDs) {
 				for (ComponentType& filterType : filterTypes) {
 					if (filterType == typeID)
 						return true; //Filter
 				}
-				for (ComponentType& dependencyType : dependecyTypes) {
-					if (dependencyType == typeID) {
-						count++;
+			}
+			// Check DependencyTypes
+			for (ComponentType& dependencyTypeID : dependencyTypes) {
+				for (std::size_t i = 0; i < typeIDs.size(); i++) {
+					if (dependencyTypeID == typeIDs[i]) { // Match
 						break;
+					}
+					else if (i == typeIDs.size() - 1) { // Miss
+						return true;
 					}
 				}
 			}
-			if (dependecyTypes.size() != count) return true;
 			return false;
 		}
 
-		std::vector<ChunkDataArray> data;
-		std::map<std::size_t, std::size_t> chunkMap; //ID, index
+		std::size_t calculateRepeat(std::vector<ComponentTypeID> typeIDs) {
+			std::size_t repeat = 1;
+			for (const ComponentType& dependencyType : dependencyTypes) {
+				if (typeof(T) == dependencyType) break; // Skip self
+				std::size_t count = 0;
+				for (std::size_t i = 0; i < typeIDs.size(); i++) {
+					if (dependencyType == typeIDs[i]) {
+						count++;
+					}
+				}
+				repeat *= count;
+			}
+			return repeat;
+		}
 
-		std::vector<ComponentType> dependecyTypes;
+		std::vector<ChunkDataArray> data;
+		std::map<std::size_t, std::vector<std::size_t>> chunkMap; //ID, std::vector<indices>
+
+		std::vector<ComponentType> dependencyTypes;
 		std::vector<ComponentType> filterTypes;
 	};
 }

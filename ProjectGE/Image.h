@@ -1,15 +1,16 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "GraphicComponent.h"
+#include "Sprite.h"
 #include "Texture2D.h"
+#include "Color.h"
 #include <glm/glm.hpp>
 #include <string>
 
 namespace Core {
 	class Texture;
 
-	class Image : public GraphicComponent {
+	class Image : public Sprite {
 	public:
 
 		Image(const char* fileName, unsigned char layerIndex = 0, unsigned int width = 0, unsigned int height = 0);

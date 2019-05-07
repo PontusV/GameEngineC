@@ -1,9 +1,12 @@
 #include "ScriptManager.h"
+#include "Engine.h"
 
 using namespace Core;
 
 
-ScriptManager::ScriptManager() {
+ScriptManager::ScriptManager(Engine* engine) {
+	Script::input = &engine->getInput();
+	Script::window = &engine->getGraphics().getWindow();
 }
 
 
@@ -14,15 +17,20 @@ ScriptManager::~ScriptManager() {
 void ScriptManager::update(float deltaTime) {
 	std::size_t scriptAmount = scriptGroup.scripts.size();
 
-	// Start
+	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
-		if (scriptGroup.scripts[i].enabled && !scriptGroup.scripts[i].active) {
-			scriptGroup.scripts[i].active = true;
-			scriptGroup.scripts[i].start();
+		if (scriptGroup.scripts[i].enabled) { // Check if enabled
+			// Start
+			if (!scriptGroup.scripts[i].started) {
+				scriptGroup.scripts[i].started = true;
+				scriptGroup.scripts[i].start();
+			}
+			// Update
+			scriptGroup.scripts[i].update(deltaTime);
 		}
 	}
-	// Update
-	for (std::size_t i = 0; i < scriptAmount; i++) {
-		scriptGroup.scripts[i].update(deltaTime);
-	}
+}
+
+ComponentArray<Script>& ScriptManager::getAllScripts() {
+	return scriptGroup.scripts;
 }

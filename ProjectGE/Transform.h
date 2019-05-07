@@ -2,20 +2,14 @@
 #define TRANSFORM_COMPONENT_H
 
 #include "Component.h"
+#include "Anchor.h"
 #include <glm/glm.hpp>
 
 namespace Core {
 
-	enum TransformAnchor {
-		TOP_LEFT=0,		TOP,		TOP_RIGHT,
-		LEFT,			CENTER,		RIGHT,
-		BOTTOM_LEFT,	BOTTOM,		BOTTOM_RIGHT
-	};
-
 	class Transform : public Component {
 	public:
-		Transform(float x, float y, float z = 0.0f, TransformAnchor anchorPoint = TransformAnchor::CENTER, float rotation = 0.0f, float scale = 1.0f);
-		Transform(float x, float y, float z = 0.0f, glm::vec2 anchorPoint = glm::vec2(0,0), float rotation = 0.0f, float scale = 1.0f);
+		Transform(float x, float y, float z = 0.0f, Anchor anchorPoint = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f);
 		Transform();
 		~Transform();
 
@@ -32,18 +26,24 @@ namespace Core {
 		/* Calculates and returns a new model matrix from local position, rotation and scale */
 		glm::mat4			getLocalModelMatrix() const;
 
+		/* Returns local rotation */
 		const float&		getRotation() const;
+		/* Returns local position */
 		const glm::vec2&	getPosition() const;
 
+		/* Returns local x coord */
 		const float&		getX() const;
+		/* Returns local y coord */
 		const float&		getY() const;
 		const float&		getZ() const;
+		/* Sets local x coord */
 		void				setX(float value);
+		/* Sets local y coord */
 		void				setY(float value);
 		void				setZ(float value);
 
 		bool				hasChanged();
-		void				setAnchor(TransformAnchor anchor);
+		void				setAnchor(Anchor anchor);
 		const glm::vec2&	getAnchor() const;
 
 		glm::vec2			calculateOffset(const glm::vec2& size) const;
@@ -60,8 +60,8 @@ namespace Core {
 		float		rotation;				// Local rotation in radians
 		float		scale;					// Local scale (both width and height atm)
 
-		bool		changed;				// Defines if the transform has moved
 		glm::vec2	anchor;					// Determines where the position is relative to BoxComponents
+		bool		changed = true;			// Defines if the transform has moved
 	};
 }
 #endif

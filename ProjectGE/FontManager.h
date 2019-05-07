@@ -55,7 +55,7 @@ namespace Core {
 		~FontManager();
 
 		// Creates and returns a vector of textures for each character in the text parameter
-		TextData2D createText(std::string text, glm::vec4 color, unsigned short size);
+		TextData2D createText(std::string text, unsigned short size);
 
 	private:
 		Character characters[128];

@@ -7,12 +7,8 @@ static float RADIANS_MAX = M_PI * 2;
 using namespace Core;
 
 
-Transform::Transform(float x, float y, float z, TransformAnchor anchorPoint, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale) {
-	setAnchor(anchorPoint);
-	changed = true;
-}
-Transform::Transform(float x, float y, float z, glm::vec2 anchorPoint, float rotation, float scale) : position(x, y), z(z), anchor(anchorPoint), rotation(rotation), scale(scale) {
-	changed = true;
+Transform::Transform(float x, float y, float z, Anchor anchorPoint, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale), anchor(anchorPoint) {
+	//anchor = glm::vec2(0, 0);
 }
 
 Transform::Transform() : position(0, 0) {
@@ -93,8 +89,8 @@ void Transform::pushModelMatrix(const glm::mat4& model) {
 }
 
 void Transform::updateLocalToWorldMatrix(const glm::mat4& model) {
-	localToWorldMatrix = model;
-	worldToLocalMatrix = glm::inverse(model);
+	localToWorldMatrix = getLocalModelMatrix() * model;
+	worldToLocalMatrix = glm::inverse(localToWorldMatrix);
 	changed = false;
 }
 
@@ -150,24 +146,6 @@ const glm::vec2& Transform::getAnchor() const {
 	return anchor;
 }
 
-void Transform::setAnchor(TransformAnchor anchorPoint) {
-	anchor = glm::vec2(0, 0);
-
-	float xOffset = -(float)(anchorPoint % 3) / 2;
-	float yOffset = -(float)((int)anchorPoint / 3) / 2;
-	anchor = glm::vec2(xOffset, yOffset);
+void Transform::setAnchor(Anchor anchorPoint) {
+	anchor = anchorPoint;
 }
-
-/*void Transform::refreshModelMatrix() {
-	resetModelMatrix();
-
-	ChunkEntityHandle* parent = getParent();
-	if (parent) {
-		Transform* pTransform = parent->getComponent<Transform>();
-		if (pTransform) {
-			model = pTransform->getModelMatrix();
-		}
-	}
-
-	pushModelMatrix(getLocalModelMatrix());
-}*/

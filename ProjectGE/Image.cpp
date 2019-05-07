@@ -7,7 +7,7 @@
 using namespace Core;
 
 
-Image::Image(const char* fileName, unsigned char layerIndex, unsigned int width, unsigned int height) : GraphicComponent(layerIndex, width, height), fileName(fileName) {
+Image::Image(const char* fileName, unsigned char layerIndex, unsigned int width, unsigned int height) : Sprite(layerIndex, width, height), fileName(fileName) {
 } // Constructor
 
 Image::Image() {
@@ -44,12 +44,12 @@ const char* Image::getFileName() const {
 // ------------------------------- Serializable ----------------------------------------
 
 void Image::serialize(std::ostream& os) const {
-	GraphicComponent::serialize(os);
+	Sprite::serialize(os);
 
 	os.write(fileName.c_str(), fileName.size() + 1);		// File name
 }
 void Image::deserialize(std::istream& is) {
-	GraphicComponent::deserialize(is);
+	Sprite::deserialize(is);
 
 	std::getline(is, fileName, '\0');						// File name
 }

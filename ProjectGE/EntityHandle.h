@@ -3,6 +3,7 @@
 
 #include "Handle.h"
 #include "EntityManager.h"
+#include <string>
 
 namespace Core {
 	/* A handle with additional functionality appropriate for an Entity. */
@@ -13,32 +14,48 @@ namespace Core {
 		EntityHandle();
 		~EntityHandle();
 
-		void										setParent(const Entity& entity);
+		void									setParent(const Entity& entity);
+		/* Returns true if the given Entity is a child of the Entity this instance points to. */
+		bool									isChild(Entity entity);
 
-		template<typename T, class... Args> void	addComponent(Args&&... args);
-		template<typename T> void					addComponent(T component);
-		template<typename T> void					removeComponent();
-		void										destroy();
+		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
+		template<typename T, class... Args> T*	addComponent(Args&&... args);
+		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
+		template<typename T> T*					addComponent(T component);
+		/* Removes the component of type T at the end of the frame. */
+		template<typename T> void				removeComponent();
+		/* Removes the Entity at the end of the frame. */
+		void									destroy();
+
+		std::string								getEntityName();
+
+		template<typename... Ts>
+		EntityHandle							createEntity(std::string name, Ts&... components);
 	};
 
 	// --------------------------- Template Function Definitions --------------------------------
 	template<typename T, class... Args>
-	void EntityHandle::addComponent(Args&&... args) {
+	T* EntityHandle::addComponent(Args&&... args) {
 		T component(args...);
-		manager->addComponent(entity, component);
-		update();
+		T* temp = manager->addComponentQueued(entity, component);
+		return temp;
 	}
 
 	template<typename T>
-	void EntityHandle::addComponent(T component) {
-		manager->addComponent(entity, component);
-		update();
+	T* EntityHandle::addComponent(T component) {
+		T* temp = manager->addComponentQueued(entity, component);
+		return temp;
 	}
 
 	template<typename T>
 	void EntityHandle::removeComponent() {
-		manager->removeComponent<T>(entity);
-		update();
+		manager->removeComponentQueued<T>(entity);
+	}
+
+	template<typename... Ts>
+	EntityHandle EntityHandle::createEntity(std::string name, Ts&... components) {
+		Entity entity = manager->createEntityQueued(name, components...);
+		return EntityHandle(entity, manager);
 	}
 }
 #endif

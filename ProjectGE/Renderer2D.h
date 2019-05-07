@@ -3,6 +3,7 @@
 
 #include "BatchRenderer2D.h"
 #include "Renderable2D.h"
+#include "Color.h"
 #include "Font.h"
 #include "Transform.h"
 #include "Texture2D.h"
@@ -27,10 +28,10 @@ namespace Core {
 		unsigned char createLayer();
 
 		/* Render sprite. Submits a Renderable2D to a batchRenderer2D. */
-		void submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const glm::vec4& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex);
+		void submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex);
 
 		/* Render text. Submits text to a batchRenderer2D. */
-		void submitText(const std::string& text, const Transform& transform, const Font& font, const glm::vec4& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
+		void submitText(const std::string& text, const Transform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
 
 		/* Draws everything submitted to this renderer since the last render() call. */
 		void render(float deltaTime);
@@ -48,7 +49,6 @@ namespace Core {
 		BatchRenderer2D	batch;
 
 		unsigned char	layerAmount; // To keep track of next LayerID
-		Window*			window;
 		PostProcessor	postProcessor;
 
 		// Shader

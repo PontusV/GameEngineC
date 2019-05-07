@@ -15,21 +15,19 @@ Level::~Level() {
 	clear();
 }
 
+void Level::awake() {
+	manager->awake();
+}
+
 /* Removes game object with given id. */
 void Level::destroyEntity(Entity entity) {
 	manager->destroyEntity(entity);
 }
 
-EntityHandle Level::getEntity(std::string entityName) {
-	std::map<std::string, Entity>::iterator it = entityNameMap.find(entityName);
-	if (it != entityNameMap.end()) {
-		return getEntityHandle(it->second);
-	}
-
-	// Exception
-	std::cout << "Entity with the name " << entityName << " does not exist!\n";
-	throw std::invalid_argument("Entity with given name does not exist!");
+EntityHandle Level::getEntityHandle(std::string entityName) {
+	return manager->getEntityHandle(entityName);
 }
+
 EntityHandle Level::getEntityHandle(Entity entity) {
 	return manager->getEntityHandle(entity);
 }
@@ -37,17 +35,10 @@ EntityHandle Level::getEntityHandle(Entity entity) {
 void Level::clear() {
 	manager->clear();
 	entities.clear();
-	entityNameMap.clear();
 }
 
 std::string Level::getEntityName(Entity entity) const {
-	auto it = entityNameMap.begin();
-	while (it != entityNameMap.end()) {
-		if (it->second == entity) return it->first;
-		it++;
-	}
-	std::cout << "Level::getEntityNameByEntity::ERROR There is no such entity stored in this Level!\n";
-	throw std::invalid_argument("Level::getEntityNameByEntity::ERROR There is no such entity stored in this Level!");
+	return manager->getEntityName(entity);
 }
 
 std::weak_ptr<EntityManager> Level::getEntityManager() {
@@ -82,7 +73,7 @@ void Level::serialize(std::ostream& os) const {
 	for (auto it = entities.begin(); it != entities.end(); it++) {
 		// Loop through all children from roots (Child order is managed by ChildManager component)
 		if (!manager->hasComponent<ParentEntity>(*it)) { // Checks if root
-			std::size_t childCount = manager->getChildCount(*it);
+			std::size_t childCount = manager->getImmediateChildCount(*it);
 			for (std::size_t i = 0; i < childCount; i++) {
 				Handle* handle = manager->getChild(*it, i);
 				if (handle->isValid()) {
@@ -108,7 +99,7 @@ void Level::serialize(std::ostream& os) const {
 			std::string childName = getEntityName(*it);
 
 			std::size_t parentID = component->getParent()->getEntity().getID();
-			std::string parentName = getEntityName(parentID);
+			std::string parentName = getEntityName(Entity(parentID));
 
 			parentChildPairs.push_back(std::make_pair(childName, parentName));
 		}
@@ -122,7 +113,7 @@ void Level::serialize(std::ostream& os) const {
 
 		std::string parentName = pair.second;
 		os.write(parentName.c_str(), parentName.size() + 1);		// Parent name
-	}//*/
+	}
 }
 
 /* Load from instream */
@@ -157,11 +148,11 @@ void Level::deserialize(std::istream& is) {
 		std::getline(is, parentName, '\0');							// Parent name
 
 		// Add ParentEntity component
-		Entity parent = getEntity(parentName).getEntity();
+		Entity parent = getEntityHandle(parentName).getEntity();
 		if (parent.getID() == Entity::INVALID_ID) {
-			getEntity(childName).destroy();
+			getEntityHandle(childName).destroy();
 		} else {
-			getEntity(childName).setParent(parent);
+			getEntityHandle(childName).setParent(parent);
 		}
-	}//*/
+	}
 }

@@ -10,7 +10,7 @@ uniform sampler2D textures[32];
 void main()
 {
 	if (tID > 0.0)
-		color = texture(textures[int(tID-1)], TexCoords);
+		color = spriteColor * texture(textures[int(tID-1)], TexCoords);
 	else
 		color = spriteColor;
 	//color = spriteColor * texture(image, TexCoords);
