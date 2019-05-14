@@ -1,42 +1,25 @@
 #include "RectButton.h"
-#include "Rect.h"
+#include "RectSprite.h"
 #include "InputEvent.h"
 #include <iostream>
 
 using namespace Core;
 
-RectButton::RectButton(int width, int height, unsigned char layerIndex) {
+RectButton::RectButton(unsigned char layerIndex) {
 	colors[DEFAULT]			= { 255,255,255,255 };
 	colors[PRESSED_DOWN]	= { 255,255,255,255 };
 	colors[HOVER_OVER]		= { 255,255,255,255 };
-	setWidth(width);
-	setHeight(height);
 	setLayerIndex(layerIndex);
 }
 
 RectButton::~RectButton() {
 }
 
-void RectButton::setWidth(std::size_t value) {
-	width = value;
-	Rect* rect = owner.getComponent<Rect>();
-	if (rect) {
-		rect->setWidth(value);
-	}
-}
-
-void RectButton::setHeight(std::size_t value) {
-	height = value;
-	Rect* rect = owner.getComponent<Rect>();
-	if (rect) {
-		rect->setHeight(value);
-	}
-}
 void RectButton::setLayerIndex(unsigned char value) {
 	layerIndex = value;
-	Rect* rect = owner.getComponent<Rect>();
-	if (rect) {
-		rect->setLayerIndex(value);
+	RectSprite* sprite = owner.getComponent<RectSprite>();
+	if (sprite) {
+		sprite->setLayerIndex(value);
 	}
 }
 
@@ -73,7 +56,7 @@ void RectButton::changeState(ButtonState state) {
 	this->state = state;
 
 	// Change image
-	Rect* rect = owner.getComponent<Rect>();
+	RectSprite* rect = owner.getComponent<RectSprite>();
 	if (rect) {
 		// Change color
 		rect->setColor(colors[state]);

@@ -112,7 +112,7 @@ EntityLocation Archetype::getLocation(Entity entity) {
 	try {
 		std::shared_ptr<Chunk> chunk = getContainer(entity);
 		std::size_t index = chunk->getIndex(entity);
-		return EntityLocation{index, chunk};
+		return EntityLocation(index, chunk);
 	} catch (std::exception&) {
 		std::cout << "Archetype::getLocation::ERROR could not find location for Entity.\n";
 		return EntityLocation(); // Returns invalid location

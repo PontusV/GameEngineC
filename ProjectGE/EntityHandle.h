@@ -14,23 +14,27 @@ namespace Core {
 		EntityHandle();
 		~EntityHandle();
 
-		void									setParent(const Entity& entity);
+		void setParent(const Entity& entity);
+		void setParent(EntityHandle entity);
 		/* Returns true if the given Entity is a child of the Entity this instance points to. */
-		bool									isChild(Entity entity);
+		bool isChild(Entity entity);
 
 		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
-		template<typename T, class... Args> T*	addComponent(Args&&... args);
+		template<typename T, class... Args>
+		T* addComponent(Args&&... args);
 		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
-		template<typename T> T*					addComponent(T component);
+		template<typename T>
+		T* addComponent(T component);
 		/* Removes the component of type T at the end of the frame. */
-		template<typename T> void				removeComponent();
+		template<typename T>
+		void removeComponent();
 		/* Removes the Entity at the end of the frame. */
-		void									destroy();
+		void destroy();
 
-		std::string								getEntityName();
+		std::string getEntityName();
 
 		template<typename... Ts>
-		EntityHandle							createEntity(std::string name, Ts&... components);
+		EntityHandle createEntity(std::string name, Ts&... components);
 	};
 
 	// --------------------------- Template Function Definitions --------------------------------

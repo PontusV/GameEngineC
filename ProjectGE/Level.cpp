@@ -75,15 +75,15 @@ void Level::serialize(std::ostream& os) const {
 		if (!manager->hasComponent<ParentEntity>(*it)) { // Checks if root
 			std::size_t childCount = manager->getImmediateChildCount(*it);
 			for (std::size_t i = 0; i < childCount; i++) {
-				Handle* handle = manager->getChild(*it, i);
-				if (handle->isValid()) {
-					Entity child = handle->getEntity();
+				Handle handle = manager->getChild(*it, i);
+				if (handle.refresh()) {
+					Entity child = handle.getEntity();
 
 					ParentEntity* component = manager->getComponent<ParentEntity>(child);
 					if (component) {
 						std::string childName = getEntityName(child);
 
-						std::size_t parentID = component->getParent()->getEntity().getID();
+						std::size_t parentID = component->getParent().getEntity().getID();
 						std::string parentName = getEntityName(Entity(parentID));
 
 						parentChildPairs.push_back(std::make_pair(childName, parentName));
@@ -98,7 +98,7 @@ void Level::serialize(std::ostream& os) const {
 		if (component) { // If the entity has a parent
 			std::string childName = getEntityName(*it);
 
-			std::size_t parentID = component->getParent()->getEntity().getID();
+			std::size_t parentID = component->getParent().getEntity().getID();
 			std::string parentName = getEntityName(Entity(parentID));
 
 			parentChildPairs.push_back(std::make_pair(childName, parentName));

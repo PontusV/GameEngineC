@@ -14,10 +14,10 @@
 namespace Core {
 	struct Character
 	{
-		glm::ivec2		size;		// Size of glyph
-		glm::ivec2		bearing;	// Offset from baseline to left/top of glyph
-		glm::vec2		uvPos;		// UV position in texture atlas
-		unsigned int	advance;	// Offset to advance to next glyph
+		glm::ivec2 size;		// Size of glyph
+		glm::ivec2 bearing;		// Offset from baseline to left/top of glyph
+		glm::vec2 uvPos;		// UV position in texture atlas
+		unsigned int advance;	// Offset to advance to next glyph
 	};
 
 	struct Glyph {

@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "TransformMaths.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 #define M_PI 3.14159265358979323846
@@ -7,18 +8,13 @@ static float RADIANS_MAX = M_PI * 2;
 using namespace Core;
 
 
-Transform::Transform(float x, float y, float z, Anchor anchorPoint, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale), anchor(anchorPoint) {
-	//anchor = glm::vec2(0, 0);
+Transform::Transform(float x, float y, float z, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale) {
 }
 
 Transform::Transform() : position(0, 0) {
 }
 
 Transform::~Transform() {
-}
-
-glm::vec2 Transform::calculateOffset(const glm::vec2& size) const {
-	return anchor * size;
 }
 
 
@@ -32,8 +28,6 @@ void Transform::serialize(std::ostream& os) const {
 	os.write((char*)&z, sizeof(z));							// Position z
 	os.write((char*)&rotation, sizeof(rotation));			// Rotation
 	os.write((char*)&scale, sizeof(scale));					// Scale
-	os.write((char*)&anchor.x, sizeof(anchor.x));			// Anchor x
-	os.write((char*)&anchor.y, sizeof(anchor.y));			// Anchor y
 }
 
 void Transform::deserialize(std::istream& is) {
@@ -44,8 +38,6 @@ void Transform::deserialize(std::istream& is) {
 	is.read((char*)&z, sizeof(z));							// Position z
 	is.read((char*)&rotation, sizeof(rotation));			// Rotation
 	is.read((char*)&scale, sizeof(scale));					// Scale
-	is.read((char*)&anchor.x, sizeof(anchor.x));			// Anchor x
-	is.read((char*)&anchor.y, sizeof(anchor.y));			// Anchor y
 
 	changed = true;
 }
@@ -74,13 +66,11 @@ void Transform::moveY(float value) {
 
 void Transform::setX(float value) {
 	position.x = value;
-	//moveX(value - position.x);
 	changed = true;
 }
 
 void Transform::setY(float value) {
 	position.y = value;
-	//moveY(value - position.y);
 	changed = true;
 }
 
@@ -105,8 +95,8 @@ const glm::mat4& Transform::getWorldToLocalMatrix() const {
 /* Calculates Local Model Matrix from local properties (position, rotation, scale). */
 glm::mat4 Transform::getLocalModelMatrix() const {
 	glm::mat4 matrix = glm::mat4(1.0f);
-	matrix = glm::translate(matrix, glm::vec3(position.x, position.y, 0.0f)); // Anchor position
-	matrix = glm::rotate(matrix, rotation, glm::vec3(0, 0, 1)); // Rotate around Anchor position
+	matrix = glm::translate(matrix, glm::vec3(position.x, position.y, 0.0f));
+	matrix = glm::rotate(matrix, rotation, glm::vec3(0, 0, 1));
 	matrix = glm::scale(matrix, glm::vec3(scale, scale, 1));
 	return matrix;
 }
@@ -115,20 +105,16 @@ const glm::mat4& Transform::getLocalToWorldMatrix() const {
 	return localToWorldMatrix;
 }
 
-const float& Transform::getRotation() const {
+const float& Transform::getLocalRotation() const {
 	return rotation;
 }
 
-const glm::vec2& Transform::getPosition() const {
+const glm::vec2& Transform::getLocalPosition() const {
 	return position;
 }
 
-const float& Transform::getX() const {
-	return position.x;
-}
-
-const float& Transform::getY() const {
-	return position.y;
+const glm::vec2 Transform::getPosition() const {
+	return localToWorldMatrix * position;
 }
 
 const float& Transform::getZ() const {
@@ -140,12 +126,4 @@ void Transform::setZ(float value) {
 }
 bool Transform::hasChanged() {
 	return changed;
-}
-
-const glm::vec2& Transform::getAnchor() const {
-	return anchor;
-}
-
-void Transform::setAnchor(Anchor anchorPoint) {
-	anchor = anchorPoint;
 }

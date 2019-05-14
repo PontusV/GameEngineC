@@ -12,7 +12,7 @@ namespace Core {
 		ComponentHandle();
 		~ComponentHandle();
 
-		Component*		getComponent();
+		Component* getComponent();
 
 	private:
 		ComponentTypeID typeID;

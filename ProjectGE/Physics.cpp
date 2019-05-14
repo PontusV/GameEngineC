@@ -35,7 +35,7 @@ void updateTransformModel(Transform& root, glm::mat4 modelMatrix, bool matrixCha
 	// Iterate through all children (immediate children iterate through their immediate children)
 	std::size_t childCount = root.getOwner().getImmediateChildCount();
 	for (std::size_t childIndex = 0; childIndex < childCount; childIndex++) {
-		Transform* childTransform = root.getOwner().getChild(childIndex)->getComponent<Transform>();
+		Transform* childTransform = root.getOwner().getChild(childIndex).getComponent<Transform>();
 		if (childTransform) {
 			updateTransformModel(*childTransform, modelMatrix, matrixChanged);
 		}

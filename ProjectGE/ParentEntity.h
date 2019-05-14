@@ -13,8 +13,8 @@ namespace Core {
 		ParentEntity();
 		~ParentEntity();
 
-		void	setParent(Handle parent);
-		Handle*	getParent();
+		void setParent(Handle parent);
+		Handle getParent();
 
 	private:
 		Handle parent;

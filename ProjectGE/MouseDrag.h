@@ -1,8 +1,9 @@
 #ifndef MOUSE_DRAG_H
 #define MOUSE_DRAG_H
-#include "Script.h"
+#include "Behaviour.h"
+#include <glm/glm.hpp>
 namespace Core {
-	class MouseDrag : public Script {
+	class MouseDrag : public Behaviour {
 	public:
 		MouseDrag();
 		~MouseDrag();
@@ -11,8 +12,7 @@ namespace Core {
 		void onMouseDrag(float mouseX, float mouseY) override;
 
 	private:
-		float offsetX;
-		float offsetY;
+		glm::vec2 offset;
 	};
 }
 #endif

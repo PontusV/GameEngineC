@@ -10,7 +10,7 @@ Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : image
 	}
 } // Constructor
 
-Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, int width, int height) : images{ Image(defaultImage, 0, width, height), Image(pressedImage, 0, width, height), Image(hoverImage, 0, width, height) } {
+Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage) : images{ Image(defaultImage, 0), Image(pressedImage, 0), Image(hoverImage, 0) } {
 	for (std::size_t i = 0; i < 3; i++) {
 		colors[i] = Color(255, 255, 255, 255);
 	}
@@ -54,7 +54,6 @@ void Button::changeState(ButtonState state) {
 		images[state].reload();
 		// Change image
 		image->setTexture(images[state].getFileName(), images[state].getTexture());
-		image->setSize(images[state].getSize());
 		// Change color
 		image->setColor(colors[state]);
 	}
@@ -70,7 +69,7 @@ Image* Button::getImages() {
 // ------------------------------- Serializable ----------------------------------------
 
 void Button::serialize(std::ostream& os) const {
-	Script::serialize(os);
+	Behaviour::serialize(os);
 
 	for (std::size_t i = 0; i < 3; i++) {
 		images[i].serialize(os);								// Images
@@ -81,7 +80,7 @@ void Button::serialize(std::ostream& os) const {
 }
 
 void Button::deserialize(std::istream& is) {
-	Script::deserialize(is);
+	Behaviour::deserialize(is);
 
 	for (std::size_t i = 0; i < 3; i++) {
 		images[i].deserialize(is);								// Images

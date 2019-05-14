@@ -3,7 +3,7 @@
 using namespace Core;
 
 
-Sprite::Sprite(unsigned char layerIndex, unsigned int width, unsigned int height, Color color) : BoxComponent(width, height), layerIndex(layerIndex), color(color), clipEnabled(false) {
+Sprite::Sprite(unsigned char layerIndex, Color color) : layerIndex(layerIndex), color(color), clipEnabled(false) {
 } // Constructor
 
 Sprite::~Sprite() {
@@ -13,7 +13,7 @@ void Sprite::setLayerIndex(unsigned char index) {
 	layerIndex = index;
 }
 
-const unsigned char& Sprite::getLayerIndex() const {
+unsigned char Sprite::getLayerIndex() const {
 	return layerIndex;
 }
 
@@ -49,7 +49,7 @@ bool Sprite::isClipEnabled() const {
 // ------------------------------- Serializable ----------------------------------------
 
 void Sprite::serialize(std::ostream& os) const {
-	BoxComponent::serialize(os);
+	Component::serialize(os);
 
 
 	os.write((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
@@ -57,7 +57,7 @@ void Sprite::serialize(std::ostream& os) const {
 }
 
 void Sprite::deserialize(std::istream& is) {
-	BoxComponent::deserialize(is);
+	Component::deserialize(is);
 
 	is.read((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
 	color.deserialize(is);												// Color

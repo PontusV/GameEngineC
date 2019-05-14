@@ -14,18 +14,18 @@ namespace Core {
 		virtual ~BoxComponent() = 0; // Abstract
 
 		/* Recalculates bounds. */
-		void				updateBounds();
-		Bounds&				getBounds();
-		const glm::ivec2&	getSize() const;
+		void updateBounds();
+		Bounds& getBounds();
+		const glm::ivec2& getSize() const;
 
-		void				setSize(int width, int height);
-		void				setSize(glm::ivec2 size);
-		void				setWidth(int width);
-		void				setHeight(int height);
+		void setSize(int width, int height);
+		void setSize(glm::ivec2 size);
+		void setWidth(int width);
+		void setHeight(int height);
 
 		// Serializable
-		virtual void		serialize(std::ostream& os) const;
-		virtual void		deserialize(std::istream& is);
+		virtual void serialize(std::ostream& os) const;
+		virtual void deserialize(std::istream& is);
 
 	protected:
 		BoxComponent(int width, int height);
@@ -33,8 +33,8 @@ namespace Core {
 		BoxComponent();
 
 	private:
-		glm::ivec2	size;
-		Bounds		bounds;
+		glm::ivec2 size;
+		Bounds bounds;
 	};
 }
 #endif

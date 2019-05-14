@@ -9,9 +9,9 @@ namespace Core {
 
 	struct EntityLocation {
 		EntityLocation(std::size_t index, std::weak_ptr<Chunk> chunk) : index(index), chunk(chunk) {}
-		EntityLocation() {}
+		EntityLocation() : index(0), chunk(std::weak_ptr<Chunk>()) {}
 		std::size_t index;
-		std::weak_ptr<Chunk> chunk;
+		std::weak_ptr<Chunk> chunk = std::weak_ptr<Chunk>();
 	};
 }
 #endif

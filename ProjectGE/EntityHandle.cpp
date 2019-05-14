@@ -23,19 +23,24 @@ void EntityHandle::destroy() {
 }
 
 void EntityHandle::setParent(const Entity& entity) {
+	setParent(manager->getEntityHandle(entity));
+}
+
+void EntityHandle::setParent(EntityHandle entity) {
 	update();
 	ParentEntity* parentComponent = getComponent<ParentEntity>();
 	if (parentComponent) {
-		parentComponent->setParent(manager->getEntityHandle(entity));
+		parentComponent->setParent(entity);
 	}
 	else {
-		addComponent<ParentEntity>(manager->getEntityHandle(entity));
+		addComponent<ParentEntity>(entity);
 	}
 }
+
 bool EntityHandle::isChild(Entity entity) {
 	std::size_t childCount = getChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
-		EntityHandle child = *getChild(i);
+		EntityHandle child = getChild(i);
 		if (child.getEntity() == entity || child.isChild(entity))
 			return true;
 	}

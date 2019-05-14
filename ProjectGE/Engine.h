@@ -4,7 +4,7 @@
 #include "Graphics.h"
 #include "Physics.h"
 #include "Input.h"
-#include "ScriptManager.h"
+#include "BehaviourManager.h"
 #include <memory>
 
 struct SDL_Renderer;
@@ -20,40 +20,40 @@ namespace Core {
 		~Engine();
 
 		// Game loop
-		int			initiate();
-		int			start();
-		void		terminate();
+		int initiate();
+		int start();
+		void terminate();
 
 		// Level
-		LevelPtr	createLevel();
-		void		setCurrentLevel(LevelPtr level);
-		LevelPtr	getCurrentLevel();
-		LevelPtr	getDebugLevel();
+		LevelPtr createLevel();
+		void setCurrentLevel(LevelPtr level);
+		LevelPtr getCurrentLevel();
+		LevelPtr getDebugLevel();
 		/* Saves current level to file */
-		void		saveLevel(const char* fileName);
+		void saveLevel(const char* fileName);
 		/* Loads level from file and returns new level */
-		LevelPtr	loadLevel(const char* fileName);
+		LevelPtr loadLevel(const char* fileName);
 
 		// Systems
-		Input&			getInput();
-		Graphics&		getGraphics();
-		Physics&		getPhysics();
-		ScriptManager&	getScriptManager();
+		Input& getInput();
+		Graphics& getGraphics();
+		Physics& getPhysics();
+		BehaviourManager& getBehaviourManager();
 
 	private:
 		// Game loop
-		bool		running;
+		bool running;
 
 		// Level
-		LevelPtr	currentLevel;
-		LevelPtr	debugLevel;		// Where you put entities showing debugging data. These will not be loaded/saved
+		LevelPtr currentLevel;
+		LevelPtr debugLevel;		// Where you put entities showing debugging data. These will not be loaded/saved
 
 		// Main Systems
-		Graphics		graphics;
-		Input			input;
-		Physics			physics;
+		Graphics graphics;
+		Input input;
+		Physics physics;
 
-		ScriptManager	scriptManager;
+		BehaviourManager behaviourManager;
 	};
 }
 #endif

@@ -1,6 +1,6 @@
 #ifndef DROP_DOWN_H
 #define DROP_DOWN_H
-#include "Script.h"
+#include "Behaviour.h"
 #include "EntityHandle.h"
 #include "Text.h"
 #include "ComponentFunctionHandle.h"
@@ -14,25 +14,24 @@ namespace Core {
 	};
 
 	/* Adds a Text and Rect component on start() */
-	class DropDown : public Script {
+	class DropDown : public Behaviour {
 	public:
-		DropDown(Text text, int width, int height);
+		DropDown(Text text);
 		DropDown();
 		~DropDown();
 
-		void	open();
-		void	close();
-		void	addOption(std::string label, ComponentFunctionHandleWrapper function);
+		void open();
+		void close();
+		void addOption(std::string label, ComponentFunctionHandleWrapper function);
 
-		void	awake() override;
-		void	update(float deltaTime) override;
-		void	onMouseButtonPressedAsButton(int buttoncode, int mods) override;
-		void	onMouseButtonPressed(int buttoncode, int mods) override;
-		void	onMouseButtonReleased(int buttoncode, int mods) override;
-		void	onHoverover() override;
-		void	onHoverout() override;
+		void awake() override;
+		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
+		void onMouseButtonPressed(int buttoncode, int mods) override;
+		void onMouseButtonReleased(int buttoncode, int mods) override;
+		void onHoverover() override;
+		void onHoverout() override;
 		// State: Default, Hover, Open
-		void	test();
+		void test();
 
 	public:
 		// Settings (set to Default values)
@@ -45,8 +44,7 @@ namespace Core {
 
 	private:
 		Text text;
-		int width, height;
-		bool isOpen;
+		bool isOpen = false;
 		EntityHandle menuBox;
 		std::vector<DropDownOption> options;
 	};

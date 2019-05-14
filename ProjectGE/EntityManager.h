@@ -25,54 +25,65 @@ namespace Core {
 			clear();
 		}
 
-		template <typename... Ts> Handle	createEntity(std::string name, Ts&... components);
-		void								destroyEntity(Entity entity);
+		template <typename... Ts>
+		Handle createEntity(std::string name, Ts&... components);
+		void destroyEntity(Entity entity);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
-		template <typename T> T*			getComponent(Entity entity);
+		template <typename T>
+		T* getComponent(Entity entity);
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
-		Component*							getComponent(Entity entity, ComponentType type);
+		Component* getComponent(Entity entity, ComponentType type);
 		/* Attaches the component to the Entity. */
-		template <typename T> void			addComponent(Entity entity, T& component);
+		template <typename T>
+		void addComponent(Entity entity, T& component);
 		/* If the Entity has a component of type T it is removed/destroyed. It does not removed components deriving from T. The destructor of the component is called and it is removed from the Entity. */
-		template <typename T> void			removeComponent(Entity entity);
-		template <typename T> bool			hasComponent(Entity entity);
-		bool								hasComponent(Entity entity, ComponentType type);
+		template <typename T>
+		void removeComponent(Entity entity);
+		template <typename T>
+		bool hasComponent(Entity entity);
+		bool hasComponent(Entity entity, ComponentType type);
 
-		std::vector<Component*>				getComponents(Entity entity);
-		template<typename T> std::vector<T*> getComponents(Entity entity);
-		std::vector<IComponentTypeInfo>		getComponentTypes(Entity entity);
+		std::vector<Component*> getComponents(Entity entity);
+		template<typename T>
+		std::vector<T*> getComponents(Entity entity);
+		std::vector<IComponentTypeInfo> getComponentTypes(Entity entity);
 
-		Handle								getParent(Entity entity);
-		Handle*								getChild(Entity entity, int index);
-		std::size_t							getImmediateChildCount(Entity entity);
+		Handle getParent(Entity entity);
+		Handle getChild(Entity entity, int index);
+		std::size_t getImmediateChildCount(Entity entity);
 
-		Handle								getEntityHandle(Entity entity);
-		Handle								getEntityHandle(std::string entityName);
-		std::string							getEntityName(Entity entity);
-		EntityLocation						getLocation(Entity entity);
+		Handle getEntityHandle(Entity entity);
+		Handle getEntityHandle(std::string entityName);
+		std::string getEntityName(Entity entity);
+		EntityLocation getLocation(Entity entity);
 
-		void								clear();
+		void clear();
 		/* Calls awake on all scripts managed by this instance. */
-		void								awake();
-		void								processQueue();
+		void awake();
+		void processQueue();
 
-		template<typename... Ts> Entity		createEntityQueued(std::string name, Ts&... components);
-		void								destroyEntityQueued(Entity entity);
+		template<typename... Ts>
+		Entity createEntityQueued(std::string name, Ts&... components);
+		void destroyEntityQueued(Entity entity);
 		/* Returns temporary pointer to the added component. This pointer will be invalid next frame. */
-		template<typename T> T*				addComponentQueued(Entity entity, T& component);
-		template<typename T> void			removeComponentQueued(Entity entity);
+		template<typename T>
+		T* addComponentQueued(Entity entity, T& component);
+		template<typename T>
+		void removeComponentQueued(Entity entity);
 
 	private:
-		template <typename... Ts> Handle	addEntity(Entity entity, Ts&... components);
-		Entity								generateEntity(std::string name);
-		void								removeEntity(Entity entity, bool destroy = true);
-		void								removeComponent(Entity entity, ComponentTypeID type);
+		template <typename... Ts>
+		Handle addEntity(Entity entity, Ts&... components);
+		Entity generateEntity(std::string name);
+		void removeEntity(Entity entity, bool destroy = true);
+		void removeComponent(Entity entity, ComponentTypeID type);
 
-		void								removeArchetype(Archetype* archetype);
-		Archetype*							createArchetype(std::vector<IComponentTypeInfo> types);
-		template<typename... Ts> Archetype*	getArchetype();
-		Archetype*							getArchetype(std::vector<IComponentTypeInfo> types);
+		void removeArchetype(Archetype* archetype);
+		Archetype* createArchetype(std::vector<IComponentTypeInfo> types);
+		template<typename... Ts>
+		Archetype* getArchetype();
+		Archetype* getArchetype(std::vector<IComponentTypeInfo> types);
 
 		/* Inits components and notifies parent Entities. */
 		void prepEntity(Entity entity, Handle owner, Archetype* target);

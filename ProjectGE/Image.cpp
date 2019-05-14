@@ -7,7 +7,7 @@
 using namespace Core;
 
 
-Image::Image(const char* fileName, unsigned char layerIndex, unsigned int width, unsigned int height) : Sprite(layerIndex, width, height), fileName(fileName) {
+Image::Image(const char* fileName, unsigned char layerIndex) : Sprite(layerIndex), fileName(fileName) {
 } // Constructor
 
 Image::Image() {
@@ -19,12 +19,6 @@ Image::~Image() {
 void Image::reload() {
 	if (texture.ID == 0) {
 		texture = ResourceManager::getInstance().loadTexture(fileName.c_str());
-		if (getSize().x != 0) {
-			texture.size.x = getSize().x;
-		}
-		if (getSize().y != 0) {
-			texture.size.y = getSize().y;
-		}
 	}
 }
 

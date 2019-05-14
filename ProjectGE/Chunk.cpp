@@ -11,27 +11,22 @@ int ChunkIDCounter::idCounter = 0;
 
 
 Chunk::Chunk(std::vector<IComponentTypeInfo> infoVec) : size(0), id(idCounter++) {
-	// Number of entries
-	std::size_t sizeSum = sizeof(Entity);
+	// Calculate max number of entries
+	stride = sizeof(Entity);
 	for (IComponentTypeInfo& info : infoVec) {
-		sizeSum += info.size;
+		stride += info.size;
 	}
 
-	MAX_SIZE = CHUNK_SIZE / sizeSum;
-	BUFFER_SIZE = MAX_SIZE * sizeSum;
+	MAX_SIZE = CHUNK_SIZE / stride;
+	BUFFER_SIZE = MAX_SIZE * stride;
 	buffer = new char[BUFFER_SIZE];
 
 	// ComponentDataArrayInfo
 	types.reserve(infoVec.size());
+	std::size_t offset = sizeof(Entity);
 	for (IComponentTypeInfo& info : infoVec) {
-		types.push_back(ComponentDataArrayInfo(info.type.getTypeID(), info.size));
-	}
-
-	// Set ptr to start of ComponenDataArrays
-	std::size_t offset = sizeof(Entity) * MAX_SIZE; // Starts after Entity array
-	for (ComponentDataArrayInfo& info : types) {
-		info.ptr = &buffer[offset];
-		offset += info.sizePerEntry * MAX_SIZE;
+		types.push_back(ComponentDataArrayInfo(&buffer[offset], info.type.getTypeID(), info.size));
+		offset += info.size;
 	}
 }
 
@@ -62,14 +57,14 @@ void Chunk::remove(std::size_t index, bool destruct) {
 		std::vector<Component*> lComponents = getComponents(size - 1);
 
 		for (std::size_t i = 0; i < types.size(); i++) {
-			std::memcpy(iComponents[i], lComponents[i], types[i].sizePerEntry);
+			std::memcpy(iComponents[i], lComponents[i], types[i].size);
 		}
 
 		// Copy data from last entry to the removed entry
-		getEntityArrayPtr()[index] = getEntityArrayPtr()[size - 1];
+		getEntity(index) = getEntity(size - 1);
 	}
 	size--;
-	getEntityArrayPtr()[size].setID(0); // Makes the back entry invalid
+	getEntity(size).setID(0); // Makes the back entry invalid
 }
 
 Component* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeID) {
@@ -94,8 +89,8 @@ Component* Chunk::getComponent(std::size_t index, ComponentType componentType) {
 }
 
 Component* Chunk::getComponent(std::size_t index, ComponentDataArrayInfo& info) {
-	if (index > size) throw std::out_of_range("Chunk::getComponent::ERROR!");
-	return (Component*)(&info.ptr[info.sizePerEntry * index]);
+	if (index > size) throw std::out_of_range("Chunk::getComponent::ERROR out of range!");
+	return (Component*)(&info.beginPtr[stride * index]);
 }
 
 std::vector<Component*> Chunk::getComponents(Entity entity) {
@@ -134,7 +129,7 @@ std::vector<ComponentDataBlock> Chunk::getComponentDataBlocks(Entity entity) {
 	int index = getIndex(entity);
 	std::vector<ComponentDataBlock> blocks;
 	for (ComponentDataArrayInfo& info : types) {
-		void* ptr = &info.ptr[info.sizePerEntry * index]; // Wrong
+		void* ptr = &info.beginPtr[stride * index];
 		blocks.push_back({ ptr, info.typeID });
 	}
 
@@ -143,32 +138,28 @@ std::vector<ComponentDataBlock> Chunk::getComponentDataBlocks(Entity entity) {
 
 Entity* Chunk::getEntityPtr(Entity entity) {
 	std::size_t index = getIndex(entity);
-	return &getEntityArrayPtr()[index];
+	return getEntityPtr(index);
+}
+
+Entity* Chunk::getEntityPtr(std::size_t index) {
+	return (Entity*)&getEntityBeginPtr()[index * stride];
+}
+
+Entity& Chunk::getEntity(std::size_t index) {
+	return *getEntityPtr(index);
 }
 
 /* Returns start of Entity array */
-Entity* Chunk::getEntityArrayPtr() {
-	return static_cast<Entity*>((void*)&buffer[0]);
+char* Chunk::getEntityBeginPtr() {
+	return buffer;
 }
 
-char* Chunk::getComponentArrayPtr(ComponentTypeID typeID) {
+char* Chunk::getComponentBeginPtr(ComponentTypeID typeID) {
 	for (ComponentDataArrayInfo& info : types) {
 		if (typeID == info.typeID)
-			return info.ptr;
+			return info.beginPtr;
 	}
 	return nullptr;
-}
-
-/* Returns all matches for the type. */
-std::vector<char*> Chunk::getComponentArrayPtrs(ComponentType type) {
-	std::vector<char*> componentArrayPtrVec;
-	for (ComponentDataArrayInfo& info : types) {
-		if (type == info.typeID) {
-			componentArrayPtrVec.push_back(info.ptr);
-		}
-	}
-
-	return componentArrayPtrVec;
 }
 
 std::vector<ComponentDataArrayInfo> Chunk::getComponentArrayInfo(ComponentType type) {
@@ -189,8 +180,8 @@ void Chunk::copyEntity(Entity entity, std::vector<ComponentDataBlock> sources) {
 		bool copied = false;
 		for (std::size_t i = 0; i < types.size(); i++) {
 			if (types[i].typeID == src.typeID) {
-				void* dest = &getComponentArrayPtr(types[i].typeID)[types[i].sizePerEntry * index];
-				std::memcpy(dest, src.ptr, types[i].sizePerEntry);
+				void* dest = &getComponentBeginPtr(types[i].typeID)[stride * index];
+				std::memcpy(dest, src.ptr, types[i].size);
 				copied = true;
 				break;
 			}
@@ -204,9 +195,8 @@ void Chunk::copyEntity(Entity entity, std::vector<ComponentDataBlock> sources) {
 
 /* Looks to see if the given entity is contained in this chunk. */
 bool Chunk::contains(Entity entity) {
-	Entity* entityArrayPtr = getEntityArrayPtr();
 	for (std::size_t i = 0; i < size; i++) {
-		if (entityArrayPtr[i] == entity) return true;
+		if (getEntity(i) == entity) return true;
 	}
 
 	return false;
@@ -229,10 +219,13 @@ std::size_t Chunk::getSize() {
 }
 
 std::size_t Chunk::getIndex(Entity entity) {
-	Entity* entityArray = getEntityArrayPtr();
 	for (std::size_t i = 0; i < size; i++) {
-		if (entityArray[i] == entity)
+		if (getEntity(i) == entity)
 			return i;
 	}
 	throw std::invalid_argument("Entity is not contained in this chunk!");
+}
+
+std::size_t Chunk::getStride() {
+	return stride;
 }

@@ -59,15 +59,15 @@ namespace glm
 	// -- Conversion scalar constructors --
 
 	template <typename T, precision P>
-	template <typename A, typename B>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(A a, B b)
+	template <typename A, typename O>
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(A a, O b)
 		: x(static_cast<T>(a))
 		, y(static_cast<T>(b))
 	{}
 
 	template <typename T, precision P>
-	template <typename A, typename B>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec1<A, P> const & a, tvec1<B, P> const & b)
+	template <typename A, typename O>
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec1<A, P> const & a, tvec1<O, P> const & b)
 		: x(static_cast<T>(a.x))
 		, y(static_cast<T>(b.x))
 	{}

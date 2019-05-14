@@ -38,9 +38,9 @@ namespace Core {
 
 	struct InputEvent {
 		int type;
-		KeyEvent			key;
-		MouseButtonEvent	mouseButton;
-		ScrollEvent			scroll;
+		KeyEvent key;
+		MouseButtonEvent mouseButton;
+		ScrollEvent scroll;
 	};
 }
 #endif

@@ -5,7 +5,7 @@
 #include "Renderable2D.h"
 #include "Color.h"
 #include "Font.h"
-#include "Transform.h"
+#include "RectTransform.h"
 #include "Texture2D.h"
 #include "PostProcessor.h"
 
@@ -15,7 +15,7 @@
 
 namespace Core {
 
-	#define MAX_RENDERABLES 10000
+	#define MAX_RENDERABLES 100000
 
 	class Window;
 
@@ -28,10 +28,10 @@ namespace Core {
 		unsigned char createLayer();
 
 		/* Render sprite. Submits a Renderable2D to a batchRenderer2D. */
-		void submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex);
+		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex);
 
 		/* Render text. Submits text to a batchRenderer2D. */
-		void submitText(const std::string& text, const Transform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
+		void submitText(const std::string& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
 
 		/* Draws everything submitted to this renderer since the last render() call. */
 		void render(float deltaTime);
@@ -44,15 +44,15 @@ namespace Core {
 		void flush();
 
 	private:
-		Renderable2D	renderableBuffer[MAX_RENDERABLES];
-		std::size_t		renderablesSize;
+		Renderable2D renderableBuffer[MAX_RENDERABLES];
+		std::size_t renderablesSize;
 		BatchRenderer2D	batch;
 
-		unsigned char	layerAmount; // To keep track of next LayerID
-		PostProcessor	postProcessor;
+		unsigned char layerAmount; // To keep track of next LayerID
+		PostProcessor postProcessor;
 
 		// Shader
-		GLuint			textShaderID;
+		GLuint textShaderID;
 	};
 }
 #endif

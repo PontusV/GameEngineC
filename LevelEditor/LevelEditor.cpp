@@ -3,10 +3,13 @@
 
 
 #include "../ProjectGE/Level.h"
+#include "../ProjectGE/RectTransform.h"
 #include "../ProjectGE/DropDown.h"
 #include "../ProjectGE/Button.h"
-#include "../ProjectGE/WindowAlignment.h"
+#include "../ProjectGE/WindowAnchor.h"
 #include "../ProjectGE/MouseDrag.h"
+#include "../ProjectGE/LayoutElement.h"
+#include "../ProjectGE/HorizontalLayoutGroup.h"
 
 using namespace Core;
 
@@ -19,9 +22,6 @@ LevelEditor::~LevelEditor() {
 }
 
 
-void buttonPressTest() {
-	std::cout << "Button press!\n";
-}
 
 int LevelEditor::initiate() {
 	// Initiate engine
@@ -39,14 +39,22 @@ int LevelEditor::initiate() {
 
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
-		Rect(1920, 20, { 60, 60, 60, 255 }, editorLayer),
-		Transform(0, 0, 10.0f, Alignment::TOP_LEFT)
+		RectSprite({ 60, 60, 60, 255 }, editorLayer),
+		RectTransform(0, 0, 1920, 25, 10.0f, Alignment::TOP_LEFT)
 	);
+	HorizontalLayoutGroup* layoutGroup = menuBar.addComponent<HorizontalLayoutGroup>();
+	layoutGroup->paddingLeft = 1;
+	layoutGroup->paddingRight = 1;
+	layoutGroup->spacing = 1;
+	layoutGroup->childForceExpandWidth = false;
+	layoutGroup->childForceExpandHeight = true;
+	layoutGroup->childAlignment = Alignment::TOP_LEFT;
 	// Drop menu
 	EntityHandle menuFile = level->createEntity("Menu_Item_File",
-		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
-		Transform(26, 10, 10.1f, Alignment::CENTER)
+		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
+	menuFile.setParent(menuBar);
 	DropDown* file = menuFile.getComponent<DropDown>();
 	file->boxPaddingX = 5;
 	file->boxPaddingY = 5;
@@ -58,9 +66,10 @@ int LevelEditor::initiate() {
 	file->addOption("Build", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuEdit = level->createEntity("Menu_Item_Edit",
-		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
-		Transform(77, 10, 10.1f, Alignment::CENTER)
+		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
+	menuEdit.setParent(menuBar);
 	file = menuEdit.getComponent<DropDown>();
 	file->boxPaddingX = 5;
 	file->boxPaddingY = 5;
@@ -70,9 +79,10 @@ int LevelEditor::initiate() {
 	file->addOption("Redo", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuView = level->createEntity("Menu_Item_View",
-		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
-		Transform(128, 10, 10.1f, Alignment::CENTER)
+		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
+	menuView.setParent(menuBar);
 	file = menuView.getComponent<DropDown>();
 	file->boxPaddingX = 5;
 	file->boxPaddingY = 5;
@@ -81,9 +91,10 @@ int LevelEditor::initiate() {
 	file->addOption("Test", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuObject = level->createEntity("Menu_Item_Object",
-		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer), 50, 20),
-		Transform(179, 10, 10.1f, Alignment::CENTER)
+		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
+	menuObject.setParent(menuBar);
 	file = menuObject.getComponent<DropDown>();
 	file->boxPaddingX = 5;
 	file->boxPaddingY = 5;
@@ -96,44 +107,42 @@ int LevelEditor::initiate() {
 	int inspectorWidth = 400;
 	int inspectorHeight = 1000;
 	EntityHandle rightPanel = level->createEntity("Right_Panel",
-		Rect(inspectorWidth, inspectorHeight, Color(60,60,60,255), editorLayer),
-		WindowAlignment(Alignment::TOP_RIGHT, 0, 20),
-		Transform(0, 0, 1.0f, Alignment::TOP_RIGHT)
+		RectSprite(Color(60,60,60,255), editorLayer),
+		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
+		RectTransform(0, 0, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
 	);
 	int textPadding = 5;
 	int backgroundPadding = 3;
 	// Inspector label
 	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
 		Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255), editorLayer),
-		Transform(textPadding+backgroundPadding-inspectorWidth, textPadding+backgroundPadding, 1.1f, Alignment::TOP_LEFT)
+		RectTransform(textPadding+backgroundPadding-inspectorWidth, textPadding+backgroundPadding, 0, 0, 1.1f, Alignment::TOP_LEFT)
 	);
-	inspectorLabel.setParent(rightPanel.getEntity());
+	inspectorLabel.setParent(rightPanel);
 	// Inspector label background
-	Text* inspectorLabelText = inspectorLabel.getComponent<Text>();
-	const glm::ivec2& inspectorLabelTextSize = inspectorLabelText->getSize();
-	int labelRectWidth = inspectorLabelTextSize.x + textPadding * 2;
-	int labelRectHeight = inspectorLabelTextSize.y + textPadding * 2;
+	glm::ivec2 inspectorLabelSize = inspectorLabel.getComponent<Text>()->getSize();
+	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
+	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
 	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
-		Rect(labelRectWidth, labelRectHeight, Color(100,100,100,255), editorLayer),
-		Transform((float)-textPadding, (float)-textPadding, 1.05f, Alignment::TOP_LEFT)
+		RectSprite(Color(100,100,100,255), editorLayer),
+		RectTransform((float)-textPadding, (float)-textPadding, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspectorLabelRect.setParent(inspectorLabel.getEntity());
+	inspectorLabelRect.setParent(inspectorLabel);
 
 	// Inspector background
 	EntityHandle inspectorBackground = level->createEntity("Inspector_background",
-		Rect(inspectorWidth - backgroundPadding*2, inspectorHeight - backgroundPadding*2 - labelRectHeight, Color(100,100,100,255), editorLayer),
-		Transform(0, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
+		RectSprite(Color(100,100,100,255), editorLayer),
+		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspectorBackground.setParent(inspectorLabelRect.getEntity());
-
+	inspectorBackground.setParent(inspectorLabelRect);
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = level->createEntity("Test_Button",
-		Image("resources/images/invaders.png", 0, 300, 300),
-		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png", 300, 300),
+		Image("resources/images/invaders.png", 0),
+		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
 		MouseDrag(),
-		Border(300, 300, 1, Color(255,255,255,255), false, editorLayer),
-		Transform(250, 250, 0.0f, Alignment::CENTER)
+		Border(1, Color(255,255,255,255), false, editorLayer),
+		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
 
 	// Level created, calling awake

@@ -4,6 +4,7 @@
 #include "FpsCounter.h"
 #include "ResourceManager.h"
 #include "Renderer2D.h"
+#include "WindowAnchor.h"
 
 #include <iostream>
 #include <fstream>
@@ -32,6 +33,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	ResourceManager::getInstance().updateShaders(projection);
 	// Resize draw area
 	engine->getGraphics().getRenderer().updateSize(width, height);
+	// Notify UIBehaviours
+	engine->getGraphics().getUISystem().onWindowResize();
 }
 
 
@@ -166,7 +169,8 @@ int Engine::start() {
 	//unsigned char debugLayer = graphics.createLayer();
 	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
 		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255), 0),
-		Transform(500, 5, 30, Alignment::TOP_LEFT)
+		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
+		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT)
 	);
 
 	// DeltaTime variables
@@ -190,7 +194,7 @@ int Engine::start() {
 
 		// Update systems
 		input.update(deltaTime);
-		scriptManager.update(deltaTime);
+		behaviourManager.update(deltaTime);
 		currentLevel->getEntityManager().lock()->processQueue(); // Process Queued
 		physics.update(deltaTime);
 		graphics.update(deltaTime);
@@ -206,7 +210,7 @@ int Engine::start() {
 	return 0;
 }
 
-Engine::Engine() : graphics(), input(this), physics(), scriptManager(this) {
+Engine::Engine() : graphics(), input(this), physics(), behaviourManager(this) {
 }
 Engine::~Engine() {
 	//Unload all entities and components
@@ -228,8 +232,8 @@ Physics& Engine::getPhysics() {
 	return physics;
 }
 
-ScriptManager& Engine::getScriptManager() {
-	return scriptManager;
+BehaviourManager& Engine::getBehaviourManager() {
+	return behaviourManager;
 }
 
 LevelPtr Engine::getCurrentLevel() {

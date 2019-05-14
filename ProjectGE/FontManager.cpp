@@ -35,7 +35,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 		}
 
 		atlas_width += g->bitmap.width;
-		atlas_height = std::max(atlas_height, g->bitmap.rows+1);
+		atlas_height = std::max(atlas_height, g->bitmap.rows);
 	}
 	textureAtlas.size = glm::ivec2(atlas_width, atlas_height);
 

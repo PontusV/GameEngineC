@@ -1,7 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "Script.h"
+#include "Behaviour.h"
 #include "Image.h"
 #include "Color.h"
 #include <iostream>
@@ -10,7 +10,7 @@
 namespace Core {
 
 	/* A button which manipulates the image component in the same Entity. A button does not function without an image. */
-	class Button : public Script {
+	class Button : public Behaviour {
 	public:
 		enum ButtonState {
 			DEFAULT = 0,
@@ -19,26 +19,26 @@ namespace Core {
 		};
 	public:
 		// Constructor / Destructor
-		Button(Image defaultImage, Image pressedImage, Image hoverImage);																// Different sized images
-		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage, int width, int height);	// Same sized images
+		Button(Image defaultImage, Image pressedImage, Image hoverImage);
+		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage);
 		Button() {}
 		~Button();
 
-		void	awake() override;
-		void	onMouseButtonPressedAsButton(int buttoncode, int mods) override;
-		void	onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
-		void	onHoverover() override;
-		void	onHoverout() override;
+		void awake() override;
+		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
+		void onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
+		void onHoverover() override;
+		void onHoverout() override;
 
-		Image*	getImages();
-		void	serialize(std::ostream& os) const;
-		void	deserialize(std::istream& is);
+		Image* getImages();
+		void serialize(std::ostream& os) const;
+		void deserialize(std::istream& is);
 	private:
-		void	changeState(ButtonState state);
+		void changeState(ButtonState state);
 
 	public:
-		Image		images[3];
-		Color		colors[3];
+		Image images[3];
+		Color colors[3];
 
 	private:
 		ButtonState	state;

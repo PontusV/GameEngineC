@@ -71,16 +71,15 @@ void Graphics::render(float deltaTime) {
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
 	// Rectangles
 	for (std::size_t i = 0; i < sizeRectangles; i++) {
-		const Rect&			rect			= renderableRects.rects[i];
-		const Transform&	transform		= renderableRects.transforms[i];
-		const Texture2D		texture			= Texture2D(); // No texture
-		const Color&		color			= rect.getColor();
-		const glm::ivec2&	size			= rect.getSize();
-		bool				clipEnabled		= rect.isClipEnabled();
-		unsigned char		layerIndex		= rect.getLayerIndex();
+		const RectSprite&				rect			= renderableRects.rects[i];
+		const RectTransform&	transform		= renderableRects.transforms[i];
+		const Texture2D			texture			= Texture2D(); // No texture
+		const Color&			color			= rect.getColor();
+		bool					clipEnabled		= rect.isClipEnabled();
+		unsigned char			layerIndex		= rect.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
 
-		renderer->submit(texture, transform, size, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
+		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableRects.rects[i].resetClipping();
 	}
@@ -89,15 +88,15 @@ void Graphics::render(float deltaTime) {
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
 
-		Image&				image		= renderableImages.images[i];
-		const Transform&	transform	= renderableImages.transforms[i];
-		const Texture2D&	texture		= image.getTexture();
-		const Color&		color		= image.getColor();
-		bool				clipEnabled = image.isClipEnabled();
-		unsigned char		layerIndex	= image.getLayerIndex();
+		Image&					image		= renderableImages.images[i];
+		const RectTransform&	transform	= renderableImages.transforms[i];
+		const Texture2D&		texture		= image.getTexture();
+		const Color&			color		= image.getColor();
+		bool					clipEnabled = image.isClipEnabled();
+		unsigned char			layerIndex	= image.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
 
-		renderer->submit( texture, transform, texture.size, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
+		renderer->submit( texture, transform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableImages.images[i].resetClipping();
 	}
@@ -117,12 +116,12 @@ void Graphics::render(float deltaTime) {
 	// Borders
 	for (std::size_t i = 0; i < sizeBorders; i++) {
 		const Border&			border			= renderableBorders.borders[i];
-		const Transform&		transform		= renderableBorders.transforms[i];
+		const RectTransform&	transform		= renderableBorders.transforms[i];
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= border.getColor();
 		const std::size_t&		borderThickness	= border.getBorderThickness();
 		bool					inner			= border.isInner();
-		const glm::ivec2&		size			= border.getSize();
+		const glm::ivec2&		size			= transform.getSize();
 		bool					clipEnabled		= border.isClipEnabled();
 		const unsigned char&	layerIndex		= border.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = border.getClipMaskVertices();
@@ -137,8 +136,8 @@ void Graphics::render(float deltaTime) {
 					rectSize.y += borderThickness * 2;
 				}
 
-				float localPosX = rectSize.x * transform.getAnchor().x; // Init with offset
-				float localPosY = rectSize.y * transform.getAnchor().y; // Initi with offset
+				float localPosX = rectSize.x * -transform.getPivot().x; // Init with offset
+				float localPosY = rectSize.y * -transform.getPivot().y; // Initi with offset
 
 
 				if (side == 1) {		// Right
@@ -161,10 +160,10 @@ void Graphics::render(float deltaTime) {
 					borderSize.y = rectSize.y - borderThickness * 2;
 				}
 
-				Transform lineTransform = Transform(localPosX, localPosY, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
+				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
 
-				renderer->submit(texture, lineTransform, borderSize, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
+				renderer->submit(texture, lineTransform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 			}
 		}
 		// Reset clipping
@@ -180,12 +179,12 @@ void Graphics::render(float deltaTime) {
 void Graphics::update(float dt) {
 	// Update all panels
 	for (std::size_t i = 0; i < panelGroup.panels.size(); i++) {
-		Panel&		panel		= panelGroup.panels[i];
-		Transform&	transform	= panelGroup.transforms[i];
+		Panel&			panel		= panelGroup.panels[i];
+		RectTransform&	transform	= panelGroup.transforms[i];
 
 		const glm::vec2& size = panel.getSize();
-		float x = size.x * transform.getAnchor().x;
-		float y = size.y * transform.getAnchor().y;
+		float x = size.x * -transform.getPivot().x;
+		float y = size.y * -transform.getPivot().y;
 		const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
 
 		std::vector<Sprite*> children = panel.getOwner().getComponentsInChildren<Sprite>();
@@ -205,6 +204,8 @@ void Graphics::update(float dt) {
 			child->clip(clipMaskVertices);
 		}
 	}
+	// Update UI
+	userInterfaceSystem.update();
 }
 
 unsigned char Graphics::createLayer() {
@@ -217,4 +218,8 @@ Window& Graphics::getWindow() {
 
 Renderer2D& Graphics::getRenderer() {
 	return *renderer;
+}
+
+UISystem& Graphics::getUISystem() {
+	return userInterfaceSystem;
 }

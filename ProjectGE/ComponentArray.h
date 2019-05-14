@@ -15,14 +15,12 @@
 
 namespace Core {
 	struct ChunkDataArray {
-		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : dataPtr(info.ptr), sizePerEntry(info.sizePerEntry), chunkPtr(chunkPtr) {}
-		char* dataPtr;
-		std::size_t sizePerEntry;
+		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : beginPtr(info.beginPtr), chunkPtr(chunkPtr) {}
+		char* beginPtr;
 		std::shared_ptr<Chunk> chunkPtr;
 
 		ChunkDataArray& operator=(const ChunkDataArray& other) {
-			dataPtr = other.dataPtr;
-			sizePerEntry = other.sizePerEntry;
+			beginPtr = other.beginPtr;
 			chunkPtr = other.chunkPtr;
 			return *this;
 		}
@@ -70,7 +68,7 @@ namespace Core {
 			for (ChunkDataArray& info : data) {
 				std::size_t chunkSize = info.chunkPtr->getSize();
 				if (index < chunkSize) {
-					return *(T*)&info.dataPtr[info.sizePerEntry * index];
+					return *(T*)&info.beginPtr[info.chunkPtr->getStride() * index];
 				}
 				else {
 					index -= chunkSize;
@@ -85,7 +83,7 @@ namespace Core {
 			for (ChunkDataArray& info : data) {
 				std::size_t chunkSize = info.chunkPtr->getSize();
 				if (index < chunkSize)
-					return info.chunkPtr->getEntityArrayPtr()[index];
+					return info.chunkPtr->getEntity(index);
 				else
 					index -= chunkSize;
 

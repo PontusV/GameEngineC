@@ -100,10 +100,10 @@ namespace glm
 		// -- Conversion constructors --
 
 		/// Explicit converions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
-		template <typename A, typename B>
-		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec2(A x, B y);
-		template <typename A, typename B>
-		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec2(tvec1<A, P> const & v1, tvec1<B, P> const & v2);
+		template <typename A, typename O>
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec2(A x, O y);
+		template <typename A, typename O>
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec2(tvec1<A, P> const & v1, tvec1<O, P> const & v2);
 
 		// -- Conversion vector constructors --
 

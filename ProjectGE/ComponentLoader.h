@@ -22,12 +22,12 @@ namespace Core {
 		~ComponentLoader();
 
 		/* Loads Component from the given instream and adds it to the given EntityHandle. */
-		static void							addComponentFromFile(std::istream& is, std::string componentTypeName, EntityHandle& go);
-		template<typename T> static bool	registerIgnore();
-		template<typename T> static void	registerComponent();
+		static void addComponentFromFile(std::istream& is, std::string componentTypeName, EntityHandle& go);
+		template<typename T> static bool registerIgnore();
+		template<typename T> static void registerComponent();
 
 	private:
-		template<typename T> static void	addComponentFromFile_impl(std::istream& is, EntityHandle& go);
+		template<typename T> static void addComponentFromFile_impl(std::istream& is, EntityHandle& go);
 
 	private:
 		typedef void(*LoaderFunc)(std::istream&, EntityHandle&);

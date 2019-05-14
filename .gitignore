@@ -3,6 +3,10 @@ ProjectGE/Release/*
 LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/resources/*
+LevelEditor/include/*
 ProjectGE.sln
 Debug/*
 Release/*
+*.db
+*.ipch
+.vs/ProjectGE/v15/.suo

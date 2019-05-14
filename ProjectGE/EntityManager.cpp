@@ -2,7 +2,7 @@
 #include "ParentEntity.h"
 #include "ChildManager.h"
 #include "Handle.h"
-#include "Script.h"
+#include "Behaviour.h"
 
 using namespace Core;
 
@@ -30,8 +30,8 @@ void EntityManager::awake() {
 
 void EntityManager::awakeEntity(Entity entity) {
 	if (!isAwake) return; // This instance has to be awake first
-	std::vector<Script*> scripts = getComponents<Script>(entity);
-	for (Script* script : scripts) {
+	std::vector<Behaviour*> scripts = getComponents<Behaviour>(entity);
+	for (Behaviour* script : scripts) {
 		script->awake();
 	}
 }
@@ -39,8 +39,8 @@ void EntityManager::awakeEntity(Entity entity) {
 void EntityManager::awakeComponent(Entity entity, ComponentType type) {
 	if (!isAwake) return; // This instance has to be awake first
 	// Awake script
-	if (type == typeof(Script)) {
-		Script* script = static_cast<Script*>(getComponent(entity, type));
+	if (type == typeof(Behaviour)) {
+		Behaviour* script = static_cast<Behaviour*>(getComponent(entity, type));
 		if (script) {
 			script->awake();
 		}
@@ -51,20 +51,20 @@ void EntityManager::awakeComponent(Entity entity, ComponentType type) {
 Handle EntityManager::getParent(Entity entity) {
 	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
 	if (parentCmp) { // If component exists
-		if (parentCmp->getParent()->refresh()) {
-			return *parentCmp->getParent();
+		if (parentCmp->getParent().refresh()) {
+			return parentCmp->getParent();
 		}
 	}
 	return Handle();
 }
 
 /* Returns nullptr if entity does not have ChildRefCollection component or if the index is out of bounds. */
-Handle* EntityManager::getChild(Entity entity, int index) {
+Handle EntityManager::getChild(Entity entity, int index) {
 	ChildManager* childRefs = getComponent<ChildManager>(entity);
 	if (childRefs) { // If component exists
 		return childRefs->getChild(index);
 	}
-	return nullptr;
+	return Handle();
 }
 
 std::size_t	EntityManager::getImmediateChildCount(Entity entity) {
@@ -118,7 +118,7 @@ void EntityManager::removeEntity(Entity entity, bool destroy) {
 	if (destroy) {
 		bool updateIterator = getImmediateChildCount(entity) > 0;
 		while (getImmediateChildCount(entity) > 0) {
-			destroyEntity(getChild(entity, 0)->getEntity());
+			destroyEntity(getChild(entity, 0).getEntity());
 		}
 		// Update the iterator if children were removed.
 		if (updateIterator) {
@@ -172,9 +172,9 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	// Update parent ref in Children
 	std::size_t childCount = getImmediateChildCount(entity);
 	for (std::size_t i = 0; i < childCount; i++) {
-		Handle* child = getChild(entity, i);
-		if (child) {
-			ParentEntity* parentCmp = child->getComponent<ParentEntity>();
+		Handle child = getChild(entity, i);
+		if (child.refresh()) {
+			ParentEntity* parentCmp = child.getComponent<ParentEntity>();
 			if (parentCmp) {
 				parentCmp->setParent(owner); // Update ref
 			}
@@ -184,7 +184,7 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 	// Notify parent
 	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
 	if (parentCmp) {
-		Handle parent = *parentCmp->getParent();
+		Handle parent = parentCmp->getParent();
 		if (parent.refresh()) {
 			Entity currentParent = parent.getEntity();
 			ChildManager* childManager = getComponent<ChildManager>(currentParent);
@@ -192,7 +192,7 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 				ChildManager newChildManager;
 				addComponent(currentParent, newChildManager);
 				childManager = getComponent<ChildManager>(currentParent);
-				parentCmp->getParent()->update();
+				parentCmp->getParent().update();
 			}
 			childManager->childAdded(owner); // Notify parent
 		}

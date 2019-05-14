@@ -4,30 +4,18 @@
 #include "Alignment.h"
 #include <vector>
 namespace Core {
-	/* Has a set amount of colums and an indefinate amount of rows. Each column may be assigned different widths. All cells have the same height. */
-	class VerticalGridLayoutGroup : public LayoutController {
-	public:
-		VerticalGridLayoutGroup();
-		~VerticalGridLayoutGroup();
+
+	class GridLayoutGroup : public LayoutController {
+		GridLayoutGroup();
+		~GridLayoutGroup();
 
 
-		float cellHeights;
-		std::vector<float> cellWidths;
-		//Alignment startAxis; Acceptable values: Up, Right, Left, Down
-		//Alignment startCorner;
-	};
-	
-	/* Has a set amount of rows and an indefinate amount of colums. Each row may be assigned different heights. All cells have the same width. */
-	class HorizontalGridLayoutGroup : public LayoutController {
-	public:
-		HorizontalGridLayoutGroup() {}
-		~HorizontalGridLayoutGroup() {}
+		void updateLayout() override;
 
-
-		std::vector<float> cellHeights;
-		float cellWidth;
-		//Alignment startAxis; Acceptable values: Up, Right, Left, Down
-		//Alignment startCorner;
+		float cellSize;
+		//Alignment startCorner
+		//Alignment startAxis
+		//unsigned char constraint; // Fixed Row count, Fixed Column Count, Flexible
 	};
 }
 #endif

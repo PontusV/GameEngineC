@@ -7,20 +7,25 @@
 #include "Image.h"
 #include "Panel.h"
 #include "ParentEntity.h"
-#include "Rect.h"
+#include "RectSprite.h"
 #include "Text.h"
 #include "Transform.h"
-#include "Script.h"
+#include "RectTransform.h"
+#include "Behaviour.h"
+#include "UIBehaviour.h"
 #include "Button.h"
 #include "RectButton.h"
 #include "DropDown.h"
-#include "WindowAlignment.h"
+#include "WindowAnchor.h"
 #include "MouseDrag.h"
 #include "LayoutController.h"
+#include "LayoutGroup.h"
+#include "ILayoutElement.h"
 #include "LayoutElement.h"
 #include "HorizontalLayoutGroup.h"
 #include "VerticalLayoutGroup.h"
 #include "GridLayoutGroup.h"
+#include "ContentSizeFitter.h"
 namespace Core {
 	Core::TypeList <
 		Core::Border,
@@ -30,20 +35,24 @@ namespace Core {
 		Core::Image,
 		Core::Panel,
 		Core::ParentEntity,
-		Core::Rect,
+		Core::RectSprite,
 		Core::Text,
 		Core::Transform,
-		Core::Script,
+		Core::RectTransform,
+		Core::Behaviour,
+		Core::UIBehaviour,
 		Core::Button,
 		Core::RectButton,
 		Core::DropDown,
-		Core::WindowAlignment,
+		Core::WindowAnchor,
 		Core::MouseDrag,
 		Core::LayoutController,
+		Core::LayoutGroup,
+		Core::ILayoutElement,
 		Core::LayoutElement,
 		Core::HorizontalLayoutGroup,
 		Core::VerticalLayoutGroup,
-		Core::VerticalGridLayoutGroup,
-		Core::HorizontalGridLayoutGroup
+		Core::GridLayoutGroup,
+		Core::ContentSizeFitter
 	> componentTypeList;
 }

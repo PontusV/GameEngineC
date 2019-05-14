@@ -1,24 +1,22 @@
 #include "DropDown.h"
 #include "Image.h"
-#include "Rect.h"
+#include "RectSprite.h"
 #include "Sprite.h"
 #include "Color.h"
-#include "Rect.h"
 #include <glm/glm.hpp>
 
-#include "Transform.h"
+#include "RectTransform.h"
 #include "RectButton.h"
-#include "Rect.h"
 #include "Text.h"
 #include "TransformMaths.h"
 #include "Input.h"
 
 using namespace Core;
 
-DropDown::DropDown(Text text, int width, int height) : text(text), width(width), height(height), isOpen(false) {
+DropDown::DropDown(Text text) : text(text) {
 }
 
-DropDown::DropDown() : isOpen(false) {
+DropDown::DropDown() {
 }
 
 DropDown::~DropDown() {
@@ -26,14 +24,12 @@ DropDown::~DropDown() {
 
 
 void DropDown::awake() {
+	// Create text
 	if (!owner.hasComponent<Text>())
 		owner.addComponent(text);
 
-	if (!owner.hasComponent<Rect>())
-		owner.addComponent<Rect>(width, height, Color(80, 80, 80, 255), text.getLayerIndex());
-}
-
-void DropDown::update(float deltaTime) {
+	if (!owner.hasComponent<RectSprite>())
+		owner.addComponent<RectSprite>(Color(80, 80, 80, 255), text.getLayerIndex());
 }
 
 void DropDown::onMouseButtonPressedAsButton(int buttoncode, int mods) {
@@ -64,7 +60,7 @@ void DropDown::onMouseButtonReleased(int buttoncode, int mods) {
 
 void DropDown::onHoverover() {
 	if (isOpen) return;
-	Sprite* sprite = owner.getComponent<Rect>();
+	Sprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {
 		sprite->setColor(Color(100, 100, 100, 255));
 	}
@@ -72,7 +68,7 @@ void DropDown::onHoverover() {
 
 void DropDown::onHoverout() {
 	if (isOpen) return;
-	Sprite* sprite = owner.getComponent<Rect>();
+	Sprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {
 		sprite->setColor(Color(80, 80, 80, 255));
 	}
@@ -83,12 +79,12 @@ void DropDown::open() {
 	isOpen = true;
 
 	// Box
-	Transform* transform = owner.getComponent<Transform>();
-	glm::vec2 position = transform->getLocalToWorldMatrix() * glm::vec2(-width/2, height/2);
+	RectTransform* transform = owner.getComponent<RectTransform>();
+	const glm::ivec2& size = transform->getSize();
+	glm::vec2 position = transform->getLocalToWorldMatrix() * glm::vec2(-size.x/2, size.y/2);
 	float z = transform->getZ()+1.0f;
-	Transform newTransform(position.x, position.y, z, Alignment::TOP_LEFT);
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
-		newTransform
+		RectSprite(Color(20, 20, 20, 255), text.getLayerIndex())
 	);
 	// Text Alignment? Left-Middle by default
 
@@ -105,23 +101,23 @@ void DropDown::open() {
 		button.colors[RectButton::HOVER_OVER] = { 80,80,80,255 };
 		button.clickFunction = options[i].function;
 		EntityHandle menuOption = createEntity(owner.getEntityName() + "_DropDownOption_" + std::to_string(i),
-			Transform((float)boxPaddingX, (float)boxPaddingY + yOffset, z + 0.1f, Alignment::TOP_LEFT),
+			RectTransform((float)boxPaddingX, (float)boxPaddingY + yOffset, optionWidth, optionHeight, z + 0.1f, Alignment::TOP_LEFT),
 			button,
-			Rect(optionWidth, optionHeight, { 20,20,20,255 }, text.getLayerIndex())
+			RectSprite({ 20,20,20,255 }, text.getLayerIndex())
 		);
 		menuOption.setParent(menuBox.getEntity());
 
 		// Button Text
 		EntityHandle menuOptionText = createEntity(owner.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),
 			Text(label, optionFont.getFileName(), optionFont.getSize(), optionTextColor, text.getLayerIndex()),
-			Transform((float)5, (float)optionHeight/2, z + 0.1f, Alignment::LEFT)
+			RectTransform((float)5, (float)optionHeight/2, 0, 0, z + 0.1f, Alignment::LEFT)
 		);
 		menuOptionText.setParent(menuOption.getEntity());
 
 		yOffset += optionHeight;
 	}
 	int boxHeight = (int)(yOffset + boxPaddingY * 2);
-	menuBox.addComponent(Rect(boxWidth, boxHeight, Color(20, 20, 20, 255), text.getLayerIndex()));
+	menuBox.addComponent(RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT));
 
 	// Box Border
 	bool border = true;
@@ -130,21 +126,21 @@ void DropDown::open() {
 	if (border) {
 		// left, bottom, right
 		EntityHandle menuBoxBorder = createEntity(owner.getEntityName() + "_DropDownBox_Border",
-			Rect(boxWidth + borderSize*2, boxHeight + borderSize, borderColor, text.getLayerIndex()),
-			Transform((float)-borderSize, 0.0f, z - 0.01f, Alignment::TOP_LEFT)
+			RectSprite(borderColor, text.getLayerIndex()),
+			RectTransform((float)-borderSize, 0.0f, boxWidth + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorder.setParent(menuBox.getEntity());
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(owner.getEntityName() + "_DropDownBox_BorderTop",
-			Rect(boxWidth - width, borderSize, borderColor, text.getLayerIndex()),
-			Transform((float)width, (float)-borderSize, z - 0.01f, Alignment::TOP_LEFT)
+			RectSprite(borderColor, text.getLayerIndex()),
+			RectTransform((float)size.x, (float)-borderSize, boxWidth - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorderTop.setParent(menuBox.getEntity());
 	}
 
 	// Set to Open color
-	owner.getComponent<Rect>()->setColor(Color(20, 20, 20, 255));
+	owner.getComponent<RectSprite>()->setColor(Color(20, 20, 20, 255));
 }
 
 void DropDown::close() {
@@ -153,7 +149,7 @@ void DropDown::close() {
 	// Close
 	menuBox.destroy();
 	// Set to Default color
-	owner.getComponent<Rect>()->setColor(Color(80, 80, 80, 255));
+	owner.getComponent<RectSprite>()->setColor(Color(80, 80, 80, 255));
 }
 void DropDown::addOption(std::string label, ComponentFunctionHandleWrapper function) {
 	options.push_back({label, function});

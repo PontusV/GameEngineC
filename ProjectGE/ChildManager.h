@@ -17,9 +17,9 @@ namespace Core {
 		void childAdded(Handle entity);
 		void childRemoved(Entity entity);
 
-		std::size_t				getChildCount();
-		Handle*					getChild(std::size_t index);
-		std::vector<Handle>&	getChildren();
+		std::size_t getChildCount();
+		Handle getChild(std::size_t index);
+		std::vector<Handle>& getChildren();
 
 	private:
 		std::vector<Handle> children;

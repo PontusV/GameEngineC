@@ -4,7 +4,7 @@
 #define DOUBLE_CLICK_THRESHOLD 0.2f
 
 #include "Sprite.h"
-#include "Transform.h"
+#include "RectTransform.h"
 #include "ComponentGroup.h"
 #include "ComponentArray.h"
 
@@ -23,9 +23,9 @@ namespace Core {
 	class KeyListener;
 
 	// Component Group for getEntityAtPos(x,y)
-	struct SpriteGroup : public ComponentGroup<Sprite, Transform> {
-		ComponentArray<Sprite>&		sprites		= getComponentArray<Sprite>();
-		ComponentArray<Transform>&	transforms	= getComponentArray<Transform>();
+	struct SpriteGroup : public ComponentGroup<Sprite, RectTransform> {
+		ComponentArray<Sprite>&			sprites		= getComponentArray<Sprite>();
+		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
 	};
 
 	class Input {
@@ -53,22 +53,22 @@ namespace Core {
 		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);*/
 
 	private:
-		EntityHandle		getEntityAtPos(float x, float y);
-		void				processInputEvent(const InputEvent& event, EntityHandle& target);
+		EntityHandle getEntityAtPos(float x, float y);
+		void processInputEvent(const InputEvent& event, EntityHandle& target);
 
 		// KEY
-		void				keyPressed(const KeyEvent& event) const;
-		void				keyReleased(const KeyEvent& event) const;
-		const std::string	getButtonName(int keycode) const;
+		void keyPressed(const KeyEvent& event) const;
+		void keyReleased(const KeyEvent& event) const;
+		std::string getButtonName(int keycode) const;
 
 		// MOUSEBUTTON
-		void				mouseButtonPressed(const MouseButtonEvent& event) const;
-		void				mouseButtonReleased(const MouseButtonEvent& event) const;
+		void mouseButtonPressed(const MouseButtonEvent& event) const;
+		void mouseButtonReleased(const MouseButtonEvent& event) const;
 
 	private:
-		Engine*						engine;
-		std::vector<KeyListener*>	keyListeners;
-		std::map<int, std::string>	keyBinds;
+		Engine* engine;
+		std::vector<KeyListener*> keyListeners;
+		std::map<int, std::string> keyBinds;
 
 		// Input cache
 		std::vector<InputEvent> events;
@@ -82,12 +82,12 @@ namespace Core {
 		//std::map<int, std::string> keyBindsReleased;
 
 	private:
-		glm::vec2					mousePosition;
-		bool						mouseMoved;
-		EntityHandle				hoverTarget;
-		EntityHandle				lastClickTarget;
-		float						timeSinceLastClick;
-		bool						leftMouseButtonPressed;
+		glm::vec2 mousePosition;
+		bool mouseMoved;
+		EntityHandle hoverTarget;
+		EntityHandle lastClickTarget;
+		float timeSinceLastClick;
+		bool leftMouseButtonPressed;
 	};
 }
 #endif

@@ -15,12 +15,12 @@ namespace Core {
 		void generate(GLuint width, GLuint height, GLuint internalFormat, GLuint imageFormat, GLuint wrapS, GLuint wrapT, GLuint filterMin, GLuint filterMax, unsigned char* data);
 		float getAlphaAtPoint(int x, int y) const;
 
-		GLuint		ID;
-		GLuint		format;
-		int			nrChannels;
-		glm::ivec2	size; // Size of destination draw area
-		glm::ivec2	sourceSize;
-		glm::vec2	uvCoords[4];
+		GLuint ID;
+		GLuint format;
+		int nrChannels;
+		glm::ivec2 size; // Size of destination draw area
+		glm::ivec2 sourceSize;
+		glm::vec2 uvCoords[4];
 	};
 }
 #endif

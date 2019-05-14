@@ -133,25 +133,25 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 
 	std::size_t& i = verticiesCount;
 
-	buffer[i].vertex = vertices[0];
+	buffer[i].vertex = (glm::ivec2)vertices[0]; // Converts to glm::ivec2 for rounding to prevent textures in a texturemap from clipping into each other
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[0];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = vertices[1];
+	buffer[i].vertex = (glm::ivec2)vertices[1];
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[1];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = vertices[2];
+	buffer[i].vertex = (glm::ivec2)vertices[2];
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[2];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = vertices[3];
+	buffer[i].vertex = (glm::ivec2)vertices[3];
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[3];
 	buffer[i].textureID = textureSlot;

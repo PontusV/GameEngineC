@@ -16,10 +16,11 @@ namespace Core {
 	};
 
 	struct ComponentDataArrayInfo {
-		ComponentDataArrayInfo(ComponentTypeID typeID, std::size_t sizePerEntry) : sizePerEntry(sizePerEntry), typeID(typeID) {}
+		ComponentDataArrayInfo(char* beginPtr, ComponentTypeID typeID, std::size_t size) : size(size), typeID(typeID), beginPtr(beginPtr) {}
 		ComponentTypeID typeID;
-		std::size_t sizePerEntry;
-		char* ptr;
+		std::size_t size;
+		char* beginPtr;
+		//functionPtr to copy constructor for getComponentDataPack(Entity entity)?
 	};
 
 	class ChunkIDCounter {
@@ -35,60 +36,66 @@ namespace Core {
 		~Chunk();
 
 		/* Adds entity and components to the back of the chunk. */
-		template<typename... Ts> void					add(Entity entity, Ts&... componentPack);
-		void											remove(Entity entity, bool destruct = true);
+		template<typename... Ts>
+		void add(Entity entity, Ts&... componentPack);
+		void remove(Entity entity, bool destruct = true);
 
-		template<typename T> void						setComponent(Entity entity, T& component);
-		template<typename T> void						setComponent(std::size_t index, T& component);
+		template<typename T>
+		void setComponent(Entity entity, T& component);
+		template<typename T>
+		void setComponent(std::size_t index, T& component);
 		/* Returns first match. */
-		template<typename T> T*							getComponent(Entity entity);
+		template<typename T>
+		T* getComponent(Entity entity);
 		/* Returns first match. */
-		Component*										getComponent(Entity entity, ComponentType componentType);
-		Component*										getComponent(std::size_t index, ComponentType componentType);
-		Component*										getComponent(std::size_t index, ComponentTypeID componentTypeID);
+		Component* getComponent(Entity entity, ComponentType componentType);
+		Component* getComponent(std::size_t index, ComponentType componentType);
+		Component* getComponent(std::size_t index, ComponentTypeID componentTypeID);
 		/* Returns all components attached to entity, who match with template T */
-		template<typename T> std::vector<Component*>	getComponents(Entity entity);
+		template<typename T>
+		std::vector<Component*> getComponents(Entity entity);
 		/* Returns all components attached to entity, who match with componentType. */
-		std::vector<Component*>							getComponents(Entity entity, ComponentType componentType);
+		std::vector<Component*> getComponents(Entity entity, ComponentType componentType);
 		/* Returns all components attached to entity at index, who match with componentType. */
-		std::vector<Component*>							getComponents(std::size_t index, ComponentType componentType);
+		std::vector<Component*> getComponents(std::size_t index, ComponentType componentType);
 		/* Returns all components attached to entity. */
-		std::vector<Component*>							getComponents(Entity entity);
-		std::vector<ComponentDataBlock>					getComponentDataBlocks(Entity entity);
-
-		Entity*											getEntityPtr(Entity entity);
-		/* Returns start of Entity array. */
-		Entity*											getEntityArrayPtr();
+		std::vector<Component*> getComponents(Entity entity);
+		Entity* getEntityPtr(Entity entity);
+		Entity& getEntity(std::size_t index);
 		/* Returns start of component array containing the exact type from template. */
-		template <typename T> T*						getComponentArrayPtr();
-		/* Returns vector of pointers to the start of all component array containing components types deriving from the type in the template. */
-		template <typename T> std::vector<T*>			getComponentArrayPtrs();
+		template <typename T>
+		char* getComponentBeginPtr();
 		/* Returns info about all ComponentDataArrays matching the ComponentType */
-		std::vector<ComponentDataArrayInfo>				getComponentArrayInfo(ComponentType type);
+		std::vector<ComponentDataArrayInfo> getComponentArrayInfo(ComponentType type);
 
-		void											copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
+		std::vector<ComponentDataBlock> getComponentDataBlocks(Entity entity);
+		void copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
-		bool											contains(Entity entity);
-		bool											isFull();
-		bool											isEmpty();
+		std::size_t getIndex(Entity entity);
+		std::vector<Component*> getComponents(std::size_t index);
 
-		std::size_t										getID();
-		std::size_t										getSize();
+		bool contains(Entity entity);
+		bool isFull();
+		bool isEmpty();
 
-		std::size_t										getIndex(Entity entity);
-		std::vector<Component*>							getComponents(std::size_t index);
+		std::size_t getID();
+		std::size_t	getSize();
+		std::size_t getStride();
 
 	private:
-		void											remove(std::size_t index, bool destroy = true);
-		char*											getComponentArrayPtr(ComponentTypeID typeID);
-		/* Returns all ComponentDataArrays matching the given type. */
-		std::vector<char*>								getComponentArrayPtrs(ComponentType type);
-		Component*										getComponent(std::size_t index, ComponentDataArrayInfo& type);
+		void remove(std::size_t index, bool destroy = true);
+		char* getComponentBeginPtr(ComponentTypeID typeID);
+		Component* getComponent(std::size_t index, ComponentDataArrayInfo& type);
+
+		/* Returns start of Entity array. */
+		char* getEntityBeginPtr();
+		Entity* getEntityPtr(std::size_t index);
 
 	private:
 		std::size_t MAX_SIZE; // Size of entries
 		std::size_t BUFFER_SIZE;
 		char* buffer;
+		std::size_t stride;
 
 		std::size_t id;
 		std::size_t size;
@@ -102,7 +109,7 @@ namespace Core {
 	void Chunk::add(Entity entity, Ts&... componentPack) {
 		if (isFull()) throw std::invalid_argument("Chunk::add::ERROR there is no more room in this chunk!");
 
-		getEntityArrayPtr()[size] = entity;
+		getEntity(size) = entity;
 		(setComponent(size, componentPack), ...);
 		size++;
 	}
@@ -113,14 +120,17 @@ namespace Core {
 		setComponent(index, component);
 	}
 	
-	/* ComponentArrayPtr has to be for type T, and not any of its base classes. */
 	template<typename T>
 	void Chunk::setComponent(std::size_t index, T& component) {
-		T* componentArrayPtr = getComponentArrayPtr<T>();
-		T* dest = &componentArrayPtr[index];
-
-		// Copy-constructor to copy the given component into memory
-		T* newComponent = new(dest) T(component);
+		char* componentBeginPtr = getComponentBeginPtr<T>();
+		if (componentBeginPtr) {
+			void* dest = &componentBeginPtr[index * stride];
+			// Copy-constructor to copy the given component into memory
+			T* newComponent = new(dest) T(component);
+		}
+		else {
+			throw std::invalid_argument("Chunk::setComponent invalid component type! It does not exist in this chunk.");
+		}
 	}
 
 	template<typename T>
@@ -134,20 +144,8 @@ namespace Core {
 	}
 
 	template <typename T>
-	T* Chunk::getComponentArrayPtr() {
-		return (T*)getComponentArrayPtr(typeIDof(T));
-	}
-
-	template <typename T>
-	std::vector<T*> Chunk::getComponentArrayPtrs() {
-		std::vector<T*> arrayVec;
-		std::vector<char*> rawArrayVec = getComponentArrayPtrs(typeof(T));
-		// Convert ptr to T*
-		arrayVec.reserve(rawArrayVec.size());
-		for (char* ptr : rawArrayVec) {
-			arrayVec.push_back(ptr);
-		}
-		return arrayVec;
+	char* Chunk::getComponentBeginPtr() {
+		return getComponentBeginPtr(typeIDof(T));
 	}
 }
 #endif

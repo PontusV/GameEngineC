@@ -1,4 +1,5 @@
 #include "ChildManager.h"
+#include "Behaviour.h"
 
 using namespace Core;
 
@@ -16,6 +17,11 @@ void ChildManager::childAdded(Handle entity) {
 	}
 	// No update
 	children.push_back(entity);
+	// Notify scripts
+	std::vector<Behaviour*> scripts = owner.getComponents<Behaviour>();
+	for (Behaviour* script : scripts) {
+		script->onChildrenChanged();
+	}
 }
 
 void ChildManager::childRemoved(Entity entity) {
@@ -24,16 +30,23 @@ void ChildManager::childRemoved(Entity entity) {
 			children.erase(children.begin() + i);
 		}
 	}
+	// Notify scripts
+	std::vector<Behaviour*> scripts = owner.getComponents<Behaviour>();
+	for (Behaviour* script : scripts) {
+		script->onChildrenChanged();
+	}
 }
 
 std::size_t ChildManager::getChildCount() {
 	return children.size();
 }
 
-Handle* ChildManager::getChild(std::size_t index) {
+Handle ChildManager::getChild(std::size_t index) {
 	if (index >= children.size())
-		return nullptr;
-	return &children[index];
+		return Handle();
+	Handle& child = children[index];
+	child.refresh(); // Make sure it is updated
+	return child;
 }
 
 std::vector<Handle>& ChildManager::getChildren() {

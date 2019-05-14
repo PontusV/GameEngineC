@@ -1,12 +1,12 @@
 #ifndef RECT_BUTTON_H
 #define RECT_BUTTON_H
-#include "Script.h"
+#include "Behaviour.h"
 #include "Color.h"
 #include "ComponentFunctionHandle.h"
 #include <memory>
 namespace Core {
 
-	class RectButton : public Script {
+	class RectButton : public Behaviour {
 	public:
 		enum ButtonState {
 			DEFAULT = 0,
@@ -14,29 +14,25 @@ namespace Core {
 			HOVER_OVER
 		};
 	public:
-		RectButton(int width, int height, unsigned char layerIndex);
+		RectButton(unsigned char layerIndex);
 		RectButton() {}
 		~RectButton();
 
-		void	awake() override;
-		void	onMouseButtonPressedAsButton(int buttoncode, int mods) override;
-		void	onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
-		void	onHoverover() override;
-		void	onHoverout() override;
+		void awake() override;
+		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
+		void onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
+		void onHoverover() override;
+		void onHoverout() override;
 
-		void	setWidth(std::size_t value);
-		void	setHeight(std::size_t value);
-		void	setLayerIndex(unsigned char value);
+		void setLayerIndex(unsigned char value);
 
 	private:
-		void	changeState(ButtonState state);
+		void changeState(ButtonState state);
 
 	public:
 		Color colors[3];
 		ComponentFunctionHandleWrapper clickFunction;
 	private:
-		int width;
-		int height;
 		unsigned char layerIndex;
 
 		ButtonState state;

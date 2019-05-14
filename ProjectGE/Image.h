@@ -13,23 +13,23 @@ namespace Core {
 	class Image : public Sprite {
 	public:
 
-		Image(const char* fileName, unsigned char layerIndex = 0, unsigned int width = 0, unsigned int height = 0);
+		Image(const char* fileName, unsigned char layerIndex = 0);
 		Image();
 
 		~Image();
 		// Loads image if it is not loaded
 		void reload();
-		Texture2D&			getTexture();
-		void				setTexture(const char* fileName, Texture2D& texture);
-		const char*			getFileName() const;
+		Texture2D& getTexture();
+		void setTexture(const char* fileName, Texture2D& texture);
+		const char* getFileName() const;
 
 		// Serializable
 		void serialize(std::ostream& os) const;
 		void deserialize(std::istream& is);
 
 	private:
-		std::string 	fileName;
-		Texture2D		texture;
+		std::string fileName;
+		Texture2D texture;
 	};
 }
 #endif

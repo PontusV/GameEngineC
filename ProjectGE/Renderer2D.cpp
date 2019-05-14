@@ -19,21 +19,21 @@ unsigned char Renderer2D::createLayer() {
 	return layerAmount++;
 }
 
-void Renderer2D::submit(const Texture2D& texture, const Transform& transform, const glm::ivec2& size, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex) {
 	if (clipMaskVertices.size() % 4 != 0) throw std::invalid_argument("Invalid amount of Clip Mask vertices!");
 	if (clipEnabled && clipMaskVertices.size() < 4) throw std::invalid_argument("Too few Clip Mask vertices!");
 
-	const glm::vec2& anchor = transform.getAnchor();
+	const glm::vec2& pivot = transform.getPivot();
 	const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
-	const glm::vec2& rSize = size;
+	glm::vec2 rSize = transform.getSize();
 
 	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
 
-	renderable.vertices[0] = localToWorldMatrix * (rSize * anchor);
-	renderable.vertices[1] = localToWorldMatrix * (glm::vec2(0, rSize.y) + rSize * anchor);
-	renderable.vertices[2] = localToWorldMatrix * (rSize + rSize * anchor);
-	renderable.vertices[3] = localToWorldMatrix * (glm::vec2(rSize.x, 0) + rSize * anchor);
+	renderable.vertices[0] = localToWorldMatrix * transform.getRectOffset();
+	renderable.vertices[1] = localToWorldMatrix * (glm::vec2(0, rSize.y) + transform.getRectOffset());
+	renderable.vertices[2] = localToWorldMatrix * (rSize + transform.getRectOffset());
+	renderable.vertices[3] = localToWorldMatrix * (glm::vec2(rSize.x, 0) + transform.getRectOffset());
 
 	std::copy(std::begin(texture.uvCoords), std::end(texture.uvCoords), std::begin(renderable.uvCoords)); // uv coords
 	renderable.z = transform.getZ();
@@ -54,7 +54,6 @@ void Renderer2D::render(float deltaTime) {
 	postProcessor.render(deltaTime);
 }
 
-/* Sort all Renderables and submit to BatchRenderer. */
 void Renderer2D::flush() {
 	if (renderablesSize == 0)
 		return;
@@ -127,21 +126,21 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::string& text, const Transform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::string& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 
 	// Calculate offset
-	glm::vec2 anchor = transform.getAnchor();
-	float offsetX = anchor.x * textData.size.x;
-	float offsetY = textData.size.y + anchor.y * textData.size.y;
+	glm::vec2 pivot = transform.getPivot();
+	float offsetX = textData.size.x * -pivot.x;
+	float offsetY = textData.size.y * -pivot.y + textData.size.y;
 
 	for (CharTexture2D& c : textTextures) {
 		// Create new Transform for Character Sprite
-		Transform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
+		RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
 		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
-		submit(c.texture, spriteTransform, c.texture.size, textShaderID, color, clipEnabled, clipMaskVertices, layerIndex);
+		submit(c.texture, spriteTransform, textShaderID, color, clipEnabled, clipMaskVertices, layerIndex);
 	}
 }
 

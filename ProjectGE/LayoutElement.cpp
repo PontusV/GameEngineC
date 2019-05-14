@@ -1,7 +1,9 @@
 #include "LayoutElement.h"
 #include "BoxComponent.h"
+#include <algorithm>
 
 using namespace Core;
+
 
 LayoutElement::LayoutElement() {
 }
@@ -11,23 +13,47 @@ LayoutElement::~LayoutElement() {
 }
 
 
-void LayoutElement::setSize(int width, int height) {
-	std::vector<BoxComponent*> boxComponents = owner.getComponents<BoxComponent>();
-	for (std::size_t i = 1; i < boxComponents.size(); i++) {
-		boxComponents[i]->setSize(glm::ivec2(width, height));
-	}
+glm::vec2 LayoutElement::getMinSize() {
+	if (minSizeEnabled)
+		return minSize;
+	return glm::vec2(0, 0);
 }
 
-glm::ivec2 LayoutElement::getSize() {
-	glm::ivec2 size(0,0);
-	std::vector<BoxComponent*> boxComponents = owner.getComponents<BoxComponent>();
-	for (BoxComponent* component : boxComponents) {
-		const glm::ivec2& componentSize = component->getSize();
-		if (componentSize.x > size.x)
-			size.x = componentSize.x;
-		if (componentSize.y > size.y)
-			size.y = componentSize.y;
+glm::vec2 LayoutElement::getPrefSize() {
+	return glm::vec2(std::max(minSize.x, prefSize.x), std::max(minSize.y, prefSize.y));
+}
 
-	}
-	return size;
+glm::vec2 LayoutElement::getFlexibleSize() {
+	if (flexibleSizeEnabled)
+		return flexibleSize;
+	return glm::vec2(1, 1);
+}
+
+void LayoutElement::setMinSize(glm::vec2 size) {
+	minSize = size;
+}
+void LayoutElement::setPrefSize(glm::vec2 size) {
+	prefSize = size;
+}
+void LayoutElement::setFlexibleSize(glm::vec2 size) {
+	flexibleSize = size;
+}
+
+void LayoutElement::setMinSizeEnabled(bool value) {
+	minSizeEnabled = value;
+}
+bool LayoutElement::getMinSizeEnabled() {
+	return minSizeEnabled;
+}
+void LayoutElement::setPrefSizeEnabled(bool value) {
+	prefSizeEnabled = value;
+}
+bool LayoutElement::getPrefSizeEnabled() {
+	return prefSizeEnabled;
+}
+void LayoutElement::setFlexibleSizeEnabled(bool value) {
+	flexibleSizeEnabled = value;
+}
+bool LayoutElement::getFlexibleSizeEnabled() {
+	return flexibleSizeEnabled;
 }

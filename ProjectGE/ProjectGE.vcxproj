@@ -178,14 +178,17 @@
     <ClCompile Include="ComponentHandle.cpp" />
     <ClCompile Include="ComponentType.cpp" />
     <ClCompile Include="ComponentTypeInfo.cpp" />
+    <ClCompile Include="ContentSizeFitter.cpp" />
     <ClCompile Include="FunctionCaller.cpp" />
     <ClCompile Include="DropDown.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GridLayoutGroup.cpp" />
     <ClCompile Include="HorizontalLayoutGroup.cpp" />
     <ClCompile Include="LayoutController.cpp" />
+    <ClCompile Include="LayoutGroup.cpp" />
     <ClCompile Include="MouseDrag.cpp" />
     <ClCompile Include="RectButton.cpp" />
+    <ClCompile Include="RectTransform.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="ComponentLoader.cpp" />
@@ -193,7 +196,7 @@
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParentEntity.cpp" />
     <ClCompile Include="PostProcessor.cpp" />
-    <ClCompile Include="Rect.cpp" />
+    <ClCompile Include="RectSprite.cpp" />
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="BatchRenderer2D.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -201,14 +204,12 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="EntityManager.cpp" />
-    <ClCompile Include="EventListener.cpp" />
-    <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="ComponentRegistry.cpp" />
-    <ClCompile Include="Script.cpp" />
-    <ClCompile Include="ScriptManager.cpp" />
+    <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BehaviourManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -222,9 +223,11 @@
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TransformMaths.cpp" />
+    <ClCompile Include="UIBehaviour.cpp" />
+    <ClCompile Include="UISystem.cpp" />
     <ClCompile Include="VerticalLayoutGroup.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="WindowAlignment.cpp" />
+    <ClCompile Include="WindowAnchor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
@@ -244,25 +247,28 @@
     <ClInclude Include="ComponentRegistry.h" />
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
+    <ClInclude Include="ContentSizeFitter.h" />
     <ClInclude Include="FunctionCaller.h" />
     <ClInclude Include="DropDown.h" />
     <ClInclude Include="EntityLocation.h" />
     <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="GridLayoutGroup.h" />
     <ClInclude Include="HorizontalLayoutGroup.h" />
+    <ClInclude Include="ILayoutElement.h" />
     <ClInclude Include="LayoutController.h" />
+    <ClInclude Include="LayoutGroup.h" />
     <ClInclude Include="MouseDrag.h" />
     <ClInclude Include="RectButton.h" />
+    <ClInclude Include="RectTransform.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
-    <ClInclude Include="Interactable.h" />
     <ClInclude Include="ComponentLoader.h" />
     <ClInclude Include="LayoutElement.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParentEntity.h" />
     <ClInclude Include="PostProcessor.h" />
-    <ClInclude Include="Rect.h" />
+    <ClInclude Include="RectSprite.h" />
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="BatchRenderer2D.h" />
     <ClInclude Include="Chunk.h" />
@@ -274,12 +280,10 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityManager.h" />
-    <ClInclude Include="EventListener.h" />
-    <ClInclude Include="EventManager.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
-    <ClInclude Include="Script.h" />
-    <ClInclude Include="ScriptManager.h" />
+    <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BehaviourManager.h" />
     <ClInclude Include="TransformMaths.h" />
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />
@@ -289,7 +293,6 @@
     <ClInclude Include="KeyListener.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Physics.h" />
-    <ClInclude Include="QuickSort.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="resource2.h" />
@@ -300,9 +303,11 @@
     <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TypeList.h" />
+    <ClInclude Include="UIBehaviour.h" />
+    <ClInclude Include="UISystem.h" />
     <ClInclude Include="VerticalLayoutGroup.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="WindowAlignment.h" />
+    <ClInclude Include="WindowAnchor.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ProjectGE.rc" />

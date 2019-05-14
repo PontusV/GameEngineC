@@ -1,11 +1,11 @@
 #include "Text.h"
 #include "ResourceManager.h"
+//#include "RectTransform.h"
 
 using namespace Core;
 
 
-Text::Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex) : Sprite(layerIndex, 0, 0, color), font(fontAddress, fontSize) {
-	setText(text);
+Text::Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex) : Sprite(layerIndex, color), font(fontAddress, fontSize), text(text) {
 } // Constructor
 
 Text::Text() {
@@ -21,8 +21,14 @@ const char* Text::getText() const {
 void Text::setText(std::string value) {
 	text = value;
 	// set size
-	glm::ivec2 size = ResourceManager::getInstance().getTextSize(text.c_str(), font);
-	setSize(size);
+	/*RectTransform* transform = owner.getComponent<RectTransform>();
+	if (transform) {
+		transform->setSize(getSize());
+	}*/
+}
+
+glm::vec2 Text::getSize() {
+	return ResourceManager::getInstance().getTextSize(text.c_str(), font);
 }
 
 const Font& Text::getFont() const {

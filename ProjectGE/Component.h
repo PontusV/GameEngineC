@@ -12,16 +12,16 @@ namespace Core {
 	public:
 		virtual ~Component() = 0; // Abstract
 
-		EntityHandle&					getOwner();
-		void							setOwner(Handle owner);
+		EntityHandle& getOwner();
+		void setOwner(Handle owner);
 		/* Marks the Component for destruction. */
-		void							destroy();
+		void destroy();
 		/* Looks if the Component is marked for destruction. */
-		bool							isDestroyed();
+		bool isDestroyed();
 
 		// Serializable
-		virtual void					serialize(std::ostream& os) const;
-		virtual void					deserialize(std::istream& is);
+		virtual void serialize(std::ostream& os) const;
+		virtual void deserialize(std::istream& is);
 
 	protected:
 		EntityHandle owner;

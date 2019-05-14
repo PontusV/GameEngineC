@@ -4,7 +4,7 @@
 #include <string>
 
 namespace Core {
-	/* Stores an address to a ttf font and font size. Used to save and load font from file */
+	/* Stores a font size and an address to a ttf font. */
 	class Font : public Serializable {
 	public:
 		static const char* defaultAddress;

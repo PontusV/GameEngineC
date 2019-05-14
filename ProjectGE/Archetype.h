@@ -20,33 +20,37 @@ namespace Core {
 		~Archetype();
 
 		template <typename... Ts>
-		EntityLocation						addEntity(Entity entity, Ts&... components);
-		void								removeEntity(Entity entity, bool destruct = true);					// Destruct decides if the destructor of its components should be called or not
-		void								copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
+		EntityLocation addEntity(Entity entity, Ts&... components);
+		/* @param destruct decides if the destructor of all the attached components should be called or not */
+		void removeEntity(Entity entity, bool destruct = true);
+		void copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
-		template<typename T> void			setComponent(Entity entity, T& component);
-		template<typename T> T*				getComponent(Entity entity);
+		template<typename T>
+		void setComponent(Entity entity, T& component);
+		template<typename T>
+		T* getComponent(Entity entity);
 		/* Returns first match. */
-		Component*							getComponent(Entity entity, ComponentType componentType);
-		std::vector<Component*>				getComponents(Entity entity);
+		Component* getComponent(Entity entity, ComponentType componentType);
+		std::vector<Component*> getComponents(Entity entity);
 
-		bool								isEmpty();
-		bool								match(std::vector<ComponentTypeID> typeIDs);
+		bool isEmpty();
+		bool match(std::vector<ComponentTypeID> typeIDs);
 		/* Returns true if exact type is contained. Will return false if not exact type */
-		bool								containsType(ComponentTypeID typeID);
+		bool containsType(ComponentTypeID typeID);
 
-		std::vector<IComponentTypeInfo>		getTypes();
-		std::vector<ComponentTypeID>		getTypeIDs();
-		std::vector<ComponentDataBlock>		getComponentDataBlocks(Entity entity);
-		EntityLocation						getLocation(Entity entity);
+		std::vector<IComponentTypeInfo> getTypes();
+		std::vector<ComponentTypeID> getTypeIDs();
+		std::vector<ComponentDataBlock> getComponentDataBlocks(Entity entity);
+		EntityLocation getLocation(Entity entity);
 
-		void								clear();
-		bool								operator==(Archetype& other);
+		void clear();
+		bool operator==(Archetype& other);
 
-		std::shared_ptr<Chunk>				getContainer(Entity entity);
+		std::shared_ptr<Chunk> getContainer(Entity entity);
+
 	private:
-		void								createChunk();
-		void								removeChunk(std::size_t index);
+		void createChunk();
+		void removeChunk(std::size_t index);
 
 	private:
 		std::vector<std::shared_ptr<Chunk>> chunks;

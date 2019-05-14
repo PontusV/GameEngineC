@@ -20,14 +20,15 @@ namespace Core {
 		const Font& getFont() const;
 
 		void setText(std::string text);
+		glm::vec2 getSize();
 
 		// Serializable
-		virtual void		serialize(std::ostream& os) const;
-		virtual void		deserialize(std::istream& is);
+		virtual void serialize(std::ostream& os) const;
+		virtual void deserialize(std::istream& is);
 
 	private:
-		std::string		text;	// Replace with vector of Images?
-		Font			font;	//Font address + size
+		std::string text;
+		Font font;
 	};
 }
 #endif

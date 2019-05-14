@@ -40,7 +40,7 @@ void BoxComponent::updateBounds() {
 	Transform* transform = owner.getComponent<Transform>();
 	if (transform) {
 		const glm::mat4& model = transform->getLocalModelMatrix();
-		const glm::vec2& position = transform->getPosition();
+		const glm::vec2& position = transform->getLocalPosition();
 		bounds = Bounds::create(model, position, size);
 	}
 }

@@ -2,11 +2,15 @@
 
 using namespace Core;
 
-VerticalGridLayoutGroup::VerticalGridLayoutGroup()
+GridLayoutGroup::GridLayoutGroup()
 {
 }
 
 
-VerticalGridLayoutGroup::~VerticalGridLayoutGroup()
+GridLayoutGroup::~GridLayoutGroup()
 {
+}
+
+void GridLayoutGroup::updateLayout() {
+
 }

@@ -1,4 +1,5 @@
 #include "ParentEntity.h"
+#include "Behaviour.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -21,8 +22,14 @@ void ParentEntity::setParent(Handle parent) {
 		throw std::invalid_argument("ParentEntity::setParent::ERROR Cannot add invalid Parent");
 	}
 	this->parent = parent;
+	// Notify scripts
+	std::vector<Behaviour*> scripts = owner.getComponents<Behaviour>();
+	for (Behaviour* script : scripts) {
+		script->onParentChanged();
+	}
 }
 
-Handle* ParentEntity::getParent() {
-	return &parent;
+Handle ParentEntity::getParent() {
+	parent.refresh(); // Make sure its updated
+	return parent;
 }

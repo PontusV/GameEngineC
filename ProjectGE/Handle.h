@@ -32,44 +32,53 @@ namespace Core {
 		void updateLocation(EntityLocation location);
 		const EntityLocation& getLocation() const;
 
-		template<typename T> bool				hasComponent();
+		template<typename T>
+		bool hasComponent();
 
-		template<typename T> T*					getComponent();
-		Component*								getComponent(ComponentType type);
-		Component*								getComponent(ComponentTypeID typeID);
-		std::vector<Component*>					getComponents();
-		template<typename T> std::vector<T*>	getComponents();
-		std::vector<Component*>					getComponents(ComponentType type);
+		template<typename T>
+		T* getComponent();
+		Component* getComponent(ComponentType type);
+		Component* getComponent(ComponentTypeID typeID);
+		std::vector<Component*> getComponents();
+		template<typename T>
+		std::vector<T*> getComponents();
+		std::vector<Component*> getComponents(ComponentType type);
 
-		template<typename T> T*					getComponentInChildren();
-		std::vector<Component*>					getComponentsInChildren();
-		template<typename T> std::vector<T*>	getComponentsInChildren();
+		template<typename T>
+		T* getComponentInChildren();
+		std::vector<Component*> getComponentsInChildren();
+		template<typename T>
+		std::vector<T*> getComponentsInChildren();
 
-		template<typename T> T*					getComponentInParents();
-		std::vector<Component*>					getComponentsInParents();
-		template<typename T> std::vector<T*>	getComponentsInParents();
+		template<typename T>
+		T* getComponentInParents();
+		std::vector<Component*> getComponentsInParents();
+		template<typename T>
+		std::vector<T*> getComponentsInParents();
 
 		/* Returns all components attached to the entity and its parents. */
-		std::vector<Component*>					getComponentsUpwards();
+		std::vector<Component*> getComponentsUpwards();
 		/* Returns all components (deriving from T) attached to the entity and its parents. */
-		template<typename T> std::vector<T*>	getComponentsUpwards();
+		template<typename T>
+		std::vector<T*> getComponentsUpwards();
 
 		/* Returns all components attached to the entity, its children and the childrens children, etc... */
-		std::vector<Component*>					getComponentsDownwards();
+		std::vector<Component*> getComponentsDownwards();
 		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
-		template<typename T> std::vector<T*>	getComponentsDownwards();
+		template<typename T>
+		std::vector<T*> getComponentsDownwards();
 
-		Handle*									getParent();
-		Handle*									getChild(std::size_t index);
-		std::size_t								getImmediateChildCount();
-		std::size_t								getChildCount();
+		Handle getParent();
+		Handle getChild(std::size_t index);
+		std::size_t getImmediateChildCount();
+		std::size_t getChildCount();
 	protected:
 		// Data required to update itself
-		EntityManager* manager;
-		Entity entity;
+		EntityManager* manager = nullptr;
+		Entity entity = Entity(0);
 
 	private:
-		EntityLocation locationData;
+		EntityLocation locationData = EntityLocation();
 	};
 	template<typename T>
 	bool Handle::hasComponent() {
@@ -78,7 +87,7 @@ namespace Core {
 
 	template<typename T>
 	T* Handle::getComponent() {
-		return static_cast<T*>(getComponent(typeof(T)));
+		return (T*)getComponent(typeof(T));
 	}
 
 	template<typename T>
@@ -87,7 +96,7 @@ namespace Core {
 		std::vector<T*> castedPtrs; // Copying
 		castedPtrs.reserve(components.size());
 		for (Component* ptr : components) {
-			castedPtrs.push_back(static_cast<T*>(ptr));
+			castedPtrs.push_back((T*)ptr);
 		}
 		return castedPtrs;
 	}
@@ -96,8 +105,8 @@ namespace Core {
 	T* Handle::getComponentInChildren() {
 		std::size_t childCount = getChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
-			Handle* child = getChild(i);
-			if (T* ptr = child->getComponent<T>()) // Check if child has the component
+			Handle child = getChild(i);
+			if (T* ptr = child.getComponent<T>()) // Check if child has the component
 				return ptr;
 		}
 	}
@@ -105,27 +114,23 @@ namespace Core {
 	template<typename T>
 	std::vector<T*> Handle::getComponentsInChildren() {
 		std::vector<T*> components;
-		if (refresh()) {
-			std::size_t childCount = getChildCount();
-			for (std::size_t i = 0; i < childCount; i++) {
-				Handle* child = getChild(i);
-				std::vector<T*> childComponents = child->getComponents<T>();
-				components.insert(components.end(), childComponents.begin(), childComponents.end());
-			}
+		std::size_t childCount = getChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			Handle child = getChild(i);
+			std::vector<T*> childComponents = child.getComponents<T>();
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
 		}
 		return components;
 	}
 
 	template<typename T>
 	T* Handle::getComponentInParents() {
-		if (refresh()) {
-			Handle* parent = getParent();
-			while (parent) {
-				if (T* ptr = parent->getComponent<T>()) // Check if parent has the component
-					return ptr;
+		Handle* parent = getParent();
+		while (parent) {
+			if (T* ptr = parent->getComponent<T>()) // Check if parent has the component
+				return ptr;
 
-				parent = parent->getParent(); // Check next parent
-			}
+			parent = parent->getParent(); // Check next parent
 		}
 		return nullptr;
 	}
@@ -133,14 +138,12 @@ namespace Core {
 	template<typename T>
 	std::vector<T*> Handle::getComponentsInParents() {
 		std::vector<T*> components;
-		if (refresh()) {
-			Handle* parent = getParent();
-			if (parent) {
-				std::vector<T*> parentComponents = parent->getComponents<T>();
-				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
-				parentComponents = parent->getComponentsInParents<T>();
-				components.insert(components.end(), parentComponents.begin(), parentComponents.end());
-			}
+		Handle parent = getParent();
+		if (parent.refresh()) {
+			std::vector<T*> parentComponents = parent.getComponents<T>();
+			components.insert(components.end(), parentComponents.begin(), parentComponents.end());
+			parentComponents = parent.getComponentsInParents<T>();
+			components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 		}
 		return components;
 	}

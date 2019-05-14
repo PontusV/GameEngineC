@@ -61,7 +61,7 @@
     <Filter Include="Header Files\Systems\Entity\Component\Scripts">
       <UniqueIdentifier>{596c150a-de2b-4324-b7a3-d0e6104bde4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Systems\Entity\Component\Scripts\UI">
+    <Filter Include="Header Files\Systems\Entity\Component\UI">
       <UniqueIdentifier>{22dea1ea-06d2-4e4e-b7a2-f28576d44d7c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -94,12 +94,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntityManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EventListener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EventManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
@@ -165,9 +159,6 @@
     <ClCompile Include="ParentEntity.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Rect.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
@@ -201,12 +192,6 @@
     <ClCompile Include="PostProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Script.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -225,9 +210,6 @@
     <ClCompile Include="ComponentFunctionHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowAlignment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MouseDrag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -243,18 +225,36 @@
     <ClCompile Include="GridLayoutGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RectTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectSprite.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UISystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Behaviour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviourManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBehaviour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowAnchor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContentSizeFitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EventListener.h">
-      <Filter>Header Files\Systems\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="EventManager.h">
-      <Filter>Header Files\Systems\Event</Filter>
-    </ClInclude>
     <ClInclude Include="resource2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Algorithm.h">
@@ -326,9 +326,6 @@
     <ClInclude Include="InputEvent.h">
       <Filter>Header Files\Systems\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Interactable.h">
-      <Filter>Header Files\Systems\Input</Filter>
-    </ClInclude>
     <ClInclude Include="KeyListener.h">
       <Filter>Header Files\Systems\Input</Filter>
     </ClInclude>
@@ -341,17 +338,11 @@
     <ClInclude Include="ParentEntity.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Rect.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
     <ClInclude Include="Physics.h">
       <Filter>Header Files\Systems\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Renderable2D.h">
       <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="QuickSort.h">
-      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Renderer2D.h">
       <Filter>Header Files\Systems\Graphics</Filter>
@@ -416,12 +407,6 @@
     <ClInclude Include="ComponentRegistry.h">
       <Filter>Header Files\Systems\Entity\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptManager.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="Script.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>Header Files\Systems\Graphics</Filter>
     </ClInclude>
@@ -429,16 +414,16 @@
       <Filter>Header Files\Systems\Entity\Component</Filter>
     </ClInclude>
     <ClInclude Include="GridLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="HorizontalLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="LayoutController.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="VerticalLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="PostProcessor.h">
       <Filter>Header Files\Systems\Graphics</Filter>
@@ -450,7 +435,7 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="DropDown.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="Anchor.h">
       <Filter>Header Files\Utility</Filter>
@@ -465,13 +450,43 @@
       <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="RectButton.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
     <ClInclude Include="Button.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
     </ClInclude>
-    <ClInclude Include="WindowAlignment.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts\UI</Filter>
+    <ClInclude Include="RectSprite.h">
+      <Filter>Header Files\Systems\Entity\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Header Files\Systems\Entity\Component\Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviourManager.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowAnchor.h">
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIBehaviour.h">
+      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UISystem.h">
+      <Filter>Header Files\Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files\Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="RectTransform.h">
+      <Filter>Header Files\Systems\Entity\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ILayoutElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContentSizeFitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutGroup.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
