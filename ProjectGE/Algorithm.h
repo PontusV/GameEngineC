@@ -19,8 +19,9 @@ namespace Core {
 
 		/* Returns true if the position is inside the rect. */
 		bool hitCheck(float posX, float posY, const RectTransform& transform) {
-			glm::vec2 localPosition = transform.getWorldToLocalMatrix() * glm::vec2(posX, posY);
+			glm::vec2 localPosition = transform.getWorldToLocalMatrix() * glm::inverse(transform.getLocalModelMatrix()) * glm::vec2(posX, posY);
 			Rect rect = transform.getRect();
+
 			return (
 				localPosition.x > rect.x &&
 				localPosition.x < rect.x + rect.w &&
@@ -53,8 +54,8 @@ namespace Core {
 		bool isInsideWindow(int cameraX, int cameraY, int windowWidth, int windowHeight, const RectTransform& rect) {
 			// TODO: Check every corner or if a rect line crosses the window
 			// Currently only checks if pivot point is inside window
-			glm::vec2 offset = rect.getRectOffset();
-			glm::vec2 rectPosition = rect.getLocalToWorldMatrix() * rect.getLocalPosition();
+			glm::vec2 rectPosition = rect.getPosition(); // Pivot point in world space, TODO: Convert to screen space
+
 			int relativeX = (int)(rectPosition.x - cameraX); // Offset
 			int relativeY = (int)(rectPosition.y - cameraY); // Offset
 			return (relativeX > 0 && relativeX < windowWidth &&

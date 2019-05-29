@@ -42,8 +42,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // ------------------------------- Input callbacks -----------------------------------
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key >= 0 && key < 1024)
-	{
+	if (key >= 0 && key < 1024) {
 		Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
 
 		InputEvent event;
@@ -172,6 +171,7 @@ int Engine::start() {
 		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
 		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT)
 	);
+	debugLevel->awake();
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;

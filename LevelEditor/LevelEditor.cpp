@@ -10,6 +10,9 @@
 #include "../ProjectGE/MouseDrag.h"
 #include "../ProjectGE/LayoutElement.h"
 #include "../ProjectGE/HorizontalLayoutGroup.h"
+#include "../ProjectGE/WindowScale.h"
+#include "../ProjectGE/DragAndResize.h"
+#include "../ProjectGE/Inspector.h"
 
 using namespace Core;
 
@@ -40,7 +43,8 @@ int LevelEditor::initiate() {
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }, editorLayer),
-		RectTransform(0, 0, 1920, 25, 10.0f, Alignment::TOP_LEFT)
+		WindowScale(true, 1.0f, false, 0),
+		RectTransform(0, 0, 500, 25, 10.0f, Alignment::TOP_LEFT)
 	);
 	HorizontalLayoutGroup* layoutGroup = menuBar.addComponent<HorizontalLayoutGroup>();
 	layoutGroup->paddingLeft = 1;
@@ -130,20 +134,29 @@ int LevelEditor::initiate() {
 	inspectorLabelRect.setParent(inspectorLabel);
 
 	// Inspector background
-	EntityHandle inspectorBackground = level->createEntity("Inspector_background",
+	EntityHandle inspector = level->createEntity("Inspector_background",
+		Inspector(),
 		RectSprite(Color(100,100,100,255), editorLayer),
 		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspectorBackground.setParent(inspectorLabelRect);
+	inspector.setParent(inspectorLabelRect);
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = level->createEntity("Test_Button",
 		Image("resources/images/invaders.png", 0),
+		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255), editorLayer),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
-		MouseDrag(),
 		Border(1, Color(255,255,255,255), false, editorLayer),
 		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
+	MouseDrag* mouseDrag = button.addComponent<MouseDrag>();
+	mouseDrag->padding = 20;
+	DragAndResize* behaviour = button.addComponent<DragAndResize>();
+	behaviour->edgeSize = 20;
+	behaviour->left = true;
+	behaviour->right = true;
+	behaviour->top = true;
+	behaviour->bottom = true;
 
 	// Level created, calling awake
 	level->awake();

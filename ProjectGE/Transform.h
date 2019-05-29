@@ -16,8 +16,6 @@ namespace Core {
 		void moveX(float value);
 		void moveY(float value);
 
-		/* Pushes model matrix into worldModelMatrix */
-		void pushModelMatrix(const glm::mat4& model);
 		void updateLocalToWorldMatrix(const glm::mat4& model);
 		void resetLocalToWorldMatrix();
 		const glm::mat4& getLocalToWorldMatrix() const;
@@ -31,12 +29,20 @@ namespace Core {
 		const glm::vec2& getLocalPosition() const;
 		/* Returns position in world space. */
 		const glm::vec2 getPosition() const;
-
 		const float& getZ() const;
-		/* Sets local x coord */
+		
+		/* Sets the position in local space. */
+		void setLocalPosition(glm::vec2 pos);
+		/* Sets the position in world space. */
+		void setPosition(glm::vec2 pos);
+		/* Sets x coord in world space. */
 		void setX(float value);
-		/* Sets local y coord */
+		/* Sets y coord in world space. */
 		void setY(float value);
+		/* Sets local x coord */
+		void setLocalX(float value);
+		/* Sets local y coord */
+		void setLocalY(float value);
 		void setZ(float value);
 
 		bool hasChanged();
@@ -48,7 +54,7 @@ namespace Core {
 	protected:
 		glm::mat4 localToWorldMatrix;	// World Model Matrix
 		glm::mat4 worldToLocalMatrix;	// Inverse of worldModelMatrix. Multiply with a world position to get local position
-		glm::vec2 position;				// Local position
+		glm::vec2 position;				// Local position (Position in parent)
 		float z;						// Depth for drawing order
 		float rotation;					// Local rotation in radians
 		float scale;					// Local scale (both width and height atm)

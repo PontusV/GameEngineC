@@ -231,7 +231,7 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		int cameraX = 0;
 		int cameraY = 0;
 		Window& window = engine->getGraphics().getWindow();
-		if (maths::isInsideWindow(cameraX, cameraY, window.getWidth() * 2, window.getHeight() * 2, transform)) {
+		if (maths::isInsideWindow(cameraX, cameraY, window.getWidth(), window.getHeight(), transform)) {
 			allRects.push_back({ transform, Texture2D(), i+1 });
 		}
 	}
@@ -265,4 +265,8 @@ EntityHandle Input::getHoverTarget() {
 }
 const glm::vec2& Input::getMousePosition() const {
 	return mousePosition;
+}
+
+EntityHandle Input::getLastClicked() {
+	return lastClickTarget;
 }

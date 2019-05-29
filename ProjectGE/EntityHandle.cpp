@@ -47,5 +47,8 @@ bool EntityHandle::isChild(Entity entity) {
 	return false;
 }
 std::string EntityHandle::getEntityName() {
-	return manager->getEntityName(entity);
+	if (refresh()) {
+		return manager->getEntityName(entity);
+	}
+	return "Invalid";
 }

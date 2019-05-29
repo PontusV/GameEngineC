@@ -6,13 +6,14 @@
 
 namespace Core {
 
+	/* Manages the position of a Transform component. The position depends on the anchor value, the size of the window and the offset. */
 	class WindowAnchor : public UIBehaviour {
 	public:
 		WindowAnchor();
 		WindowAnchor(Anchor anchor, float offsetX = 0, float offsetY = 0);
 		~WindowAnchor();
 
-		void start() override;
+		void awake() override;
 		void onWindowResize() override;
 
 	public:

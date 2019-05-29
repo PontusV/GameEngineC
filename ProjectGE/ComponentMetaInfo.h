@@ -17,6 +17,7 @@
 #include "RectButton.h"
 #include "DropDown.h"
 #include "WindowAnchor.h"
+#include "WindowScale.h"
 #include "MouseDrag.h"
 #include "LayoutController.h"
 #include "LayoutGroup.h"
@@ -26,6 +27,8 @@
 #include "VerticalLayoutGroup.h"
 #include "GridLayoutGroup.h"
 #include "ContentSizeFitter.h"
+#include "DragAndResize.h"
+#include "Inspector.h"
 namespace Core {
 	Core::TypeList <
 		Core::Border,
@@ -45,6 +48,7 @@ namespace Core {
 		Core::RectButton,
 		Core::DropDown,
 		Core::WindowAnchor,
+		Core::WindowScale,
 		Core::MouseDrag,
 		Core::LayoutController,
 		Core::LayoutGroup,
@@ -53,6 +57,8 @@ namespace Core {
 		Core::HorizontalLayoutGroup,
 		Core::VerticalLayoutGroup,
 		Core::GridLayoutGroup,
-		Core::ContentSizeFitter
+		Core::ContentSizeFitter,
+		Core::DragAndResize,
+		Core::Inspector
 	> componentTypeList;
 }

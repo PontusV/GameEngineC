@@ -11,6 +11,7 @@ namespace Core {
 		float x, y, w, h;
 	};
 
+	/* A Transform with a size and pivot. */
 	class RectTransform : public Transform {
 	public:
 		RectTransform(float x, float y, int width, int height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f);

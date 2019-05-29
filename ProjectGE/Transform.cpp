@@ -64,22 +64,36 @@ void Transform::moveY(float value) {
 	changed = true;
 }
 
+void Transform::setLocalPosition(glm::vec2 pos) {
+	position = pos;
+}
+
+void Transform::setPosition(glm::vec2 pos) {
+	setLocalPosition(getWorldToLocalMatrix() * pos);
+}
+
 void Transform::setX(float value) {
+	glm::vec2 position = getWorldToLocalMatrix() * glm::vec2(value, 0);
+	setLocalX(position.x);
+}
+
+void Transform::setY(float value) {
+	glm::vec2 position = getWorldToLocalMatrix() * glm::vec2(0, value);
+	setLocalX(position.y);
+}
+
+void Transform::setLocalX(float value) {
 	position.x = value;
 	changed = true;
 }
 
-void Transform::setY(float value) {
+void Transform::setLocalY(float value) {
 	position.y = value;
 	changed = true;
 }
 
-void Transform::pushModelMatrix(const glm::mat4& model) {
-	localToWorldMatrix *= model;
-}
-
 void Transform::updateLocalToWorldMatrix(const glm::mat4& model) {
-	localToWorldMatrix = getLocalModelMatrix() * model;
+	localToWorldMatrix = model;
 	worldToLocalMatrix = glm::inverse(localToWorldMatrix);
 	changed = false;
 }

@@ -20,7 +20,6 @@ namespace Core {
 		ComponentTypeID typeID;
 		std::size_t size;
 		char* beginPtr;
-		//functionPtr to copy constructor for getComponentDataPack(Entity entity)?
 	};
 
 	class ChunkIDCounter {

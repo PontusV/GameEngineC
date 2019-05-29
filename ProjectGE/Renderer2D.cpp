@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 #include "BatchConfig.h"
 #include "TransformMaths.h"
+#include <glm/glm.hpp>
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
@@ -23,17 +24,20 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 	if (clipMaskVertices.size() % 4 != 0) throw std::invalid_argument("Invalid amount of Clip Mask vertices!");
 	if (clipEnabled && clipMaskVertices.size() < 4) throw std::invalid_argument("Too few Clip Mask vertices!");
 
-	const glm::vec2& pivot = transform.getPivot();
-	const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
-	glm::vec2 rSize = transform.getSize();
+	
 
 	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
+	
+	glm::mat4 localModelMatrix = transform.getLocalModelMatrix();
+	glm::mat4 localToWorldMatrix = transform.getLocalToWorldMatrix();
+	glm::vec2 rectOffset = transform.getRectOffset();
+	glm::vec2 rSize = transform.getSize();
 
-	renderable.vertices[0] = localToWorldMatrix * transform.getRectOffset();
-	renderable.vertices[1] = localToWorldMatrix * (glm::vec2(0, rSize.y) + transform.getRectOffset());
-	renderable.vertices[2] = localToWorldMatrix * (rSize + transform.getRectOffset());
-	renderable.vertices[3] = localToWorldMatrix * (glm::vec2(rSize.x, 0) + transform.getRectOffset());
+	renderable.vertices[0] = localToWorldMatrix * localModelMatrix * transform.getRectOffset();
+	renderable.vertices[1] = localToWorldMatrix * localModelMatrix * glm::vec2(rectOffset.x, rectOffset.y + rSize.y);
+	renderable.vertices[2] = localToWorldMatrix * localModelMatrix * (rectOffset + rSize);
+	renderable.vertices[3] = localToWorldMatrix * localModelMatrix * glm::vec2(rectOffset.x + rSize.x, rectOffset.y);
 
 	std::copy(std::begin(texture.uvCoords), std::end(texture.uvCoords), std::begin(renderable.uvCoords)); // uv coords
 	renderable.z = transform.getZ();
@@ -139,7 +143,7 @@ void Renderer2D::submitText(const std::string& text, const RectTransform& transf
 		// Create new Transform for Character Sprite
 		RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
-		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
+		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
 		submit(c.texture, spriteTransform, textShaderID, color, clipEnabled, clipMaskVertices, layerIndex);
 	}
 }

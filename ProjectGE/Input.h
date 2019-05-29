@@ -42,15 +42,11 @@ namespace Core {
 
 		// Helper
 		void setMousePosition(glm::vec2 position);
+		/* Returns mouse position in screen space. */
 		const glm::vec2& getMousePosition() const;
 
 		EntityHandle getHoverTarget();
-
-		// Callback functions
-		/*static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-		static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);*/
+		EntityHandle getLastClicked();
 
 	private:
 		EntityHandle getEntityAtPos(float x, float y);
@@ -82,7 +78,7 @@ namespace Core {
 		//std::map<int, std::string> keyBindsReleased;
 
 	private:
-		glm::vec2 mousePosition;
+		glm::vec2 mousePosition;		// Mouse position in screen space
 		bool mouseMoved;
 		EntityHandle hoverTarget;
 		EntityHandle lastClickTarget;

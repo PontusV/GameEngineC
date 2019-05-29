@@ -30,10 +30,12 @@ void updateTransformModel(Transform& root, glm::mat4 modelMatrix, bool matrixCha
 		root.updateLocalToWorldMatrix(modelMatrix);
 		onTransformChange(root);
 	}
-	modelMatrix = root.getLocalToWorldMatrix();
 
 	// Iterate through all children (immediate children iterate through their immediate children)
 	std::size_t childCount = root.getOwner().getImmediateChildCount();
+	if (childCount > 0)
+		modelMatrix = root.getLocalToWorldMatrix() * root.getLocalModelMatrix();
+
 	for (std::size_t childIndex = 0; childIndex < childCount; childIndex++) {
 		Transform* childTransform = root.getOwner().getChild(childIndex).getComponent<Transform>();
 		if (childTransform) {
@@ -47,7 +49,6 @@ void Physics::update(float dt) {
 
 	for (std::size_t i = 0; i < sizeTransform; i++) {
 		Transform& root = rootTransforms.transforms[i];
-		//root.rotate(60 * dt); // Tests
 
 		//glm::mat4 rootModelMatrix = glm::mat4(1.0f);
 		updateTransformModel(root, glm::mat4(1.0f), false);

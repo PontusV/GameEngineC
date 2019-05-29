@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <stdexcept>
 
 #define MAX_TEXTURE_IDS 32
 

@@ -14,15 +14,15 @@ WindowAnchor::~WindowAnchor() {
 }
 
 
-void WindowAnchor::start() {
+void WindowAnchor::awake() {
 	onWindowResize();
 }
 
 void WindowAnchor::onWindowResize() {
-	glm::vec2 resolution = window->getResolution();
 	Transform* transform = owner.getComponent<Transform>();
 	if (transform) {
-		transform->setX(resolution.x * anchor.x + offset.x);
-		transform->setY(resolution.y * anchor.y + offset.y);
+		glm::vec2 resolution = window->getResolution();
+		transform->setLocalX(resolution.x * anchor.x + offset.x);
+		transform->setLocalY(resolution.y * anchor.y + offset.y);
 	}
 }

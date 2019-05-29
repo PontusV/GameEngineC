@@ -29,7 +29,7 @@ namespace Core {
 		virtual void onMouseButtonPressedAsButton(int buttoncode, int mods) {}
 		/* Called when a mouse button was released while the mouse points on the owner. */
 		virtual void onMouseButtonReleasedAsButton(int buttoncode, int mods) {}
-		/* Called when the mouse moves while the left mouse button is held down and the mouse points on the owner. */
+		/* Called when the mouse moves while the left mouse button is held down and the owner is the last Entity to have been clicked on. */
 		virtual void onMouseDrag(float mouseX, float mouseY) {}
 		/* Called when the owner was double clicked on. */
 		virtual void onDoubleClick() {}
@@ -55,6 +55,7 @@ namespace Core {
 	public:
 		bool started;
 		bool enabled;
+		bool runInEditorMode = true;
 
 		static Input* input;
 		static Window* window;

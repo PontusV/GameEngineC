@@ -252,6 +252,15 @@
     <ClCompile Include="LayoutGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowScale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DragAndResize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource2.h">
@@ -486,6 +495,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LayoutGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowScale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DragAndResize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inspector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

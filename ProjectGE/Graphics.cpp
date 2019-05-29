@@ -71,7 +71,7 @@ void Graphics::render(float deltaTime) {
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
 	// Rectangles
 	for (std::size_t i = 0; i < sizeRectangles; i++) {
-		const RectSprite&				rect			= renderableRects.rects[i];
+		const RectSprite&		rect			= renderableRects.rects[i];
 		const RectTransform&	transform		= renderableRects.transforms[i];
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= rect.getColor();
@@ -87,6 +87,8 @@ void Graphics::render(float deltaTime) {
 	// Images
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
+
+		//renderableImages.transforms[i].rotate(60 * deltaTime); // Tesst
 
 		Image&					image		= renderableImages.images[i];
 		const RectTransform&	transform	= renderableImages.transforms[i];
@@ -161,7 +163,7 @@ void Graphics::render(float deltaTime) {
 				}
 
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
-				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix());
+				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
 
 				renderer->submit(texture, lineTransform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 			}

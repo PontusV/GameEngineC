@@ -20,7 +20,7 @@ void UISystem::update() {
 			controller.refresh();
 	}
 
-	// Update Layout Controllers
+	// Update Layout Groups
 	std::size_t layoutGroupSize = layoutGroupComponentGroup.layoutGroups.size();
 	for (std::size_t i = 0; i < layoutGroupSize; i++) {
 		LayoutController& controller = layoutGroupComponentGroup.layoutGroups[i];
