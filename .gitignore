@@ -9,4 +9,5 @@ Debug/*
 Release/*
 *.db
 *.ipch
-.vs/ProjectGE/v15/.suo
+.vs/ProjectGE/v15/*
+.vs/ProjectGE/v16/*
