@@ -24,6 +24,7 @@ void WindowScale::onWindowResize() {
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	if (transform) {
 		glm::vec2 resolution = window->getResolution();
+		if (stretchWidth)
 			transform->setWidth(resolution.x * widthScale);
 		if (stretchHeight)
 			transform->setHeight(resolution.y * heightScale);
