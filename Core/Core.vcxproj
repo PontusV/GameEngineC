@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{743277F7-3306-46A7-8E5E-755E8CE45DBD}</ProjectGuid>
-    <RootNamespace>ProjectGE</RootNamespace>
+    <RootNamespace>Core</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>Core</ProjectName>
   </PropertyGroup>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include; $(ProjectDir)include\ReflectionParser</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -163,6 +163,10 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)Core.h</Command>
+      <Message>Running Reflection Parser</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -281,6 +285,7 @@
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
     <ClInclude Include="ContentSizeFitter.h" />
+    <ClInclude Include="Core.h" />
     <ClInclude Include="DragAndResize.h" />
     <ClInclude Include="FunctionCaller.h" />
     <ClInclude Include="DropDown.h" />
@@ -295,6 +300,7 @@
     <ClInclude Include="MouseDrag.h" />
     <ClInclude Include="RectButton.h" />
     <ClInclude Include="RectTransform.h" />
+    <ClInclude Include="ReflectionMacros.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
@@ -344,9 +350,6 @@
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowAnchor.h" />
     <ClInclude Include="WindowScale.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ProjectGE.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,19 +1,6 @@
 #include "LevelEditor.h"
 #include <GLFW/glfw3.h>
 
-
-#include "../ProjectGE/Level.h"
-#include "../ProjectGE/RectTransform.h"
-#include "../ProjectGE/DropDown.h"
-#include "../ProjectGE/Button.h"
-#include "../ProjectGE/WindowAnchor.h"
-#include "../ProjectGE/MouseDrag.h"
-#include "../ProjectGE/LayoutElement.h"
-#include "../ProjectGE/HorizontalLayoutGroup.h"
-#include "../ProjectGE/WindowScale.h"
-#include "../ProjectGE/DragAndResize.h"
-#include "../ProjectGE/Inspector.h"
-
 using namespace Core;
 
 LevelEditor::LevelEditor() {

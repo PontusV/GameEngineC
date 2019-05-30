@@ -4,9 +4,11 @@
 #include "Sprite.h"
 #include "Color.h"
 #include <cstddef>
+#include "ReflectionMacros.h"
+#include "Border.Border.generated.h"
 
 namespace Core {
-	class Border : public Sprite {
+	CLASS() Border : public Sprite {
 	public:
 
 		Border(std::size_t thickness, Color color, bool inner = false, unsigned int layerIndex = 0, bool top = true, bool right = true, bool bottom = true, bool left = true);

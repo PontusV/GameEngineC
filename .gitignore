@@ -1,5 +1,5 @@
-ProjectGE/Debug/*
-ProjectGE/Release/*
+Core/Debug/*
+Core/Release/*
 LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/resources/*
@@ -9,5 +9,4 @@ Debug/*
 Release/*
 *.db
 *.ipch
-.vs/ProjectGE/v15/*
-.vs/ProjectGE/v16/*
+.vs/*
