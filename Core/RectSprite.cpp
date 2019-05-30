@@ -11,13 +11,3 @@ RectSprite::RectSprite() {
 
 RectSprite::~RectSprite() {
 } // Destructor
-
-// ------------------------------- Serializable ----------------------------------------
-
-void RectSprite::serialize(std::ostream &os) const {
-	Sprite::serialize(os);
-}
-
-void RectSprite::deserialize(std::istream &is) {
-	Sprite::deserialize(is);
-}

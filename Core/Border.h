@@ -4,11 +4,11 @@
 #include "Sprite.h"
 #include "Color.h"
 #include <cstddef>
-#include "ReflectionMacros.h"
 #include "Border.Border.generated.h"
 
 namespace Core {
 	CLASS() Border : public Sprite {
+		GENERATED_BODY()
 	public:
 
 		Border(std::size_t thickness, Color color, bool inner = false, unsigned int layerIndex = 0, bool top = true, bool right = true, bool bottom = true, bool left = true);
@@ -20,13 +20,20 @@ namespace Core {
 		void setInner(bool value);
 		const std::size_t& getBorderThickness() const;
 
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
 	private:
-		bool top, right, bottom, left;
-		bool inner;
-		std::size_t borderThickness;
+		PROPERTY()
+		bool top = true;
+		PROPERTY()
+		bool right = true;
+		PROPERTY()
+		bool bottom = true;
+		PROPERTY()
+		bool left = true;
+		PROPERTY()
+		bool inner = false;
+		PROPERTY()
+		std::size_t borderThickness = 1;
+		PROPERTY()
 		Color color;
 		// padding!
 	};

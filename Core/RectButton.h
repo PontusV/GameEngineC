@@ -4,9 +4,10 @@
 #include "Color.h"
 #include "ComponentFunctionHandle.h"
 #include <memory>
+#include "RectButton.RectButton.generated.h"
 namespace Core {
-
-	class RectButton : public Behaviour {
+	CLASS() RectButton : public Behaviour {
+		GENERATED_BODY()
 	public:
 		enum ButtonState {
 			DEFAULT = 0,
@@ -30,12 +31,16 @@ namespace Core {
 		void changeState(ButtonState state);
 
 	public:
+		PROPERTY()
 		Color colors[3];
+		PROPERTY()
 		ComponentFunctionHandleWrapper clickFunction;
-	private:
-		unsigned char layerIndex;
 
-		ButtonState state;
+	private:
+		PROPERTY()
+		unsigned char layerIndex = 0;
+		PROPERTY()
+		ButtonState state = ButtonState::DEFAULT;
 	};
 }
 #endif

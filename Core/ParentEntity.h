@@ -3,12 +3,13 @@
 
 #include "Component.h"
 #include "Handle.h"
+#include "ParentEntity.ParentEntity.generated.h"
 
 namespace Core {
 
-	class ParentEntity : public Component {
+	CLASS() ParentEntity : public Component {
+		GENERATED_BODY()
 	public:
-
 		ParentEntity(Handle parent);
 		ParentEntity();
 		~ParentEntity();
@@ -17,6 +18,7 @@ namespace Core {
 		Handle getParent();
 
 	private:
+		PROPERTY()
 		Handle parent;
 	};
 }

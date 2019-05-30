@@ -14,13 +14,3 @@ Panel::Panel() {
 
 Panel::~Panel() {
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Panel::serialize(std::ostream& os) const {
-	BoxComponent::serialize(os);
-}
-
-void Panel::deserialize(std::istream& is) {
-	BoxComponent::deserialize(is);
-}

@@ -34,16 +34,3 @@ void Image::setTexture(const char* fileName, Texture2D& texture) {
 const char* Image::getFileName() const {
 	return fileName.c_str();
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Image::serialize(std::ostream& os) const {
-	Sprite::serialize(os);
-
-	os.write(fileName.c_str(), fileName.size() + 1);		// File name
-}
-void Image::deserialize(std::istream& is) {
-	Sprite::deserialize(is);
-
-	std::getline(is, fileName, '\0');						// File name
-}

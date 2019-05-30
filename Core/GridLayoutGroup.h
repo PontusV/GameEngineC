@@ -3,15 +3,20 @@
 #include "LayoutController.h"
 #include "Alignment.h"
 #include <vector>
+#include "GridLayoutGroup.GridLayoutGroup.generated.h"
+
 namespace Core {
 
-	class GridLayoutGroup : public LayoutController {
+	CLASS() GridLayoutGroup : public LayoutController {
+		GENERATED_BODY()
+	public:
 		GridLayoutGroup();
 		~GridLayoutGroup();
 
 
 		void updateLayout() override;
 
+		PROPERTY()
 		float cellSize;
 		//Alignment startCorner
 		//Alignment startAxis

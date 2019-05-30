@@ -1,8 +1,11 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
 #include "Behaviour.h"
+#include "Inspector.Inspector.generated.h"
+
 namespace Core {
-	class Inspector : public Behaviour {
+	CLASS() Inspector : public Behaviour {
+		GENERATED_BODY()
 	public:
 		Inspector();
 		~Inspector();

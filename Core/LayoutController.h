@@ -3,6 +3,7 @@
 #include "UIBehaviour.h"
 #include "ILayoutElement.h"
 #include <glm/glm.hpp>
+#include "LayoutController.LayoutController.generated.h"
 namespace Core {
 
 	class LayoutElement;
@@ -18,7 +19,8 @@ namespace Core {
 		glm::vec2 flexibleSize;
 	};
 
-	class LayoutController : public UIBehaviour {
+	CLASS() LayoutController : public UIBehaviour {
+		GENERATED_BODY()
 	protected:
 		LayoutController();
 

@@ -51,7 +51,7 @@ Bounds& BoxComponent::getBounds() {
 
 // ------------------------------- Serializable ----------------------------------------
 
-void BoxComponent::serialize(std::ostream& os) const {
+/*void BoxComponent::serialize(std::ostream& os) const {
 	Component::serialize(os);
 
 	os.write((char*)&size.x, sizeof(size.x));			// Size x
@@ -63,4 +63,4 @@ void BoxComponent::deserialize(std::istream& is) {
 
 	is.read((char*)&size.x, sizeof(size.x));			// Size x
 	is.read((char*)&size.y, sizeof(size.y));			// Size y
-}
+}*/

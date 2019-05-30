@@ -6,6 +6,7 @@
 #include "ComponentFunctionHandle.h"
 #include "Font.h"
 #include <cstddef>
+#include "DropDown.DropDown.generated.h"
 namespace Core {
 
 	struct DropDownOption {
@@ -14,7 +15,8 @@ namespace Core {
 	};
 
 	/* Adds a Text and Rect component on start() */
-	class DropDown : public Behaviour {
+	CLASS() DropDown : public Behaviour {
+		GENERATED_BODY()
 	public:
 		DropDown(Text text);
 		DropDown();
@@ -35,18 +37,26 @@ namespace Core {
 
 	public:
 		// Settings (set to Default values)
+		PROPERTY()
 		int boxWidth = 200;
+		PROPERTY()
 		int boxPaddingX = 5;
+		PROPERTY()
 		int boxPaddingY = 5;
+		PROPERTY()
 		int optionHeight = 20;
+		PROPERTY()
 		Font optionFont = Font("resources/fonts/segoeui.ttf", 14);
+		PROPERTY()
 		Color optionTextColor = { 255,255,255,255 };
 
 	private:
+		PROPERTY()
 		Text text;
+		PROPERTY()
+		std::vector<DropDownOption> options;
 		bool isOpen = false;
 		EntityHandle menuBox;
-		std::vector<DropDownOption> options;
 	};
 }
 #endif

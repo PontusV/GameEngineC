@@ -2,8 +2,10 @@
 #define MOUSE_DRAG_H
 #include "Behaviour.h"
 #include <glm/glm.hpp>
+#include "MouseDrag.MouseDrag.generated.h"
 namespace Core {
-	class MouseDrag : public Behaviour {
+	CLASS() MouseDrag : public Behaviour {
+		GENERATED_BODY()
 	public:
 		MouseDrag();
 		~MouseDrag();
@@ -16,7 +18,9 @@ namespace Core {
 		float padding = 0; // Padding around the area that triggers the drag event
 
 	private:
+		PROPERTY()
 		bool dragging = false;
+		PROPERTY()
 		glm::vec2 offset;
 	};
 }

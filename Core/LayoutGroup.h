@@ -4,9 +4,11 @@
 #include "ILayoutElement.h"
 #include "Alignment.h"
 #include <glm/glm.hpp>
+#include "LayoutGroup.LayoutGroup.generated.h"
 
 namespace Core {
-	class LayoutGroup : public LayoutController, public ILayoutElement {
+	CLASS() LayoutGroup : public LayoutController, public ILayoutElement {
+		GENERATED_BODY()
 	protected:
 		LayoutGroup();
 	public:
@@ -19,11 +21,17 @@ namespace Core {
 		/* Returns how much extra relative space this element may be allocated if there is additional available space. */
 		glm::vec2 getFlexibleSize();
 
+		PROPERTY()
 		float paddingTop = 0;
+		PROPERTY()
 		float paddingRight = 0;
+		PROPERTY()
 		float paddingBottom = 0;
+		PROPERTY()
 		float paddingLeft = 0;
+		PROPERTY()
 		float spacing = 0;
+		PROPERTY()
 		Alignment childAlignment = Alignment::TOP_LEFT;
 
 	protected:

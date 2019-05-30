@@ -5,10 +5,12 @@
 #include "Entity.h"
 #include <vector>
 #include <cstddef>
+#include "ChildManager.ChildManager.generated.h"
 
 namespace Core {
 
-	class ChildManager : public Component {
+	CLASS() ChildManager : public Component {
+		GENERATED_BODY()
 	public:
 		ChildManager() {}
 		~ChildManager();
@@ -22,6 +24,7 @@ namespace Core {
 		std::vector<Handle>& getChildren();
 
 	private:
+		PROPERTY()
 		std::vector<Handle> children;
 	};
 }

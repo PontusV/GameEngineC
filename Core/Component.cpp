@@ -29,9 +29,7 @@ bool Component::isDestroyed() {
 // ------------------------------- Serializable ----------------------------------------
 
 void Component::serialize(std::ostream& os) const {
-	// Component Type is saved by loader
 }
 
 void Component::deserialize(std::istream& is) {
-	// Component Type is read by loader
 }

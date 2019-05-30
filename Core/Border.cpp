@@ -42,28 +42,3 @@ void Border::setInner(bool value) {
 bool Border::isInner() const {
 	return inner;
 }
-// ------------------------------- Serializable ----------------------------------------
-
-void Border::serialize(std::ostream& os) const {
-	Sprite::serialize(os);
-
-	os.write((char*)&top, sizeof(top));					// top
-	os.write((char*)&right, sizeof(right));				// right
-	os.write((char*)&bottom, sizeof(bottom));			// bottom
-	os.write((char*)&left, sizeof(left));				// left
-
-	os.write((char*)&inner, sizeof(inner));				// inner
-	os.write((char*)&borderThickness, sizeof(borderThickness));	// borderSize
-}
-
-void Border::deserialize(std::istream& is) {
-	Sprite::deserialize(is);
-
-	is.read((char*)&top, sizeof(top));					// top
-	is.read((char*)&right, sizeof(right));				// right
-	is.read((char*)&bottom, sizeof(bottom));			// bottom
-	is.read((char*)&left, sizeof(left));				// left
-
-	is.read((char*)&inner, sizeof(inner));				// inner
-	is.read((char*)&borderThickness, sizeof(borderThickness));	// borderSize
-}

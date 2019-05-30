@@ -46,24 +46,6 @@ bool Sprite::isClipEnabled() const {
 	return clipEnabled;
 }
 
-// ------------------------------- Serializable ----------------------------------------
-
-void Sprite::serialize(std::ostream& os) const {
-	Component::serialize(os);
-
-
-	os.write((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
-	color.serialize(os);												// Color
-}
-
-void Sprite::deserialize(std::istream& is) {
-	Component::deserialize(is);
-
-	is.read((char*)&layerIndex, sizeof(decltype(layerIndex)));			// Layer Index
-	color.deserialize(is);												// Color
-}
-
-
 
 
 

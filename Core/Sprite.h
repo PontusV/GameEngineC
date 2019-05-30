@@ -4,10 +4,12 @@
 #include "BoxComponent.h"
 #include "Color.h"
 #include <glm/glm.hpp>
+#include "Sprite.Sprite.generated.h"
 
 namespace Core {
 	/* 2D Graphic. */
-	class Sprite : public Component {
+	CLASS() Sprite : public Component {
+		GENERATED_BODY()
 	public:
 		virtual ~Sprite() = 0; // Abstract
 
@@ -23,17 +25,17 @@ namespace Core {
 		void resetClipping();
 		bool isClipEnabled() const;
 
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
-
 	protected:
 		Sprite(unsigned char layerIndex = 0, Color color = {255, 255, 255, 255});
 
 	private:
+		PROPERTY()
 		Color color;
+		PROPERTY()
 		unsigned char layerIndex;
+		PROPERTY()
 		bool clipEnabled;
+		PROPERTY()
 		std::vector<glm::vec2> clipMaskVertices;
 	};
 }

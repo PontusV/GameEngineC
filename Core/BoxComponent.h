@@ -4,12 +4,14 @@
 #include "Component.h"
 #include "Bounds.h"
 #include <glm/glm.hpp>
+#include "BoxComponent.BoxComponent.generated.h"
 
 namespace Core {
 	/* A type of component with a size.
 	 * Abstract class. Requires a Transform component attached to the same Entity.
 	 */
-	class BoxComponent : public Component {
+	CLASS() BoxComponent : public Component {
+		GENERATED_BODY()
 	public:
 		virtual ~BoxComponent() = 0; // Abstract
 
@@ -24,8 +26,8 @@ namespace Core {
 		void setHeight(int height);
 
 		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
+		//virtual void serialize(std::ostream& os) const;
+		//virtual void deserialize(std::istream& is);
 
 	protected:
 		BoxComponent(int width, int height);
@@ -33,7 +35,9 @@ namespace Core {
 		BoxComponent();
 
 	private:
+		PROPERTY()
 		glm::ivec2 size;
+		PROPERTY()
 		Bounds bounds;
 	};
 }

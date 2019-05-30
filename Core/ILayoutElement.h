@@ -1,11 +1,13 @@
 #ifndef INTERFACE_LAYOUT_ELEMENT_H
 #define INTERFACE_LAYOUT_ELEMENT_H
 #include <glm/glm.hpp>
+#include "ILayoutElement.ILayoutElement.generated.h"
 
 namespace Core {
 
 	/* An interface for components that may be considered elements in a layout. */
-	class ILayoutElement {
+	CLASS() ILayoutElement {
+		GENERATED_BODY()
 	protected:
 		ILayoutElement() {}
 	public:

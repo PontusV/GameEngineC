@@ -3,18 +3,15 @@
 
 #include "Sprite.h"
 #include "Color.h"
+#include "RectSprite.RectSprite.generated.h"
 
 namespace Core {
-	class RectSprite : public Sprite {
+	CLASS() RectSprite : public Sprite {
+		GENERATED_BODY()
 	public:
-
 		RectSprite(Color color, unsigned char layerIndex = 0);
 		RectSprite();
 		~RectSprite();
-
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
 	};
 }
 #endif

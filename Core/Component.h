@@ -1,5 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
+#include "ReflectionMacros.h"
 #include "Serializable.h"
 #include "EntityHandle.h"
 

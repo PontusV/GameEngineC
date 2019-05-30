@@ -2,10 +2,13 @@
 #define DRAG_AND_RESIZE_H
 #include "Behaviour.h"
 #include <glm/glm.hpp>
+#include "DragAndResize.DragAndResize.generated.h"
+
 namespace Core {
 
 	/* Allows resizing of a RectTransform by pulling at its edges and corners */
-	class DragAndResize : public Behaviour {
+	CLASS() DragAndResize : public Behaviour {
+		GENERATED_BODY()
 	public:
 		DragAndResize();
 		~DragAndResize();
@@ -14,10 +17,15 @@ namespace Core {
 		void onMouseDrag(float mouseX, float mouseY) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;
 
+		PROPERTY()
 		bool top = true;
+		PROPERTY()
 		bool right = true;
+		PROPERTY()
 		bool bottom = true;
+		PROPERTY()
 		bool left = true;
+		PROPERTY()
 		float edgeSize = 0;
 
 	private:

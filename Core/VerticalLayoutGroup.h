@@ -3,18 +3,24 @@
 #include "LayoutController.h"
 #include "LayoutGroup.h"
 #include <vector>
+#include "VerticalLayoutGroup.VerticalLayoutGroup.generated.h"
 namespace Core {
 
-	class VerticalLayoutGroup : public LayoutGroup {
+	CLASS() VerticalLayoutGroup : public LayoutGroup {
+		GENERATED_BODY()
 	public:
 		VerticalLayoutGroup();
 		~VerticalLayoutGroup();
 
 
+		PROPERTY()
 		bool shrinkableChildWidth = true; // Determines if the childrens width can be shrunk below their original width
+		PROPERTY()
 		bool shrinkableChildHeight = true; // Determines if the childrens height can be shrunk below their original height
 
+		PROPERTY()
 		bool childForceExpandWidth = true;
+		PROPERTY()
 		bool childForceExpandHeight = true;
 
 	private:

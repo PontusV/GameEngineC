@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 #include <type_traits>
+#include <array>
 
 
 namespace Mirror {
@@ -17,6 +18,25 @@ namespace Mirror {
 
 	template<typename From, typename To>
 	std::enable_if_t<!std::is_convertible<From, To>::value, To> convertType(From from) {
+		throw std::invalid_argument("Cannot convert type!\n");
+	}
+	// Array
+	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
+	std::enable_if_t<std::is_convertible<From, To>::value, std::array<To, ToN>> convertType(From from[FromN]) {
+		// Array conversion for each element
+		if (FromN > ToN)
+			throw std::invalid_argument("Too many elements given!");
+		else if (ToN < FromN)
+			throw std::invalid_argument("Too few elements given!");
+		std::array<To, ToN> result;
+		for (std::size_t i = 0; i < FromN; i++) {
+			result[i] = To(from[i]);
+		}
+		return result;
+	}
+
+	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
+	std::enable_if_t<!std::is_convertible<From, To>::value, std::array<To, ToN>> convertType(From from[FromN]) {
 		throw std::invalid_argument("Cannot convert type!\n");
 	}
 
@@ -53,6 +73,8 @@ namespace Mirror {
 		bool isPointer = false;
 		bool isReference = false;
 		bool isConst = false;
+		bool isArray = false;
+		std::size_t arraySize = 0;
 	};
 
 	struct Variable {
@@ -80,6 +102,15 @@ namespace Mirror {
 		}
 		template<typename ClassType, typename T>
 		void setValue(ClassType* instance, T value) {
+			return ClassType::setValue(instance, name, value);
+		}
+		template<typename T, std::size_t N, typename ClassType>
+		std::array<T, N> getValue(ClassType* instance) {
+			return ClassType::template getValue<T, N>(instance, name);
+		}
+
+		template<typename T, std::size_t N, typename ClassType>
+		void setValue(ClassType* instance, T value[N]) {
 			return ClassType::setValue(instance, name, value);
 		}
 	};

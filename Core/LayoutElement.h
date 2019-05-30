@@ -3,11 +3,13 @@
 #include "Component.h"
 #include "ILayoutElement.h"
 #include <glm/glm.hpp>
+#include "LayoutElement.LayoutElement.generated.h"
 
 namespace Core {
 
 	/* Manages the size and position of immediate children. */
-	class LayoutElement : public Component, public ILayoutElement {
+	CLASS() LayoutElement : public Component, public ILayoutElement {
+		GENERATED_BODY()
 	public:
 		LayoutElement();
 		~LayoutElement();
@@ -31,12 +33,18 @@ namespace Core {
 		bool getFlexibleSizeEnabled();
 
 	private:
+		PROPERTY()
 		glm::vec2 minSize = glm::vec2(50,50);
+		PROPERTY()
 		glm::vec2 prefSize;
+		PROPERTY()
 		glm::vec2 flexibleSize; // Value between 0 - 1
 
+		PROPERTY()
 		bool minSizeEnabled = false;
+		PROPERTY()
 		bool prefSizeEnabled = false;
+		PROPERTY()
 		bool flexibleSizeEnabled = false;
 	};
 	class AspectRatioFitter; // Same as ContentSizeFitter

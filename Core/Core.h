@@ -1,6 +1,7 @@
 /*
  * Contains all includes for the Reflection Parser.
- * All components are required to be included by this header.
+ * All reflected classes are required to be included by this header.
+ * That includes all components.
  */
 #ifndef CORE_H
 #define CORE_H
