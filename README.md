@@ -1,7 +1,7 @@
 # GameEngineC
 C++ Game Engine
 
-This Game Engine in currently a work in progress and is intented to become a high performance 2D game engine. I have created my own Entity Component System (ECS) for this engine and it is still a work in progress.
+This Game Engine in currently a work in progress and is intented to become a high performance 2D game engine. I have created my own Entity Component System (ECS) for this engine.
 
 Compiles with C++ 17
 
