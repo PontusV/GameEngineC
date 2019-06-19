@@ -110,7 +110,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "layerIndex";\
-	newProperty.type.name = "char";\
+	newProperty.type.name = "unsigned char";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -123,7 +123,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual bool getValue3365180733000(std::string propertyName) {\
+bool getValue3365180733000(std::string propertyName) {\
 	if (propertyName == "top") {\
 		return this->top;\
 	}\
@@ -141,13 +141,13 @@ virtual bool getValue3365180733000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual std::size_t getValue3491869076000(std::string propertyName) {\
+std::size_t getValue3491869076000(std::string propertyName) {\
 	if (propertyName == "borderThickness") {\
 		return this->borderThickness;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Color getValue1701103765000(std::string propertyName) {\
+Core::Color getValue1701103765000(std::string propertyName) {\
 	if (propertyName == "color") {\
 		return this->color;\
 	}\
@@ -223,7 +223,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Border::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Border::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, bool value) {\
+bool setValue(std::string propertyName, bool value) {\
 	if (propertyName == "top") {\
 		this->top = value;\
 		return true;\
@@ -246,14 +246,14 @@ virtual bool setValue(std::string propertyName, bool value) {\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, std::size_t value) {\
+bool setValue(std::string propertyName, std::size_t value) {\
 	if (propertyName == "borderThickness") {\
 		this->borderThickness = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Color value) {\
+bool setValue(std::string propertyName, Core::Color value) {\
 	if (propertyName == "color") {\
 		this->color = value;\
 		return true;\

@@ -98,7 +98,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual float getValue2797886853000(std::string propertyName) {\
+float getValue2797886853000(std::string propertyName) {\
 	if (propertyName == "paddingTop") {\
 		return this->paddingTop;\
 	}\
@@ -116,7 +116,7 @@ virtual float getValue2797886853000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Alignment getValue2036400663000(std::string propertyName) {\
+Core::Alignment getValue2036400663000(std::string propertyName) {\
 	if (propertyName == "childAlignment") {\
 		return this->childAlignment;\
 	}\
@@ -182,7 +182,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::LayoutGroup::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, float value) {\
+bool setValue(std::string propertyName, float value) {\
 	if (propertyName == "paddingTop") {\
 		this->paddingTop = value;\
 		return true;\
@@ -205,7 +205,7 @@ virtual bool setValue(std::string propertyName, float value) {\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Alignment value) {\
+bool setValue(std::string propertyName, Core::Alignment value) {\
 	if (propertyName == "childAlignment") {\
 		this->childAlignment = value;\
 		return true;\

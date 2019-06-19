@@ -45,13 +45,13 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual Core::Image* getValue2008884359001(std::string propertyName) {\
+Core::Image* getValue2008884359001(std::string propertyName) {\
 	if (propertyName == "images") {\
 		return this->images;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Color* getValue1701103765001(std::string propertyName) {\
+Core::Color* getValue1701103765001(std::string propertyName) {\
 	if (propertyName == "colors") {\
 		return this->colors;\
 	}\
@@ -97,7 +97,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Button::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Button::" + propertyName + " does not exist!");\
 }\
-virtual bool setArrayValue(std::string propertyName, std::array<Core::Image, 3> value) {\
+bool setArrayValue(std::string propertyName, std::array<Core::Image, 3> value) {\
 	if (propertyName == "images") {\
 		for (std::size_t i = 0; i < 3; i++) {\
 			this->images[i] = value[i];\
@@ -106,7 +106,7 @@ virtual bool setArrayValue(std::string propertyName, std::array<Core::Image, 3> 
 	}\
 	return false;\
 }\
-virtual bool setArrayValue(std::string propertyName, std::array<Core::Color, 3> value) {\
+bool setArrayValue(std::string propertyName, std::array<Core::Color, 3> value) {\
 	if (propertyName == "colors") {\
 		for (std::size_t i = 0; i < 3; i++) {\
 			this->colors[i] = value[i];\

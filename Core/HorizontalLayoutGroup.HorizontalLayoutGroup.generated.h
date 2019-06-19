@@ -149,7 +149,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual bool getValue3365180733000(std::string propertyName) {\
+bool getValue3365180733000(std::string propertyName) {\
 	if (propertyName == "shrinkableChildWidth") {\
 		return this->shrinkableChildWidth;\
 	}\
@@ -216,7 +216,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, bool value) {\
+bool setValue(std::string propertyName, bool value) {\
 	if (propertyName == "shrinkableChildWidth") {\
 		this->shrinkableChildWidth = value;\
 		return true;\

@@ -58,7 +58,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "layerIndex";\
-	newProperty.type.name = "char";\
+	newProperty.type.name = "unsigned char";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -71,13 +71,13 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual std::string getValue2722919607000(std::string propertyName) {\
+std::string getValue2722919607000(std::string propertyName) {\
 	if (propertyName == "fileName") {\
 		return this->fileName;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Texture2D getValue2681426803000(std::string propertyName) {\
+Core::Texture2D getValue2681426803000(std::string propertyName) {\
 	if (propertyName == "texture") {\
 		return this->texture;\
 	}\
@@ -123,14 +123,14 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, std::string value) {\
+bool setValue(std::string propertyName, std::string value) {\
 	if (propertyName == "fileName") {\
 		this->fileName = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Texture2D value) {\
+bool setValue(std::string propertyName, Core::Texture2D value) {\
 	if (propertyName == "texture") {\
 		this->texture = value;\
 		return true;\

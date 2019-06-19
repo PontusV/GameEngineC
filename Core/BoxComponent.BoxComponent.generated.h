@@ -45,13 +45,13 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual glm::ivec2 getValue2153734176000(std::string propertyName) {\
+glm::ivec2 getValue2153734176000(std::string propertyName) {\
 	if (propertyName == "size") {\
 		return this->size;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Bounds getValue3542546387000(std::string propertyName) {\
+Core::Bounds getValue3542546387000(std::string propertyName) {\
 	if (propertyName == "bounds") {\
 		return this->bounds;\
 	}\
@@ -93,14 +93,14 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::BoxComponent::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::BoxComponent::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, glm::ivec2 value) {\
+bool setValue(std::string propertyName, glm::ivec2 value) {\
 	if (propertyName == "size") {\
 		this->size = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Bounds value) {\
+bool setValue(std::string propertyName, Core::Bounds value) {\
 	if (propertyName == "bounds") {\
 		this->bounds = value;\
 		return true;\

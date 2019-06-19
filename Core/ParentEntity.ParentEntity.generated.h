@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual Core::Handle getValue1911159836000(std::string propertyName) {\
+Core::Handle getValue1911159836000(std::string propertyName) {\
 	if (propertyName == "parent") {\
 		return this->parent;\
 	}\
@@ -68,7 +68,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::ParentEntity::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::ParentEntity::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, Core::Handle value) {\
+bool setValue(std::string propertyName, Core::Handle value) {\
 	if (propertyName == "parent") {\
 		this->parent = value;\
 		return true;\

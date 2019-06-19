@@ -45,7 +45,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual glm::vec2 getValue226795177000(std::string propertyName) {\
+glm::vec2 getValue226795177000(std::string propertyName) {\
 	if (propertyName == "anchor") {\
 		return this->anchor;\
 	}\
@@ -86,7 +86,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::WindowAnchor::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, glm::vec2 value) {\
+bool setValue(std::string propertyName, glm::vec2 value) {\
 	if (propertyName == "anchor") {\
 		this->anchor = value;\
 		return true;\

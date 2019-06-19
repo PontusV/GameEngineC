@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "layerIndex";\
-	newProperty.type.name = "char";\
+	newProperty.type.name = "unsigned char";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -45,13 +45,13 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual Core::Color getValue1701103765000(std::string propertyName) {\
+Core::Color getValue1701103765000(std::string propertyName) {\
 	if (propertyName == "color") {\
 		return this->color;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual char getValue2823553821000(std::string propertyName) {\
+unsigned char getValue2802854000(std::string propertyName) {\
 	if (propertyName == "layerIndex") {\
 		return this->layerIndex;\
 	}\
@@ -64,7 +64,7 @@ T getValue_impl(std::string propertyName) {\
 			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
 		}\
 		if (propertyName == "layerIndex") {\
-			return Mirror::convertType<char, T>(getValue2823553821000(propertyName));\
+			return Mirror::convertType<unsigned char, T>(getValue2802854000(propertyName));\
 		}\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getValue_impl<T>(propertyName);\
@@ -93,14 +93,14 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, Core::Color value) {\
+bool setValue(std::string propertyName, Core::Color value) {\
 	if (propertyName == "color") {\
 		this->color = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, char value) {\
+bool setValue(std::string propertyName, unsigned char value) {\
 	if (propertyName == "layerIndex") {\
 		this->layerIndex = value;\
 		return true;\
@@ -114,7 +114,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
 		}\
 		if (propertyName == "layerIndex") {\
-			if (setValue(propertyName, Mirror::convertType<T, char>(value))) return true;\
+			if (setValue(propertyName, Mirror::convertType<T, unsigned char>(value))) return true;\
 		}\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\

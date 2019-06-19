@@ -110,7 +110,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual int getValue2515107422000(std::string propertyName) {\
+int getValue2515107422000(std::string propertyName) {\
 	if (propertyName == "boxWidth") {\
 		return this->boxWidth;\
 	}\
@@ -125,19 +125,19 @@ virtual int getValue2515107422000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Font getValue1469732627000(std::string propertyName) {\
+Core::Font getValue1469732627000(std::string propertyName) {\
 	if (propertyName == "optionFont") {\
 		return this->optionFont;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Color getValue1701103765000(std::string propertyName) {\
+Core::Color getValue1701103765000(std::string propertyName) {\
 	if (propertyName == "optionTextColor") {\
 		return this->optionTextColor;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual Core::Text getValue2684722473000(std::string propertyName) {\
+Core::Text getValue2684722473000(std::string propertyName) {\
 	if (propertyName == "text") {\
 		return this->text;\
 	}\
@@ -213,7 +213,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, int value) {\
+bool setValue(std::string propertyName, int value) {\
 	if (propertyName == "boxWidth") {\
 		this->boxWidth = value;\
 		return true;\
@@ -232,21 +232,21 @@ virtual bool setValue(std::string propertyName, int value) {\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Font value) {\
+bool setValue(std::string propertyName, Core::Font value) {\
 	if (propertyName == "optionFont") {\
 		this->optionFont = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Color value) {\
+bool setValue(std::string propertyName, Core::Color value) {\
 	if (propertyName == "optionTextColor") {\
 		this->optionTextColor = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, Core::Text value) {\
+bool setValue(std::string propertyName, Core::Text value) {\
 	if (propertyName == "text") {\
 		this->text = value;\
 		return true;\

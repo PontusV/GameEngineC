@@ -71,7 +71,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual bool getValue3365180733000(std::string propertyName) {\
+bool getValue3365180733000(std::string propertyName) {\
 	if (propertyName == "stretchWidth") {\
 		return this->stretchWidth;\
 	}\
@@ -80,7 +80,7 @@ virtual bool getValue3365180733000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual float getValue2797886853000(std::string propertyName) {\
+float getValue2797886853000(std::string propertyName) {\
 	if (propertyName == "widthScale") {\
 		return this->widthScale;\
 	}\
@@ -133,7 +133,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::WindowScale::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, bool value) {\
+bool setValue(std::string propertyName, bool value) {\
 	if (propertyName == "stretchWidth") {\
 		this->stretchWidth = value;\
 		return true;\
@@ -144,7 +144,7 @@ virtual bool setValue(std::string propertyName, bool value) {\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, float value) {\
+bool setValue(std::string propertyName, float value) {\
 	if (propertyName == "widthScale") {\
 		this->widthScale = value;\
 		return true;\

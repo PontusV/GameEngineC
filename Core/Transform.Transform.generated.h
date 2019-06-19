@@ -71,13 +71,13 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual glm::vec2 getValue226795177000(std::string propertyName) {\
+glm::vec2 getValue226795177000(std::string propertyName) {\
 	if (propertyName == "position") {\
 		return this->position;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual float getValue2797886853000(std::string propertyName) {\
+float getValue2797886853000(std::string propertyName) {\
 	if (propertyName == "z") {\
 		return this->z;\
 	}\
@@ -137,14 +137,14 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Transform::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Transform::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, glm::vec2 value) {\
+bool setValue(std::string propertyName, glm::vec2 value) {\
 	if (propertyName == "position") {\
 		this->position = value;\
 		return true;\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, float value) {\
+bool setValue(std::string propertyName, float value) {\
 	if (propertyName == "z") {\
 		this->z = value;\
 		return true;\

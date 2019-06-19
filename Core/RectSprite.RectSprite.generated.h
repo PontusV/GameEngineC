@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "layerIndex";\
-	newProperty.type.name = "char";\
+	newProperty.type.name = "unsigned char";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\

@@ -84,7 +84,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-virtual bool getValue3365180733000(std::string propertyName) {\
+bool getValue3365180733000(std::string propertyName) {\
 	if (propertyName == "top") {\
 		return this->top;\
 	}\
@@ -99,7 +99,7 @@ virtual bool getValue3365180733000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-virtual float getValue2797886853000(std::string propertyName) {\
+float getValue2797886853000(std::string propertyName) {\
 	if (propertyName == "edgeSize") {\
 		return this->edgeSize;\
 	}\
@@ -163,7 +163,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::DragAndResize::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " does not exist!");\
 }\
-virtual bool setValue(std::string propertyName, bool value) {\
+bool setValue(std::string propertyName, bool value) {\
 	if (propertyName == "top") {\
 		this->top = value;\
 		return true;\
@@ -182,7 +182,7 @@ virtual bool setValue(std::string propertyName, bool value) {\
 	}\
 	return false;\
 }\
-virtual bool setValue(std::string propertyName, float value) {\
+bool setValue(std::string propertyName, float value) {\
 	if (propertyName == "edgeSize") {\
 		this->edgeSize = value;\
 		return true;\

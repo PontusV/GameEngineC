@@ -114,6 +114,91 @@ namespace Mirror {
 		bool operator!=(const VariableType& other) const {
 			return !(*this == other);
 		}
+		// Data Type Queries
+		bool isNumber() const {
+			if (name == "std::size_t") return true;
+			if (name == "short int") return true;
+			if (name == "unsigned short int") return true;
+			if (name == "unsigned int") return true;
+			if (name == "int") return true;
+			if (name == "long int") return true;
+			if (name == "unsigned long int") return true;
+			if (name == "long long int") return true;
+			if (name == "unsigned long long int") return true;
+			if (name == "char") return true;
+			if (name == "signed char") return true;
+			if (name == "unsigned char") return true;
+			if (name == "float") return true;
+			if (name == "double") return true;
+			if (name == "long double") return true;
+			if (name == "wchar_t") return true;
+			return false;
+		}
+		bool isUnsignedNumber() const {
+			if (name == "std::size_t") return true;
+			if (name == "unsigned short int") return true;
+			if (name == "unsigned int") return true;
+			if (name == "unsigned long int") return true;
+			if (name == "unsigned long long int") return true;
+			if (name == "unsigned char") return true;
+			return false;
+		}
+		bool isSignedNumber() const {
+			if (name == "short int") return true;
+			if (name == "int") return true;
+			if (name == "long int") return true;
+			if (name == "long long int") return true;
+			if (name == "char") return true;
+			if (name == "signed char") return true;
+			if (name == "float") return true;
+			if (name == "double") return true;
+			if (name == "long double") return true;
+			if (name == "wchar_t") return true;
+			return false;
+		}
+		bool isChar() const {
+			if (name == "char") return true;
+			if (name == "signed char") return true;
+			if (name == "wchar_t") return true;
+			return false;
+		}
+		bool isBool() const {
+			if (name == "bool") return true;
+			return false;
+		}
+		bool isCArray() const {
+			return isArray;
+		}
+		bool isString() const {
+			if (name == "std::string") return true;
+			return false;
+		}
+		bool isVector() const {
+			if (name.find("std::vector<") != std::string::npos) return true;
+			return false;
+		}
+		bool isEnum() const {
+			return false;
+		}
+		bool isObject() const {
+			if (isNumber() || isBool() || isString() || isVector() || isEnum())
+				return false;
+			else
+				return true;
+		}
+		// End of Data Type Queries
+		/* Returns the Type from the template. */
+		Type getTemplateType() const {
+			std::size_t index = name.find('<');
+			if (index != std::string::npos) {
+				std::size_t endIndex = name.find('>');
+				if (endIndex != std::string::npos) {
+					std::string typeName = name.substr(index + 1, endIndex - index);
+					return Type{ typeName };
+				}
+			}
+			return Type{};
+		}
 	};
 
 	struct Variable {
