@@ -12,8 +12,8 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(4);\
-	newClass.name = "Core::ChildManager";\
+	Mirror::Class newClass(11);\
+	newClass.name = "Core::Behaviour";\
 	newClass.annotatedAttributes = {"Reflect"};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
 	return newClass;\
@@ -25,11 +25,11 @@ T getValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::Behaviour::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::Behaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T, std::size_t N>\
 std::array<T, N> getArrayValue_impl(std::string propertyName) {\
@@ -37,33 +37,33 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::Behaviour::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::Behaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::Behaviour::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::Behaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::Behaviour::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::Behaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Behaviour::" + propertyName + " does not exist!");\
 }\
 template<typename... Ts>\
 bool invoke_impl(std::string functionName, Ts... args) { return false; }\

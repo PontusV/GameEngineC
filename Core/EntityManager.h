@@ -103,7 +103,7 @@ namespace Core {
 		std::vector<Archetype*> archetypes;
 		std::size_t entityIDCounter;
 
-		std::vector<IFunctionCaller*>	functionQueue;
+		std::vector<IFunctionCaller*> functionQueue;
 		bool isAwake;
 	};
 

@@ -4,69 +4,82 @@
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
+#include <tuple>
 
 #ifdef GENERATED_BODY
 #undef GENERATED_BODY
 #endif
-#define GENERATED_BODY(...) \
-private: \
-Mirror::Class getTypeImpl() { \
-	Mirror::Class newClass(0);\
-	newClass.name = "LayoutController";\
-	newClass.size = sizeof(LayoutController);\
+#define GENERATED_BODY(...)\
+private:\
+static Mirror::Class createType() {\
+	Mirror::Class newClass(18);\
+	newClass.name = "Core::LayoutController";\
 	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::UIBehaviour" });\
 	return newClass;\
 }\
+protected:\
+template<typename T>\
+T getValue_impl(std::string propertyName) {\
+	try {\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::LayoutController::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::LayoutController::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+std::array<T, N> getArrayValue_impl(std::string propertyName) {\
+	try {\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::LayoutController::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::LayoutController::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " does not exist!");\
+}\
+template<typename T>\
+bool setValue_impl(std::string propertyName, T value) {\
+	try {\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::LayoutController::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::LayoutController::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
+	try {\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::LayoutController::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::LayoutController::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " does not exist!");\
+}\
+template<typename... Ts>\
+bool invoke_impl(std::string functionName, Ts... args) { return false; }\
+friend Mirror::Function;\
+friend Mirror::Property;\
+static Mirror::Class getTypeImpl() {\
+	static Mirror::Class type = createType();\
+	return type;\
+}\
+static bool hasProperty(std::string propertyName) {\
+	Mirror::Class type = getTypeImpl();\
+	for (const Mirror::Property& prop : type.properties)\
+		if (prop.name == propertyName) return true;\
+	return false;\
+}\
 public:\
-Mirror::Class getType() {\
+virtual Mirror::Class getType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
 }\
-template<typename T, typename ClassType>\
-static T getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-	} catch(std::exception&) {\
-		std::cout << "The property LayoutController::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property LayoutController::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property LayoutController::" + propertyName + " does not exist in LayoutController!" << "\n";\
-	throw std::invalid_argument("The property LayoutController::" + propertyName + " does not exist in LayoutController!");\
+virtual void serialize(std::ostream& os) const {\
 }\
-template<typename T, std::size_t N, typename ClassType>\
-static std::array<T, N> getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-	} catch(std::exception&) {\
-		std::cout << "The property LayoutController::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property LayoutController::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property LayoutController::" + propertyName + " does not exist in LayoutController!" << "\n";\
-	throw std::invalid_argument("The property LayoutController::" + propertyName + " does not exist in LayoutController!");\
-}\
-template<typename T, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value) {\
-	try {\
-	} catch(std::exception&) {\
-		std::cout << "The property LayoutController::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property LayoutController::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property LayoutController::" + propertyName + " does not exist in LayoutController!" << "\n";\
-	throw std::invalid_argument("The property LayoutController::" + propertyName + " does not exist in LayoutController!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value[N]) {\
-	try {\
-	} catch(std::exception&) {\
-		std::cout << "The property LayoutController::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property LayoutController::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property LayoutController::" + propertyName + " does not exist in LayoutController!" << "\n";\
-	throw std::invalid_argument("The property LayoutController::" + propertyName + " does not exist in LayoutController!");\
-}\
-template<typename ClassType, typename... Args>\
-static void invoke(ClassType* instance, std::string functionName, Args... args) {\
-}\
-void serialize(std::ostream& os) const {\
-}\
-void deserialize(std::istream& is) {\
+virtual void deserialize(std::istream& is) {\
 }
 #endif

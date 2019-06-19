@@ -4,22 +4,22 @@
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
+#include <tuple>
 
 #ifdef GENERATED_BODY
 #undef GENERATED_BODY
 #endif
-#define GENERATED_BODY(...) \
-private: \
-Mirror::Class getTypeImpl() { \
-	Mirror::Class newClass(0);\
-	newClass.name = "HorizontalLayoutGroup";\
-	newClass.size = sizeof(HorizontalLayoutGroup);\
+#define GENERATED_BODY(...)\
+private:\
+static Mirror::Class createType() {\
+	Mirror::Class newClass(21);\
+	newClass.name = "Core::HorizontalLayoutGroup";\
 	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutGroup" });\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "shrinkableChildWidth";\
 	newProperty.type.name = "bool";\
-	newProperty.type.size = sizeof(bool);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -33,7 +33,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "shrinkableChildHeight";\
 	newProperty.type.name = "bool";\
-	newProperty.type.size = sizeof(bool);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -47,7 +46,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "childForceExpandWidth";\
 	newProperty.type.name = "bool";\
-	newProperty.type.size = sizeof(bool);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -61,7 +59,84 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "childForceExpandHeight";\
 	newProperty.type.name = "bool";\
-	newProperty.type.size = sizeof(bool);\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "paddingTop";\
+	newProperty.type.name = "float";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "paddingRight";\
+	newProperty.type.name = "float";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "paddingBottom";\
+	newProperty.type.name = "float";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "paddingLeft";\
+	newProperty.type.name = "float";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "spacing";\
+	newProperty.type.name = "float";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {"Reflect"};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "childAlignment";\
+	newProperty.type.name = "Core::Alignment";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -73,120 +148,174 @@ Mirror::Class getTypeImpl() { \
 	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
+protected:\
+virtual bool getValue3365180733000(std::string propertyName) {\
+	if (propertyName == "shrinkableChildWidth") {\
+		return this->shrinkableChildWidth;\
+	}\
+	if (propertyName == "shrinkableChildHeight") {\
+		return this->shrinkableChildHeight;\
+	}\
+	if (propertyName == "childForceExpandWidth") {\
+		return this->childForceExpandWidth;\
+	}\
+	if (propertyName == "childForceExpandHeight") {\
+		return this->childForceExpandHeight;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+template<typename T>\
+T getValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "shrinkableChildWidth") {\
+			return Mirror::convertType<bool, T>(getValue3365180733000(propertyName));\
+		}\
+		if (propertyName == "shrinkableChildHeight") {\
+			return Mirror::convertType<bool, T>(getValue3365180733000(propertyName));\
+		}\
+		if (propertyName == "childForceExpandWidth") {\
+			return Mirror::convertType<bool, T>(getValue3365180733000(propertyName));\
+		}\
+		if (propertyName == "childForceExpandHeight") {\
+			return Mirror::convertType<bool, T>(getValue3365180733000(propertyName));\
+		}\
+		if (Core::LayoutGroup::hasProperty(propertyName))\
+			return Core::LayoutGroup::getValue_impl<T>(propertyName);\
+		if (Core::LayoutController::hasProperty(propertyName))\
+			return Core::LayoutController::getValue_impl<T>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+std::array<T, N> getArrayValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "shrinkableChildWidth") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "shrinkableChildHeight") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "childForceExpandWidth") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "childForceExpandHeight") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (Core::LayoutGroup::hasProperty(propertyName))\
+			return Core::LayoutGroup::getArrayValue_impl<T, N>(propertyName);\
+		if (Core::LayoutController::hasProperty(propertyName))\
+			return Core::LayoutController::getArrayValue_impl<T, N>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!");\
+}\
+virtual bool setValue(std::string propertyName, bool value) {\
+	if (propertyName == "shrinkableChildWidth") {\
+		this->shrinkableChildWidth = value;\
+		return true;\
+	}\
+	if (propertyName == "shrinkableChildHeight") {\
+		this->shrinkableChildHeight = value;\
+		return true;\
+	}\
+	if (propertyName == "childForceExpandWidth") {\
+		this->childForceExpandWidth = value;\
+		return true;\
+	}\
+	if (propertyName == "childForceExpandHeight") {\
+		this->childForceExpandHeight = value;\
+		return true;\
+	}\
+	return false;\
+}\
+template<typename T>\
+bool setValue_impl(std::string propertyName, T value) {\
+	try {\
+		if (propertyName == "shrinkableChildWidth") {\
+			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+		}\
+		if (propertyName == "shrinkableChildHeight") {\
+			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+		}\
+		if (propertyName == "childForceExpandWidth") {\
+			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+		}\
+		if (propertyName == "childForceExpandHeight") {\
+			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+		}\
+		if (Core::LayoutGroup::setValue_impl<T>(propertyName, value)) return true;\
+		if (Core::LayoutController::setValue_impl<T>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
+	try {\
+		if (propertyName == "shrinkableChildWidth") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "shrinkableChildHeight") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "childForceExpandWidth") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "childForceExpandHeight") {\
+			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+		}\
+		if (Core::LayoutGroup::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+		if (Core::LayoutController::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist!");\
+}\
+template<typename... Ts>\
+bool invoke_impl(std::string functionName, Ts... args) { return false; }\
+friend Mirror::Function;\
+friend Mirror::Property;\
+static Mirror::Class getTypeImpl() {\
+	static Mirror::Class type = createType();\
+	return type;\
+}\
+static bool hasProperty(std::string propertyName) {\
+	Mirror::Class type = getTypeImpl();\
+	for (const Mirror::Property& prop : type.properties)\
+		if (prop.name == propertyName) return true;\
+	return false;\
+}\
 public:\
-Mirror::Class getType() {\
+virtual Mirror::Class getType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
 }\
-template<typename T, typename ClassType>\
-static T getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "shrinkableChildWidth") {\
-			return Mirror::convertType<bool, T>(instance->shrinkableChildWidth);\
-		}\
-		if (propertyName == "shrinkableChildHeight") {\
-			return Mirror::convertType<bool, T>(instance->shrinkableChildHeight);\
-		}\
-		if (propertyName == "childForceExpandWidth") {\
-			return Mirror::convertType<bool, T>(instance->childForceExpandWidth);\
-		}\
-		if (propertyName == "childForceExpandHeight") {\
-			return Mirror::convertType<bool, T>(instance->childForceExpandHeight);\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!" << "\n";\
-	throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static std::array<T, N> getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "shrinkableChildWidth") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "shrinkableChildHeight") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "childForceExpandWidth") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "childForceExpandHeight") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is not an array!");\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!" << "\n";\
-	throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!");\
-}\
-template<typename T, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value) {\
-	try {\
-		if (propertyName == "shrinkableChildWidth") {\
-			instance->shrinkableChildWidth = Mirror::convertType<T, bool>(value);\
-			return;\
-		}\
-		if (propertyName == "shrinkableChildHeight") {\
-			instance->shrinkableChildHeight = Mirror::convertType<T, bool>(value);\
-			return;\
-		}\
-		if (propertyName == "childForceExpandWidth") {\
-			instance->childForceExpandWidth = Mirror::convertType<T, bool>(value);\
-			return;\
-		}\
-		if (propertyName == "childForceExpandHeight") {\
-			instance->childForceExpandHeight = Mirror::convertType<T, bool>(value);\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!" << "\n";\
-	throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value[N]) {\
-	try {\
-		if (propertyName == "shrinkableChildWidth") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "shrinkableChildHeight") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "childForceExpandWidth") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "childForceExpandHeight") {\
-			throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " is an array!");\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!" << "\n";\
-	throw std::invalid_argument("The property HorizontalLayoutGroup::" + propertyName + " does not exist in HorizontalLayoutGroup!");\
-}\
-template<typename ClassType, typename... Args>\
-static void invoke(ClassType* instance, std::string functionName, Args... args) {\
-}\
-void serialize(std::ostream& os) const {\
+virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(shrinkableChildWidth, os);\
 		Mirror::serialize(shrinkableChildHeight, os);\
 		Mirror::serialize(childForceExpandWidth, os);\
 		Mirror::serialize(childForceExpandHeight, os);\
+	Core::LayoutGroup::serialize(os);\
+	Core::LayoutController::serialize(os);\
 }\
-void deserialize(std::istream& is) {\
+virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(shrinkableChildWidth, is);\
 		Mirror::deserialize(shrinkableChildHeight, is);\
 		Mirror::deserialize(childForceExpandWidth, is);\
 		Mirror::deserialize(childForceExpandHeight, is);\
+	Core::LayoutGroup::deserialize(is);\
+	Core::LayoutController::deserialize(is);\
 }
 #endif

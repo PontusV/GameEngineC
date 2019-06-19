@@ -16,9 +16,9 @@ namespace Core {
 		~ContentSizeFitter();
 
 
-		PROPERTY()
+		//PROPERTY() // ENUM
 		Mode horizontalFit = Mode::UNCONSTRAINED;
-		PROPERTY()
+		//PROPERTY() // ENUM
 		Mode verticalFit = Mode::UNCONSTRAINED;
 
 	private:

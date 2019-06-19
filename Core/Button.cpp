@@ -65,27 +65,3 @@ void Button::changeState(ButtonState state) {
 Image* Button::getImages() {
 	return images;
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Button::serialize(std::ostream& os) const {
-	Behaviour::serialize(os);
-
-	for (std::size_t i = 0; i < 3; i++) {
-		images[i].serialize(os);								// Images
-		colors[i].serialize(os);								// Colors
-	}
-
-	os.write((char*)&state, sizeof(state));						// State
-}
-
-void Button::deserialize(std::istream& is) {
-	Behaviour::deserialize(is);
-
-	for (std::size_t i = 0; i < 3; i++) {
-		images[i].deserialize(is);								// Images
-		colors[i].deserialize(is);								// Colors
-	}
-
-	is.read((char*)&state, sizeof(state));						// State
-}

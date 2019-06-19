@@ -9,8 +9,10 @@
 
 namespace Core {
 
+	#include "Button.Button.generated.h"
 	/* A button which manipulates the image component in the same Entity. A button does not function without an image. */
-	class Button : public Behaviour {
+	CLASS() Button : public Behaviour {
+		GENERATED_BODY()
 	public:
 		enum ButtonState {
 			DEFAULT = 0,
@@ -31,13 +33,13 @@ namespace Core {
 		void onHoverout() override;
 
 		Image* getImages();
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
 	private:
 		void changeState(ButtonState state);
 
 	public:
+		PROPERTY()
 		Image images[3];
+		PROPERTY()
 		Color colors[3];
 
 	private:

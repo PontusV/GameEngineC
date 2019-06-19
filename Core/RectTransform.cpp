@@ -59,19 +59,3 @@ const glm::vec2& RectTransform::getPivot() const {
 void RectTransform::setPivot(glm::vec2 pivot) {
 	this->pivot = pivot;
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void RectTransform::serialize(std::ostream& os) const {
-	Transform::serialize(os);
-	os.write((char*)&pivot.x, sizeof(pivot.x));			// Pivot x
-	os.write((char*)&pivot.y, sizeof(pivot.y));			// Pivot y
-}
-
-void RectTransform::deserialize(std::istream& is) {
-	Transform::deserialize(is);
-	is.read((char*)&pivot.x, sizeof(pivot.x));			// Pivot x
-	is.read((char*)&pivot.y, sizeof(pivot.y));			// Pivot y
-
-	changed = true;
-}

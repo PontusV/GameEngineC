@@ -53,7 +53,7 @@ namespace Core {
 	private:
 		PROPERTY()
 		Text text;
-		PROPERTY()
+		//PROPERTY()
 		std::vector<DropDownOption> options;
 		bool isOpen = false;
 		EntityHandle menuBox;

@@ -11,8 +11,11 @@ namespace Core {
 		float x, y, w, h;
 	};
 
+	#include "RectTransform.RectTransform.generated.h"
+
 	/* A Transform with a size and pivot. */
-	class RectTransform : public Transform {
+	CLASS() RectTransform : public Transform {
+		GENERATED_BODY()
 	public:
 		RectTransform(float x, float y, int width, int height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f);
 		RectTransform();
@@ -30,16 +33,14 @@ namespace Core {
 		Rect getRect() const;
 		glm::vec2 getRectOffset() const;
 
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
-
 	private:
 		/* Notifies UIBehaviours of a change in size */
 		void notifyResize();
 
 	private:
+		PROPERTY()
 		glm::vec2 size;	// Size of the rect
+		PROPERTY()
 		glm::vec2 pivot;	// The position the Entity scales and rotates around
 	};
 }

@@ -6,6 +6,11 @@
 #ifndef CORE_H
 #define CORE_H
 
+#ifdef REFLECTION_PARSER
+#include <vector>
+#include "include/glm/glm.hpp"
+#endif
+
 #include "ReflectionMacros.h"
 // All components
 #include "Border.h"

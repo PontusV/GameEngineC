@@ -7,22 +7,46 @@
 #include <stdexcept>
 #include <type_traits>
 #include <array>
+#include <tuple>
+#include <functional> // std::ref
 
 
 namespace Mirror {
 	// Type Conversion helper for the generated headers
 	template<typename From, typename To>
 	std::enable_if_t<std::is_convertible<From, To>::value, To> convertType(From from) {
-		return To(from);
+		return static_cast<To>(from);
 	}
 
 	template<typename From, typename To>
 	std::enable_if_t<!std::is_convertible<From, To>::value, To> convertType(From from) {
 		throw std::invalid_argument("Cannot convert type!\n");
 	}
+
+	// Array
+	/*template<typename From, typename To>
+	std::enable_if_t<std::is_array<From>::value && std::is_array<To>::value && std::is_same<From, To>::value, To*> convertType(From from) {
+		return from;
+	}
+
+	template<typename From, typename To>
+	std::enable_if_t<!std::is_array<From>::value && std::is_array<To>::value, To*> convertType(From from) {
+		throw std::invalid_argument("Cannot convert type!\n");
+	}
+
+	template<typename From, typename To>
+	std::enable_if_t<std::is_array<From>::value && !std::is_array<To>::value, To*> convertType(From from) {
+		throw std::invalid_argument("Cannot convert type!\n");
+	}
+
+	template<typename From, typename To>
+	std::enable_if_t<std::is_array<From>::value && std::is_array<To>::value && !std::is_same<From, To>::value, To*> convertType(From from) {
+		throw std::invalid_argument("Cannot convert type!\n");
+	}*/
+
 	// Array
 	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
-	std::enable_if_t<std::is_convertible<From, To>::value, std::array<To, ToN>> convertType(From from[FromN]) {
+	std::enable_if_t<std::is_convertible<From, To>::value, std::array<To, ToN>> convertArrayType(From from[FromN]) {
 		// Array conversion for each element
 		if (FromN > ToN)
 			throw std::invalid_argument("Too many elements given!");
@@ -30,30 +54,35 @@ namespace Mirror {
 			throw std::invalid_argument("Too few elements given!");
 		std::array<To, ToN> result;
 		for (std::size_t i = 0; i < FromN; i++) {
-			result[i] = To(from[i]);
+			result[i] = static_cast<To>(from[i]);
 		}
 		return result;
 	}
 
 	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
-	std::enable_if_t<!std::is_convertible<From, To>::value, std::array<To, ToN>> convertType(From from[FromN]) {
+	std::enable_if_t<!std::is_convertible<From, To>::value, std::array<To, ToN>> convertArrayType(From from[FromN]) {
 		throw std::invalid_argument("Cannot convert type!\n");
 	}
 
 	// Helper for invoke
-	// Invoke member function
-	template<typename Fn, typename ClassType, typename... Args>
-	std::enable_if_t<std::is_member_function_pointer<Fn>::value && std::is_invocable<Fn, ClassType, Args...>::value, void> invoke(Fn callable, ClassType* instance, Args... args) {
+	// Invoke const member function
+	template<typename R, typename Class, typename... FnArgs, typename ClassType, typename... Args>
+	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...) const, ClassType, Args&&...>::value, void> invoke(R(Class::*callable)(FnArgs...) const, ClassType* instance, Args&&... args) {
+		(instance->*callable)(args...);
+	}
+	// Invoke non-const member function
+	template<typename R, typename Class, typename... FnArgs, typename ClassType, typename... Args>
+	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...), ClassType, Args&&...>::value, void> invoke(R(Class::* callable)(FnArgs...), ClassType* instance, Args&&... args) {
 		(instance->*callable)(args...);
 	}
 	// Invoke static function
-	template<typename Fn, typename ClassType, typename... Args>
-	std::enable_if_t<!std::is_member_function_pointer<Fn>::value && std::is_invocable<Fn, Args...>::value, void> invoke(Fn callable, ClassType* instance, Args... args) {
-		(*callable)(args...);
+	template<typename R, typename... FnArgs, typename ClassType, typename... Args>
+	std::enable_if_t<std::is_invocable<R(*)(FnArgs...), Args&&...>::value, void> invoke(R(*callable)(FnArgs...), ClassType* instance, Args&&... args) {
+		(*callable)((FnArgs)args...);
 	}
 
 	template<typename Fn, typename... Args>
-	std::enable_if_t<!std::is_invocable<Fn, Args...>::value, void> invoke(Fn callable, Args... args) {
+	std::enable_if_t<!std::is_invocable<Fn, Args&&...>::value, void> invoke(Fn callable, Args&&... args) {
 		std::cout << "Cannot invoke with incompatible arguments!\n";
 	}
 
@@ -66,7 +95,6 @@ namespace Mirror {
 
 	struct Type {
 		std::string name;
-		size_t size = 0;
 	};
 
 	struct VariableType : public Type {
@@ -75,11 +103,28 @@ namespace Mirror {
 		bool isConst = false;
 		bool isArray = false;
 		std::size_t arraySize = 0;
+		bool operator==(const VariableType& other) const {
+			int pointerCount = isPointer + isArray;
+			int otherPointerCount = other.isPointer + other.isArray;
+			return isReference == other.isReference &&
+				isConst == other.isConst &&
+				pointerCount == otherPointerCount &&
+				name == other.name;
+		}
+		bool operator!=(const VariableType& other) const {
+			return !(*this == other);
+		}
 	};
 
 	struct Variable {
 		VariableType type;
 		std::string name;
+		bool operator==(const Variable& other) const {
+			return name == other.name && type == other.type;
+		}
+		bool operator!=(const Variable& other) const {
+			return !(*this == other);
+		}
 	};
 
 	struct ClassMember {
@@ -98,20 +143,19 @@ namespace Mirror {
 	struct Property : public Variable, public ClassMember {
 		template<typename T, typename ClassType>
 		T getValue(ClassType* instance) {
-			return ClassType::template getValue<T>(instance, name);
+			return instance->getValue_impl<T>(name);
+		}
+		template<typename T, std::size_t N, typename ClassType>
+		std::array<T, N> getArrayValue(ClassType* instance) {
+			return instance->getArrayValue_impl<T, N>(name);
 		}
 		template<typename ClassType, typename T>
 		void setValue(ClassType* instance, T value) {
-			return ClassType::setValue(instance, name, value);
+			instance->setValue_impl(name, value);
 		}
 		template<typename T, std::size_t N, typename ClassType>
-		std::array<T, N> getValue(ClassType* instance) {
-			return ClassType::template getValue<T, N>(instance, name);
-		}
-
-		template<typename T, std::size_t N, typename ClassType>
-		void setValue(ClassType* instance, T value[N]) {
-			return ClassType::setValue(instance, name, value);
+		void setArrayValue(ClassType* instance, T(&value)[N]) {
+			instance->setArrayValue_impl<T, N>(name, value);
 		}
 	};
 
@@ -122,7 +166,16 @@ namespace Mirror {
 		std::vector<Variable> parameters;
 		template<typename ClassType, typename... Ts>
 		void invoke(ClassType* instance, Ts... args) {
-			ClassType::invoke(instance, name, args...);
+			if (!instance->template invoke_impl<Ts...>(name, args...))
+				std::cout << "Warning: Could not invoke " + instance->getType().name + "::" + name + ". The arguments are either invalid or the function does not exist!" << std::endl;
+		}
+		bool operator==(const Function& other) const {
+			if (name != other.name) return false;
+			if (parameters.size() != other.parameters.size()) return false;
+			for (std::size_t i = 0; i < parameters.size();i++) {
+				if (parameters[i] != other.parameters[i]) return false;
+			}
+			return true;
 		}
 	};
 
@@ -131,21 +184,23 @@ namespace Mirror {
 		std::vector<Function> functions;
 		std::vector<Type> baseClasses;
 		std::vector<std::string> annotatedAttributes;
-		Property getProperty(std::string name) {
+		Property getProperty(std::string propertyName) {
 			for (const Property& prop : properties) {
-				if (prop.name == name)
+				if (prop.name == propertyName)
 					return prop;
 			}
-			std::cout << "Property(" << name << ") not found!\n";
+			std::cout << "Property(" << name << "::" << propertyName << ") not found!\n";
 			return Property{};
 		}
-		Function getFunction(std::string name) {
+		Function getFunction(std::string functionName) {
 			for (const Function& fun : functions) {
-				if (fun.name == name)
+				if (fun.name == functionName)
 					return fun;
 			}
-			std::cout << "Function(" << name << ") not found!\n";
-			return Function{};
+			std::cout << "Function(" << name << "::" << functionName << ") not found!\n";
+			Function invalid{};
+			invalid.name = "INVALID_FUNCTION";
+			return invalid;
 		}
 		bool hasAttribute(std::string attribute) {
 			for (const std::string& entry : annotatedAttributes) {
@@ -161,7 +216,7 @@ namespace Mirror {
 			return typeID != other.typeID;
 		}
 		Class(unsigned int typeID) : typeID(typeID) {}
-	private:
+	public:
 		const unsigned int typeID;
 	};
 }

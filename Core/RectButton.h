@@ -39,7 +39,7 @@ namespace Core {
 	private:
 		PROPERTY()
 		unsigned char layerIndex = 0;
-		PROPERTY()
+		//PROPERTY() // ENUM!
 		ButtonState state = ButtonState::DEFAULT;
 	};
 }

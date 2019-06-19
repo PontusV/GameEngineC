@@ -3,11 +3,13 @@
 #include "ReflectionMacros.h"
 #include "Serializable.h"
 #include "EntityHandle.h"
+#include "Component.Component.generated.h"
 
 typedef std::size_t ComponentTypeID; // Should not be needed here. Remove
 
 namespace Core {
-	class Component : public Serializable {
+	CLASS() Component : public Serializable {
+		GENERATED_BODY()
 	protected:
 		Component();
 	public:
@@ -19,10 +21,6 @@ namespace Core {
 		void destroy();
 		/* Looks if the Component is marked for destruction. */
 		bool isDestroyed();
-
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
 
 	protected:
 		EntityHandle owner;

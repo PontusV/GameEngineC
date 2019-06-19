@@ -4,22 +4,22 @@
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
+#include <tuple>
 
 #ifdef GENERATED_BODY
 #undef GENERATED_BODY
 #endif
-#define GENERATED_BODY(...) \
-private: \
-Mirror::Class getTypeImpl() { \
-	Mirror::Class newClass(0);\
-	newClass.name = "Sprite";\
-	newClass.size = sizeof(Sprite);\
+#define GENERATED_BODY(...)\
+private:\
+static Mirror::Class createType() {\
+	Mirror::Class newClass(2);\
+	newClass.name = "Core::Sprite";\
 	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "color";\
 	newProperty.type.name = "Core::Color";\
-	newProperty.type.size = sizeof(Core::Color);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -33,35 +33,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "layerIndex";\
 	newProperty.type.name = "char";\
-	newProperty.type.size = sizeof(char);\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
-	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "clipEnabled";\
-	newProperty.type.name = "bool";\
-	newProperty.type.size = sizeof(bool);\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
-	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "clipMaskVertices";\
-	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -73,120 +44,130 @@ Mirror::Class getTypeImpl() { \
 	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
+protected:\
+virtual Core::Color getValue1701103765000(std::string propertyName) {\
+	if (propertyName == "color") {\
+		return this->color;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+virtual char getValue2823553821000(std::string propertyName) {\
+	if (propertyName == "layerIndex") {\
+		return this->layerIndex;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+template<typename T>\
+T getValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "color") {\
+			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
+		}\
+		if (propertyName == "layerIndex") {\
+			return Mirror::convertType<char, T>(getValue2823553821000(propertyName));\
+		}\
+		if (Core::Component::hasProperty(propertyName))\
+			return Core::Component::getValue_impl<T>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::Sprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::Sprite::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+std::array<T, N> getArrayValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "color") {\
+			throw std::invalid_argument("The property Core::Sprite::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "layerIndex") {\
+			throw std::invalid_argument("The property Core::Sprite::" + propertyName + " is not an array!");\
+		}\
+		if (Core::Component::hasProperty(propertyName))\
+			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::Sprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::Sprite::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
+}\
+virtual bool setValue(std::string propertyName, Core::Color value) {\
+	if (propertyName == "color") {\
+		this->color = value;\
+		return true;\
+	}\
+	return false;\
+}\
+virtual bool setValue(std::string propertyName, char value) {\
+	if (propertyName == "layerIndex") {\
+		this->layerIndex = value;\
+		return true;\
+	}\
+	return false;\
+}\
+template<typename T>\
+bool setValue_impl(std::string propertyName, T value) {\
+	try {\
+		if (propertyName == "color") {\
+			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+		}\
+		if (propertyName == "layerIndex") {\
+			if (setValue(propertyName, Mirror::convertType<T, char>(value))) return true;\
+		}\
+		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::Sprite::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::Sprite::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
+	try {\
+		if (propertyName == "color") {\
+			throw std::invalid_argument("The property Core::Sprite::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "layerIndex") {\
+			throw std::invalid_argument("The property Core::Sprite::" + propertyName + " is not an array!");\
+		}\
+		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::Sprite::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::Sprite::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
+}\
+template<typename... Ts>\
+bool invoke_impl(std::string functionName, Ts... args) { return false; }\
+friend Mirror::Function;\
+friend Mirror::Property;\
+static Mirror::Class getTypeImpl() {\
+	static Mirror::Class type = createType();\
+	return type;\
+}\
+static bool hasProperty(std::string propertyName) {\
+	Mirror::Class type = getTypeImpl();\
+	for (const Mirror::Property& prop : type.properties)\
+		if (prop.name == propertyName) return true;\
+	return false;\
+}\
 public:\
-Mirror::Class getType() {\
+virtual Mirror::Class getType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
 }\
-template<typename T, typename ClassType>\
-static T getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "color") {\
-			return Mirror::convertType<Core::Color, T>(instance->color);\
-		}\
-		if (propertyName == "layerIndex") {\
-			return Mirror::convertType<unsigned char, T>(instance->layerIndex);\
-		}\
-		if (propertyName == "clipEnabled") {\
-			return Mirror::convertType<bool, T>(instance->clipEnabled);\
-		}\
-		if (propertyName == "clipMaskVertices") {\
-			return Mirror::convertType<int, T>(instance->clipMaskVertices);\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property Sprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Sprite::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property Sprite::" + propertyName + " does not exist in Sprite!" << "\n";\
-	throw std::invalid_argument("The property Sprite::" + propertyName + " does not exist in Sprite!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static std::array<T, N> getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "color") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "layerIndex") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "clipEnabled") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "clipMaskVertices") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is not an array!");\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property Sprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Sprite::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property Sprite::" + propertyName + " does not exist in Sprite!" << "\n";\
-	throw std::invalid_argument("The property Sprite::" + propertyName + " does not exist in Sprite!");\
-}\
-template<typename T, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value) {\
-	try {\
-		if (propertyName == "color") {\
-			instance->color = Mirror::convertType<T, Core::Color>(value);\
-			return;\
-		}\
-		if (propertyName == "layerIndex") {\
-			instance->layerIndex = Mirror::convertType<T, unsigned char>(value);\
-			return;\
-		}\
-		if (propertyName == "clipEnabled") {\
-			instance->clipEnabled = Mirror::convertType<T, bool>(value);\
-			return;\
-		}\
-		if (propertyName == "clipMaskVertices") {\
-			instance->clipMaskVertices = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property Sprite::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Sprite::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property Sprite::" + propertyName + " does not exist in Sprite!" << "\n";\
-	throw std::invalid_argument("The property Sprite::" + propertyName + " does not exist in Sprite!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value[N]) {\
-	try {\
-		if (propertyName == "color") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "layerIndex") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "clipEnabled") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "clipMaskVertices") {\
-			throw std::invalid_argument("The property Sprite::" + propertyName + " is an array!");\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property Sprite::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Sprite::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property Sprite::" + propertyName + " does not exist in Sprite!" << "\n";\
-	throw std::invalid_argument("The property Sprite::" + propertyName + " does not exist in Sprite!");\
-}\
-template<typename ClassType, typename... Args>\
-static void invoke(ClassType* instance, std::string functionName, Args... args) {\
-}\
-void serialize(std::ostream& os) const {\
+virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(color, os);\
 		Mirror::serialize(layerIndex, os);\
-		Mirror::serialize(clipEnabled, os);\
-		Mirror::serialize(clipMaskVertices, os);\
+	Core::Component::serialize(os);\
 }\
-void deserialize(std::istream& is) {\
+virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(color, is);\
 		Mirror::deserialize(layerIndex, is);\
-		Mirror::deserialize(clipEnabled, is);\
-		Mirror::deserialize(clipMaskVertices, is);\
+	Core::Component::deserialize(is);\
 }
 #endif

@@ -25,11 +25,3 @@ void Component::destroy() {
 bool Component::isDestroyed() {
 	return destruct;
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Component::serialize(std::ostream& os) const {
-}
-
-void Component::deserialize(std::istream& is) {
-}

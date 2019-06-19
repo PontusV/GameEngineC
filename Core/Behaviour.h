@@ -7,7 +7,10 @@ namespace Core {
 	class Input;
 	class Window;
 
-	class Behaviour : public Component {
+	#include "Behaviour.Behaviour.generated.h"
+
+	CLASS() Behaviour : public Component {
+		GENERATED_BODY()
 	public:
 		virtual ~Behaviour() = 0; // Abstract
 
@@ -48,9 +51,6 @@ namespace Core {
 
 		void enable();
 		void disable();
-
-		void serialize(std::ostream& os) const {}
-		void deserialize(std::istream& is) {}
 
 	public:
 		bool started;

@@ -33,9 +33,7 @@ namespace Core {
 		Color color;
 		PROPERTY()
 		unsigned char layerIndex;
-		PROPERTY()
 		bool clipEnabled;
-		PROPERTY()
 		std::vector<glm::vec2> clipMaskVertices;
 	};
 }

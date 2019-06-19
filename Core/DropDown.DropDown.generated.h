@@ -4,22 +4,22 @@
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
+#include <tuple>
 
 #ifdef GENERATED_BODY
 #undef GENERATED_BODY
 #endif
-#define GENERATED_BODY(...) \
-private: \
-Mirror::Class getTypeImpl() { \
-	Mirror::Class newClass(0);\
-	newClass.name = "DropDown";\
-	newClass.size = sizeof(DropDown);\
+#define GENERATED_BODY(...)\
+private:\
+static Mirror::Class createType() {\
+	Mirror::Class newClass(14);\
+	newClass.name = "Core::DropDown";\
 	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "boxWidth";\
 	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -33,7 +33,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "boxPaddingX";\
 	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -47,7 +46,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "boxPaddingY";\
 	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -61,7 +59,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "optionHeight";\
 	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -75,7 +72,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "optionFont";\
 	newProperty.type.name = "Core::Font";\
-	newProperty.type.size = sizeof(Core::Font);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -89,7 +85,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "optionTextColor";\
 	newProperty.type.name = "Core::Color";\
-	newProperty.type.size = sizeof(Core::Color);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -103,21 +98,6 @@ Mirror::Class getTypeImpl() { \
 	newProperty = {};\
 	newProperty.name = "text";\
 	newProperty.type.name = "Core::Text";\
-	newProperty.type.size = sizeof(Core::Text);\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
-	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "options";\
-	newProperty.type.name = "int";\
-	newProperty.type.size = sizeof(int);\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -129,167 +109,236 @@ Mirror::Class getTypeImpl() { \
 	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
+protected:\
+virtual int getValue2515107422000(std::string propertyName) {\
+	if (propertyName == "boxWidth") {\
+		return this->boxWidth;\
+	}\
+	if (propertyName == "boxPaddingX") {\
+		return this->boxPaddingX;\
+	}\
+	if (propertyName == "boxPaddingY") {\
+		return this->boxPaddingY;\
+	}\
+	if (propertyName == "optionHeight") {\
+		return this->optionHeight;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+virtual Core::Font getValue1469732627000(std::string propertyName) {\
+	if (propertyName == "optionFont") {\
+		return this->optionFont;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+virtual Core::Color getValue1701103765000(std::string propertyName) {\
+	if (propertyName == "optionTextColor") {\
+		return this->optionTextColor;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+virtual Core::Text getValue2684722473000(std::string propertyName) {\
+	if (propertyName == "text") {\
+		return this->text;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+template<typename T>\
+T getValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "boxWidth") {\
+			return Mirror::convertType<int, T>(getValue2515107422000(propertyName));\
+		}\
+		if (propertyName == "boxPaddingX") {\
+			return Mirror::convertType<int, T>(getValue2515107422000(propertyName));\
+		}\
+		if (propertyName == "boxPaddingY") {\
+			return Mirror::convertType<int, T>(getValue2515107422000(propertyName));\
+		}\
+		if (propertyName == "optionHeight") {\
+			return Mirror::convertType<int, T>(getValue2515107422000(propertyName));\
+		}\
+		if (propertyName == "optionFont") {\
+			return Mirror::convertType<Core::Font, T>(getValue1469732627000(propertyName));\
+		}\
+		if (propertyName == "optionTextColor") {\
+			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
+		}\
+		if (propertyName == "text") {\
+			return Mirror::convertType<Core::Text, T>(getValue2684722473000(propertyName));\
+		}\
+		if (Core::Behaviour::hasProperty(propertyName))\
+			return Core::Behaviour::getValue_impl<T>(propertyName);\
+		if (Core::Component::hasProperty(propertyName))\
+			return Core::Component::getValue_impl<T>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::DropDown::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+std::array<T, N> getArrayValue_impl(std::string propertyName) {\
+	try {\
+		if (propertyName == "boxWidth") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "boxPaddingX") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "boxPaddingY") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionHeight") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionFont") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionTextColor") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "text") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (Core::Behaviour::hasProperty(propertyName))\
+			return Core::Behaviour::getArrayValue_impl<T, N>(propertyName);\
+		if (Core::Component::hasProperty(propertyName))\
+			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::DropDown::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " cannot be converted to the specified type!");\
+	}\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
+}\
+virtual bool setValue(std::string propertyName, int value) {\
+	if (propertyName == "boxWidth") {\
+		this->boxWidth = value;\
+		return true;\
+	}\
+	if (propertyName == "boxPaddingX") {\
+		this->boxPaddingX = value;\
+		return true;\
+	}\
+	if (propertyName == "boxPaddingY") {\
+		this->boxPaddingY = value;\
+		return true;\
+	}\
+	if (propertyName == "optionHeight") {\
+		this->optionHeight = value;\
+		return true;\
+	}\
+	return false;\
+}\
+virtual bool setValue(std::string propertyName, Core::Font value) {\
+	if (propertyName == "optionFont") {\
+		this->optionFont = value;\
+		return true;\
+	}\
+	return false;\
+}\
+virtual bool setValue(std::string propertyName, Core::Color value) {\
+	if (propertyName == "optionTextColor") {\
+		this->optionTextColor = value;\
+		return true;\
+	}\
+	return false;\
+}\
+virtual bool setValue(std::string propertyName, Core::Text value) {\
+	if (propertyName == "text") {\
+		this->text = value;\
+		return true;\
+	}\
+	return false;\
+}\
+template<typename T>\
+bool setValue_impl(std::string propertyName, T value) {\
+	try {\
+		if (propertyName == "boxWidth") {\
+			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+		}\
+		if (propertyName == "boxPaddingX") {\
+			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+		}\
+		if (propertyName == "boxPaddingY") {\
+			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+		}\
+		if (propertyName == "optionHeight") {\
+			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+		}\
+		if (propertyName == "optionFont") {\
+			if (setValue(propertyName, Mirror::convertType<T, Core::Font>(value))) return true;\
+		}\
+		if (propertyName == "optionTextColor") {\
+			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+		}\
+		if (propertyName == "text") {\
+			if (setValue(propertyName, Mirror::convertType<T, Core::Text>(value))) return true;\
+		}\
+		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
+		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::DropDown::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
+}\
+template<typename T, std::size_t N>\
+bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
+	try {\
+		if (propertyName == "boxWidth") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "boxPaddingX") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "boxPaddingY") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionHeight") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionFont") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "optionTextColor") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "text") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+	} catch(std::exception&) {\
+		std::cout << "Warning: The property Core::DropDown::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " was set to a value with an incompatible type!");\
+	}\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
+}\
+template<typename... Ts>\
+bool invoke_impl(std::string functionName, Ts... args) { return false; }\
+friend Mirror::Function;\
+friend Mirror::Property;\
+static Mirror::Class getTypeImpl() {\
+	static Mirror::Class type = createType();\
+	return type;\
+}\
+static bool hasProperty(std::string propertyName) {\
+	Mirror::Class type = getTypeImpl();\
+	for (const Mirror::Property& prop : type.properties)\
+		if (prop.name == propertyName) return true;\
+	return false;\
+}\
 public:\
-Mirror::Class getType() {\
+virtual Mirror::Class getType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
 }\
-template<typename T, typename ClassType>\
-static T getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "boxWidth") {\
-			return Mirror::convertType<int, T>(instance->boxWidth);\
-		}\
-		if (propertyName == "boxPaddingX") {\
-			return Mirror::convertType<int, T>(instance->boxPaddingX);\
-		}\
-		if (propertyName == "boxPaddingY") {\
-			return Mirror::convertType<int, T>(instance->boxPaddingY);\
-		}\
-		if (propertyName == "optionHeight") {\
-			return Mirror::convertType<int, T>(instance->optionHeight);\
-		}\
-		if (propertyName == "optionFont") {\
-			return Mirror::convertType<Core::Font, T>(instance->optionFont);\
-		}\
-		if (propertyName == "optionTextColor") {\
-			return Mirror::convertType<Core::Color, T>(instance->optionTextColor);\
-		}\
-		if (propertyName == "text") {\
-			return Mirror::convertType<Core::Text, T>(instance->text);\
-		}\
-		if (propertyName == "options") {\
-			return Mirror::convertType<int, T>(instance->options);\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property DropDown::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property DropDown::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property DropDown::" + propertyName + " does not exist in DropDown!" << "\n";\
-	throw std::invalid_argument("The property DropDown::" + propertyName + " does not exist in DropDown!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static std::array<T, N> getValue(ClassType* instance, std::string propertyName) {\
-	try {\
-		if (propertyName == "boxWidth") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "boxPaddingX") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "boxPaddingY") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "optionHeight") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "optionFont") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "optionTextColor") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "text") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "options") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is not an array!");\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property DropDown::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property DropDown::" + propertyName + " cannot be converted to the specified type!");\
-	}\
-	std::cout << "The property DropDown::" + propertyName + " does not exist in DropDown!" << "\n";\
-	throw std::invalid_argument("The property DropDown::" + propertyName + " does not exist in DropDown!");\
-}\
-template<typename T, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value) {\
-	try {\
-		if (propertyName == "boxWidth") {\
-			instance->boxWidth = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-		if (propertyName == "boxPaddingX") {\
-			instance->boxPaddingX = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-		if (propertyName == "boxPaddingY") {\
-			instance->boxPaddingY = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-		if (propertyName == "optionHeight") {\
-			instance->optionHeight = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-		if (propertyName == "optionFont") {\
-			instance->optionFont = Mirror::convertType<T, Core::Font>(value);\
-			return;\
-		}\
-		if (propertyName == "optionTextColor") {\
-			instance->optionTextColor = Mirror::convertType<T, Core::Color>(value);\
-			return;\
-		}\
-		if (propertyName == "text") {\
-			instance->text = Mirror::convertType<T, Core::Text>(value);\
-			return;\
-		}\
-		if (propertyName == "options") {\
-			instance->options = Mirror::convertType<T, int>(value);\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property DropDown::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property DropDown::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property DropDown::" + propertyName + " does not exist in DropDown!" << "\n";\
-	throw std::invalid_argument("The property DropDown::" + propertyName + " does not exist in DropDown!");\
-}\
-template<typename T, std::size_t N, typename ClassType>\
-static void setValue(ClassType* instance, std::string propertyName, T value[N]) {\
-	try {\
-		if (propertyName == "boxWidth") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "boxPaddingX") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "boxPaddingY") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "optionHeight") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "optionFont") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "optionTextColor") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "text") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-		if (propertyName == "options") {\
-			throw std::invalid_argument("The property DropDown::" + propertyName + " is an array!");\
-			return;\
-		}\
-	} catch(std::exception&) {\
-		std::cout << "The property DropDown::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property DropDown::" + propertyName + " was set to a value with an incompatible type!");\
-	}\
-	std::cout << "The property DropDown::" + propertyName + " does not exist in DropDown!" << "\n";\
-	throw std::invalid_argument("The property DropDown::" + propertyName + " does not exist in DropDown!");\
-}\
-template<typename ClassType, typename... Args>\
-static void invoke(ClassType* instance, std::string functionName, Args... args) {\
-}\
-void serialize(std::ostream& os) const {\
+virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(boxWidth, os);\
 		Mirror::serialize(boxPaddingX, os);\
 		Mirror::serialize(boxPaddingY, os);\
@@ -297,9 +346,10 @@ void serialize(std::ostream& os) const {\
 		Mirror::serialize(optionFont, os);\
 		Mirror::serialize(optionTextColor, os);\
 		Mirror::serialize(text, os);\
-		Mirror::serialize(options, os);\
+	Core::Behaviour::serialize(os);\
+	Core::Component::serialize(os);\
 }\
-void deserialize(std::istream& is) {\
+virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(boxWidth, is);\
 		Mirror::deserialize(boxPaddingX, is);\
 		Mirror::deserialize(boxPaddingY, is);\
@@ -307,6 +357,7 @@ void deserialize(std::istream& is) {\
 		Mirror::deserialize(optionFont, is);\
 		Mirror::deserialize(optionTextColor, is);\
 		Mirror::deserialize(text, is);\
-		Mirror::deserialize(options, is);\
+	Core::Behaviour::deserialize(is);\
+	Core::Component::deserialize(is);\
 }
 #endif

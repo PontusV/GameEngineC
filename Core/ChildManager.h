@@ -24,7 +24,7 @@ namespace Core {
 		std::vector<Handle>& getChildren();
 
 	private:
-		PROPERTY()
+		//PROPERTY()
 		std::vector<Handle> children;
 	};
 }

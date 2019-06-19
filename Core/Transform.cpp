@@ -17,31 +17,6 @@ Transform::Transform() : position(0, 0) {
 Transform::~Transform() {
 }
 
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Transform::serialize(std::ostream& os) const {
-	Component::serialize(os);
-
-	os.write((char*)&position.x, sizeof(position.x));		// Position x
-	os.write((char*)&position.y, sizeof(position.y));		// Position y
-	os.write((char*)&z, sizeof(z));							// Position z
-	os.write((char*)&rotation, sizeof(rotation));			// Rotation
-	os.write((char*)&scale, sizeof(scale));					// Scale
-}
-
-void Transform::deserialize(std::istream& is) {
-	Component::deserialize(is);
-
-	is.read((char*)&position.x, sizeof(position.x));		// Position x
-	is.read((char*)&position.y, sizeof(position.y));		// Position y
-	is.read((char*)&z, sizeof(z));							// Position z
-	is.read((char*)&rotation, sizeof(rotation));			// Rotation
-	is.read((char*)&scale, sizeof(scale));					// Scale
-
-	changed = true;
-}
-
 // ----------------------- Getters and Setters -----------------------------------------
 
 void Transform::rotate(float degrees) {

@@ -6,7 +6,10 @@
 
 namespace Core {
 
-	class Transform : public Component {
+	#include "Transform.Transform.generated.h"
+
+	CLASS() Transform : public Component {
+		GENERATED_BODY()
 	public:
 		Transform(float x, float y, float z = 0.0f, float rotation = 0.0f, float scale = 1.0f);
 		Transform();
@@ -47,16 +50,16 @@ namespace Core {
 
 		bool hasChanged();
 
-		// Serializable
-		virtual void		serialize(std::ostream& os) const;
-		virtual void		deserialize(std::istream& is);
-
 	protected:
 		glm::mat4 localToWorldMatrix;	// World Model Matrix
 		glm::mat4 worldToLocalMatrix;	// Inverse of worldModelMatrix. Multiply with a world position to get local position
+		PROPERTY()
 		glm::vec2 position;				// Local position (Position in parent)
+		PROPERTY()
 		float z;						// Depth for drawing order
+		PROPERTY()
 		float rotation;					// Local rotation in radians
+		PROPERTY()
 		float scale;					// Local scale (both width and height atm)
 
 		bool changed = true;			// Defines if the transform has moved
