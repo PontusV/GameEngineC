@@ -16,7 +16,15 @@ namespace Core {
 		void inspect(EntityHandle entity);
 
 	private:
+		void clearEntries();
+		void addComponentEntry(Component* component);
+
+	private:
 		EntityHandle currentTarget;
+		EntityHandle scrollPanel;
+		std::vector<EntityHandle> targetComponentList;
+
+		std::size_t entryCount;
 	};
 }
 #endif

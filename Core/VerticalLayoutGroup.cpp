@@ -41,14 +41,14 @@ void VerticalLayoutGroup::updateLayout() {
 			// Calculate width
 			float width;
 			if (childForceExpandWidth) { // Expand height?
-				width = allocatedSpace.y * element.flexibleSize.y;
+				width = allocatedSpace.x * element.flexibleSize.x;
 			}
 			else {
-				width = element.child.getComponent<RectTransform>()->getSize().y;
+				width = element.child.getComponent<RectTransform>()->getSize().x;
 			}
 
 			// Calculate height
-			float height = element.minSize.x * minHeightScale + (element.preferredSize.x - element.minSize.x) * prefHeightScale;
+			float height = element.minSize.y * minHeightScale + (element.preferredSize.y - element.minSize.y) * prefHeightScale;
 
 			if (width < element.minSize.x)
 				width = element.minSize.x;

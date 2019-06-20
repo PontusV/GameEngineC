@@ -28,7 +28,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 	unsigned int atlas_height = 0;
 
 	// Calculate atlas size
-	for (std::size_t i = 0; i < 128; i++) {
+	for (std::size_t i = 0; i < FONT_MANAGER_CHARACTER_COUNT; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)) {
 			fprintf(stderr, "Loading character %c failed!\n", i);
 			continue;
@@ -59,7 +59,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 	float x = 0;
 	float y = 0;
 
-	for (std::size_t i = 0; i < 128; i++) {
+	for (std::size_t i = 0; i < FONT_MANAGER_CHARACTER_COUNT; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			fprintf(stderr, "Creating texture for character %c failed!\n", i);
 			continue;
@@ -69,7 +69,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 
 		characters[i].size = glm::ivec2(g->bitmap.width, g->bitmap.rows);
 		characters[i].bearing = glm::ivec2(g->bitmap_left, g->bitmap_top);
-		characters[i].uvPos = glm::vec2((x+0.5f)/atlas_width, 0.0f);
+		characters[i].uvPos = glm::vec2((x/*+0.5f*/)/atlas_width, 0.0f);
 		characters[i].advance = g->advance.x >> 6;
 
 		x += g->bitmap.width;

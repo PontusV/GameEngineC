@@ -11,6 +11,8 @@
 
 #include "Texture2D.h"
 
+#define FONT_MANAGER_CHARACTER_COUNT 255
+
 namespace Core {
 	struct Character
 	{
@@ -58,8 +60,8 @@ namespace Core {
 		TextData2D createText(std::string text, unsigned short size);
 
 	private:
-		Character characters[128];
-		CharTexture2D charTextures[128];
+		Character characters[FONT_MANAGER_CHARACTER_COUNT];
+		CharTexture2D charTextures[FONT_MANAGER_CHARACTER_COUNT];
 		Texture2D textureAtlas;
 		unsigned short textSize;
 		unsigned short textHeight;

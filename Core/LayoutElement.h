@@ -34,11 +34,11 @@ namespace Core {
 
 	private:
 		PROPERTY()
-		glm::vec2 minSize = glm::vec2(50,50);
+		glm::vec2 minSize = glm::vec2(1, 1);
 		PROPERTY()
-		glm::vec2 prefSize;
+		glm::vec2 prefSize = glm::vec2(1, 1);
 		PROPERTY()
-		glm::vec2 flexibleSize; // Value between 0 - 1
+		glm::vec2 flexibleSize = glm::vec2(1, 1); // Value between 0 - 1
 
 		PROPERTY()
 		bool minSizeEnabled = false;
