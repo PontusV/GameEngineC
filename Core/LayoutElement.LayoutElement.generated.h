@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(21);\
+	Mirror::Class newClass(23);\
 	newClass.name = "Core::LayoutElement";\
 	newClass.annotatedAttributes = {"Reflect"};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
@@ -285,9 +285,13 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
-virtual Mirror::Class getType() {\
+static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
+}\
+public:\
+virtual Mirror::Class getType() {\
+	return getClassType();\
 }\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(minSize, os);\

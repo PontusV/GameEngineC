@@ -81,9 +81,6 @@
     <ClCompile Include="ComponentHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,15 +177,6 @@
     <ClCompile Include="Bounds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentRegistry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentType.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentTypeInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PostProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -261,6 +249,18 @@
     <ClCompile Include="Inspector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentTypeInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource2.h">
@@ -307,9 +307,6 @@
     </ClInclude>
     <ClInclude Include="ChildManager.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentTypeInfo.h">
-      <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Systems\Entity</Filter>
@@ -404,18 +401,6 @@
     <ClInclude Include="Bounds.h">
       <Filter>Header Files\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="TypeList.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentLoader.h">
-      <Filter>Header Files\Systems\Entity\Meta</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentMetaInfo.h">
-      <Filter>Header Files\Systems\Entity\Meta</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentRegistry.h">
-      <Filter>Header Files\Systems\Entity\Meta</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>Header Files\Systems\Graphics</Filter>
     </ClInclude>
@@ -454,9 +439,6 @@
     </ClInclude>
     <ClInclude Include="ComponentFunctionHandle.h">
       <Filter>Header Files\Systems\Entity\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentType.h">
-      <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="RectButton.h">
       <Filter>Header Files\Systems\Entity\Component\UI</Filter>
@@ -510,6 +492,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReflectionMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentTypeInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

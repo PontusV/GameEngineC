@@ -213,6 +213,8 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ComponentFunctionHandle.cpp" />
     <ClCompile Include="ComponentHandle.cpp" />
+    <ClCompile Include="ComponentLoader.cpp" />
+    <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="ComponentType.cpp" />
     <ClCompile Include="ComponentTypeInfo.cpp" />
     <ClCompile Include="ContentSizeFitter.cpp" />
@@ -230,7 +232,6 @@
     <ClCompile Include="RectTransform.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Handle.cpp" />
-    <ClCompile Include="ComponentLoader.cpp" />
     <ClCompile Include="LayoutElement.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParentEntity.cpp" />
@@ -246,7 +247,6 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="glad.c" />
-    <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
@@ -283,7 +283,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="ComponentFunctionHandle.h" />
     <ClInclude Include="ComponentHandle.h" />
-    <ClInclude Include="ComponentMetaInfo.h" />
+    <ClInclude Include="ComponentLoader.h" />
     <ClInclude Include="ComponentRegistry.h" />
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
@@ -307,7 +307,6 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
-    <ClInclude Include="ComponentLoader.h" />
     <ClInclude Include="LayoutElement.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParentEntity.h" />

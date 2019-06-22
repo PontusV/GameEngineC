@@ -3,6 +3,7 @@
 
 #include "Component.h"
 #include "Entity.h"
+#include "Handle.h"
 #include <vector>
 #include <cstddef>
 #include "ChildManager.ChildManager.generated.h"

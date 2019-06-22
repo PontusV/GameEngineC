@@ -12,8 +12,8 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(28);\
-	newClass.name = "Core::Inspector";\
+	Mirror::Class newClass(11);\
+	newClass.name = "Core::UIBehaviour";\
 	newClass.annotatedAttributes = {"Reflect"};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
 	return newClass;\
@@ -27,11 +27,11 @@ T getValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::Inspector::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::Inspector::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::Inspector::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::Inspector::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T, std::size_t N>\
 std::array<T, N> getArrayValue_impl(std::string propertyName) {\
@@ -41,11 +41,11 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::Inspector::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::Inspector::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::Inspector::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::Inspector::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
@@ -53,11 +53,11 @@ bool setValue_impl(std::string propertyName, T value) {\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::Inspector::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::Inspector::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::Inspector::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::Inspector::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " does not exist!");\
 }\
 template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
@@ -65,11 +65,11 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::Inspector::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::Inspector::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::Inspector::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::Inspector::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::UIBehaviour::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::UIBehaviour::" + propertyName + " does not exist!");\
 }\
 template<typename... Ts>\
 bool invoke_impl(std::string functionName, Ts... args) { return false; }\

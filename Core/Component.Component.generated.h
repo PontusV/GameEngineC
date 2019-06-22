@@ -74,9 +74,13 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
-virtual Mirror::Class getType() {\
+static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
+}\
+public:\
+virtual Mirror::Class getType() {\
+	return getClassType();\
 }\
 virtual void serialize(std::ostream& os) const {\
 }\

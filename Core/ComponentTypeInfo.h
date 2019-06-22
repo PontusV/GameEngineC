@@ -9,7 +9,7 @@
 
 #define typeof(T) Core::ComponentTypeInfo<T>::getType()
 #define typeIDof(T) Core::ComponentTypeInfo<T>::getTypeID()
-#define nameof(T) typeid(T).name()
+#define nameof(T) Core::ComponentTypeInfo<T>::getName()
 
 namespace Core {
 	struct IComponentTypeInfo {
@@ -55,7 +55,7 @@ namespace Core {
 		}
 
 		static const char* getName() { // Used for parameter packs
-			return nameof(T);
+			return T::getClassType().name.c_str();
 		}
 
 		/* ATM makes use of RTTI. Swap typeid.name() with name */

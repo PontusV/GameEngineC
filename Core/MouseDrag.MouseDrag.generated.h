@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(18);\
+	Mirror::Class newClass(21);\
 	newClass.name = "Core::MouseDrag";\
 	newClass.annotatedAttributes = {"Reflect"};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -86,9 +86,13 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
-virtual Mirror::Class getType() {\
+static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
+}\
+public:\
+virtual Mirror::Class getType() {\
+	return getClassType();\
 }\
 virtual void serialize(std::ostream& os) const {\
 	Core::Behaviour::serialize(os);\

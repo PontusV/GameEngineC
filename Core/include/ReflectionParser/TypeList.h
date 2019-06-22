@@ -1,7 +1,7 @@
 #ifndef TYPE_LIST_H
 #define TYPE_LIST_H
 
-namespace Core {
+namespace Mirror {
 	template <typename... Ts> struct TypeList {
 		typedef TypeList<Ts...> type;
 	};

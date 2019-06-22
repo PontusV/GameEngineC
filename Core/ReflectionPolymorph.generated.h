@@ -2,6 +2,7 @@
 #pragma once
 #include <ReflectionTypes.h>
 #include <stdexcept>
+#include <TypeList.h>
 
 #include "G:/Projects/ProjectGE/Core/Component.h"
 #include "G:/Projects/ProjectGE/Core/Transform.h"
@@ -14,6 +15,9 @@
 #include "G:/Projects/ProjectGE/Core/Button.h"
 #include "G:/Projects/ProjectGE/Core/ChildManager.h"
 #include "G:/Projects/ProjectGE/Core/ParentEntity.h"
+#include "G:/Projects/ProjectGE/Core/UIBehaviour.h"
+#include "G:/Projects/ProjectGE/Core/LayoutController.h"
+#include "G:/Projects/ProjectGE/Core/ContentSizeFitter.h"
 #include "G:/Projects/ProjectGE/Core/Panel.h"
 #include "G:/Projects/ProjectGE/Core/RectSprite.h"
 #include "G:/Projects/ProjectGE/Core/Text.h"
@@ -22,13 +26,11 @@
 #include "G:/Projects/ProjectGE/Core/WindowAnchor.h"
 #include "G:/Projects/ProjectGE/Core/WindowScale.h"
 #include "G:/Projects/ProjectGE/Core/MouseDrag.h"
-#include "G:/Projects/ProjectGE/Core/LayoutController.h"
 #include "G:/Projects/ProjectGE/Core/LayoutGroup.h"
 #include "G:/Projects/ProjectGE/Core/LayoutElement.h"
 #include "G:/Projects/ProjectGE/Core/HorizontalLayoutGroup.h"
 #include "G:/Projects/ProjectGE/Core/VerticalLayoutGroup.h"
 #include "G:/Projects/ProjectGE/Core/GridLayoutGroup.h"
-#include "G:/Projects/ProjectGE/Core/ContentSizeFitter.h"
 #include "G:/Projects/ProjectGE/Core/DragAndResize.h"
 #include "G:/Projects/ProjectGE/Core/Inspector.h"
 
@@ -58,6 +60,12 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::ChildManager*>(instance), args...);
 	else if (instance->getType().name == "Core::ParentEntity")
 		return fun.invoke(reinterpret_cast<Core::ParentEntity*>(instance), args...);
+	else if (instance->getType().name == "Core::UIBehaviour")
+		return fun.invoke(reinterpret_cast<Core::UIBehaviour*>(instance), args...);
+	else if (instance->getType().name == "Core::LayoutController")
+		return fun.invoke(reinterpret_cast<Core::LayoutController*>(instance), args...);
+	else if (instance->getType().name == "Core::ContentSizeFitter")
+		return fun.invoke(reinterpret_cast<Core::ContentSizeFitter*>(instance), args...);
 	else if (instance->getType().name == "Core::Panel")
 		return fun.invoke(reinterpret_cast<Core::Panel*>(instance), args...);
 	else if (instance->getType().name == "Core::RectSprite")
@@ -74,8 +82,6 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::WindowScale*>(instance), args...);
 	else if (instance->getType().name == "Core::MouseDrag")
 		return fun.invoke(reinterpret_cast<Core::MouseDrag*>(instance), args...);
-	else if (instance->getType().name == "Core::LayoutController")
-		return fun.invoke(reinterpret_cast<Core::LayoutController*>(instance), args...);
 	else if (instance->getType().name == "Core::LayoutGroup")
 		return fun.invoke(reinterpret_cast<Core::LayoutGroup*>(instance), args...);
 	else if (instance->getType().name == "Core::LayoutElement")
@@ -86,8 +92,6 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::VerticalLayoutGroup*>(instance), args...);
 	else if (instance->getType().name == "Core::GridLayoutGroup")
 		return fun.invoke(reinterpret_cast<Core::GridLayoutGroup*>(instance), args...);
-	else if (instance->getType().name == "Core::ContentSizeFitter")
-		return fun.invoke(reinterpret_cast<Core::ContentSizeFitter*>(instance), args...);
 	else if (instance->getType().name == "Core::DragAndResize")
 		return fun.invoke(reinterpret_cast<Core::DragAndResize*>(instance), args...);
 	else if (instance->getType().name == "Core::Inspector")
@@ -118,6 +122,12 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::ChildManager*>(instance));
 	else if (instance->getType().name == "Core::ParentEntity")
 		return prop.getValue<T>(reinterpret_cast<Core::ParentEntity*>(instance));
+	else if (instance->getType().name == "Core::UIBehaviour")
+		return prop.getValue<T>(reinterpret_cast<Core::UIBehaviour*>(instance));
+	else if (instance->getType().name == "Core::LayoutController")
+		return prop.getValue<T>(reinterpret_cast<Core::LayoutController*>(instance));
+	else if (instance->getType().name == "Core::ContentSizeFitter")
+		return prop.getValue<T>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
 	else if (instance->getType().name == "Core::Panel")
 		return prop.getValue<T>(reinterpret_cast<Core::Panel*>(instance));
 	else if (instance->getType().name == "Core::RectSprite")
@@ -134,8 +144,6 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::WindowScale*>(instance));
 	else if (instance->getType().name == "Core::MouseDrag")
 		return prop.getValue<T>(reinterpret_cast<Core::MouseDrag*>(instance));
-	else if (instance->getType().name == "Core::LayoutController")
-		return prop.getValue<T>(reinterpret_cast<Core::LayoutController*>(instance));
 	else if (instance->getType().name == "Core::LayoutGroup")
 		return prop.getValue<T>(reinterpret_cast<Core::LayoutGroup*>(instance));
 	else if (instance->getType().name == "Core::LayoutElement")
@@ -146,8 +154,6 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::VerticalLayoutGroup*>(instance));
 	else if (instance->getType().name == "Core::GridLayoutGroup")
 		return prop.getValue<T>(reinterpret_cast<Core::GridLayoutGroup*>(instance));
-	else if (instance->getType().name == "Core::ContentSizeFitter")
-		return prop.getValue<T>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
 	else if (instance->getType().name == "Core::DragAndResize")
 		return prop.getValue<T>(reinterpret_cast<Core::DragAndResize*>(instance));
 	else if (instance->getType().name == "Core::Inspector")
@@ -178,6 +184,12 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance));
 	else if (instance->getType().name == "Core::ParentEntity")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance));
+	else if (instance->getType().name == "Core::UIBehaviour")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::UIBehaviour*>(instance));
+	else if (instance->getType().name == "Core::LayoutController")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance));
+	else if (instance->getType().name == "Core::ContentSizeFitter")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
 	else if (instance->getType().name == "Core::Panel")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance));
 	else if (instance->getType().name == "Core::RectSprite")
@@ -194,8 +206,6 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::WindowScale*>(instance));
 	else if (instance->getType().name == "Core::MouseDrag")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::MouseDrag*>(instance));
-	else if (instance->getType().name == "Core::LayoutController")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance));
 	else if (instance->getType().name == "Core::LayoutGroup")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::LayoutGroup*>(instance));
 	else if (instance->getType().name == "Core::LayoutElement")
@@ -206,8 +216,6 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::VerticalLayoutGroup*>(instance));
 	else if (instance->getType().name == "Core::GridLayoutGroup")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::GridLayoutGroup*>(instance));
-	else if (instance->getType().name == "Core::ContentSizeFitter")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
 	else if (instance->getType().name == "Core::DragAndResize")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::DragAndResize*>(instance));
 	else if (instance->getType().name == "Core::Inspector")
@@ -238,6 +246,12 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::ChildManager*>(instance), value);
 	else if (instance->getType().name == "Core::ParentEntity")
 		return prop.setValue(reinterpret_cast<Core::ParentEntity*>(instance), value);
+	else if (instance->getType().name == "Core::UIBehaviour")
+		return prop.setValue(reinterpret_cast<Core::UIBehaviour*>(instance), value);
+	else if (instance->getType().name == "Core::LayoutController")
+		return prop.setValue(reinterpret_cast<Core::LayoutController*>(instance), value);
+	else if (instance->getType().name == "Core::ContentSizeFitter")
+		return prop.setValue(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
 	else if (instance->getType().name == "Core::Panel")
 		return prop.setValue(reinterpret_cast<Core::Panel*>(instance), value);
 	else if (instance->getType().name == "Core::RectSprite")
@@ -254,8 +268,6 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::WindowScale*>(instance), value);
 	else if (instance->getType().name == "Core::MouseDrag")
 		return prop.setValue(reinterpret_cast<Core::MouseDrag*>(instance), value);
-	else if (instance->getType().name == "Core::LayoutController")
-		return prop.setValue(reinterpret_cast<Core::LayoutController*>(instance), value);
 	else if (instance->getType().name == "Core::LayoutGroup")
 		return prop.setValue(reinterpret_cast<Core::LayoutGroup*>(instance), value);
 	else if (instance->getType().name == "Core::LayoutElement")
@@ -266,8 +278,6 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::VerticalLayoutGroup*>(instance), value);
 	else if (instance->getType().name == "Core::GridLayoutGroup")
 		return prop.setValue(reinterpret_cast<Core::GridLayoutGroup*>(instance), value);
-	else if (instance->getType().name == "Core::ContentSizeFitter")
-		return prop.setValue(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
 	else if (instance->getType().name == "Core::DragAndResize")
 		return prop.setValue(reinterpret_cast<Core::DragAndResize*>(instance), value);
 	else if (instance->getType().name == "Core::Inspector")
@@ -298,6 +308,12 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance), value);
 	else if (instance->getType().name == "Core::ParentEntity")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance), value);
+	else if (instance->getType().name == "Core::UIBehaviour")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::UIBehaviour*>(instance), value);
+	else if (instance->getType().name == "Core::LayoutController")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance), value);
+	else if (instance->getType().name == "Core::ContentSizeFitter")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
 	else if (instance->getType().name == "Core::Panel")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance), value);
 	else if (instance->getType().name == "Core::RectSprite")
@@ -314,8 +330,6 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::WindowScale*>(instance), value);
 	else if (instance->getType().name == "Core::MouseDrag")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::MouseDrag*>(instance), value);
-	else if (instance->getType().name == "Core::LayoutController")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance), value);
 	else if (instance->getType().name == "Core::LayoutGroup")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::LayoutGroup*>(instance), value);
 	else if (instance->getType().name == "Core::LayoutElement")
@@ -326,14 +340,13 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::VerticalLayoutGroup*>(instance), value);
 	else if (instance->getType().name == "Core::GridLayoutGroup")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::GridLayoutGroup*>(instance), value);
-	else if (instance->getType().name == "Core::ContentSizeFitter")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
 	else if (instance->getType().name == "Core::DragAndResize")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::DragAndResize*>(instance), value);
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Inspector*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
 }
+typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector> ReflectedTypes;
 }
 
 #endif
