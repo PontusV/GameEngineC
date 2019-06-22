@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(6);\
+	Mirror::Class newClass(11);\
 	newClass.name = "Core::Panel";\
 	newClass.annotatedAttributes = {"Reflect"};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::BoxComponent" });\

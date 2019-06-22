@@ -1,6 +1,18 @@
 #include "LevelEditor.h"
 #include <GLFW/glfw3.h>
 
+#include "../Core/Level.h"
+#include "../Core/RectTransform.h"
+#include "../Core/DropDown.h"
+#include "../Core/Button.h"
+#include "../Core/WindowAnchor.h"
+#include "../Core/MouseDrag.h"
+#include "../Core/LayoutElement.h"
+#include "../Core/HorizontalLayoutGroup.h"
+#include "../Core/WindowScale.h"
+#include "../Core/DragAndResize.h"
+#include "../Core/Inspector.h"
+
 using namespace Core;
 
 LevelEditor::LevelEditor() {
@@ -123,7 +135,6 @@ int LevelEditor::initiate() {
 	// Inspector background
 	EntityHandle inspector = level->createEntity("Inspector_background",
 		Inspector(),
-		RectSprite(Color(100,100,100,255), editorLayer),
 		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspector.setParent(inspectorLabelRect);

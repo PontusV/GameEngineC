@@ -7,9 +7,11 @@
 #include "Sprite.h"
 #include "Color.h"
 #include <glm/glm.hpp>
+#include "Text.Text.generated.h"
 
 namespace Core {
-	class Text : public Sprite {
+	CLASS() Text : public Sprite {
+		GENERATED_BODY()
 	public:
 
 		Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0);
@@ -22,12 +24,10 @@ namespace Core {
 		void setText(std::string text);
 		glm::vec2 getSize();
 
-		// Serializable
-		virtual void serialize(std::ostream& os) const;
-		virtual void deserialize(std::istream& is);
-
 	private:
+		PROPERTY()
 		std::string text;
+		PROPERTY()
 		Font font;
 	};
 }

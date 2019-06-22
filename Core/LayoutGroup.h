@@ -14,13 +14,6 @@ namespace Core {
 	public:
 		virtual ~LayoutGroup() = 0;
 
-		/* Returns the minimum valid size for this element. */
-		glm::vec2 getMinSize();
-		/* Returns the prefered size for this element. The returned size will always be equal to or more than the minimum size. */
-		glm::vec2 getPrefSize();
-		/* Returns how much extra relative space this element may be allocated if there is additional available space. */
-		glm::vec2 getFlexibleSize();
-
 		PROPERTY()
 		float paddingTop = 0;
 		PROPERTY()

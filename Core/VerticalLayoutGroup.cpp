@@ -23,8 +23,8 @@ void VerticalLayoutGroup::updateLayout() {
 		float totalPrefHeightDif = totalPrefHeight - totalMinHeight;
 
 		// Calculate height scales
-		float allocatedMinHeight = std::min(totalMinHeight, allocatedSpace.x);
-		float allocatedPrefHeightDif = std::min(totalPrefHeightDif, allocatedSpace.x - allocatedMinHeight);
+		float allocatedMinHeight = std::min(totalMinHeight, allocatedSpace.y);
+		float allocatedPrefHeightDif = std::min(totalPrefHeightDif, allocatedSpace.y - allocatedMinHeight);
 
 		float minHeightScale = totalMinHeight > 0 ? allocatedMinHeight / totalMinHeight : 0;
 		float prefHeightScale = totalPrefHeightDif > 0 ? allocatedPrefHeightDif / totalPrefHeightDif : 0;
@@ -40,7 +40,7 @@ void VerticalLayoutGroup::updateLayout() {
 		for (LayoutElementData& element : elements) {
 			// Calculate width
 			float width;
-			if (childForceExpandWidth) { // Expand height?
+			if (childForceExpandWidth) { // Expand width?
 				width = allocatedSpace.x * element.flexibleSize.x;
 			}
 			else {
@@ -131,4 +131,35 @@ void VerticalLayoutGroup::expandHeight(std::vector<LayoutElementData>& elements,
 				break;
 		}
 	}
+}
+
+glm::vec2 VerticalLayoutGroup::getMinSize() {
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	float minWidth = 0;
+	for (LayoutElementData& element : elements) {
+		minWidth = std::max(element.minSize.x, minWidth);
+	}
+	return glm::vec2(minWidth, getTotalMinHeight(elements));
+}
+
+glm::vec2 VerticalLayoutGroup::getPrefSize() {
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	float prefWidth = 0;
+	for (LayoutElementData& element : elements) {
+		prefWidth = std::max(element.preferredSize.x, prefWidth);
+	}
+	return glm::vec2(paddingLeft + paddingRight + prefWidth, paddingTop + paddingBottom + getTotalPrefHeight(elements));
+}
+
+glm::vec2 VerticalLayoutGroup::getFlexibleSize() {
+	float flexibleWidth = 1;
+	float totalFlexibleHeight = 0;
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	for (LayoutElementData& element : elements) {
+		flexibleWidth = std::max(element.flexibleSize.x, flexibleWidth);
+		totalFlexibleHeight += element.flexibleSize.y;
+	}
+	if (flexibleWidth > 1) flexibleWidth = 1;
+	if (totalFlexibleHeight > 1) totalFlexibleHeight = 1;
+	return glm::vec2(flexibleWidth, totalFlexibleHeight);
 }

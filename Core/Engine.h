@@ -42,7 +42,7 @@ namespace Core {
 
 	private:
 		// Game loop
-		bool running;
+		bool running = false;
 
 		// Level
 		LevelPtr currentLevel;

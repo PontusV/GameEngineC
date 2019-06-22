@@ -18,9 +18,7 @@ namespace Core {
 		float padding = 0; // Padding around the area that triggers the drag event
 
 	private:
-		PROPERTY()
 		bool dragging = false;
-		PROPERTY()
 		glm::vec2 offset;
 	};
 }

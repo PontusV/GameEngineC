@@ -5,7 +5,6 @@
 #include "RectSprite.h"
 #include "Panel.h"
 #include "LayoutElement.h"
-#include "ContentSizeFitter.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -18,6 +17,42 @@ Inspector::Inspector()
 
 Inspector::~Inspector()
 {
+}
+
+std::string propertyValueToString(Mirror::Property& prop, Component* component) {
+	if (prop.type.isChar()) {
+		return std::to_string(Mirror::polyGetValue<char>(prop, component));
+	}
+	else if (prop.type.isNumber()) {
+		if (prop.type.name == "float")
+			return std::to_string(Mirror::polyGetValue<float>(prop, component));
+		else if (prop.type.isSignedNumber())
+			return std::to_string(Mirror::polyGetValue<int>(prop, component));
+		else if (prop.type.isUnsignedNumber())
+			return std::to_string(Mirror::polyGetValue<unsigned int>(prop, component));
+	}
+	else if (prop.type.isBool()) {
+		if (Mirror::polyGetValue<bool>(prop, component))
+			return "true";
+		else
+			return "false";
+	}
+	else if (prop.type.isString()) {
+		return Mirror::polyGetValue<std::string>(prop, component);
+	}
+	else if (prop.type.isVector()) {
+		return "instance of std::vector<" + prop.type.getTemplateType().name + ">";
+	}
+	else if (prop.type.isObject()) {
+		if (prop.type.name == "glm::vec2") {
+			glm::vec2 size = Mirror::polyGetValue<glm::vec2>(prop, component);
+			return "x: " + std::to_string(size.x) + ", y: " + std::to_string(size.y);
+		}
+		else {
+			return "instance of " + prop.type.name;
+		}
+	}
+	return "ERROR!";
 }
 
 void Inspector::awake() {
@@ -35,7 +70,9 @@ void Inspector::awake() {
 			RectTransform(0, 0, 100, 100, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
-		element->setFlexibleSize(glm::ivec2(1,1));
+		element->setFlexibleSize(glm::vec2(1, 1));
+		element->setPrefSize(glm::vec2(1, 1));
+		element->setMinSize(glm::vec2(1, 1));
 		element->setFlexibleSizeEnabled(true);
 		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
 		group->childForceExpandHeight = false;
@@ -57,16 +94,58 @@ void Inspector::clearEntries() {
 	targetComponentList.clear();
 }
 
+
+EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Property& prop, Component* component) {
+	static constexpr unsigned char layer = 0;
+	RectTransform* rect = owner.getComponent<RectTransform>();
+
+	// Create Field
+	EntityHandle propField = createEntity(fieldName,
+		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+	);
+	HorizontalLayoutGroup* fieldLayout = propField.addComponent<HorizontalLayoutGroup>();
+	fieldLayout->spacing = 10;
+
+	// -- Create Field Body
+
+	if (prop.type.isNumber() && !prop.type.isCArray()) {
+		// Property Name
+		EntityHandle propLabel = createEntity(fieldName + "_Label");
+		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propLabel.setParent(propField);
+
+		// Input Field
+		float propertyValue = Mirror::polyGetValue<float>(prop, component);
+		EntityHandle inputField = createEntity(fieldName + "_InputField");
+		// TODO: Add InputField (script)
+		inputField.setParent(propField);
+	}
+	else {
+		// Property Name
+		EntityHandle propLabel = createEntity(fieldName + "_Label");
+		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propLabel.setParent(propField);
+
+		// Property Value
+		std::string propValueString = propertyValueToString(prop, component);
+		EntityHandle propValue = createEntity(fieldName + "_Value");
+		Text * propValueText = propValue.addComponent(Text(propValueString, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		propValue.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propValue.setParent(propField);
+	}
+	// -- End of Field Body
+
+	return propField;
+}
+
 void Inspector::addComponentEntry(Component* component) {
+	static constexpr unsigned char layer = 0;
 	// Reflection Data
 	Mirror::Class type = component->getType();
 	// Check for reset for counter
 	if (entryCount == std::numeric_limits<std::size_t>::max()) entryCount = 0;
-	static constexpr unsigned char layer = 0;
-	static constexpr int height = 1;
-	static constexpr int yOffset = 10;
-	static constexpr int xPadding = 10;
-	static constexpr int yPadding = 10;
 
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	std::size_t entryIndex = entryCount++;
@@ -74,88 +153,37 @@ void Inspector::addComponentEntry(Component* component) {
 
 	// Entry
 	EntityHandle entry = createEntity(entryName,
-		RectSprite(Color(150, 150, 150), layer),
-		RectTransform(0, 0, rect->getSize().x - xPadding * 2, height, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
+		RectSprite(Color(50, 50, 50), layer),
+		RectTransform(0, 0, 0, 0, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
 	);
 	LayoutElement* element = entry.addComponent<LayoutElement>();
 	element->setFlexibleSize(glm::vec2(1, 1));
 	element->setFlexibleSizeEnabled(true);
-	element->setPrefSize(glm::vec2(1, 1));
-	ContentSizeFitter* fit = entry.addComponent<ContentSizeFitter>();
-	fit->horizontalFit = ContentSizeFitter::PREFERREDSIZE;
-	fit->verticalFit = ContentSizeFitter::PREFERREDSIZE;
 	VerticalLayoutGroup* group = entry.addComponent<VerticalLayoutGroup>();
 	group->paddingTop = 5;
 	group->paddingLeft = 5;
 	group->paddingRight = 5;
 	group->paddingBottom = 5;
+	group->spacing = 5;
+	group->childForceExpandHeight = false;
+	group->childForceExpandWidth = false;
+	group->shrinkableChildHeight = false;
+	group->shrinkableChildWidth = false;
 	entry.setParent(scrollPanel);
 
 	// Entry content
 	EntityHandle label = createEntity(entryName + "_Label");
 	Text* labelText = label.addComponent(Text(type.name, "resources/fonts/segoeui.ttf", 20, Color(255, 255, 255), layer));
-	RectTransform* labelRect = label.addComponent(RectTransform(0, 0, labelText->getSize().x, labelText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+	label.addComponent(RectTransform(0, 0, labelText->getSize().x, labelText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 	label.setParent(entry);
+	//*/
 	// Property field
-	for (const Mirror::Property& prop : type.properties) {
-
+	for(std::size_t i = 0; i < type.properties.size(); i++) {
+		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component);
+		propField.setParent(entry);
 	}
 	// End of Entry content
 	targetComponentList.push_back(entry);
-
-	// Print reflection data
-	std::cout << "\tComponent: " << type.name << "\n";
-	for (Mirror::Property& prop : type.properties) {
-		std::cout << "\t\tProperty: " << prop.name << ", ";
-		std::size_t offset = 30 - prop.name.size();
-		if (30 < prop.name.size()) offset = 0;
-		for (std::size_t i = 0; i < offset; i++) {
-			std::cout << " ";
-		}
-		std::cout << "type: " << prop.type.name << ", ";
-		std::size_t offset2 = 30 - prop.type.name.size();
-		if (30 < prop.type.name.size()) offset2 = 0;
-		for (std::size_t i = 0; i < offset2; i++) {
-			std::cout << " ";
-		}
-		std::cout << "value: ";
-		if (prop.type.isChar()) {
-			std::cout << std::to_string(polyGetValue<char>(prop, component));
-		}
-		else if (prop.type.isNumber()) {
-			if (prop.type.name == "float")
-				std::cout << std::to_string(polyGetValue<float>(prop, component));
-			else if (prop.type.isSignedNumber())
-				std::cout << std::to_string(polyGetValue<int>(prop, component));
-			else if (prop.type.isUnsignedNumber())
-				std::cout << std::to_string(polyGetValue<unsigned int>(prop, component));
-		}
-		else if (prop.type.isBool()) {
-			if (polyGetValue<bool>(prop, component))
-				std::cout << "true";
-			else
-				std::cout << "false";
-		}
-		else if (prop.type.isString()) {
-			std::cout << polyGetValue<std::string>(prop, component);
-		}
-		else if (prop.type.isVector()) {
-			std::cout << "instance of std::vector<" + prop.type.getTemplateType().name + ">";
-		}
-		else if (prop.type.isObject()) {
-			if (prop.type.name == "glm::vec2") {
-				glm::vec2 size = polyGetValue<glm::vec2>(prop, component);
-				std::cout << "x: " << size.x << ", y: " << size.y;
-			}
-			else {
-				std::cout << "instance of " << prop.type.name;
-			}
-		}
-		else {
-			std::cout << "ERROR!";
-		}
-		std::cout << std::endl;
-	}
 }
 
 void Inspector::inspect(EntityHandle entity) {

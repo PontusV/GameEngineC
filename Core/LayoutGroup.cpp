@@ -76,26 +76,3 @@ float LayoutGroup::getTotalPrefHeight(const std::vector<LayoutElementData>& elem
 	}
 	return totalPrefHeight;
 }
-
-glm::vec2 LayoutGroup::getMinSize() {
-	std::vector<LayoutElementData> elements = getLayoutElementData();
-	return glm::vec2(getTotalMinWidth(elements), getTotalMinHeight(elements));
-}
-
-glm::vec2 LayoutGroup::getPrefSize() {
-	std::vector<LayoutElementData> elements = getLayoutElementData();
-	return glm::vec2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + getTotalPrefHeight(elements));
-}
-
-glm::vec2 LayoutGroup::getFlexibleSize() {
-	float totalFlexibleWidth = 0;
-	float totalFlexibleHeight = 0;
-	std::vector<LayoutElementData> elements = getLayoutElementData();
-	for (LayoutElementData& element : elements) {
-		totalFlexibleWidth += element.flexibleSize.x;
-		totalFlexibleHeight += element.flexibleSize.y;
-	}
-	if (totalFlexibleWidth > 1) totalFlexibleWidth = 1;
-	if (totalFlexibleHeight > 1) totalFlexibleHeight = 1;
-	return glm::vec2(totalFlexibleWidth, totalFlexibleHeight);
-}

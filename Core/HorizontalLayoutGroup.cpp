@@ -133,3 +133,34 @@ void HorizontalLayoutGroup::expandWidth(std::vector<LayoutElementData>& elements
 		}
 	}
 }
+
+glm::vec2 HorizontalLayoutGroup::getMinSize() {
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	float minHeight = 0;
+	for (LayoutElementData& element : elements) {
+		minHeight = std::max(element.minSize.y, minHeight);
+	}
+	return glm::vec2(getTotalMinWidth(elements), minHeight);
+}
+
+glm::vec2 HorizontalLayoutGroup::getPrefSize() {
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	float prefHeight = 0;
+	for (LayoutElementData& element : elements) {
+		prefHeight = std::max(element.preferredSize.y, prefHeight);
+	}
+	return glm::vec2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
+}
+
+glm::vec2 HorizontalLayoutGroup::getFlexibleSize() {
+	float totalFlexibleWidth = 0;
+	float flexibleHeight = 0;
+	std::vector<LayoutElementData> elements = getLayoutElementData();
+	for (LayoutElementData& element : elements) {
+		totalFlexibleWidth += element.flexibleSize.x;
+		flexibleHeight = std::max(element.flexibleSize.y, flexibleHeight);
+	}
+	if (totalFlexibleWidth > 1) totalFlexibleWidth = 1;
+	if (flexibleHeight > 1) flexibleHeight = 1;
+	return glm::vec2(totalFlexibleWidth, flexibleHeight);
+}

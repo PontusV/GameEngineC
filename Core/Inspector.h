@@ -19,12 +19,14 @@ namespace Core {
 		void clearEntries();
 		void addComponentEntry(Component* component);
 
+		EntityHandle createPropertyField(std::string fieldName, Mirror::Property& prop, Component* component);
+
 	private:
 		EntityHandle currentTarget;
 		EntityHandle scrollPanel;
 		std::vector<EntityHandle> targetComponentList;
 
-		std::size_t entryCount;
+		std::size_t entryCount = 0;
 	};
 }
 #endif

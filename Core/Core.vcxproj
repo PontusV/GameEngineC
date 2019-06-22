@@ -109,6 +109,9 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -164,7 +167,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)Core.h</Command>
+      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)</Command>
       <Message>Running Reflection Parser</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>

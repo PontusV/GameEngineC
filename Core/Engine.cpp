@@ -195,7 +195,7 @@ int Engine::start() {
 		// Update systems
 		input.update(deltaTime);
 		behaviourManager.update(deltaTime);
-		currentLevel->getEntityManager().lock()->processQueue(); // Process Queued
+		currentLevel->getEntityManager().lock()->processQueue(); // Process Queue
 		physics.update(deltaTime);
 		graphics.update(deltaTime);
 

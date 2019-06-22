@@ -34,19 +34,3 @@ glm::vec2 Text::getSize() {
 const Font& Text::getFont() const {
 	return font;
 }
-
-// ------------------------------- Serializable ----------------------------------------
-
-void Text::serialize(std::ostream& os) const {
-	Sprite::serialize(os);
-
-	os.write(text.c_str(), text.size() + 1);		// Text string
-	font.serialize(os);								// Font
-}
-
-void Text::deserialize(std::istream& is) {
-	Sprite::deserialize(is);
-
-	std::getline(is, text, '\0');					// Text string
-	font.deserialize(is);							// Font
-}

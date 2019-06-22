@@ -3,63 +3,67 @@
 #include <ReflectionTypes.h>
 #include <stdexcept>
 
-#include "G:\Projects\ProjectGE\Core/Component.h"
-#include "G:\Projects\ProjectGE\Core/BoxComponent.h"
-#include "G:\Projects\ProjectGE\Core/Sprite.h"
-#include "G:\Projects\ProjectGE\Core/Border.h"
-#include "G:\Projects\ProjectGE\Core/ChildManager.h"
-#include "G:\Projects\ProjectGE\Core/Image.h"
-#include "G:\Projects\ProjectGE\Core/Panel.h"
-#include "G:\Projects\ProjectGE\Core/ParentEntity.h"
-#include "G:\Projects\ProjectGE\Core/RectSprite.h"
-#include "G:\Projects\ProjectGE\Core/Transform.h"
-#include "G:\Projects\ProjectGE\Core/RectTransform.h"
-#include "G:\Projects\ProjectGE\Core/Behaviour.h"
-#include "G:\Projects\ProjectGE\Core/Button.h"
-#include "G:\Projects\ProjectGE\Core/RectButton.h"
-#include "G:\Projects\ProjectGE\Core/DropDown.h"
-#include "G:\Projects\ProjectGE\Core/WindowAnchor.h"
-#include "G:\Projects\ProjectGE\Core/WindowScale.h"
-#include "G:\Projects\ProjectGE\Core/MouseDrag.h"
-#include "G:\Projects\ProjectGE\Core/LayoutController.h"
-#include "G:\Projects\ProjectGE\Core/LayoutGroup.h"
-#include "G:\Projects\ProjectGE\Core/LayoutElement.h"
-#include "G:\Projects\ProjectGE\Core/HorizontalLayoutGroup.h"
-#include "G:\Projects\ProjectGE\Core/VerticalLayoutGroup.h"
-#include "G:\Projects\ProjectGE\Core/GridLayoutGroup.h"
-#include "G:\Projects\ProjectGE\Core/ContentSizeFitter.h"
-#include "G:\Projects\ProjectGE\Core/DragAndResize.h"
-#include "G:\Projects\ProjectGE\Core/Inspector.h"
+#include "G:/Projects/ProjectGE/Core/Component.h"
+#include "G:/Projects/ProjectGE/Core/Transform.h"
+#include "G:/Projects/ProjectGE/Core/BoxComponent.h"
+#include "G:/Projects/ProjectGE/Core/RectTransform.h"
+#include "G:/Projects/ProjectGE/Core/Behaviour.h"
+#include "G:/Projects/ProjectGE/Core/Sprite.h"
+#include "G:/Projects/ProjectGE/Core/Border.h"
+#include "G:/Projects/ProjectGE/Core/Image.h"
+#include "G:/Projects/ProjectGE/Core/Button.h"
+#include "G:/Projects/ProjectGE/Core/ChildManager.h"
+#include "G:/Projects/ProjectGE/Core/ParentEntity.h"
+#include "G:/Projects/ProjectGE/Core/Panel.h"
+#include "G:/Projects/ProjectGE/Core/RectSprite.h"
+#include "G:/Projects/ProjectGE/Core/Text.h"
+#include "G:/Projects/ProjectGE/Core/RectButton.h"
+#include "G:/Projects/ProjectGE/Core/DropDown.h"
+#include "G:/Projects/ProjectGE/Core/WindowAnchor.h"
+#include "G:/Projects/ProjectGE/Core/WindowScale.h"
+#include "G:/Projects/ProjectGE/Core/MouseDrag.h"
+#include "G:/Projects/ProjectGE/Core/LayoutController.h"
+#include "G:/Projects/ProjectGE/Core/LayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/LayoutElement.h"
+#include "G:/Projects/ProjectGE/Core/HorizontalLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/VerticalLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/GridLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/ContentSizeFitter.h"
+#include "G:/Projects/ProjectGE/Core/DragAndResize.h"
+#include "G:/Projects/ProjectGE/Core/Inspector.h"
 
+namespace Mirror {
 /* Converts the given pointer to the derived type. Calls invoke on the function instance with the casted pointer. */
 template<typename ClassType, typename... Args>
 void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 	if (instance->getType().name == "Core::Component")
 		return fun.invoke(reinterpret_cast<Core::Component*>(instance), args...);
-	else if (instance->getType().name == "Core::BoxComponent")
-		return fun.invoke(reinterpret_cast<Core::BoxComponent*>(instance), args...);
-	else if (instance->getType().name == "Core::Sprite")
-		return fun.invoke(reinterpret_cast<Core::Sprite*>(instance), args...);
-	else if (instance->getType().name == "Core::Border")
-		return fun.invoke(reinterpret_cast<Core::Border*>(instance), args...);
-	else if (instance->getType().name == "Core::ChildManager")
-		return fun.invoke(reinterpret_cast<Core::ChildManager*>(instance), args...);
-	else if (instance->getType().name == "Core::Image")
-		return fun.invoke(reinterpret_cast<Core::Image*>(instance), args...);
-	else if (instance->getType().name == "Core::Panel")
-		return fun.invoke(reinterpret_cast<Core::Panel*>(instance), args...);
-	else if (instance->getType().name == "Core::ParentEntity")
-		return fun.invoke(reinterpret_cast<Core::ParentEntity*>(instance), args...);
-	else if (instance->getType().name == "Core::RectSprite")
-		return fun.invoke(reinterpret_cast<Core::RectSprite*>(instance), args...);
 	else if (instance->getType().name == "Core::Transform")
 		return fun.invoke(reinterpret_cast<Core::Transform*>(instance), args...);
+	else if (instance->getType().name == "Core::BoxComponent")
+		return fun.invoke(reinterpret_cast<Core::BoxComponent*>(instance), args...);
 	else if (instance->getType().name == "Core::RectTransform")
 		return fun.invoke(reinterpret_cast<Core::RectTransform*>(instance), args...);
 	else if (instance->getType().name == "Core::Behaviour")
 		return fun.invoke(reinterpret_cast<Core::Behaviour*>(instance), args...);
+	else if (instance->getType().name == "Core::Sprite")
+		return fun.invoke(reinterpret_cast<Core::Sprite*>(instance), args...);
+	else if (instance->getType().name == "Core::Border")
+		return fun.invoke(reinterpret_cast<Core::Border*>(instance), args...);
+	else if (instance->getType().name == "Core::Image")
+		return fun.invoke(reinterpret_cast<Core::Image*>(instance), args...);
 	else if (instance->getType().name == "Core::Button")
 		return fun.invoke(reinterpret_cast<Core::Button*>(instance), args...);
+	else if (instance->getType().name == "Core::ChildManager")
+		return fun.invoke(reinterpret_cast<Core::ChildManager*>(instance), args...);
+	else if (instance->getType().name == "Core::ParentEntity")
+		return fun.invoke(reinterpret_cast<Core::ParentEntity*>(instance), args...);
+	else if (instance->getType().name == "Core::Panel")
+		return fun.invoke(reinterpret_cast<Core::Panel*>(instance), args...);
+	else if (instance->getType().name == "Core::RectSprite")
+		return fun.invoke(reinterpret_cast<Core::RectSprite*>(instance), args...);
+	else if (instance->getType().name == "Core::Text")
+		return fun.invoke(reinterpret_cast<Core::Text*>(instance), args...);
 	else if (instance->getType().name == "Core::RectButton")
 		return fun.invoke(reinterpret_cast<Core::RectButton*>(instance), args...);
 	else if (instance->getType().name == "Core::DropDown")
@@ -94,30 +98,32 @@ template<typename T, typename ClassType>
 T polyGetValue(Mirror::Property prop, ClassType* instance) {
 	if (instance->getType().name == "Core::Component")
 		return prop.getValue<T>(reinterpret_cast<Core::Component*>(instance));
-	else if (instance->getType().name == "Core::BoxComponent")
-		return prop.getValue<T>(reinterpret_cast<Core::BoxComponent*>(instance));
-	else if (instance->getType().name == "Core::Sprite")
-		return prop.getValue<T>(reinterpret_cast<Core::Sprite*>(instance));
-	else if (instance->getType().name == "Core::Border")
-		return prop.getValue<T>(reinterpret_cast<Core::Border*>(instance));
-	else if (instance->getType().name == "Core::ChildManager")
-		return prop.getValue<T>(reinterpret_cast<Core::ChildManager*>(instance));
-	else if (instance->getType().name == "Core::Image")
-		return prop.getValue<T>(reinterpret_cast<Core::Image*>(instance));
-	else if (instance->getType().name == "Core::Panel")
-		return prop.getValue<T>(reinterpret_cast<Core::Panel*>(instance));
-	else if (instance->getType().name == "Core::ParentEntity")
-		return prop.getValue<T>(reinterpret_cast<Core::ParentEntity*>(instance));
-	else if (instance->getType().name == "Core::RectSprite")
-		return prop.getValue<T>(reinterpret_cast<Core::RectSprite*>(instance));
 	else if (instance->getType().name == "Core::Transform")
 		return prop.getValue<T>(reinterpret_cast<Core::Transform*>(instance));
+	else if (instance->getType().name == "Core::BoxComponent")
+		return prop.getValue<T>(reinterpret_cast<Core::BoxComponent*>(instance));
 	else if (instance->getType().name == "Core::RectTransform")
 		return prop.getValue<T>(reinterpret_cast<Core::RectTransform*>(instance));
 	else if (instance->getType().name == "Core::Behaviour")
 		return prop.getValue<T>(reinterpret_cast<Core::Behaviour*>(instance));
+	else if (instance->getType().name == "Core::Sprite")
+		return prop.getValue<T>(reinterpret_cast<Core::Sprite*>(instance));
+	else if (instance->getType().name == "Core::Border")
+		return prop.getValue<T>(reinterpret_cast<Core::Border*>(instance));
+	else if (instance->getType().name == "Core::Image")
+		return prop.getValue<T>(reinterpret_cast<Core::Image*>(instance));
 	else if (instance->getType().name == "Core::Button")
 		return prop.getValue<T>(reinterpret_cast<Core::Button*>(instance));
+	else if (instance->getType().name == "Core::ChildManager")
+		return prop.getValue<T>(reinterpret_cast<Core::ChildManager*>(instance));
+	else if (instance->getType().name == "Core::ParentEntity")
+		return prop.getValue<T>(reinterpret_cast<Core::ParentEntity*>(instance));
+	else if (instance->getType().name == "Core::Panel")
+		return prop.getValue<T>(reinterpret_cast<Core::Panel*>(instance));
+	else if (instance->getType().name == "Core::RectSprite")
+		return prop.getValue<T>(reinterpret_cast<Core::RectSprite*>(instance));
+	else if (instance->getType().name == "Core::Text")
+		return prop.getValue<T>(reinterpret_cast<Core::Text*>(instance));
 	else if (instance->getType().name == "Core::RectButton")
 		return prop.getValue<T>(reinterpret_cast<Core::RectButton*>(instance));
 	else if (instance->getType().name == "Core::DropDown")
@@ -152,30 +158,32 @@ template<typename T, std::size_t N, typename ClassType>
 std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 	if (instance->getType().name == "Core::Component")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Component*>(instance));
-	else if (instance->getType().name == "Core::BoxComponent")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::BoxComponent*>(instance));
-	else if (instance->getType().name == "Core::Sprite")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Sprite*>(instance));
-	else if (instance->getType().name == "Core::Border")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Border*>(instance));
-	else if (instance->getType().name == "Core::ChildManager")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance));
-	else if (instance->getType().name == "Core::Image")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance));
-	else if (instance->getType().name == "Core::Panel")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance));
-	else if (instance->getType().name == "Core::ParentEntity")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance));
-	else if (instance->getType().name == "Core::RectSprite")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance));
 	else if (instance->getType().name == "Core::Transform")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Transform*>(instance));
+	else if (instance->getType().name == "Core::BoxComponent")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::BoxComponent*>(instance));
 	else if (instance->getType().name == "Core::RectTransform")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectTransform*>(instance));
 	else if (instance->getType().name == "Core::Behaviour")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Behaviour*>(instance));
+	else if (instance->getType().name == "Core::Sprite")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Sprite*>(instance));
+	else if (instance->getType().name == "Core::Border")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Border*>(instance));
+	else if (instance->getType().name == "Core::Image")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance));
 	else if (instance->getType().name == "Core::Button")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Button*>(instance));
+	else if (instance->getType().name == "Core::ChildManager")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance));
+	else if (instance->getType().name == "Core::ParentEntity")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance));
+	else if (instance->getType().name == "Core::Panel")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance));
+	else if (instance->getType().name == "Core::RectSprite")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance));
+	else if (instance->getType().name == "Core::Text")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Text*>(instance));
 	else if (instance->getType().name == "Core::RectButton")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectButton*>(instance));
 	else if (instance->getType().name == "Core::DropDown")
@@ -210,30 +218,32 @@ template<typename T, typename ClassType>
 void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 	if (instance->getType().name == "Core::Component")
 		return prop.setValue(reinterpret_cast<Core::Component*>(instance), value);
-	else if (instance->getType().name == "Core::BoxComponent")
-		return prop.setValue(reinterpret_cast<Core::BoxComponent*>(instance), value);
-	else if (instance->getType().name == "Core::Sprite")
-		return prop.setValue(reinterpret_cast<Core::Sprite*>(instance), value);
-	else if (instance->getType().name == "Core::Border")
-		return prop.setValue(reinterpret_cast<Core::Border*>(instance), value);
-	else if (instance->getType().name == "Core::ChildManager")
-		return prop.setValue(reinterpret_cast<Core::ChildManager*>(instance), value);
-	else if (instance->getType().name == "Core::Image")
-		return prop.setValue(reinterpret_cast<Core::Image*>(instance), value);
-	else if (instance->getType().name == "Core::Panel")
-		return prop.setValue(reinterpret_cast<Core::Panel*>(instance), value);
-	else if (instance->getType().name == "Core::ParentEntity")
-		return prop.setValue(reinterpret_cast<Core::ParentEntity*>(instance), value);
-	else if (instance->getType().name == "Core::RectSprite")
-		return prop.setValue(reinterpret_cast<Core::RectSprite*>(instance), value);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.setValue(reinterpret_cast<Core::Transform*>(instance), value);
+	else if (instance->getType().name == "Core::BoxComponent")
+		return prop.setValue(reinterpret_cast<Core::BoxComponent*>(instance), value);
 	else if (instance->getType().name == "Core::RectTransform")
 		return prop.setValue(reinterpret_cast<Core::RectTransform*>(instance), value);
 	else if (instance->getType().name == "Core::Behaviour")
 		return prop.setValue(reinterpret_cast<Core::Behaviour*>(instance), value);
+	else if (instance->getType().name == "Core::Sprite")
+		return prop.setValue(reinterpret_cast<Core::Sprite*>(instance), value);
+	else if (instance->getType().name == "Core::Border")
+		return prop.setValue(reinterpret_cast<Core::Border*>(instance), value);
+	else if (instance->getType().name == "Core::Image")
+		return prop.setValue(reinterpret_cast<Core::Image*>(instance), value);
 	else if (instance->getType().name == "Core::Button")
 		return prop.setValue(reinterpret_cast<Core::Button*>(instance), value);
+	else if (instance->getType().name == "Core::ChildManager")
+		return prop.setValue(reinterpret_cast<Core::ChildManager*>(instance), value);
+	else if (instance->getType().name == "Core::ParentEntity")
+		return prop.setValue(reinterpret_cast<Core::ParentEntity*>(instance), value);
+	else if (instance->getType().name == "Core::Panel")
+		return prop.setValue(reinterpret_cast<Core::Panel*>(instance), value);
+	else if (instance->getType().name == "Core::RectSprite")
+		return prop.setValue(reinterpret_cast<Core::RectSprite*>(instance), value);
+	else if (instance->getType().name == "Core::Text")
+		return prop.setValue(reinterpret_cast<Core::Text*>(instance), value);
 	else if (instance->getType().name == "Core::RectButton")
 		return prop.setValue(reinterpret_cast<Core::RectButton*>(instance), value);
 	else if (instance->getType().name == "Core::DropDown")
@@ -268,30 +278,32 @@ template<typename T, std::size_t N, typename ClassType>
 void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N]) {
 	if (instance->getType().name == "Core::Component")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Component*>(instance), value);
-	else if (instance->getType().name == "Core::BoxComponent")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::BoxComponent*>(instance), value);
-	else if (instance->getType().name == "Core::Sprite")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Sprite*>(instance), value);
-	else if (instance->getType().name == "Core::Border")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Border*>(instance), value);
-	else if (instance->getType().name == "Core::ChildManager")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance), value);
-	else if (instance->getType().name == "Core::Image")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance), value);
-	else if (instance->getType().name == "Core::Panel")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance), value);
-	else if (instance->getType().name == "Core::ParentEntity")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance), value);
-	else if (instance->getType().name == "Core::RectSprite")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance), value);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Transform*>(instance), value);
+	else if (instance->getType().name == "Core::BoxComponent")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::BoxComponent*>(instance), value);
 	else if (instance->getType().name == "Core::RectTransform")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectTransform*>(instance), value);
 	else if (instance->getType().name == "Core::Behaviour")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Behaviour*>(instance), value);
+	else if (instance->getType().name == "Core::Sprite")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Sprite*>(instance), value);
+	else if (instance->getType().name == "Core::Border")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Border*>(instance), value);
+	else if (instance->getType().name == "Core::Image")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance), value);
 	else if (instance->getType().name == "Core::Button")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Button*>(instance), value);
+	else if (instance->getType().name == "Core::ChildManager")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance), value);
+	else if (instance->getType().name == "Core::ParentEntity")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ParentEntity*>(instance), value);
+	else if (instance->getType().name == "Core::Panel")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance), value);
+	else if (instance->getType().name == "Core::RectSprite")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance), value);
+	else if (instance->getType().name == "Core::Text")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Text*>(instance), value);
 	else if (instance->getType().name == "Core::RectButton")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectButton*>(instance), value);
 	else if (instance->getType().name == "Core::DropDown")
@@ -321,6 +333,7 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Inspector*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
+}
 }
 
 #endif
