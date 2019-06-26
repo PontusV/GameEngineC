@@ -14,19 +14,21 @@ namespace Core {
 		GENERATED_BODY()
 	public:
 
-		Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0);
+		Text(std::wstring text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0);
+		Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0) : Text(std::wstring(text.begin(), text.end()), fontAddress, fontSize, color, layerIndex) {}
 		Text();
 		~Text();
 
-		const char* getText() const;
+		const wchar_t* getText() const;
 		const Font& getFont() const;
 
+		void setText(std::wstring text);
 		void setText(std::string text);
 		glm::vec2 getSize();
 
 	private:
 		PROPERTY()
-		std::string text;
+		std::wstring text;
 		PROPERTY()
 		Font font;
 	};

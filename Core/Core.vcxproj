@@ -224,6 +224,7 @@
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GridLayoutGroup.cpp" />
     <ClCompile Include="HorizontalLayoutGroup.cpp" />
+    <ClCompile Include="InputField.cpp" />
     <ClCompile Include="Inspector.cpp" />
     <ClCompile Include="LayoutController.cpp" />
     <ClCompile Include="LayoutGroup.cpp" />
@@ -295,8 +296,10 @@
     <ClInclude Include="EntityLocation.h" />
     <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="GridLayoutGroup.h" />
+    <ClInclude Include="HideFlags.h" />
     <ClInclude Include="HorizontalLayoutGroup.h" />
     <ClInclude Include="ILayoutElement.h" />
+    <ClInclude Include="InputField.h" />
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="LayoutController.h" />
     <ClInclude Include="LayoutGroup.h" />

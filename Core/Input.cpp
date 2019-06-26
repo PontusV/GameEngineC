@@ -23,7 +23,7 @@ Input::~Input() {
 
 void Input::update(float dt) {
 	// Mouse Drag
-	if (mouseMoved && leftMouseButtonPressed) {
+	if (mouseMoved && leftMouseButtonPressed && lastClickTarget.refresh()) {
 		std::vector<Behaviour*> scripts = lastClickTarget.getComponentsUpwards<Behaviour>();
 		for (Behaviour* script : scripts) {
 			script->onMouseDrag(mousePosition.x, mousePosition.y);
@@ -76,7 +76,11 @@ void Input::update(float dt) {
 			}
 		}
 	}
-	
+
+	// Clear old key pressed/released
+	keysPressed.clear();
+	keysReleased.clear();
+	typedText = std::wstring();
 	// Process input events
 	for (InputEvent& event : events) {
 		processInputEvent(event, hoverTarget);
@@ -89,6 +93,9 @@ void Input::update(float dt) {
 /* Process input event */
 void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 	switch (event.type) {
+	case INPUT_EVENT_CHARACTER:
+		typeText(event.chr.codepoint);
+		break;
 	case INPUT_EVENT_KEY:
 		if (event.key.action == GLFW_PRESS) {
 			keyPressed(event.key);
@@ -106,26 +113,23 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				leftMouseButtonPressed = true;
 				timeSinceLastClick = (float)glfwGetTime();
 
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-				for (Behaviour* script : scripts) {
-					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
-				}
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
+				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
+					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+				}
 				if (clickTime <= DOUBLE_CLICK_THRESHOLD && lastClickTarget.getEntity() == target.getEntity()) {
-					std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-					for (Behaviour* script : scripts) {
+					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 						script->onDoubleClick();
 					}
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
 				leftMouseButtonPressed = false;
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
 				if (target.getEntity() == lastClickTarget.getEntity()) {
-					for (Behaviour* script : scripts) {
+					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 					}
 				}
@@ -137,36 +141,31 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-				for (Behaviour* script : scripts) {
+				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-				for (Behaviour* script : scripts) {
+				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
 			}
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-				for (Behaviour* script : scripts) {
+				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
-				std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-				for (Behaviour* script : scripts) {
+				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
 			}
 		}
 		break;
 	case INPUT_EVENT_SCROLL:
-		std::vector<Behaviour*> scripts = target.getComponentsUpwards<Behaviour>();
-		for (Behaviour* script : scripts) {
+		for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 			script->onScroll(event.scroll.xoffset, event.scroll.yoffset);
 		}
 		break;
@@ -183,6 +182,23 @@ void Input::mouseButtonReleased(const MouseButtonEvent& event) const {
 }
 
 // ------------------------------- KEY -----------------------------------
+
+std::string Input::getKeyName(int keycode, int scancode) const {
+	if (keycode == GLFW_KEY_SPACE) {
+		return "space";
+	}
+	return glfwGetKeyName(keycode, scancode);
+}
+
+void Input::typeText(unsigned int codepoint) {
+	wchar_t character = (wchar_t)codepoint;
+	typedText += character;
+}
+
+const std::wstring& Input::getTextTyped() const {
+	return typedText;
+}
+
 std::string Input::getButtonName(int keycode) const {
 	std::map<int, std::string>::const_iterator pos = keyBinds.find(keycode);
 	if (pos != keyBinds.end())
@@ -191,7 +207,37 @@ std::string Input::getButtonName(int keycode) const {
 		return "";
 }
 
-void Input::keyPressed(const KeyEvent& event) const {
+bool Input::getKeyDown(int keycode) const {
+	return std::find(keysDown.begin(), keysDown.end(), keycode) != keysDown.end();
+}
+
+bool Input::getKeyPressed(int keycode) const {
+	return std::find(keysPressed.begin(), keysPressed.end(), keycode) != keysPressed.end();
+}
+
+bool Input::getKeyReleased(int keycode) const {
+	return std::find(keysReleased.begin(), keysReleased.end(), keycode) != keysReleased.end();
+}
+
+std::vector<int> Input::getKeysDown() {
+	return keysDown;
+}
+
+std::vector<int> Input::getKeysPressed() {
+	return keysPressed;
+}
+
+std::vector<int> Input::getKeysReleased() {
+	return keysReleased;
+}
+
+void Input::keyPressed(const KeyEvent& event) {
+	// Update list
+	if (std::find(keysDown.begin(), keysDown.end(), event.keycode) == keysDown.end()) {
+		keysDown.push_back(event.keycode);
+		keysPressed.push_back(event.keycode);
+	}
+	//
 	std::string buttonName = getButtonName(event.keycode);
 	if (buttonName == "") //Return if no buttonName was found
 		return;
@@ -201,7 +247,11 @@ void Input::keyPressed(const KeyEvent& event) const {
 	}
 }
 
-void Input::keyReleased(const KeyEvent& event) const {
+void Input::keyReleased(const KeyEvent& event) {
+	// Update list
+	keysDown.erase(std::find(keysDown.begin(), keysDown.end(), event.keycode));
+	keysReleased.push_back(event.keycode);
+	//
 	std::string buttonName = getButtonName(event.keycode);
 	if (buttonName == "") //Return if no buttonName was found
 		return;

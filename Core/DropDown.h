@@ -11,7 +11,7 @@ namespace Core {
 
 	struct DropDownOption {
 		std::string text;
-		ComponentFunctionHandleWrapper function;
+		ComponentFunctionHandle<> function;
 	};
 
 	/* Adds a Text and Rect component on start() */
@@ -24,7 +24,7 @@ namespace Core {
 
 		void open();
 		void close();
-		void addOption(std::string label, ComponentFunctionHandleWrapper function);
+		void addOption(std::string label, ComponentFunctionHandle<> function);
 
 		void awake() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;

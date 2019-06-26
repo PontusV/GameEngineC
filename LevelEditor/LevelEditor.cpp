@@ -45,6 +45,7 @@ int LevelEditor::initiate() {
 		WindowScale(true, 1.0f, false, 0),
 		RectTransform(0, 0, 500, 25, 10.0f, Alignment::TOP_LEFT)
 	);
+	menuBar.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	HorizontalLayoutGroup* layoutGroup = menuBar.addComponent<HorizontalLayoutGroup>();
 	layoutGroup->paddingLeft = 1;
 	layoutGroup->paddingRight = 1;
@@ -114,6 +115,7 @@ int LevelEditor::initiate() {
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		RectTransform(0, 0, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
 	);
+	rightPanel.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	int textPadding = 5;
 	int backgroundPadding = 3;
 	// Inspector label

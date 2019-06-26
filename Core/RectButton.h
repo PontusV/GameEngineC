@@ -34,7 +34,7 @@ namespace Core {
 		PROPERTY()
 		Color colors[3];
 		PROPERTY()
-		ComponentFunctionHandleWrapper clickFunction;
+		ComponentFunctionHandle<> clickFunction;
 
 	private:
 		PROPERTY()

@@ -130,7 +130,7 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::string& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 

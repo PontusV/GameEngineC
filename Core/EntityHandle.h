@@ -32,6 +32,8 @@ namespace Core {
 		void destroy();
 
 		std::string getEntityName();
+		HideFlags getEntityHideFlags();
+		void setEntityHideFlags(HideFlags hideFlags);
 
 		template<typename... Ts>
 		EntityHandle createEntity(std::string name, Ts&... components);

@@ -87,7 +87,7 @@ FontManager::~FontManager()
 }
 
 
-TextData2D FontManager::createText(std::string text, unsigned short size) {
+TextData2D FontManager::createText(std::wstring text, unsigned short size) {
 	//float scale = ((float)size)/textSize;
 	//float scale = 1.0f;
 
@@ -98,7 +98,7 @@ TextData2D FontManager::createText(std::string text, unsigned short size) {
 	std::vector<CharTexture2D> textures;
 	textures.reserve(text.size());
 
-	float width;
+	float width = 0.0f;
 
 	// Iterate through all characters
 	for (std::size_t character : text) {

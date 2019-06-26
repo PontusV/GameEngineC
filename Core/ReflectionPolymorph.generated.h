@@ -33,6 +33,7 @@
 #include "G:/Projects/ProjectGE/Core/GridLayoutGroup.h"
 #include "G:/Projects/ProjectGE/Core/DragAndResize.h"
 #include "G:/Projects/ProjectGE/Core/Inspector.h"
+#include "G:/Projects/ProjectGE/Core/InputField.h"
 
 namespace Mirror {
 /* Converts the given pointer to the derived type. Calls invoke on the function instance with the casted pointer. */
@@ -96,6 +97,8 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::DragAndResize*>(instance), args...);
 	else if (instance->getType().name == "Core::Inspector")
 		return fun.invoke(reinterpret_cast<Core::Inspector*>(instance), args...);
+	else if (instance->getType().name == "Core::InputField")
+		return fun.invoke(reinterpret_cast<Core::InputField*>(instance), args...);
 	throw std::invalid_argument("polyInvoke::ERROR");
 }
 template<typename T, typename ClassType>
@@ -158,6 +161,8 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::DragAndResize*>(instance));
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.getValue<T>(reinterpret_cast<Core::Inspector*>(instance));
+	else if (instance->getType().name == "Core::InputField")
+		return prop.getValue<T>(reinterpret_cast<Core::InputField*>(instance));
 	throw std::invalid_argument("polyGetValue::ERROR");
 }
 template<typename T, std::size_t N, typename ClassType>
@@ -220,6 +225,8 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::DragAndResize*>(instance));
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Inspector*>(instance));
+	else if (instance->getType().name == "Core::InputField")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance));
 	throw std::invalid_argument("polyGetArrayValue::ERROR");
 }
 template<typename T, typename ClassType>
@@ -282,6 +289,8 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::DragAndResize*>(instance), value);
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.setValue(reinterpret_cast<Core::Inspector*>(instance), value);
+	else if (instance->getType().name == "Core::InputField")
+		return prop.setValue(reinterpret_cast<Core::InputField*>(instance), value);
 	throw std::invalid_argument("polySetValue::ERROR");
 }
 template<typename T, std::size_t N, typename ClassType>
@@ -344,9 +353,11 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::DragAndResize*>(instance), value);
 	else if (instance->getType().name == "Core::Inspector")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Inspector*>(instance), value);
+	else if (instance->getType().name == "Core::InputField")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
 }
-typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector> ReflectedTypes;
+typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::InputField> ReflectedTypes;
 }
 
 #endif

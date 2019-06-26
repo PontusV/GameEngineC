@@ -5,6 +5,8 @@
 #include "RectSprite.h"
 #include "Panel.h"
 #include "LayoutElement.h"
+#include "InputField.h"
+#include "HideFlags.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -117,8 +119,14 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 
 		// Input Field
 		float propertyValue = Mirror::polyGetValue<float>(prop, component);
-		EntityHandle inputField = createEntity(fieldName + "_InputField");
-		// TODO: Add InputField (script)
+		EntityHandle inputField = createEntity(fieldName + "_InputField",
+			RectSprite(Color(255, 255, 255), layer),
+			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+		);
+		InputField* inputFieldComponent = inputField.addComponent<InputField>();
+		inputFieldComponent->setText(propertyValueToString(prop, component));
+		inputFieldComponent->contentType = InputField::ContentType::Decimal;
+		//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
 		inputField.setParent(propField);
 	}
 	else {
@@ -188,6 +196,8 @@ void Inspector::addComponentEntry(Component* component) {
 
 void Inspector::inspect(EntityHandle entity) {
 	if (entity.refresh()) {
+		HideFlags hideFlags = entity.getEntityHideFlags();
+		if (hideFlags == HideFlags::HideInInspector) return;
 		currentTarget = entity;
 		std::cout << "Inspecting " << entity.getEntityName() << "\n";
 		// Clear old target component list

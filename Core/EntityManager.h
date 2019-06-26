@@ -7,12 +7,15 @@
 #include "EntityLocation.h"
 #include "Handle.h"
 #include "FunctionCaller.h"
+#include "HideFlags.h"
 
 #include <map>
 #include <vector>
+#include <queue>
 #include <stdexcept>
 #include <iostream>
 #include <functional>
+
 
 namespace Core {
 
@@ -56,6 +59,8 @@ namespace Core {
 		Handle getEntityHandle(Entity entity);
 		Handle getEntityHandle(std::string entityName);
 		std::string getEntityName(Entity entity);
+		HideFlags getEntityHideFlags(Entity entity);
+		void setEntityHideFlags(Entity entity, HideFlags hideFlags);
 		EntityLocation getLocation(Entity entity);
 
 		void clear();
@@ -100,10 +105,11 @@ namespace Core {
 	private:
 		std::map<Entity, Archetype*> entityMap;
 		std::map<std::string, Entity> entityNameMap;
+		std::map<Entity, HideFlags> entityHideFlags;
 		std::vector<Archetype*> archetypes;
 		std::size_t entityIDCounter;
 
-		std::vector<IFunctionCaller*> functionQueue;
+		std::queue<IFunctionCaller*> functionQueue;
 		bool isAwake;
 	};
 
@@ -209,18 +215,19 @@ namespace Core {
 	template<typename... Ts>
 	Entity EntityManager::createEntityQueued(std::string name, Ts&... components) {
 		Entity entity = generateEntity(name);
-		functionQueue.push_back(new FunctionCaller<Handle, EntityManager, Entity, Ts&...>(&EntityManager::addEntity<Ts...>, *this, entity, components...));
+		functionQueue.push(new FunctionCaller<Handle, EntityManager, Entity, Ts&...>(&EntityManager::addEntity<Ts...>, *this, entity, components...));
+		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::awakeEntity, *this, entity));
 		return entity;
 	}
 	template<typename T>
 	T* EntityManager::addComponentQueued(Entity entity, T& component) {
 		auto function = new FunctionCaller<void, EntityManager, Entity, T&>(&EntityManager::addComponent<T>, *this, entity, component);
-		functionQueue.push_back(function);
+		functionQueue.push(function);
 		return function->getArgument<T>();
 	}
 	template<typename T>
 	void EntityManager::removeComponentQueued(Entity entity) {
-		functionQueue.push_back(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::removeComponent<T>, *this, entity));
+		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::removeComponent<T>, *this, entity));
 	}
 } // End of namespace
 #endif

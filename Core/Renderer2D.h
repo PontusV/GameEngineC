@@ -31,7 +31,7 @@ namespace Core {
 		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned char& layerIndex);
 
 		/* Render text. Submits text to a batchRenderer2D. */
-		void submitText(const std::string& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
+		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<glm::vec2>& clipMaskVertices, const unsigned int& layerIndex);
 
 		/* Draws everything submitted to this renderer since the last render() call. */
 		void render(float deltaTime);

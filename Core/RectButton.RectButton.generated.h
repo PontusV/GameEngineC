@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "clickFunction";\
-	newProperty.type.name = "Core::ComponentFunctionHandleWrapper";\
+	newProperty.type.name = "ComponentFunctionHandle<>";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -64,7 +64,7 @@ Core::Color* getValue1701103765001(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-Core::ComponentFunctionHandleWrapper getValue1683755490000(std::string propertyName) {\
+ComponentFunctionHandle<> getValue4233867720000(std::string propertyName) {\
 	if (propertyName == "clickFunction") {\
 		return this->clickFunction;\
 	}\
@@ -83,7 +83,7 @@ T getValue_impl(std::string propertyName) {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is an array!");\
 		}\
 		if (propertyName == "clickFunction") {\
-			return Mirror::convertType<Core::ComponentFunctionHandleWrapper, T>(getValue1683755490000(propertyName));\
+			return Mirror::convertType<ComponentFunctionHandle<>, T>(getValue4233867720000(propertyName));\
 		}\
 		if (propertyName == "layerIndex") {\
 			return Mirror::convertType<unsigned char, T>(getValue2802854000(propertyName));\
@@ -122,7 +122,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::RectButton::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::RectButton::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, Core::ComponentFunctionHandleWrapper value) {\
+bool setValue(std::string propertyName, ComponentFunctionHandle<> value) {\
 	if (propertyName == "clickFunction") {\
 		this->clickFunction = value;\
 		return true;\
@@ -152,7 +152,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is an array!");\
 		}\
 		if (propertyName == "clickFunction") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::ComponentFunctionHandleWrapper>(value))) return true;\
+			if (setValue(propertyName, Mirror::convertType<T, ComponentFunctionHandle<>>(value))) return true;\
 		}\
 		if (propertyName == "layerIndex") {\
 			if (setValue(propertyName, Mirror::convertType<T, unsigned char>(value))) return true;\

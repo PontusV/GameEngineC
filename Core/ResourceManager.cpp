@@ -57,11 +57,12 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm:
 	return texture;
 }
 
-TextData2D ResourceManager::createText(std::string text, Font font) {
+TextData2D ResourceManager::createText(std::wstring text, Font font) {
 	FontManager& manager = loadFontManager(font.getFileName(), font.getSize());
 	return manager.createText(text, font.getSize());
 }
-glm::ivec2 ResourceManager::getTextSize(const char* text, const Font& font) {
+
+glm::ivec2 ResourceManager::getTextSize(std::wstring text, const Font& font) {
 	FontManager& manager = loadFontManager(font.getFileName(), font.getSize());
 	TextData2D data = manager.createText(text, font.getSize());
 	return data.size;

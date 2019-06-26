@@ -5,6 +5,7 @@
 #define INPUT_EVENT_KEY				0
 #define INPUT_EVENT_MOUSEBUTTON		1
 #define INPUT_EVENT_SCROLL			2
+#define INPUT_EVENT_CHARACTER		3
 
 #define MOUSE_BUTTON_LEFT			0
 #define MOUSE_BUTTON_RIGHT			1
@@ -36,11 +37,16 @@ namespace Core {
 		float yoffset;
 	};
 
+	struct CharacterEvent {
+		unsigned int codepoint;
+	};
+
 	struct InputEvent {
 		int type;
 		KeyEvent key;
 		MouseButtonEvent mouseButton;
 		ScrollEvent scroll;
+		CharacterEvent chr;
 	};
 }
 #endif

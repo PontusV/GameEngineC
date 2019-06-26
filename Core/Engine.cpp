@@ -56,6 +56,16 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 }
 
+void characterCallback(GLFWwindow* window, unsigned int codepoint) {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+	InputEvent event;
+	event.type = INPUT_EVENT_CHARACTER;
+	event.chr.codepoint = codepoint;
+
+	engine->getInput().addInputEvent(event);
+}
+
 void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
 	engine->getInput().setMousePosition(glm::vec2(xpos, ypos));
@@ -152,6 +162,7 @@ int Engine::initiate() {
 	// Input
 	glfwSetWindowUserPointer(window.getWindow(), this); // TODO: Change user to Engine
 	glfwSetKeyCallback(window.getWindow(), keyCallback);
+	glfwSetCharCallback(window.getWindow(), characterCallback);
 	glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
 	glfwSetMouseButtonCallback(window.getWindow(), mouseButtonCallback);
 	// End of system initialization
@@ -196,6 +207,7 @@ int Engine::start() {
 		input.update(deltaTime);
 		behaviourManager.update(deltaTime);
 		currentLevel->getEntityManager().lock()->processQueue(); // Process Queue
+		debugLevel->getEntityManager().lock()->processQueue(); // Temporary for testing (ugly solution for updating all levels)
 		physics.update(deltaTime);
 		graphics.update(deltaTime);
 

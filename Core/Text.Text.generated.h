@@ -19,7 +19,7 @@ static Mirror::Class createType() {\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "text";\
-	newProperty.type.name = "std::string";\
+	newProperty.type.name = "std::wstring";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -71,7 +71,7 @@ static Mirror::Class createType() {\
 	return newClass;\
 }\
 protected:\
-std::string getValue2722919607000(std::string propertyName) {\
+std::wstring getValue3223175238000(std::string propertyName) {\
 	if (propertyName == "text") {\
 		return this->text;\
 	}\
@@ -87,7 +87,7 @@ template<typename T>\
 T getValue_impl(std::string propertyName) {\
 	try {\
 		if (propertyName == "text") {\
-			return Mirror::convertType<std::string, T>(getValue2722919607000(propertyName));\
+			return Mirror::convertType<std::wstring, T>(getValue3223175238000(propertyName));\
 		}\
 		if (propertyName == "font") {\
 			return Mirror::convertType<Core::Font, T>(getValue1469732627000(propertyName));\
@@ -123,7 +123,7 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Text::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Text::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, std::string value) {\
+bool setValue(std::string propertyName, std::wstring value) {\
 	if (propertyName == "text") {\
 		this->text = value;\
 		return true;\
@@ -141,7 +141,7 @@ template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "text") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::string>(value))) return true;\
+			if (setValue(propertyName, Mirror::convertType<T, std::wstring>(value))) return true;\
 		}\
 		if (propertyName == "font") {\
 			if (setValue(propertyName, Mirror::convertType<T, Core::Font>(value))) return true;\

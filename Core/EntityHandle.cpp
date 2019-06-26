@@ -23,7 +23,8 @@ void EntityHandle::destroy() {
 }
 
 void EntityHandle::setParent(const Entity& entity) {
-	setParent(manager->getEntityHandle(entity));
+	EntityHandle parent = manager->getEntityHandle(entity);
+	setParent(parent);
 }
 
 void EntityHandle::setParent(EntityHandle entity) {
@@ -50,5 +51,19 @@ std::string EntityHandle::getEntityName() {
 	if (refresh()) {
 		return manager->getEntityName(entity);
 	}
+	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!";
 	return "Invalid";
+}
+HideFlags EntityHandle::getEntityHideFlags() {
+	HideFlags result = manager->getEntityHideFlags(entity);
+	EntityHandle parent = getParent();
+	while (parent.refresh()) {
+		HideFlags hideFlags = parent.getEntityHideFlags();
+		result = result | hideFlags;
+		parent = parent.getParent();
+	}
+	return result;
+}
+void EntityHandle::setEntityHideFlags(HideFlags hideFlags) {
+	return manager->setEntityHideFlags(entity, hideFlags);
 }

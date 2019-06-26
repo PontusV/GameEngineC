@@ -16,6 +16,7 @@ Entity EntityManager::generateEntity(std::string name) {
 		throw std::invalid_argument("Entity with given name already exist!");
 	}
 	entityNameMap[name] = entity;
+	entityHideFlags[entity] = HideFlags::None;
 	return entity;
 }
 
@@ -87,18 +88,37 @@ Handle EntityManager::getEntityHandle(Entity entity) {
 	handle.update();
 	return handle;
 }
+
 Handle EntityManager::getEntityHandle(std::string entityName) {
 	Entity& entity = entityNameMap[entityName];
 	return getEntityHandle(entity);
 }
+
 std::string EntityManager::getEntityName(Entity entity) {
 	auto it = entityNameMap.begin();
 	while (it != entityNameMap.end()) {
 		if (it->second == entity) return it->first;
 		it++;
 	}
-	std::cout << "EntityManager::getEntityName::ERROR There is no such entity stored in this Level!\n";
+	std::cout << "EntityManager::getEntityName::ERROR There is no such entity stored in this Level!" << std::endl;
 	throw std::invalid_argument("EntityManager::getEntityName::ERROR There is no such entity stored in this Level!");
+}
+
+HideFlags EntityManager::getEntityHideFlags(Entity entity) {
+	auto it = entityHideFlags.find(entity);
+	if (it == entityHideFlags.end()) {
+		std::cout << "EntityManager::getEntityHideFlags::ERROR The Entity does not have any hideflags registered!" << std::endl;
+		throw std::invalid_argument("EntityManager::getEntityHideFlags::ERROR The Entity does not have any hideflags registered!");
+	}
+	return it->second;
+}
+void EntityManager::setEntityHideFlags(Entity entity, HideFlags hideFlags) {
+	auto it = entityHideFlags.find(entity);
+	if (it == entityHideFlags.end()) {
+		std::cout << "EntityManager::setEntityHideFlags::ERROR The Entity does not have any hideflags registered!" << std::endl;
+		throw std::invalid_argument("EntityManager::setEntityHideFlags::ERROR The Entity does not have any hideflags registered!");
+	}
+	it->second = hideFlags;
 }
 
 void EntityManager::destroyEntity(Entity entity) {
@@ -125,10 +145,21 @@ void EntityManager::removeEntity(Entity entity, bool destroy) {
 			it = entityMap.find(entity);
 		}
 
+		// Remove hideflags entry
+		auto iterator = entityHideFlags.find(entity);
+		if (iterator == entityHideFlags.end()) {
+			std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << getEntityName(entity) << std::endl;
+			throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have hideflags!");
+		}
+		entityHideFlags.erase(iterator);
+
 		// Erase Entity name
-		auto iterator = entityNameMap.find(getEntityName(entity));
-		if (iterator == entityNameMap.end()) throw "EntityManager::removeEntity::ERROR The Entity does not have a name!";
-		entityNameMap.erase(iterator);
+		auto iterator2 = entityNameMap.find(getEntityName(entity));
+		if (iterator2 == entityNameMap.end()) {
+			std::cout << "EntityManager::removeEntity::ERROR The Entity does not have a name!" << std::endl;
+			throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have a name!");
+		}
+		entityNameMap.erase(iterator2);
 	}
 
 	// Notify parent
@@ -296,10 +327,10 @@ Handle EntityManager::moveEntity(Entity entity, Archetype* src, Archetype* dest)
 
 void EntityManager::clear() {
 	// Clears and deletes all stored function calls
-	for (IFunctionCaller* caller : functionQueue) {
-		delete caller;
+	while (!functionQueue.empty()) {
+		delete functionQueue.front();
+		functionQueue.pop();
 	}
-	functionQueue.clear();
 	// Clears and deletes all archetypes
 	for (Archetype* archetype : archetypes) {
 		archetype->clear();
@@ -309,16 +340,18 @@ void EntityManager::clear() {
 	archetypes.clear();
 	entityMap.clear();
 	entityNameMap.clear();
+	entityHideFlags.clear();
 }
 
 void EntityManager::processQueue() {
-	for (IFunctionCaller* caller : functionQueue) {
-		caller->call();
-		delete caller;
+	while (!functionQueue.empty()) {
+		IFunctionCaller* fun = functionQueue.front();
+		fun->call();
+		delete fun;
+		functionQueue.pop();
 	}
-	functionQueue.clear();
 }
 
 void EntityManager::destroyEntityQueued(Entity entity) {
-	functionQueue.push_back(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
+	functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
 }

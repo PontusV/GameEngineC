@@ -86,7 +86,8 @@ void DropDown::open() {
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
 		RectSprite(Color(20, 20, 20, 255), text.getLayerIndex())
 	);
-	// Text Alignment? Left-Middle by default
+	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
+	// Text Alignment? Left by default
 
 	// Menu Option settings
 	int optionWidth = boxWidth - (int)(boxPaddingX*2);
@@ -151,7 +152,7 @@ void DropDown::close() {
 	// Set to Default color
 	owner.getComponent<RectSprite>()->setColor(Color(80, 80, 80, 255));
 }
-void DropDown::addOption(std::string label, ComponentFunctionHandleWrapper function) {
+void DropDown::addOption(std::string label, ComponentFunctionHandle<> function) {
 	options.push_back({label, function});
 }
 

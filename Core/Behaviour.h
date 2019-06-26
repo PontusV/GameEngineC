@@ -53,9 +53,9 @@ namespace Core {
 		void disable();
 
 	public:
-		bool started;
-		bool enabled;
-		bool runInEditorMode = true;
+		bool started = false;
+		bool enabled = false;
+		bool runInEditMode = true;
 
 		static Input* input;
 		static Window* window;

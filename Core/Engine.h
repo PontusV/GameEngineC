@@ -46,6 +46,7 @@ namespace Core {
 
 		// Level
 		LevelPtr currentLevel;
+		std::vector<LevelPtr> levels;
 		LevelPtr debugLevel;		// Where you put entities showing debugging data. These will not be loaded/saved
 
 		// Main Systems
