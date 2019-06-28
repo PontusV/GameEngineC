@@ -115,6 +115,12 @@ namespace Mirror {
 			return !(*this == other);
 		}
 		// Data Type Queries
+		bool isDecimal() const {
+			if (name == "float") return true;
+			if (name == "double") return true;
+			if (name == "long double") return true;
+			return false;
+		}
 		bool isNumber() const {
 			if (name == "std::size_t") return true;
 			if (name == "short int") return true;
