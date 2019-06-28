@@ -26,8 +26,13 @@ std::string propertyValueToString(Mirror::Property& prop, Component* component) 
 		return std::to_string(Mirror::polyGetValue<char>(prop, component));
 	}
 	else if (prop.type.isNumber()) {
-		if (prop.type.name == "float")
-			return std::to_string(Mirror::polyGetValue<float>(prop, component));
+		if (prop.type.isDecimal()) {
+			std::string result = std::to_string(Mirror::polyGetValue<double>(prop, component));
+			// Removes trailing 0s
+			std::size_t offset = result.at(result.find_last_not_of('0')) == '.' ? 2 : 1;
+			result.erase(result.find_last_not_of('0') + offset, std::string::npos);
+			return result;
+		}
 		else if (prop.type.isSignedNumber())
 			return std::to_string(Mirror::polyGetValue<int>(prop, component));
 		else if (prop.type.isUnsignedNumber())
@@ -118,16 +123,30 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		propLabel.setParent(propField);
 
 		// Input Field
-		float propertyValue = Mirror::polyGetValue<float>(prop, component);
-		EntityHandle inputField = createEntity(fieldName + "_InputField",
-			RectSprite(Color(255, 255, 255), layer),
-			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
-		);
-		InputField* inputFieldComponent = inputField.addComponent<InputField>();
-		inputFieldComponent->setText(propertyValueToString(prop, component));
-		inputFieldComponent->contentType = InputField::ContentType::Decimal;
-		//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
-		inputField.setParent(propField);
+		if (prop.type.isDecimal()) {
+			double propertyValue = Mirror::polyGetValue<double>(prop, component);
+			EntityHandle inputField = createEntity(fieldName + "_InputField",
+				RectSprite(Color(255, 255, 255), layer),
+				RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+			);
+			InputField* inputFieldComponent = inputField.addComponent<InputField>();
+			inputFieldComponent->setText(propertyValueToString(prop, component));
+			inputFieldComponent->contentType = InputField::ContentType::Decimal;
+			//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
+			inputField.setParent(propField);
+		}
+		else {
+			int propertyValue = Mirror::polyGetValue<int>(prop, component);
+			EntityHandle inputField = createEntity(fieldName + "_InputField",
+				RectSprite(Color(255, 255, 255), layer),
+				RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+			);
+			InputField* inputFieldComponent = inputField.addComponent<InputField>();
+			inputFieldComponent->setText(propertyValueToString(prop, component));
+			inputFieldComponent->contentType = InputField::ContentType::Decimal;
+			//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
+			inputField.setParent(propField);
+		}
 	}
 	else {
 		// Property Name
