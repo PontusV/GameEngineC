@@ -179,6 +179,10 @@ namespace Mirror {
 			if (name == "std::string") return true;
 			return false;
 		}
+		bool isWideString() const {
+			if (name == "std::wstring") return true;
+			return false;
+		}
 		bool isVector() const {
 			if (name.find("std::vector<") != std::string::npos) return true;
 			return false;

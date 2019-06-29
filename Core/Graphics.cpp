@@ -184,9 +184,9 @@ void Graphics::update(float dt) {
 		Panel&			panel		= panelGroup.panels[i];
 		RectTransform&	transform	= panelGroup.transforms[i];
 
-		const glm::vec2& size = panel.getSize();
-		float x = size.x * -transform.getPivot().x;
-		float y = size.y * -transform.getPivot().y;
+		const glm::vec2& size = transform.getSize();
+		float x = transform.getLocalPosition().x + transform.getRectOffset().x;
+		float y = transform.getLocalPosition().y + transform.getRectOffset().y;
 		const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
 
 		std::vector<Sprite*> children = panel.getOwner().getComponentsInChildren<Sprite>();

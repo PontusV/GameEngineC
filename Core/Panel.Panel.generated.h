@@ -15,41 +15,13 @@ static Mirror::Class createType() {\
 	Mirror::Class newClass(14);\
 	newClass.name = "Core::Panel";\
 	newClass.annotatedAttributes = {"Reflect"};\
-	newClass.baseClasses.push_back(Mirror::Type{ "Core::BoxComponent" });\
-\
-	Mirror::Property newProperty;\
-	newProperty.name = "size";\
-	newProperty.type.name = "glm::ivec2";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
-	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "bounds";\
-	newProperty.type.name = "Core::Bounds";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
-	newClass.properties.push_back(newProperty);\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
 	return newClass;\
 }\
 protected:\
 template<typename T>\
 T getValue_impl(std::string propertyName) {\
 	try {\
-		if (Core::BoxComponent::hasProperty(propertyName))\
-			return Core::BoxComponent::getValue_impl<T>(propertyName);\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
@@ -62,8 +34,6 @@ T getValue_impl(std::string propertyName) {\
 template<typename T, std::size_t N>\
 std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	try {\
-		if (Core::BoxComponent::hasProperty(propertyName))\
-			return Core::BoxComponent::getArrayValue_impl<T, N>(propertyName);\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
@@ -76,7 +46,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
-		if (Core::BoxComponent::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Panel::" + propertyName + " was set to a value with an incompatible type!\n";\
@@ -88,7 +57,6 @@ bool setValue_impl(std::string propertyName, T value) {\
 template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
-		if (Core::BoxComponent::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Panel::" + propertyName + " was set to a value with an incompatible type!\n";\
@@ -121,11 +89,9 @@ virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
 virtual void serialize(std::ostream& os) const {\
-	Core::BoxComponent::serialize(os);\
 	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
-	Core::BoxComponent::deserialize(is);\
 	Core::Component::deserialize(is);\
 }
 #endif

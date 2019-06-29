@@ -21,7 +21,7 @@ namespace Core {
 		void addComponentEntry(Component* component);
 
 		EntityHandle createPropertyField(std::string fieldName, Mirror::Property& prop, Component* component);
-		std::string propertyValueToString(Mirror::Property& prop, Component* component) const;
+		std::wstring propertyValueToString(Mirror::Property& prop, Component* component) const;
 
 	private:
 		EntityHandle currentTarget;
