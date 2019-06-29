@@ -194,56 +194,32 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::LayoutGroup::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, float value) {\
-	if (propertyName == "paddingTop") {\
-		this->paddingTop = value;\
-		return true;\
-	}\
-	if (propertyName == "paddingRight") {\
-		this->paddingRight = value;\
-		return true;\
-	}\
-	if (propertyName == "paddingBottom") {\
-		this->paddingBottom = value;\
-		return true;\
-	}\
-	if (propertyName == "paddingLeft") {\
-		this->paddingLeft = value;\
-		return true;\
-	}\
-	if (propertyName == "spacing") {\
-		this->spacing = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Alignment value) {\
-	if (propertyName == "childAlignment") {\
-		this->childAlignment = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "paddingTop") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->paddingTop = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "paddingRight") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->paddingRight = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "paddingBottom") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->paddingBottom = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "paddingLeft") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->paddingLeft = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "spacing") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->spacing = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "childAlignment") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Alignment>(value))) return true;\
+			this->childAlignment = Mirror::convertType<T, Core::Alignment>(value);\
+			return true;\
 		}\
 		if (Core::LayoutController::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::UIBehaviour::setValue_impl<T>(propertyName, value)) return true;\

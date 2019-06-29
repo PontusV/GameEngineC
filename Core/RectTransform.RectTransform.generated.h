@@ -146,25 +146,16 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::RectTransform::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, glm::vec2 value) {\
-	if (propertyName == "size") {\
-		this->size = value;\
-		return true;\
-	}\
-	if (propertyName == "pivot") {\
-		this->pivot = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "size") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->size = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "pivot") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->pivot = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (Core::Transform::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\

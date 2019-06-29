@@ -123,28 +123,16 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, std::string value) {\
-	if (propertyName == "fileName") {\
-		this->fileName = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Texture2D value) {\
-	if (propertyName == "texture") {\
-		this->texture = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "fileName") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::string>(value))) return true;\
+			this->fileName = Mirror::convertType<T, std::string>(value);\
+			return true;\
 		}\
 		if (propertyName == "texture") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Texture2D>(value))) return true;\
+			this->texture = Mirror::convertType<T, Core::Texture2D>(value);\
+			return true;\
 		}\
 		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\

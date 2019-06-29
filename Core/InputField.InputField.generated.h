@@ -12,10 +12,10 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(29);\
+	Mirror::Class newClass(30);\
 	newClass.name = "Core::InputField";\
 	newClass.annotatedAttributes = {"Reflect"};\
-	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::Selectable" });\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "initText";\
@@ -129,6 +129,8 @@ T getValue_impl(std::string propertyName) {\
 		if (propertyName == "highlightColor") {\
 			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
 		}\
+		if (Core::Selectable::hasProperty(propertyName))\
+			return Core::Selectable::getValue_impl<T>(propertyName);\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getValue_impl<T>(propertyName);\
 		if (Core::Component::hasProperty(propertyName))\
@@ -158,6 +160,8 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 		if (propertyName == "highlightColor") {\
 			throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
 		}\
+		if (Core::Selectable::hasProperty(propertyName))\
+			return Core::Selectable::getArrayValue_impl<T, N>(propertyName);\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getArrayValue_impl<T, N>(propertyName);\
 		if (Core::Component::hasProperty(propertyName))\
@@ -169,56 +173,30 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::InputField::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::InputField::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, std::wstring value) {\
-	if (propertyName == "initText") {\
-		this->initText = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, ComponentFunctionHandle<std::wstring> value) {\
-	if (propertyName == "onSubmit") {\
-		this->onSubmit = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, std::size_t value) {\
-	if (propertyName == "characterLimit") {\
-		this->characterLimit = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Color value) {\
-	if (propertyName == "markColor") {\
-		this->markColor = value;\
-		return true;\
-	}\
-	if (propertyName == "highlightColor") {\
-		this->highlightColor = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "initText") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::wstring>(value))) return true;\
+			this->initText = Mirror::convertType<T, std::wstring>(value);\
+			return true;\
 		}\
 		if (propertyName == "onSubmit") {\
-			if (setValue(propertyName, Mirror::convertType<T, ComponentFunctionHandle<std::wstring>>(value))) return true;\
+			this->onSubmit = Mirror::convertType<T, ComponentFunctionHandle<std::wstring>>(value);\
+			return true;\
 		}\
 		if (propertyName == "characterLimit") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::size_t>(value))) return true;\
+			this->characterLimit = Mirror::convertType<T, std::size_t>(value);\
+			return true;\
 		}\
 		if (propertyName == "markColor") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+			this->markColor = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
 		}\
 		if (propertyName == "highlightColor") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+			this->highlightColor = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
 		}\
+		if (Core::Selectable::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
@@ -246,6 +224,7 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 		if (propertyName == "highlightColor") {\
 			throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
 		}\
+		if (Core::Selectable::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
@@ -284,6 +263,7 @@ virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(characterLimit, os);\
 		Mirror::serialize(markColor, os);\
 		Mirror::serialize(highlightColor, os);\
+	Core::Selectable::serialize(os);\
 	Core::Behaviour::serialize(os);\
 	Core::Component::serialize(os);\
 }\
@@ -293,6 +273,7 @@ virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(characterLimit, is);\
 		Mirror::deserialize(markColor, is);\
 		Mirror::deserialize(highlightColor, is);\
+	Core::Selectable::deserialize(is);\
 	Core::Behaviour::deserialize(is);\
 	Core::Component::deserialize(is);\
 }

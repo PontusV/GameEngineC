@@ -97,24 +97,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Button::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Button::" + propertyName + " does not exist!");\
 }\
-bool setArrayValue(std::string propertyName, std::array<Core::Image, 3> value) {\
-	if (propertyName == "images") {\
-		for (std::size_t i = 0; i < 3; i++) {\
-			this->images[i] = value[i];\
-		}\
-		return true;\
-	}\
-	return false;\
-}\
-bool setArrayValue(std::string propertyName, std::array<Core::Color, 3> value) {\
-	if (propertyName == "colors") {\
-		for (std::size_t i = 0; i < 3; i++) {\
-			this->colors[i] = value[i];\
-		}\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
@@ -137,10 +119,16 @@ template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
 		if (propertyName == "images") {\
-			if (setArrayValue(propertyName, Mirror::convertArrayType<T, N, Core::Image, 3>(value))) return true;\
+			for (std::size_t i = 0; i < 3; i++) {\
+				this->images[i] = Mirror::convertType<T, Core::Image>(value[i]);\
+			}\
+			return true;\
 		}\
 		if (propertyName == "colors") {\
-			if (setArrayValue(propertyName, Mirror::convertArrayType<T, N, Core::Color, 3>(value))) return true;\
+			for (std::size_t i = 0; i < 3; i++) {\
+				this->colors[i] = Mirror::convertType<T, Core::Color>(value[i]);\
+			}\
+			return true;\
 		}\
 		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\

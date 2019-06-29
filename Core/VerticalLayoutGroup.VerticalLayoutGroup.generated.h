@@ -228,39 +228,24 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::VerticalLayoutGroup::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, bool value) {\
-	if (propertyName == "shrinkableChildWidth") {\
-		this->shrinkableChildWidth = value;\
-		return true;\
-	}\
-	if (propertyName == "shrinkableChildHeight") {\
-		this->shrinkableChildHeight = value;\
-		return true;\
-	}\
-	if (propertyName == "childForceExpandWidth") {\
-		this->childForceExpandWidth = value;\
-		return true;\
-	}\
-	if (propertyName == "childForceExpandHeight") {\
-		this->childForceExpandHeight = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "shrinkableChildWidth") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->shrinkableChildWidth = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "shrinkableChildHeight") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->shrinkableChildHeight = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "childForceExpandWidth") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->childForceExpandWidth = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "childForceExpandHeight") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->childForceExpandHeight = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (Core::LayoutGroup::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::LayoutController::setValue_impl<T>(propertyName, value)) return true;\

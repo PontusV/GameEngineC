@@ -122,29 +122,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::RectButton::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::RectButton::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, ComponentFunctionHandle<> value) {\
-	if (propertyName == "clickFunction") {\
-		this->clickFunction = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, unsigned char value) {\
-	if (propertyName == "layerIndex") {\
-		this->layerIndex = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setArrayValue(std::string propertyName, std::array<Core::Color, 3> value) {\
-	if (propertyName == "colors") {\
-		for (std::size_t i = 0; i < 3; i++) {\
-			this->colors[i] = value[i];\
-		}\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
@@ -152,10 +129,12 @@ bool setValue_impl(std::string propertyName, T value) {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is an array!");\
 		}\
 		if (propertyName == "clickFunction") {\
-			if (setValue(propertyName, Mirror::convertType<T, ComponentFunctionHandle<>>(value))) return true;\
+			this->clickFunction = Mirror::convertType<T, ComponentFunctionHandle<>>(value);\
+			return true;\
 		}\
 		if (propertyName == "layerIndex") {\
-			if (setValue(propertyName, Mirror::convertType<T, unsigned char>(value))) return true;\
+			this->layerIndex = Mirror::convertType<T, unsigned char>(value);\
+			return true;\
 		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
@@ -170,7 +149,10 @@ template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
 		if (propertyName == "colors") {\
-			if (setArrayValue(propertyName, Mirror::convertArrayType<T, N, Core::Color, 3>(value))) return true;\
+			for (std::size_t i = 0; i < 3; i++) {\
+				this->colors[i] = Mirror::convertType<T, Core::Color>(value[i]);\
+			}\
+			return true;\
 		}\
 		if (propertyName == "clickFunction") {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\

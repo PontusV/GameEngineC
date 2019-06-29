@@ -123,28 +123,16 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Text::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Text::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, std::wstring value) {\
-	if (propertyName == "text") {\
-		this->text = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Font value) {\
-	if (propertyName == "font") {\
-		this->font = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "text") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::wstring>(value))) return true;\
+			this->text = Mirror::convertType<T, std::wstring>(value);\
+			return true;\
 		}\
 		if (propertyName == "font") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Font>(value))) return true;\
+			this->font = Mirror::convertType<T, Core::Font>(value);\
+			return true;\
 		}\
 		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\

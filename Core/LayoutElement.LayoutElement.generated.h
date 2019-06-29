@@ -182,56 +182,32 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::LayoutElement::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, glm::vec2 value) {\
-	if (propertyName == "minSize") {\
-		this->minSize = value;\
-		return true;\
-	}\
-	if (propertyName == "prefSize") {\
-		this->prefSize = value;\
-		return true;\
-	}\
-	if (propertyName == "flexibleSize") {\
-		this->flexibleSize = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, bool value) {\
-	if (propertyName == "minSizeEnabled") {\
-		this->minSizeEnabled = value;\
-		return true;\
-	}\
-	if (propertyName == "prefSizeEnabled") {\
-		this->prefSizeEnabled = value;\
-		return true;\
-	}\
-	if (propertyName == "flexibleSizeEnabled") {\
-		this->flexibleSizeEnabled = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "minSize") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->minSize = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "prefSize") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->prefSize = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "flexibleSize") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->flexibleSize = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "minSizeEnabled") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->minSizeEnabled = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "prefSizeEnabled") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->prefSizeEnabled = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "flexibleSizeEnabled") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->flexibleSizeEnabled = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\

@@ -93,28 +93,16 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Sprite::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Sprite::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, Core::Color value) {\
-	if (propertyName == "color") {\
-		this->color = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, unsigned char value) {\
-	if (propertyName == "layerIndex") {\
-		this->layerIndex = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "color") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+			this->color = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
 		}\
 		if (propertyName == "layerIndex") {\
-			if (setValue(propertyName, Mirror::convertType<T, unsigned char>(value))) return true;\
+			this->layerIndex = Mirror::convertType<T, unsigned char>(value);\
+			return true;\
 		}\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\

@@ -7,6 +7,7 @@
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
+#include "Selectable.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -21,7 +22,9 @@ Inspector::~Inspector()
 {
 }
 
-std::string propertyValueToString(Mirror::Property& prop, Component* component) {
+
+
+std::string Inspector::propertyValueToString(Mirror::Property& prop, Component* component) const {
 	if (prop.type.isChar()) {
 		return std::to_string(Mirror::polyGetValue<char>(prop, component));
 	}
@@ -60,6 +63,37 @@ std::string propertyValueToString(Mirror::Property& prop, Component* component) 
 		}
 	}
 	return "ERROR!";
+}
+
+void Inspector::onPropertyValueSubmit(std::wstring value) {
+	std::size_t childCount = scrollPanel.getImmediateChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle entry = scrollPanel.getChild(i);
+		std::size_t entryChildCount = entry.getImmediateChildCount();
+		for (std::size_t ii = 0; ii < entryChildCount; ii++) {
+			Handle propField = entry.getChild(ii);
+			Selectable* selectable = propField.getComponent<Selectable>();
+			if (selectable) {
+				if (selectable->isSelected()) {
+					// Component i, Property ii
+					std::vector<Component*> components = currentTarget.getComponents();
+					Component* instance = components[i];
+					Mirror::Class classType = instance->getType();
+					Mirror::Property& prop = classType.properties[ii-1];
+					if (prop.type.isNumber() && !prop.type.isCArray()) {
+						if (prop.type.isDecimal()) {
+							Mirror::polySetValue(prop, instance, std::stod(value));
+						}
+						else {
+							Mirror::polySetValue(prop, instance, std::stoi(value));
+						}
+					}
+					std::cout << "Target prop name: " << prop.name << std::endl;
+					std::cout << "Target prop value: " << propertyValueToString(prop, instance) << std::endl;
+				}
+			}
+		}
+	}
 }
 
 void Inspector::awake() {
@@ -108,6 +142,7 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 
 	// Create Field
 	EntityHandle propField = createEntity(fieldName,
+		Selectable(),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
 	HorizontalLayoutGroup* fieldLayout = propField.addComponent<HorizontalLayoutGroup>();
@@ -123,30 +158,18 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		propLabel.setParent(propField);
 
 		// Input Field
-		if (prop.type.isDecimal()) {
-			double propertyValue = Mirror::polyGetValue<double>(prop, component);
-			EntityHandle inputField = createEntity(fieldName + "_InputField",
-				RectSprite(Color(255, 255, 255), layer),
-				RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
-			);
-			InputField* inputFieldComponent = inputField.addComponent<InputField>();
-			inputFieldComponent->setText(propertyValueToString(prop, component));
+		EntityHandle inputField = createEntity(fieldName + "_InputField",
+			RectSprite(Color(255, 255, 255), layer),
+			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+		);
+		InputField* inputFieldComponent = inputField.addComponent<InputField>();
+		inputFieldComponent->setText(propertyValueToString(prop, component));
+		if (prop.type.isDecimal())
 			inputFieldComponent->contentType = InputField::ContentType::Decimal;
-			//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
-			inputField.setParent(propField);
-		}
-		else {
-			int propertyValue = Mirror::polyGetValue<int>(prop, component);
-			EntityHandle inputField = createEntity(fieldName + "_InputField",
-				RectSprite(Color(255, 255, 255), layer),
-				RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
-			);
-			InputField* inputFieldComponent = inputField.addComponent<InputField>();
-			inputFieldComponent->setText(propertyValueToString(prop, component));
-			inputFieldComponent->contentType = InputField::ContentType::Decimal;
-			//inputFieldComponent->onSubmit = Core::bind(behaviour, functionPtr);
-			inputField.setParent(propField);
-		}
+		else
+			inputFieldComponent->contentType = InputField::ContentType::Integer;
+		inputFieldComponent->onSubmit = Core::bind(this, &Inspector::onPropertyValueSubmit);
+		inputField.setParent(propField);
 	}
 	else {
 		// Property Name

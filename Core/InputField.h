@@ -1,7 +1,7 @@
 #ifndef INPUT_FIELD_H
 #define INPUT_FIELD_H
 
-#include "Behaviour.h"
+#include "Selectable.h"
 #include "Color.h"
 #include "ComponentFunctionHandle.h"
 #include <string>
@@ -15,7 +15,7 @@ namespace Core {
 	class Text;
 
 	/* A Text Field that is modifiable by the user. */
-	CLASS() InputField : public Behaviour {
+	CLASS() InputField : public Selectable {
 		GENERATED_BODY()
 	public:
 		InputField();
@@ -24,16 +24,12 @@ namespace Core {
 
 		void awake() override;
 		void update(float deltaTime) override;
-		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
-		void onMouseButtonPressed(int buttoncode, int mods) override;
+		void onSelect() override;
+		void onDeselect() override;
 		void onMouseDrag(float mouseX, float mouseY) override;
 
 		void setText(std::wstring text);
 		void setText(std::string text);
-
-		// Selectable
-		void select();
-		void deselect();
 		
 		enum class ContentType {
 			Standard,

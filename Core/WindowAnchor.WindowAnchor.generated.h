@@ -98,25 +98,16 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::WindowAnchor::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, glm::vec2 value) {\
-	if (propertyName == "anchor") {\
-		this->anchor = value;\
-		return true;\
-	}\
-	if (propertyName == "offset") {\
-		this->offset = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "anchor") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->anchor = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "offset") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->offset = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (Core::UIBehaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\

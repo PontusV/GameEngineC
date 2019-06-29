@@ -14,12 +14,14 @@ namespace Core {
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 
 		void inspect(EntityHandle entity);
+		void onPropertyValueSubmit(std::wstring value);
 
 	private:
 		void clearEntries();
 		void addComponentEntry(Component* component);
 
 		EntityHandle createPropertyField(std::string fieldName, Mirror::Property& prop, Component* component);
+		std::string propertyValueToString(Mirror::Property& prop, Component* component) const;
 
 	private:
 		EntityHandle currentTarget;

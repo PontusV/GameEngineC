@@ -80,18 +80,12 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::GridLayoutGroup::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::GridLayoutGroup::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, float value) {\
-	if (propertyName == "cellSize") {\
-		this->cellSize = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "cellSize") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->cellSize = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (Core::LayoutController::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::UIBehaviour::setValue_impl<T>(propertyName, value)) return true;\

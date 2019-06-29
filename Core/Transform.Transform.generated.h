@@ -137,42 +137,24 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Transform::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Transform::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, glm::vec2 value) {\
-	if (propertyName == "position") {\
-		this->position = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, float value) {\
-	if (propertyName == "z") {\
-		this->z = value;\
-		return true;\
-	}\
-	if (propertyName == "rotation") {\
-		this->rotation = value;\
-		return true;\
-	}\
-	if (propertyName == "scale") {\
-		this->scale = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "position") {\
-			if (setValue(propertyName, Mirror::convertType<T, glm::vec2>(value))) return true;\
+			this->position = Mirror::convertType<T, glm::vec2>(value);\
+			return true;\
 		}\
 		if (propertyName == "z") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->z = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "rotation") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->rotation = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (propertyName == "scale") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->scale = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\

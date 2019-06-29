@@ -150,6 +150,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -231,6 +232,7 @@
     <ClCompile Include="MouseDrag.cpp" />
     <ClCompile Include="RectButton.cpp" />
     <ClCompile Include="RectTransform.cpp" />
+    <ClCompile Include="Selectable.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="LayoutElement.cpp" />
@@ -307,6 +309,7 @@
     <ClInclude Include="RectButton.h" />
     <ClInclude Include="RectTransform.h" />
     <ClInclude Include="ReflectionMacros.h" />
+    <ClInclude Include="Selectable.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="InputEvent.h" />
@@ -348,7 +351,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="TypeList.h" />
     <ClInclude Include="UIBehaviour.h" />
     <ClInclude Include="UISystem.h" />
     <ClInclude Include="VerticalLayoutGroup.h" />

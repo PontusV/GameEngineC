@@ -213,69 +213,36 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, int value) {\
-	if (propertyName == "boxWidth") {\
-		this->boxWidth = value;\
-		return true;\
-	}\
-	if (propertyName == "boxPaddingX") {\
-		this->boxPaddingX = value;\
-		return true;\
-	}\
-	if (propertyName == "boxPaddingY") {\
-		this->boxPaddingY = value;\
-		return true;\
-	}\
-	if (propertyName == "optionHeight") {\
-		this->optionHeight = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Font value) {\
-	if (propertyName == "optionFont") {\
-		this->optionFont = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Color value) {\
-	if (propertyName == "optionTextColor") {\
-		this->optionTextColor = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Text value) {\
-	if (propertyName == "text") {\
-		this->text = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "boxWidth") {\
-			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+			this->boxWidth = Mirror::convertType<T, int>(value);\
+			return true;\
 		}\
 		if (propertyName == "boxPaddingX") {\
-			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+			this->boxPaddingX = Mirror::convertType<T, int>(value);\
+			return true;\
 		}\
 		if (propertyName == "boxPaddingY") {\
-			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+			this->boxPaddingY = Mirror::convertType<T, int>(value);\
+			return true;\
 		}\
 		if (propertyName == "optionHeight") {\
-			if (setValue(propertyName, Mirror::convertType<T, int>(value))) return true;\
+			this->optionHeight = Mirror::convertType<T, int>(value);\
+			return true;\
 		}\
 		if (propertyName == "optionFont") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Font>(value))) return true;\
+			this->optionFont = Mirror::convertType<T, Core::Font>(value);\
+			return true;\
 		}\
 		if (propertyName == "optionTextColor") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+			this->optionTextColor = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
 		}\
 		if (propertyName == "text") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Text>(value))) return true;\
+			this->text = Mirror::convertType<T, Core::Text>(value);\
+			return true;\
 		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\

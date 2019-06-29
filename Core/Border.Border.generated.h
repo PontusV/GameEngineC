@@ -223,66 +223,36 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::Border::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::Border::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, bool value) {\
-	if (propertyName == "top") {\
-		this->top = value;\
-		return true;\
-	}\
-	if (propertyName == "right") {\
-		this->right = value;\
-		return true;\
-	}\
-	if (propertyName == "bottom") {\
-		this->bottom = value;\
-		return true;\
-	}\
-	if (propertyName == "left") {\
-		this->left = value;\
-		return true;\
-	}\
-	if (propertyName == "inner") {\
-		this->inner = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, std::size_t value) {\
-	if (propertyName == "borderThickness") {\
-		this->borderThickness = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, Core::Color value) {\
-	if (propertyName == "color") {\
-		this->color = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "top") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->top = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "right") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->right = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "bottom") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->bottom = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "left") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->left = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "inner") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->inner = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "borderThickness") {\
-			if (setValue(propertyName, Mirror::convertType<T, std::size_t>(value))) return true;\
+			this->borderThickness = Mirror::convertType<T, std::size_t>(value);\
+			return true;\
 		}\
 		if (propertyName == "color") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Color>(value))) return true;\
+			this->color = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
 		}\
 		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\

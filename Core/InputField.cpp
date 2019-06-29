@@ -175,7 +175,7 @@ void InputField::update(float deltaTime) {
 	}
 }
 
-void InputField::select() {
+void InputField::onSelect() {
 	selected = true;
 	pressTextIndex = getTextIndexAtPosition(input->getMousePosition(), inputText.getComponent<RectTransform>(), inputText.getComponent<Text>());
 	selectedTextIndex = pressTextIndex;
@@ -184,26 +184,12 @@ void InputField::select() {
 	showHighlight();
 }
 
-void InputField::deselect() {
+void InputField::onDeselect() {
 	selected = false;
 	pressTextIndex = 0;
 	selectedTextIndex = 0;
 	hideMark();
 	hideHighlight();
-}
-
-void InputField::onMouseButtonPressedAsButton(int buttoncode, int mods) {
-	if (buttoncode == GLFW_MOUSE_BUTTON_1) {
-		select();
-	}
-}
-
-void InputField::onMouseButtonPressed(int buttoncode, int mods) {
-	if (buttoncode == GLFW_MOUSE_BUTTON_1) {
-		if (selected)
-			deselect();
-		hideMark();
-	}
 }
 
 bool InputField::deleteHighlightedText() {

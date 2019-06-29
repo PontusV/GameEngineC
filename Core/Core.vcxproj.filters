@@ -264,6 +264,9 @@
     <ClCompile Include="InputField.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Selectable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource2.h">
@@ -509,13 +512,13 @@
     <ClInclude Include="ComponentTypeInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TypeList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InputField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HideFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Selectable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -68,18 +68,12 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::ParentEntity::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::ParentEntity::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, Core::Handle value) {\
-	if (propertyName == "parent") {\
-		this->parent = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "parent") {\
-			if (setValue(propertyName, Mirror::convertType<T, Core::Handle>(value))) return true;\
+			this->parent = Mirror::convertType<T, Core::Handle>(value);\
+			return true;\
 		}\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\

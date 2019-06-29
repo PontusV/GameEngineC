@@ -163,49 +163,28 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	std::cout << "Warning: The property Core::DragAndResize::" + propertyName + " does not exist!" << "\n";\
 	throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " does not exist!");\
 }\
-bool setValue(std::string propertyName, bool value) {\
-	if (propertyName == "top") {\
-		this->top = value;\
-		return true;\
-	}\
-	if (propertyName == "right") {\
-		this->right = value;\
-		return true;\
-	}\
-	if (propertyName == "bottom") {\
-		this->bottom = value;\
-		return true;\
-	}\
-	if (propertyName == "left") {\
-		this->left = value;\
-		return true;\
-	}\
-	return false;\
-}\
-bool setValue(std::string propertyName, float value) {\
-	if (propertyName == "edgeSize") {\
-		this->edgeSize = value;\
-		return true;\
-	}\
-	return false;\
-}\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "top") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->top = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "right") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->right = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "bottom") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->bottom = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "left") {\
-			if (setValue(propertyName, Mirror::convertType<T, bool>(value))) return true;\
+			this->left = Mirror::convertType<T, bool>(value);\
+			return true;\
 		}\
 		if (propertyName == "edgeSize") {\
-			if (setValue(propertyName, Mirror::convertType<T, float>(value))) return true;\
+			this->edgeSize = Mirror::convertType<T, float>(value);\
+			return true;\
 		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
