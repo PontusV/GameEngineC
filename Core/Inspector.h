@@ -15,6 +15,7 @@ namespace Core {
 
 		void inspect(EntityHandle entity);
 		void onPropertyValueSubmit(std::wstring value);
+		void onBoolPropertyValueSubmit(bool value);
 
 	private:
 		void clearEntries();

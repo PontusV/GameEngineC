@@ -4,7 +4,6 @@ LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/resources/*
 LevelEditor/include/*
-ProjectGE.sln
 Debug/*
 Release/*
 *.db
