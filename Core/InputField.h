@@ -27,9 +27,13 @@ namespace Core {
 		void onSelect() override;
 		void onDeselect() override;
 		void onMouseDrag(float mouseX, float mouseY) override;
+		void onDoubleClick() override;
 
 		void setText(std::wstring text);
 		void setText(std::string text);
+
+		std::wstring getText();
+		std::wstring getHighlightedText();
 		
 		enum class ContentType {
 			Standard,
@@ -53,7 +57,16 @@ namespace Core {
 	private:
 		void backSpace();
 		void deleteText();
+		/* Calls the assigned onSubmit. */
 		void submit();
+		/* Moves the selectedTextIndex one step to the left, if possible. */
+		void traverseLeft();
+		/* Moves the selectedTextIndex one step to the right, if possible. */
+		void traverseRight();
+		/* Highlight all text inside the inputField. */
+		void selectAll();
+		/* Writes text at the selected index. */
+		void write(std::wstring input);
 
 		/* Returns true if text was deleted. */
 		bool deleteHighlightedText();
@@ -65,11 +78,6 @@ namespace Core {
 
 		void showHighlight();
 		void hideHighlight();
-
-		/* Moves the selectedTextIndex one step to the left, if possible. */
-		void traverseLeft();
-		/* Moves the selectedTextIndex one step to the right, if possible. */
-		void traverseRight();
 
 		float getXPosOfTextIndex(std::size_t index, RectTransform* textRect, Text* textComponent);
 		std::size_t getTextIndexAtPosition(const glm::vec2& position, RectTransform* textRect, Text* textComponent);

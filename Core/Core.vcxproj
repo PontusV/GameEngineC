@@ -93,7 +93,7 @@
       <BasicRuntimeChecks>StackFrameRuntimeCheck</BasicRuntimeChecks>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
@@ -149,7 +149,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
@@ -215,6 +215,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="ChildManager.cpp" />
     <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="Clipboard.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ComponentFunctionHandle.cpp" />
     <ClCompile Include="ComponentHandle.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="BoxComponent.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="ChildManager.h" />
+    <ClInclude Include="Clipboard.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ComponentFunctionHandle.h" />
     <ClInclude Include="ComponentHandle.h" />

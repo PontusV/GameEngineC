@@ -28,6 +28,7 @@ void Input::update(float dt) {
 		for (Behaviour* script : scripts) {
 			script->onMouseDrag(mousePosition.x, mousePosition.y);
 		}
+		mouseMoved = false;
 	}
 
 	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);

@@ -4,6 +4,7 @@
 #include "RectTransform.h"
 #include "RectSprite.h"
 #include "ResourceManager.h"
+#include "Clipboard.h"
 #include <GLFW/glfw3.h>
 
 using namespace Core;
@@ -47,8 +48,6 @@ void InputField::submit() {
 	Text* textComponent = inputText.getComponent<Text>();
 	std::wstring input = textComponent->getText();
 	textComponent->setText(input);
-	// Do something with input
-	std::wcout << "Submit: " << input << std::endl; // The special characters will not print properly, even though its wcout
 	onSubmit.call(input);
 }
 
@@ -67,11 +66,25 @@ void InputField::update(float deltaTime) {
 
 	if (!selected) return;
 	// Select all (ctrl + a)
-	if (input->getKeyPressed(GLFW_KEY_A) && input->getKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-		std::wstring currentText = inputText.getComponent<Text>()->getText();
-		pressTextIndex = 0;
-		selectedTextIndex = currentText.size();
-		updateTextHighlight();
+	if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_A)) {
+		selectAll();
+	}
+	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_C)) {
+		std::wstring copy = getHighlightedText();
+		if (!copy.empty())
+			Clipboard::copy(copy);
+	}
+	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_V)) {
+		std::wstring paste = Clipboard::paste();
+		std::wcout << paste << std::endl;
+		write(paste);
+	}
+	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_X)) {
+		std::wstring copy = getHighlightedText();
+		if (!copy.empty()) {
+			Clipboard::copy(copy);
+			deleteHighlightedText();
+		}
 	}
 
 	// Traversal with arrow-keys
@@ -130,32 +143,7 @@ void InputField::update(float deltaTime) {
 	
 	// Check for text input
 	std::wstring textInput = input->getTextTyped();
-	if (!textInput.empty()) {
-		Text* textComponent = inputText.getComponent<Text>();
-		if (textComponent) {
-			deleteHighlightedText(); // Deletes any marked text
-			std::wstring currentText = textComponent->getText();
-
-			if (contentType == ContentType::Decimal && currentText.find('.') != std::wstring::npos) {
-				textInput.erase(std::remove(textInput.begin(), textInput.end(), '.'), textInput.end());
-			}
-			if (!textInput.empty()) {
-				std::wstring beginText = currentText.substr(0, selectedTextIndex);
-				std::wstring endText = L"";
-				if (selectedTextIndex < currentText.size())
-					endText = currentText.substr(selectedTextIndex, currentText.size() - selectedTextIndex);
-				std::wstring newText = filterText(beginText + textInput + endText);
-
-				if (characterLimit != 0 && characterLimit < currentText.size()) {
-					newText = newText.substr(0, characterLimit);
-				}
-
-				textComponent->setText(newText);
-				selectedTextIndex += textInput.size();
-				pressTextIndex = selectedTextIndex;
-			}
-		}
-	}
+	write(textInput);
 
 	// Text Mark (Blinking)
 	markTime += deltaTime;
@@ -304,24 +292,24 @@ void InputField::updateTextHighlight() {
 void InputField::traverseLeft() {
 	if (selectedTextIndex > 0) {
 		selectedTextIndex--;
-		if (!input->getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			pressTextIndex = selectedTextIndex;
-		}
-		updateTextHighlight();
-		markTime = 0.0f;
 	}
+	if (!input->getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+		pressTextIndex = selectedTextIndex;
+	}
+	updateTextHighlight();
+	markTime = 0.0f;
 }
 
 void InputField::traverseRight() {
 	std::wstring text = inputText.getComponent<Text>()->getText();
 	if (selectedTextIndex < text.size()) {
 		selectedTextIndex++;
-		if (!input->getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			pressTextIndex = selectedTextIndex;
-		}
-		updateTextHighlight();
-		markTime = 0.0f;
 	}
+	if (!input->getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+		pressTextIndex = selectedTextIndex;
+	}
+	updateTextHighlight();
+	markTime = 0.0f;
 }
 
 std::size_t InputField::getSelectedStartIndex() {
@@ -400,4 +388,54 @@ std::wstring InputField::filterText(const std::wstring& text) {
 		}
 	}
 	return newText;
+}
+
+void InputField::onDoubleClick() {
+	selectAll();
+}
+
+void InputField::selectAll() {
+	std::wstring currentText = inputText.getComponent<Text>()->getText();
+	pressTextIndex = 0;
+	selectedTextIndex = currentText.size();
+	updateTextHighlight();
+}
+
+void InputField::write(std::wstring input) {
+	if (!input.empty()) {
+		Text* textComponent = inputText.getComponent<Text>();
+		if (textComponent) {
+			deleteHighlightedText(); // Deletes any marked text
+			std::wstring currentText = textComponent->getText();
+
+			if (contentType == ContentType::Decimal && currentText.find('.') != std::wstring::npos) {
+				input.erase(std::remove(input.begin(), input.end(), '.'), input.end());
+			}
+			if (!input.empty()) {
+				std::wstring beginText = currentText.substr(0, selectedTextIndex);
+				std::wstring endText = L"";
+				if (selectedTextIndex < currentText.size())
+					endText = currentText.substr(selectedTextIndex, currentText.size() - selectedTextIndex);
+				std::wstring newText = filterText(beginText + input + endText);
+
+				if (characterLimit != 0 && characterLimit < currentText.size()) {
+					newText = newText.substr(0, characterLimit);
+				}
+
+				textComponent->setText(newText);
+				selectedTextIndex += input.size();
+				pressTextIndex = selectedTextIndex;
+			}
+		}
+	}
+}
+
+std::wstring InputField::getText() {
+	return inputText.getComponent<Text>()->getText();
+}
+
+std::wstring InputField::getHighlightedText() {
+	std::size_t start = getSelectedStartIndex();
+	std::size_t end = getSelectedEndIndex();
+	return getText().substr(start, end - start);
 }
