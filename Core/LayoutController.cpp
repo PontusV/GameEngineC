@@ -53,6 +53,11 @@ glm::vec2 LayoutController::getMinSize(Handle entity) {
 			minSize.y = std::max(minSize.y, currentMinSize.y);
 		}
 	}
+	else {
+		// Default value for children without any ILayoutElement components
+		if (RectTransform * childRectTransform = entity.getComponent<RectTransform>())
+			minSize = childRectTransform->getSize();
+	}
 	return minSize;
 }
 
