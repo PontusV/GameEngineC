@@ -1,6 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#define SHADER_SAMPLE_COUNT 32
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -19,7 +21,7 @@ namespace Core {
 	{
 	public:
 		// the program ID
-		GLuint ID;
+		GLuint ID = 0;
 		Shader();
 		~Shader();
 		// use/activate the shader
@@ -42,6 +44,7 @@ namespace Core {
 			return ID == other.ID;
 		}
 	private:
+		void initSamples(unsigned char sampleCount);
 		void checkCompileErrors(unsigned int shader, std::string type);
 	};
 }

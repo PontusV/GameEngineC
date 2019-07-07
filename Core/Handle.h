@@ -34,6 +34,7 @@ namespace Core {
 
 		template<typename T>
 		bool hasComponent();
+		bool hasComponent(ComponentType type);
 
 		template<typename T>
 		T* getComponent();
@@ -82,7 +83,8 @@ namespace Core {
 	};
 	template<typename T>
 	bool Handle::hasComponent() {
-		return manager->hasComponent<T>(entity);
+		//return manager->hasComponent<T>(entity);
+		return hasComponent(typeof(T));
 	}
 
 	template<typename T>

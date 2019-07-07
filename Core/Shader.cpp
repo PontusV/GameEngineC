@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include <glad/glad.h>
+#include <vector>
 
 using namespace Core;
 
@@ -34,12 +35,22 @@ void Shader::compile(const GLchar* vertexSource, const GLchar* fragmentSource)
 	// delete the shaders as they're linked into our program now and no longer necessary
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
+
+	initSamples(SHADER_SAMPLE_COUNT);
 }
 
 Shader& Shader::use()
 {
 	glUseProgram(ID);
 	return *this;
+}
+
+void Shader::initSamples(unsigned char sampleCount) {
+	std::vector<GLint> texIDs(sampleCount);
+	for (GLint i = 0; i < sampleCount; i++) {
+		texIDs[i] = i;
+	}
+	setIntegerV("textures", sampleCount, texIDs.data(), true);
 }
 
 void Shader::setFloat(const GLchar* name, GLfloat value, GLboolean useShader)

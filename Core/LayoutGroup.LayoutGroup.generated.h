@@ -1,6 +1,6 @@
 #ifndef REFLECTION_PARSER
 #pragma once
-#include <ReflectionParser.h>
+#include <ReflectionParser/ReflectionParser.h>
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
@@ -14,7 +14,7 @@ private:\
 static Mirror::Class createType() {\
 	Mirror::Class newClass(22);\
 	newClass.name = "Core::LayoutGroup";\
-	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutController" });\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::ILayoutElement" });\
 \
@@ -28,7 +28,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -41,7 +41,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -54,7 +54,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -67,7 +67,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -80,7 +80,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -93,7 +93,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\

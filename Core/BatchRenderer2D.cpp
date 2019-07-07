@@ -31,7 +31,7 @@ void initIndices() {
 }
 
 BatchRenderer2D::BatchRenderer2D(Window* window) : window(window) {
-	maskShaderID = ResourceManager::getInstance().loadShader("resources/shaders/sprite.vert", "resources/shaders/sprite.frag").ID;
+	maskShaderID = ResourceManager::getInstance().loadShader("resources/shaders/sprite").ID;
 }
 
 

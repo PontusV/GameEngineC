@@ -82,7 +82,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -102,7 +102,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -142,7 +142,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include; $(ProjectDir)include\ReflectionParser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -160,7 +160,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)libs\win32;$(ProjectDir)libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -180,7 +180,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include/ReflectionParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -202,6 +202,10 @@
     <Lib>
       <SubSystem>Console</SubSystem>
     </Lib>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)</Command>
+      <Message>Running reflection parser</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Archetype.cpp" />
@@ -301,6 +305,7 @@
     <ClInclude Include="HideFlags.h" />
     <ClInclude Include="HorizontalLayoutGroup.h" />
     <ClInclude Include="ILayoutElement.h" />
+    <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />
     <ClInclude Include="InputField.h" />
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="LayoutController.h" />

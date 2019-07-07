@@ -7,7 +7,7 @@ using namespace Core;
 
 
 PostProcessor::PostProcessor(Window* window) : window(window) {
-	shader = ResourceManager::getInstance().loadShader("resources/shaders/postprocess.vert", "resources/shaders/postprocess.frag");
+	shader = ResourceManager::getInstance().loadShader("resources/shaders/postprocess");
 	// Generate texture/renderbuffer/framebuffer object
 	glGenFramebuffers(1, &FBO);
 	glGenRenderbuffers(1, &RBO);

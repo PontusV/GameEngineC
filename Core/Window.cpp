@@ -101,3 +101,8 @@ const glm::ivec2& Window::getResolution() {
 	glfwGetWindowSize(window, &resolution.x, &resolution.y);
 	return resolution;
 }
+
+glm::mat4 Window::getProjectionMatrix() {
+	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	return glm::ortho(0.0f, static_cast<GLfloat>(resolution.x), static_cast<GLfloat>(resolution.y), 0.0f, -1.0f, 1.0f);
+}

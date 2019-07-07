@@ -6,18 +6,21 @@
 
 using namespace Core;
 
-
 Image::Image(const char* fileName, unsigned char layerIndex) : Sprite(layerIndex), fileName(fileName) {
 } // Constructor
 
+Image::Image(const char* fileName, unsigned char layerIndex, Shader shader) : Sprite(layerIndex, {255,255,255,255}, shader), fileName(fileName) {
+} // Constructor
+
 Image::Image() {
-} 
+}
 
 Image::~Image() {
 } // Destructor
 
-void Image::reload() {
-	if (texture.ID == 0) {
+void Image::reload(bool force) {
+	if (texture.ID == 0 || force) {
+		
 		texture = ResourceManager::getInstance().loadTexture(fileName.c_str());
 	}
 }

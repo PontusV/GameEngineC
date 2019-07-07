@@ -9,29 +9,29 @@
 using namespace Core;
 
 
-ResourceManager::ResourceManager()
-{
+ResourceManager::ResourceManager() {
 	if (FT_Init_FreeType(&ft))
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 }
-ResourceManager::~ResourceManager()
-{
+ResourceManager::~ResourceManager() {
 	clear();
 	FT_Done_FreeType(ft);
 }
 
-Shader ResourceManager::loadShader(const GLchar* vShaderFile, const GLchar* fShaderFile)
-{
-	std::string name = std::string(vShaderFile) + "|" + fShaderFile;
+Shader ResourceManager::loadShader(const std::string shaderFileName) {
+
+	std::string vShaderFile = shaderFileName + ".vert";
+	std::string fShaderFile = shaderFileName + ".frag";
+
+	std::string name = vShaderFile + "|" + fShaderFile;
 	auto it = shaders.find(name);
 	if (it != shaders.end())
 		return it->second;
-	shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile);
+	shaders[name] = loadShaderFromFile(vShaderFile.c_str(), fShaderFile.c_str());
 	return shaders[name];
 }
 
-Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartCoords)
-{
+Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartCoords) {
 	//Copy value from storage
 	Texture2D texture;
 	auto it = textures.find(file);
@@ -81,10 +81,14 @@ void ResourceManager::clear()
 		delete it.second;
 }
 
-void ResourceManager::updateShaders(glm::mat4& projection) {
+void ResourceManager::updateShaders(const glm::mat4& projection) {
 	for (auto it = shaders.begin(); it != shaders.end(); ++it) {
 		it->second.setMatrix4("projection", projection, true);
 	}
+}
+
+void ResourceManager::initShader(const glm::mat4& projection) {
+	updateShaders(projection);
 }
 
 Shader ResourceManager::loadShaderFromFile(const GLchar* vertexPath, const GLchar* fragmentPath)

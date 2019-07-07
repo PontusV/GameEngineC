@@ -1,0 +1,3 @@
+﻿  Running reflection parser
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(128,5): error MSB3073: The command "C:\Users\Pontus\Documents\GitHub\GameEngineC\Core\exe\ReflectionParser.exe C:\Users\Pontus\Documents\GitHub\GameEngineC\Core\
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(128,5): error MSB3073: :VCEnd" exited with code -1073741515.

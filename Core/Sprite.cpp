@@ -1,9 +1,15 @@
 #include "Sprite.h"
+#include "ResourceManager.h"
 
 using namespace Core;
 
 
-Sprite::Sprite(unsigned char layerIndex, Color color) : layerIndex(layerIndex), color(color), clipEnabled(false) {
+Sprite::Sprite(unsigned char layerIndex, Color color) : layerIndex(layerIndex), color(color) {
+	// Default shader
+	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
+} // Constructor
+
+Sprite::Sprite(unsigned char layerIndex, Color color, Shader shader) : layerIndex(layerIndex), color(color), shader(shader) {
 } // Constructor
 
 Sprite::~Sprite() {
@@ -44,6 +50,14 @@ void Sprite::resetClipping() {
 
 bool Sprite::isClipEnabled() const {
 	return clipEnabled;
+}
+
+const Shader& Sprite::getShader() const {
+	return shader;
+}
+
+void Sprite::setShader(Shader shader) {
+	this->shader = shader;
 }
 
 

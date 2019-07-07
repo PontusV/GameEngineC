@@ -27,6 +27,7 @@ namespace Core {
 		void setBackgroundColor(glm::vec3 color);
 
 		GLFWwindow* getWindow();
+		glm::mat4 getProjectionMatrix();
 
 	private:
 		const char* title;

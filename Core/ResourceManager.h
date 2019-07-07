@@ -27,15 +27,18 @@ namespace Core {
 			static ResourceManager instance;
 			return instance;
 		}
-		Shader loadShader(const GLchar* vShaderFile, const GLchar* fShaderFile);
+		/* @param shaderFileName the name of the shader file without any file extension. */
+		Shader loadShader(const std::string shaderFileName);
 		Texture2D loadTexture(const GLchar* file, glm::ivec2 size = glm::ivec2(0,0), glm::ivec2 uvStartCoords = glm::ivec2(0,0));
 		TextData2D createText(std::wstring text, Font font);
 		glm::ivec2 getTextSize(std::wstring text, const Font& font);
 
-		// Properly de-allocates all loaded resources
+		// De-allocates all loaded resources
 		void clear();
 		// Updates Projection matrix of all shaders
-		void updateShaders(glm::mat4& projection);
+		void updateShaders(const glm::mat4& projection);
+		// Initializes all shaders. Prepares them for use in rendering.
+		void initShader(const glm::mat4& projection);
 	private:
 		ResourceManager();
 

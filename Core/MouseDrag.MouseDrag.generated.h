@@ -1,6 +1,6 @@
 #ifndef REFLECTION_PARSER
 #pragma once
-#include <ReflectionParser.h>
+#include <ReflectionParser/ReflectionParser.h>
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
@@ -14,7 +14,7 @@ private:\
 static Mirror::Class createType() {\
 	Mirror::Class newClass(21);\
 	newClass.name = "Core::MouseDrag";\
-	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
 	return newClass;\
 }\

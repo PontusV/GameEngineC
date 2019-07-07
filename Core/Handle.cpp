@@ -51,6 +51,10 @@ const EntityLocation& Handle::getLocation() const {
 	return locationData;
 }
 
+bool Handle::hasComponent(ComponentType type) {
+	return manager->hasComponent(entity, type);
+}
+
 Component* Handle::getComponent(ComponentTypeID typeID) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())

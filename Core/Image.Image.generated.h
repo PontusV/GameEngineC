@@ -1,6 +1,6 @@
 #ifndef REFLECTION_PARSER
 #pragma once
-#include <ReflectionParser.h>
+#include <ReflectionParser/ReflectionParser.h>
 #include <cstddef>
 #include <stdexcept>
 #include <type_traits>
@@ -14,7 +14,7 @@ private:\
 static Mirror::Class createType() {\
 	Mirror::Class newClass(7);\
 	newClass.name = "Core::Image";\
-	newClass.annotatedAttributes = {"Reflect"};\
+	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
 \
 	Mirror::Property newProperty;\
@@ -27,7 +27,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}, Mirror::Annotation{"Category", {"ImagePath"}}, Mirror::Annotation{"Update", {"reload(true)"}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -40,7 +40,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -53,7 +53,7 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -66,7 +66,20 @@ static Mirror::Class createType() {\
 	newProperty.type.arraySize = 0;\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {"Reflect"};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "shader";\
+	newProperty.type.name = "Core::Shader";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
@@ -128,6 +141,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "fileName") {\
 			this->fileName = Mirror::convertType<T, std::string>(value);\
+			reload(true);\
 			return true;\
 		}\
 		if (propertyName == "texture") {\
