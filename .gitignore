@@ -2,8 +2,8 @@ Core/Debug/*
 Core/Release/*
 LevelEditor/Debug/*
 LevelEditor/Release/*
+LevelEditor/x64/*
 LevelEditor/resources/*
-LevelEditor/include/*
 Debug/*
 Release/*
 *.db

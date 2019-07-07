@@ -120,19 +120,6 @@ static Mirror::Class createType() {\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "shader";\
-	newProperty.type.name = "Core::Shader";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
-	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
 protected:\

@@ -4,6 +4,7 @@
 #include "Sprite.h"
 #include "Texture2D.h"
 #include "Color.h"
+#include "Shader.h"
 #include <glm/glm.hpp>
 #include <string>
 #include "Image.Image.generated.h"
@@ -15,7 +16,7 @@ namespace Core {
 		GENERATED_BODY()
 	public:
 		Image(const char* fileName, unsigned char layerIndex = 0);
-		Image(const char* fileName, unsigned char layerIndex, Shader shader);
+		Image(const char* fileName, unsigned char layerIndex, Shader shader, Color color = {255,255,255,255});
 		Image();
 		~Image();
 
@@ -25,11 +26,16 @@ namespace Core {
 		void setTexture(const char* fileName, Texture2D& texture);
 		const char* getFileName() const;
 
+		const Shader& getShader() const;
+		void setShader(Shader shader);
+
 	private:
 		PROPERTY(Category=ImagePath, Update=reload(true))
 		std::string fileName;
 		PROPERTY()
 		Texture2D texture;
+		PROPERTY()
+		Shader shader;
 	};
 }
 #endif

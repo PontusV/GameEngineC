@@ -44,6 +44,19 @@ static Mirror::Class createType() {\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
+	newProperty.name = "shader";\
+	newProperty.type.name = "Core::Shader";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
 	newProperty.name = "color";\
 	newProperty.type.name = "Core::Color";\
 	newProperty.type.isConst = false;\
@@ -68,19 +81,6 @@ static Mirror::Class createType() {\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "shader";\
-	newProperty.type.name = "Core::Shader";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
-	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
 protected:\
@@ -96,6 +96,12 @@ Core::Texture2D getValue2681426803000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
+Core::Shader getValue840279851000(std::string propertyName) {\
+	if (propertyName == "shader") {\
+		return this->shader;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
 template<typename T>\
 T getValue_impl(std::string propertyName) {\
 	try {\
@@ -104,6 +110,9 @@ T getValue_impl(std::string propertyName) {\
 		}\
 		if (propertyName == "texture") {\
 			return Mirror::convertType<Core::Texture2D, T>(getValue2681426803000(propertyName));\
+		}\
+		if (propertyName == "shader") {\
+			return Mirror::convertType<Core::Shader, T>(getValue840279851000(propertyName));\
 		}\
 		if (Core::Sprite::hasProperty(propertyName))\
 			return Core::Sprite::getValue_impl<T>(propertyName);\
@@ -123,6 +132,9 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "texture") {\
+			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "shader") {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
 		if (Core::Sprite::hasProperty(propertyName))\
@@ -148,6 +160,10 @@ bool setValue_impl(std::string propertyName, T value) {\
 			this->texture = Mirror::convertType<T, Core::Texture2D>(value);\
 			return true;\
 		}\
+		if (propertyName == "shader") {\
+			this->shader = Mirror::convertType<T, Core::Shader>(value);\
+			return true;\
+		}\
 		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
@@ -164,6 +180,9 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "texture") {\
+			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "shader") {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
 		if (Core::Sprite::setArrayValue_impl<T, N>(propertyName, value)) return true;\
@@ -201,12 +220,14 @@ virtual Mirror::Class getType() {\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(fileName, os);\
 		Mirror::serialize(texture, os);\
+		Mirror::serialize(shader, os);\
 	Core::Sprite::serialize(os);\
 	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(fileName, is);\
 		Mirror::deserialize(texture, is);\
+		Mirror::deserialize(shader, is);\
 	Core::Sprite::deserialize(is);\
 	Core::Component::deserialize(is);\
 }

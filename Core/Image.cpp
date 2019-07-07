@@ -7,12 +7,16 @@
 using namespace Core;
 
 Image::Image(const char* fileName, unsigned char layerIndex) : Sprite(layerIndex), fileName(fileName) {
+	// Default shader
+	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
 } // Constructor
 
-Image::Image(const char* fileName, unsigned char layerIndex, Shader shader) : Sprite(layerIndex, {255,255,255,255}, shader), fileName(fileName) {
+Image::Image(const char* fileName, unsigned char layerIndex, Shader shader, Color color) : Sprite(layerIndex, color), fileName(fileName), shader(shader) {
 } // Constructor
 
 Image::Image() {
+	// Default shader
+	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
 }
 
 Image::~Image() {
@@ -36,4 +40,12 @@ void Image::setTexture(const char* fileName, Texture2D& texture) {
 
 const char* Image::getFileName() const {
 	return fileName.c_str();
+}
+
+const Shader& Image::getShader() const {
+	return shader;
+}
+
+void Image::setShader(Shader shader) {
+	this->shader = shader;
 }

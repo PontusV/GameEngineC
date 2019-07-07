@@ -71,7 +71,7 @@ void Graphics::render(float deltaTime) {
 		unsigned char			layerIndex		= rect.getLayerIndex();
 		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
 
-		renderer->submit(texture, transform, rect.getShader().ID, color, clipEnabled, clipMaskVertices, layerIndex);
+		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
 		// Reset clipping
 		renderableRects.rects[i].resetClipping();
 	}

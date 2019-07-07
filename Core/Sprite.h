@@ -3,7 +3,6 @@
 
 #include "BoxComponent.h"
 #include "Color.h"
-#include "Shader.h"
 #include <glm/glm.hpp>
 #include "Sprite.Sprite.generated.h"
 
@@ -26,20 +25,14 @@ namespace Core {
 		void resetClipping();
 		bool isClipEnabled() const;
 
-		const Shader& getShader() const;
-		void setShader(Shader shader);
-
 	protected:
 		Sprite(unsigned char layerIndex = 0, Color color = {255, 255, 255, 255});
-		Sprite(unsigned char layerIndex, Color color, Shader shader);
 
 	private:
 		PROPERTY()
 		Color color;
 		PROPERTY()
 		unsigned char layerIndex;
-		PROPERTY()
-		Shader shader;
 
 		bool clipEnabled = false;
 		std::vector<glm::vec2> clipMaskVertices;

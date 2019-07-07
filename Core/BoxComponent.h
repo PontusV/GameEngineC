@@ -25,10 +25,6 @@ namespace Core {
 		void setWidth(int width);
 		void setHeight(int height);
 
-		// Serializable
-		//virtual void serialize(std::ostream& os) const;
-		//virtual void deserialize(std::istream& is);
-
 	protected:
 		BoxComponent(int width, int height);
 		BoxComponent(glm::ivec2 size);
