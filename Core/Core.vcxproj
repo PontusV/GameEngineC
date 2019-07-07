@@ -213,6 +213,7 @@
     <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="BoxComponent.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="CheckBox.cpp" />
     <ClCompile Include="ChildManager.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Clipboard.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="BoxComponent.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="CheckBox.h" />
     <ClInclude Include="ChildManager.h" />
     <ClInclude Include="Clipboard.h" />
     <ClInclude Include="Color.h" />

@@ -14,8 +14,8 @@ namespace Core {
 		GENERATED_BODY()
 	public:
 
-		Text(std::wstring text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0);
-		Text(std::string text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex = 0) : Text(std::wstring(text.begin(), text.end()), fontAddress, fontSize, color, layerIndex) {}
+		Text(std::wstring text, const char* fontAddress, int fontSize, Color color);
+		Text(std::string text, const char* fontAddress, int fontSize, Color color);
 		Text();
 		~Text();
 

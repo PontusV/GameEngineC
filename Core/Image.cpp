@@ -6,12 +6,12 @@
 
 using namespace Core;
 
-Image::Image(const char* fileName, unsigned char layerIndex) : Sprite(layerIndex), fileName(fileName) {
+Image::Image(const char* fileName, Color color) : Sprite(color), fileName(fileName) {
 	// Default shader
 	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
 } // Constructor
 
-Image::Image(const char* fileName, unsigned char layerIndex, Shader shader, Color color) : Sprite(layerIndex, color), fileName(fileName), shader(shader) {
+Image::Image(const char* fileName, Shader shader, Color color) : Sprite(color), fileName(fileName), shader(shader) {
 } // Constructor
 
 Image::Image() {

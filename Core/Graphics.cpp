@@ -68,7 +68,7 @@ void Graphics::render(float deltaTime) {
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= rect.getColor();
 		bool					clipEnabled		= rect.isClipEnabled();
-		unsigned char			layerIndex		= rect.getLayerIndex();
+		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
 		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
 
 		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
@@ -87,7 +87,7 @@ void Graphics::render(float deltaTime) {
 		const Texture2D&		texture		= image.getTexture();
 		const Color&			color		= image.getColor();
 		bool					clipEnabled = image.isClipEnabled();
-		unsigned char			layerIndex	= image.getLayerIndex();
+		unsigned char			layerIndex	= image.getOwner().getEntityLayer();
 		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
 
 		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, clipMaskVertices, layerIndex);
@@ -99,7 +99,7 @@ void Graphics::render(float deltaTime) {
 	for (std::size_t i = 0; i < sizeTexts; i++) {
 		const Text&						text				= renderableTexts.texts[i];
 		bool							clipEnabled			= text.isClipEnabled();
-		const unsigned char&			layerIndex			= text.getLayerIndex();
+		const unsigned char&			layerIndex			= text.getOwner().getEntityLayer();
 		const std::vector<glm::vec2>&	clipMaskVertices	= text.getClipMaskVertices();
 
 		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
@@ -117,7 +117,7 @@ void Graphics::render(float deltaTime) {
 		bool					inner			= border.isInner();
 		const glm::ivec2&		size			= transform.getSize();
 		bool					clipEnabled		= border.isClipEnabled();
-		const unsigned char&	layerIndex		= border.getLayerIndex();
+		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
 		const std::vector<glm::vec2>& clipMaskVertices = border.getClipMaskVertices();
 
 

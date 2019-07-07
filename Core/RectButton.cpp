@@ -5,28 +5,16 @@
 
 using namespace Core;
 
-RectButton::RectButton(unsigned char layerIndex) {
+RectButton::RectButton() {
 	colors[DEFAULT]			= { 255,255,255,255 };
 	colors[PRESSED_DOWN]	= { 255,255,255,255 };
 	colors[HOVER_OVER]		= { 255,255,255,255 };
-	setLayerIndex(layerIndex);
 }
 
 RectButton::~RectButton() {
 }
 
-void RectButton::setLayerIndex(unsigned char value) {
-	layerIndex = value;
-	RectSprite* sprite = owner.getComponent<RectSprite>();
-	if (sprite) {
-		sprite->setLayerIndex(value);
-	}
-}
-
 void RectButton::awake() {
-	//std::cout << owner.hasComponent<Rect>() << "\n";
-	//if (!owner.hasComponent<Rect>())
-		//owner.addComponent<Rect>(width, height, colors[DEFAULT], layerIndex);
 	changeState(DEFAULT);
 }
 

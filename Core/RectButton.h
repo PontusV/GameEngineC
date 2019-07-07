@@ -15,8 +15,7 @@ namespace Core {
 			HOVER_OVER
 		};
 	public:
-		RectButton(unsigned char layerIndex);
-		RectButton() {}
+		RectButton();
 		~RectButton();
 
 		void awake() override;
@@ -24,8 +23,6 @@ namespace Core {
 		void onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
 		void onHoverover() override;
 		void onHoverout() override;
-
-		void setLayerIndex(unsigned char value);
 
 	private:
 		void changeState(ButtonState state);
@@ -37,8 +34,6 @@ namespace Core {
 		ComponentFunctionHandle<> clickFunction;
 
 	private:
-		PROPERTY()
-		unsigned char layerIndex = 0;
 		//PROPERTY() // ENUM!
 		ButtonState state = ButtonState::DEFAULT;
 	};

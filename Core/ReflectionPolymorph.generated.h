@@ -13,6 +13,7 @@
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Border.h"
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Image.h"
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Button.h"
+#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/CheckBox.h"
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/ChildManager.h"
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/ParentEntity.h"
 #include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/UIBehaviour.h"
@@ -58,6 +59,8 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::Image*>(instance), args...);
 	else if (instance->getType().name == "Core::Button")
 		return fun.invoke(reinterpret_cast<Core::Button*>(instance), args...);
+	else if (instance->getType().name == "Core::CheckBox")
+		return fun.invoke(reinterpret_cast<Core::CheckBox*>(instance), args...);
 	else if (instance->getType().name == "Core::ChildManager")
 		return fun.invoke(reinterpret_cast<Core::ChildManager*>(instance), args...);
 	else if (instance->getType().name == "Core::ParentEntity")
@@ -124,6 +127,8 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::Image*>(instance));
 	else if (instance->getType().name == "Core::Button")
 		return prop.getValue<T>(reinterpret_cast<Core::Button*>(instance));
+	else if (instance->getType().name == "Core::CheckBox")
+		return prop.getValue<T>(reinterpret_cast<Core::CheckBox*>(instance));
 	else if (instance->getType().name == "Core::ChildManager")
 		return prop.getValue<T>(reinterpret_cast<Core::ChildManager*>(instance));
 	else if (instance->getType().name == "Core::ParentEntity")
@@ -190,6 +195,8 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance));
 	else if (instance->getType().name == "Core::Button")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Button*>(instance));
+	else if (instance->getType().name == "Core::CheckBox")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::CheckBox*>(instance));
 	else if (instance->getType().name == "Core::ChildManager")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance));
 	else if (instance->getType().name == "Core::ParentEntity")
@@ -256,6 +263,8 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::Image*>(instance), value);
 	else if (instance->getType().name == "Core::Button")
 		return prop.setValue(reinterpret_cast<Core::Button*>(instance), value);
+	else if (instance->getType().name == "Core::CheckBox")
+		return prop.setValue(reinterpret_cast<Core::CheckBox*>(instance), value);
 	else if (instance->getType().name == "Core::ChildManager")
 		return prop.setValue(reinterpret_cast<Core::ChildManager*>(instance), value);
 	else if (instance->getType().name == "Core::ParentEntity")
@@ -322,6 +331,8 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Image*>(instance), value);
 	else if (instance->getType().name == "Core::Button")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Button*>(instance), value);
+	else if (instance->getType().name == "Core::CheckBox")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::CheckBox*>(instance), value);
 	else if (instance->getType().name == "Core::ChildManager")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ChildManager*>(instance), value);
 	else if (instance->getType().name == "Core::ParentEntity")
@@ -368,7 +379,7 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
 }
-typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField> ReflectedTypes;
+typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::CheckBox,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField> ReflectedTypes;
 }
 
 #endif

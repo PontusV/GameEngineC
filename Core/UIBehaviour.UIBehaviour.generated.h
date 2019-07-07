@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(11);\
+	Mirror::Class newClass(12);\
 	newClass.name = "Core::UIBehaviour";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\

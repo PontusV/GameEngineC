@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(29);\
+	Mirror::Class newClass(30);\
 	newClass.name = "Core::Selectable";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\

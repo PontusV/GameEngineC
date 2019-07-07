@@ -107,8 +107,6 @@ void Inspector::onPropertyValueSubmit(std::wstring value) {
 							throw std::invalid_argument("Inspector::onPropertyValueSubmit::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
 						}
 					}
-					std::cout << "Target prop name: " << prop.name << std::endl;
-					std::wcout << L"Target prop value: " << propertyValueToString(prop, instance) << std::endl;
 				}
 			}
 		}
@@ -126,7 +124,7 @@ void Inspector::awake() {
 		RectTransform* rect = owner.getComponent<RectTransform>();
 
 		scrollPanel = createEntity("Inspector_Scroll_Panel",
-			RectSprite(Color(150, 0, 0), 0),
+			RectSprite(Color(150, 0, 0)),
 			RectTransform(0, 0, 100, 100, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
@@ -156,7 +154,6 @@ void Inspector::clearEntries() {
 
 
 EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Property& prop, Component* component) {
-	static constexpr unsigned char layer = 0;
 	RectTransform* rect = owner.getComponent<RectTransform>();
 
 	// Create Field
@@ -172,13 +169,13 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 	if (prop.type.isNumber() && !prop.type.isCArray()) {
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
-		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
 		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 		propLabel.setParent(propField);
 
 		// Input Field
 		EntityHandle inputField = createEntity(fieldName + "_InputField",
-			RectSprite(Color(255, 255, 255), layer),
+			RectSprite(Color(255, 255, 255)),
 			Panel(),
 			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 		);
@@ -194,13 +191,13 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 	else if ((prop.type.isString() || prop.type.isWideString()) && !prop.type.isCArray()) {
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
-		Text* propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		Text* propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
 		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 		propLabel.setParent(propField);
 
 		// Input Field
 		EntityHandle inputField = createEntity(fieldName + "_InputField",
-			RectSprite(Color(255, 255, 255), layer),
+			RectSprite(Color(255, 255, 255)),
 			Panel(),
 			RectTransform(0, 0, 250, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 		);
@@ -213,14 +210,14 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 	else {
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
-		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
 		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 		propLabel.setParent(propField);
 
 		// Property Value
 		std::wstring propValueString = propertyValueToString(prop, component);
 		EntityHandle propValue = createEntity(fieldName + "_Value");
-		Text * propValueText = propValue.addComponent(Text(propValueString, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255), layer));
+		Text * propValueText = propValue.addComponent(Text(propValueString, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
 		propValue.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 		propValue.setParent(propField);
 	}
@@ -230,7 +227,6 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 }
 
 void Inspector::addComponentEntry(Component* component) {
-	static constexpr unsigned char layer = 0;
 	// Reflection Data
 	Mirror::Class type = component->getType();
 	// Check for reset for counter
@@ -242,7 +238,7 @@ void Inspector::addComponentEntry(Component* component) {
 
 	// Entry
 	EntityHandle entry = createEntity(entryName,
-		RectSprite(Color(50, 50, 50), layer),
+		RectSprite(Color(50, 50, 50)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
 	);
 	LayoutElement* element = entry.addComponent<LayoutElement>();
@@ -262,7 +258,7 @@ void Inspector::addComponentEntry(Component* component) {
 
 	// Entry content
 	EntityHandle label = createEntity(entryName + "_Label");
-	Text* labelText = label.addComponent(Text(type.name, "resources/fonts/segoeui.ttf", 20, Color(255, 255, 255), layer));
+	Text* labelText = label.addComponent(Text(type.name, "resources/fonts/segoeui.ttf", 20, Color(255, 255, 255)));
 	label.addComponent(RectTransform(0, 0, labelText->getSize().x, labelText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
 	label.setParent(entry);
 	//*/
@@ -280,7 +276,6 @@ void Inspector::inspect(EntityHandle entity) {
 		HideFlags hideFlags = entity.getEntityHideFlags();
 		if (hideFlags == HideFlags::HideInInspector) return;
 		currentTarget = entity;
-		std::cout << "Inspecting " << entity.getEntityName() << "\n";
 		// Clear old target component list
 		clearEntries();
 		// Get components and their reflection data

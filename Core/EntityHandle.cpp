@@ -64,6 +64,11 @@ HideFlags EntityHandle::getEntityHideFlags() {
 	}
 	return result;
 }
+unsigned char EntityHandle::getEntityLayer() const {
+	return 0; // TEMP
+}
+
+
 void EntityHandle::setEntityHideFlags(HideFlags hideFlags) {
 	return manager->setEntityHideFlags(entity, hideFlags);
 }

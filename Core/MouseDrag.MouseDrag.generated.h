@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(21);\
+	Mirror::Class newClass(22);\
 	newClass.name = "Core::MouseDrag";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\

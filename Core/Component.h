@@ -15,7 +15,7 @@ namespace Core {
 	public:
 		virtual ~Component() = 0; // Abstract
 
-		EntityHandle& getOwner();
+		EntityHandle getOwner() const;
 		void setOwner(Handle owner);
 		/* Marks the Component for destruction. */
 		void destroy();

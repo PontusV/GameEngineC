@@ -10,7 +10,7 @@ Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : image
 	}
 } // Constructor
 
-Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage) : images{ Image(defaultImage, 0), Image(pressedImage, 0), Image(hoverImage, 0) } {
+Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage) : images{ Image(defaultImage), Image(pressedImage), Image(hoverImage) } {
 	for (std::size_t i = 0; i < 3; i++) {
 		colors[i] = Color(255, 255, 255, 255);
 	}

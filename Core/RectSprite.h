@@ -9,8 +9,7 @@ namespace Core {
 	CLASS() RectSprite : public Sprite {
 		GENERATED_BODY()
 	public:
-		RectSprite(Color color, unsigned char layerIndex = 0);
-		RectSprite();
+		RectSprite(Color color = {255,255,255,255});
 		~RectSprite();
 	};
 }

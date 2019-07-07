@@ -3,11 +3,8 @@
 using namespace Core;
 
 
-RectSprite::RectSprite(Color color, unsigned char layerIndex) : Sprite(layerIndex, color) {
+RectSprite::RectSprite(Color color) : Sprite(color) {
 } // Constructor
-
-RectSprite::RectSprite() {
-}
 
 RectSprite::~RectSprite() {
 } // Destructor

@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(10);\
+	Mirror::Class newClass(11);\
 	newClass.name = "Core::ParentEntity";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\

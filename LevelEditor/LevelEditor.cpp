@@ -41,7 +41,7 @@ int LevelEditor::initiate() {
 
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
-		RectSprite({ 60, 60, 60, 255 }, editorLayer),
+		RectSprite({ 60, 60, 60, 255 }),
 		WindowScale(true, 1.0f, false, 0),
 		RectTransform(0, 0, 500, 25, 10.0f, Alignment::TOP_LEFT)
 	);
@@ -55,7 +55,7 @@ int LevelEditor::initiate() {
 	layoutGroup->childAlignment = Alignment::TOP_LEFT;
 	// Drop menu
 	EntityHandle menuFile = level->createEntity("Menu_Item_File",
-		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
 	menuFile.setParent(menuBar);
@@ -70,7 +70,7 @@ int LevelEditor::initiate() {
 	file->addOption("Build", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuEdit = level->createEntity("Menu_Item_Edit",
-		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
 	menuEdit.setParent(menuBar);
@@ -83,7 +83,7 @@ int LevelEditor::initiate() {
 	file->addOption("Redo", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuView = level->createEntity("Menu_Item_View",
-		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
 	menuView.setParent(menuBar);
@@ -95,7 +95,7 @@ int LevelEditor::initiate() {
 	file->addOption("Test", Core::bind(file, &DropDown::test));
 	// Drop menu
 	EntityHandle menuObject = level->createEntity("Menu_Item_Object",
-		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255), editorLayer)),
+		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
 	menuObject.setParent(menuBar);
@@ -111,7 +111,7 @@ int LevelEditor::initiate() {
 	int inspectorWidth = 400;
 	int inspectorHeight = 1000;
 	EntityHandle rightPanel = level->createEntity("Right_Panel",
-		RectSprite(Color(60,60,60,255), editorLayer),
+		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		RectTransform(0, 0, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
 	);
@@ -120,7 +120,7 @@ int LevelEditor::initiate() {
 	int backgroundPadding = 3;
 	// Inspector label
 	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
-		Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255), editorLayer),
+		Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		RectTransform(textPadding+backgroundPadding-inspectorWidth, textPadding+backgroundPadding, 0, 0, 1.1f, Alignment::TOP_LEFT)
 	);
 	inspectorLabel.setParent(rightPanel);
@@ -129,7 +129,7 @@ int LevelEditor::initiate() {
 	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
 	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
-		RectSprite(Color(100,100,100,255), editorLayer),
+		RectSprite(Color(100,100,100,255)),
 		RectTransform((float)-textPadding, (float)-textPadding, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspectorLabelRect.setParent(inspectorLabel);
@@ -143,10 +143,10 @@ int LevelEditor::initiate() {
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = level->createEntity("Test_Button",
-		Image("resources/images/invaders.png", 0),
-		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255), editorLayer),
+		Image("resources/images/invaders.png"),
+		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
-		Border(1, Color(255,255,255,255), false, editorLayer),
+		Border(1, Color(255,255,255,255), false),
 		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
 	MouseDrag* mouseDrag = button.addComponent<MouseDrag>();

@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(17);\
+	Mirror::Class newClass(18);\
 	newClass.name = "Core::RectButton";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -42,19 +42,6 @@ static Mirror::Class createType() {\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "layerIndex";\
-	newProperty.type.name = "unsigned char";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
-	newClass.properties.push_back(newProperty);\
 	return newClass;\
 }\
 protected:\
@@ -70,12 +57,6 @@ ComponentFunctionHandle<> getValue4233867720000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-unsigned char getValue2802854000(std::string propertyName) {\
-	if (propertyName == "layerIndex") {\
-		return this->layerIndex;\
-	}\
-	throw std::invalid_argument("Could not find the property!");\
-}\
 template<typename T>\
 T getValue_impl(std::string propertyName) {\
 	try {\
@@ -84,9 +65,6 @@ T getValue_impl(std::string propertyName) {\
 		}\
 		if (propertyName == "clickFunction") {\
 			return Mirror::convertType<ComponentFunctionHandle<>, T>(getValue4233867720000(propertyName));\
-		}\
-		if (propertyName == "layerIndex") {\
-			return Mirror::convertType<unsigned char, T>(getValue2802854000(propertyName));\
 		}\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getValue_impl<T>(propertyName);\
@@ -106,9 +84,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 			return Mirror::convertArrayType<Core::Color, 3, T, N>(getValue1701103765001(propertyName));\
 		}\
 		if (propertyName == "clickFunction") {\
-			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "layerIndex") {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\
 		}\
 		if (Core::Behaviour::hasProperty(propertyName))\
@@ -132,10 +107,6 @@ bool setValue_impl(std::string propertyName, T value) {\
 			this->clickFunction = Mirror::convertType<T, ComponentFunctionHandle<>>(value);\
 			return true;\
 		}\
-		if (propertyName == "layerIndex") {\
-			this->layerIndex = Mirror::convertType<T, unsigned char>(value);\
-			return true;\
-		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
@@ -155,9 +126,6 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 			return true;\
 		}\
 		if (propertyName == "clickFunction") {\
-			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "layerIndex") {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\
 		}\
 		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
@@ -195,14 +163,12 @@ virtual Mirror::Class getType() {\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(colors, os);\
 		Mirror::serialize(clickFunction, os);\
-		Mirror::serialize(layerIndex, os);\
 	Core::Behaviour::serialize(os);\
 	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(colors, is);\
 		Mirror::deserialize(clickFunction, is);\
-		Mirror::deserialize(layerIndex, is);\
 	Core::Behaviour::deserialize(is);\
 	Core::Component::deserialize(is);\
 }

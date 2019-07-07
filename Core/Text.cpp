@@ -5,7 +5,9 @@
 using namespace Core;
 
 
-Text::Text(std::wstring text, const char* fontAddress, int fontSize, Color color, unsigned char layerIndex) : Sprite(layerIndex, color), font(fontAddress, fontSize), text(text) {
+Text::Text(std::wstring text, const char* fontAddress, int fontSize, Color color) : Sprite(color), font(fontAddress, fontSize), text(text) {
+} // Constructor
+Text::Text(std::string text, const char* fontAddress, int fontSize, Color color) : Sprite(color), font(fontAddress, fontSize), text(text.begin(), text.end()) {
 } // Constructor
 
 Text::Text() {

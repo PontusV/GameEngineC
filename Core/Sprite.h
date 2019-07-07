@@ -13,9 +13,6 @@ namespace Core {
 	public:
 		virtual ~Sprite() = 0; // Abstract
 
-		void setLayerIndex(unsigned char index);
-		unsigned char getLayerIndex() const;
-
 		const Color& getColor() const;
 		void setColor(Color value);
 
@@ -26,13 +23,11 @@ namespace Core {
 		bool isClipEnabled() const;
 
 	protected:
-		Sprite(unsigned char layerIndex = 0, Color color = {255, 255, 255, 255});
+		Sprite(Color color = {255, 255, 255, 255});
 
 	private:
 		PROPERTY()
 		Color color;
-		PROPERTY()
-		unsigned char layerIndex;
 
 		bool clipEnabled = false;
 		std::vector<glm::vec2> clipMaskVertices;

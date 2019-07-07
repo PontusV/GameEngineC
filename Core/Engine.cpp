@@ -160,7 +160,7 @@ int Engine::initiate() {
 	Window& window = graphics.getWindow();
 	// Physics
 	// Input
-	glfwSetWindowUserPointer(window.getWindow(), this); // TODO: Change user to Engine
+	glfwSetWindowUserPointer(window.getWindow(), this);
 	glfwSetKeyCallback(window.getWindow(), keyCallback);
 	glfwSetCharCallback(window.getWindow(), characterCallback);
 	glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
@@ -178,7 +178,7 @@ int Engine::start() {
 	FpsCounter fpsCounter;
 	//unsigned char debugLayer = graphics.createLayer();
 	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
-		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255), 0),
+		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255)),
 		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
 		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT)
 	);

@@ -4,19 +4,12 @@
 using namespace Core;
 
 
-Sprite::Sprite(unsigned char layerIndex, Color color) : layerIndex(layerIndex), color(color) {
+Sprite::Sprite(Color color) : color(color) {
 } // Constructor
 
 Sprite::~Sprite() {
 } // Destructor
 
-void Sprite::setLayerIndex(unsigned char index) {
-	layerIndex = index;
-}
-
-unsigned char Sprite::getLayerIndex() const {
-	return layerIndex;
-}
 
 const Color& Sprite::getColor() const {
 	return color;

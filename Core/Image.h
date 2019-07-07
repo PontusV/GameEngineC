@@ -15,8 +15,8 @@ namespace Core {
 	CLASS() Image : public Sprite {
 		GENERATED_BODY()
 	public:
-		Image(const char* fileName, unsigned char layerIndex = 0);
-		Image(const char* fileName, unsigned char layerIndex, Shader shader, Color color = {255,255,255,255});
+		Image(const char* fileName, Color color = {255,255,255,255});
+		Image(const char* fileName, Shader shader, Color color = {255,255,255,255});
 		Image();
 		~Image();
 

@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(15);\
+	Mirror::Class newClass(16);\
 	newClass.name = "Core::RectSprite";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
@@ -20,19 +20,6 @@ static Mirror::Class createType() {\
 	Mirror::Property newProperty;\
 	newProperty.name = "color";\
 	newProperty.type.name = "Core::Color";\
-	newProperty.type.isConst = false;\
-	newProperty.type.isPointer = false;\
-	newProperty.type.isReference = false;\
-	newProperty.type.isArray = false;\
-	newProperty.type.arraySize = 0;\
-	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
-	newClass.properties.push_back(newProperty);\
-\
-	newProperty = {};\
-	newProperty.name = "layerIndex";\
-	newProperty.type.name = "unsigned char";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\

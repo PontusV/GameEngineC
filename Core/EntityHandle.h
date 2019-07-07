@@ -33,6 +33,7 @@ namespace Core {
 
 		std::string getEntityName();
 		HideFlags getEntityHideFlags();
+		unsigned char getEntityLayer() const;
 		void setEntityHideFlags(HideFlags hideFlags);
 
 		template<typename... Ts>

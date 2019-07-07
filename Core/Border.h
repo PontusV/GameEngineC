@@ -11,7 +11,7 @@ namespace Core {
 		GENERATED_BODY()
 	public:
 
-		Border(std::size_t thickness, Color color, bool inner = false, unsigned int layerIndex = 0, bool top = true, bool right = true, bool bottom = true, bool left = true);
+		Border(std::size_t thickness, Color color, bool inner = false, bool top = true, bool right = true, bool bottom = true, bool left = true);
 		Border();
 		~Border();
 
