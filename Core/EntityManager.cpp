@@ -148,18 +148,20 @@ void EntityManager::removeEntity(Entity entity, bool destroy) {
 		// Remove hideflags entry
 		auto iterator = entityHideFlags.find(entity);
 		if (iterator == entityHideFlags.end()) {
-			std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << getEntityName(entity) << std::endl;
+			std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << entity.getID() << std::endl;
 			throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have hideflags!");
 		}
 		entityHideFlags.erase(iterator);
-
-		// Erase Entity name
-		auto iterator2 = entityNameMap.find(getEntityName(entity));
-		if (iterator2 == entityNameMap.end()) {
-			std::cout << "EntityManager::removeEntity::ERROR The Entity does not have a name!" << std::endl;
-			throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have a name!");
+		
+		// Erase Entity name if the Entity still has one assigned
+		auto it = entityNameMap.begin();
+		while (it != entityNameMap.end()) {
+			if (it->second == entity) {
+				entityNameMap.erase(it);
+				break;
+			}
+			it++;
 		}
-		entityNameMap.erase(iterator2);
 	}
 
 	// Notify parent
@@ -353,5 +355,15 @@ void EntityManager::processQueue() {
 }
 
 void EntityManager::destroyEntityQueued(Entity entity) {
+	// Erase Entity name to make it available again
+	auto it = entityNameMap.begin();
+	while (it != entityNameMap.end()) {
+		if (it->second == entity) {
+			entityNameMap.erase(it);
+			break;
+		}
+		it++;
+	}
+	//
 	functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
 }

@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "clickFunction";\
-	newProperty.type.name = "ComponentFunctionHandle<>";\
+	newProperty.type.name = "ComponentFunctionHandle<void>";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -51,7 +51,7 @@ Core::Color* getValue1701103765001(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-ComponentFunctionHandle<> getValue4233867720000(std::string propertyName) {\
+ComponentFunctionHandle<void> getValue2602665746000(std::string propertyName) {\
 	if (propertyName == "clickFunction") {\
 		return this->clickFunction;\
 	}\
@@ -64,7 +64,7 @@ T getValue_impl(std::string propertyName) {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is an array!");\
 		}\
 		if (propertyName == "clickFunction") {\
-			return Mirror::convertType<ComponentFunctionHandle<>, T>(getValue4233867720000(propertyName));\
+			return Mirror::convertType<ComponentFunctionHandle<void>, T>(getValue2602665746000(propertyName));\
 		}\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getValue_impl<T>(propertyName);\
@@ -104,7 +104,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 			throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is an array!");\
 		}\
 		if (propertyName == "clickFunction") {\
-			this->clickFunction = Mirror::convertType<T, ComponentFunctionHandle<>>(value);\
+			this->clickFunction = Mirror::convertType<T, ComponentFunctionHandle<void>>(value);\
 			return true;\
 		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\

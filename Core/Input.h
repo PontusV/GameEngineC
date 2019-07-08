@@ -21,6 +21,7 @@ struct GLFWwindow;
 namespace Core {
 	class Engine;
 	class KeyListener;
+	class Selectable;
 
 	// Component Group for getEntityAtPos(x,y)
 	struct SpriteGroup : public ComponentGroup<Sprite, RectTransform> {
@@ -87,6 +88,7 @@ namespace Core {
 		std::vector<int> keysDown;
 		std::vector<int> keysReleased;
 		std::wstring typedText; // contains the text typed this frame
+		std::vector<Selectable*> selectedScripts;
 
 		// Input cache
 		std::vector<InputEvent> events;

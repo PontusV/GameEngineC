@@ -13,18 +13,13 @@ Selectable::~Selectable()
 }
 
 
-void Selectable::onMouseButtonPressedAsButton(int buttoncode, int mods) {
-	if (buttoncode == GLFW_MOUSE_BUTTON_1) {
-		onSelect();
-		selected = true;
-	}
+void Selectable::select() {
+	selected = true;
+	onSelect();
 }
-
-void Selectable::onMouseButtonPressed(int buttoncode, int mods) {
-	if (buttoncode == GLFW_MOUSE_BUTTON_1) {
-		onDeselect();
-		selected = false;
-	}
+void Selectable::deselect() {
+	selected = false;
+	onDeselect();
 }
 
 bool Selectable::isSelected() {

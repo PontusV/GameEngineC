@@ -31,7 +31,7 @@ namespace Core {
 		PROPERTY()
 		Color colors[3];
 		PROPERTY()
-		ComponentFunctionHandle<> clickFunction;
+		ComponentFunctionHandle<void> clickFunction;
 
 	private:
 		//PROPERTY() // ENUM!

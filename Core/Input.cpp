@@ -7,6 +7,7 @@
 #include "Level.h"
 #include "Component.h"
 #include "Behaviour.h"
+#include "Selectable.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>
@@ -114,6 +115,13 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				leftMouseButtonPressed = true;
 				timeSinceLastClick = (float)glfwGetTime();
 
+				for (Selectable* script : selectedScripts) {
+					script->deselect();
+				}
+				selectedScripts = target.getComponentsUpwards<Selectable>();
+				for (Selectable* script : selectedScripts) {
+					script->select();
+				}
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);

@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 \
 	newProperty = {};\
 	newProperty.name = "onSubmit";\
-	newProperty.type.name = "ComponentFunctionHandle<std::wstring>";\
+	newProperty.type.name = "ComponentFunctionHandle<void, std::wstring>";\
 	newProperty.type.isConst = false;\
 	newProperty.type.isPointer = false;\
 	newProperty.type.isReference = false;\
@@ -90,7 +90,7 @@ std::wstring getValue3223175238000(std::string propertyName) {\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
-ComponentFunctionHandle<std::wstring> getValue3958114413000(std::string propertyName) {\
+ComponentFunctionHandle<void, std::wstring> getValue1863640427000(std::string propertyName) {\
 	if (propertyName == "onSubmit") {\
 		return this->onSubmit;\
 	}\
@@ -118,7 +118,7 @@ T getValue_impl(std::string propertyName) {\
 			return Mirror::convertType<std::wstring, T>(getValue3223175238000(propertyName));\
 		}\
 		if (propertyName == "onSubmit") {\
-			return Mirror::convertType<ComponentFunctionHandle<std::wstring>, T>(getValue3958114413000(propertyName));\
+			return Mirror::convertType<ComponentFunctionHandle<void, std::wstring>, T>(getValue1863640427000(propertyName));\
 		}\
 		if (propertyName == "characterLimit") {\
 			return Mirror::convertType<std::size_t, T>(getValue3491869076000(propertyName));\
@@ -181,7 +181,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 			return true;\
 		}\
 		if (propertyName == "onSubmit") {\
-			this->onSubmit = Mirror::convertType<T, ComponentFunctionHandle<std::wstring>>(value);\
+			this->onSubmit = Mirror::convertType<T, ComponentFunctionHandle<void, std::wstring>>(value);\
 			return true;\
 		}\
 		if (propertyName == "characterLimit") {\

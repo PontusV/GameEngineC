@@ -8,6 +8,7 @@
 #include "InputField.h"
 #include "HideFlags.h"
 #include "Selectable.h"
+#include "CheckBox.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -69,7 +70,7 @@ std::wstring Inspector::propertyValueToString(Mirror::Property& prop, Component*
 	return L"ERROR!";
 }
 
-void Inspector::onPropertyValueSubmit(std::wstring value) {
+bool Inspector::getSelectedProperty(PropertyInstance& ref) {
 	std::size_t childCount = scrollPanel.getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle entry = scrollPanel.getChild(i);
@@ -82,33 +83,62 @@ void Inspector::onPropertyValueSubmit(std::wstring value) {
 					// Component i, Property ii
 					std::vector<Component*> components = currentTarget.getComponents();
 					Component* instance = components[i];
-					Mirror::Class classType = instance->getType();
-					Mirror::Property& prop = classType.properties[ii-1];
-					if (prop.type.isCArray()) {
-						// WIP
-						std::cout << "Inspector::onPropertyValueSubmit::ERROR Did not set value for the array type. Setting value of array types are still a WIP." << std::endl;
-					}
-					else {
-						if (prop.type.isNumber()) {
-							if (prop.type.isDecimal()) {
-								Mirror::polySetValue(prop, instance, std::stod(value));
-							}
-							else {
-								Mirror::polySetValue(prop, instance, std::stoi(value));
-							}
-						}
-						else if (prop.type.isString()) {
-							Mirror::polySetValue(prop, instance, std::string(value.begin(), value.end()));
-						}
-						else if (prop.type.isWideString()) {
-							Mirror::polySetValue(prop, instance, value);
-						}
-						else {
-							throw std::invalid_argument("Inspector::onPropertyValueSubmit::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
-						}
-					}
+					ref = { instance, instance->getType().properties[ii - 1] };
+					return true;
 				}
 			}
+		}
+	}
+	return false;
+}
+
+void Inspector::onPropertyValueSubmit(std::wstring value) {
+	PropertyInstance propInstance;
+	if (!getSelectedProperty(propInstance)) return;
+
+	Component* instance = propInstance.instance;
+	Mirror::Property prop = propInstance.prop;
+	if (prop.type.isCArray()) {
+		// WIP
+		std::cout << "Inspector::onPropertyValueSubmit::ERROR Did not set value for the array type. Setting value of array types are still a WIP." << std::endl;
+	}
+	else {
+		if (prop.type.isNumber()) {
+			if (prop.type.isDecimal()) {
+				Mirror::polySetValue(prop, instance, std::stod(value));
+			}
+			else {
+				Mirror::polySetValue(prop, instance, std::stoi(value));
+			}
+		}
+		else if (prop.type.isString()) {
+			Mirror::polySetValue(prop, instance, std::string(value.begin(), value.end()));
+		}
+		else if (prop.type.isWideString()) {
+			Mirror::polySetValue(prop, instance, value);
+		}
+		else {
+			throw std::invalid_argument("Inspector::onPropertyValueSubmit::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
+		}
+	}
+}
+
+void Inspector::onPropertyValueToggle(bool value) {
+	PropertyInstance propInstance;
+	if (!getSelectedProperty(propInstance)) return;
+
+	Component* instance = propInstance.instance;
+	Mirror::Property prop = propInstance.prop;
+	if (prop.type.isCArray()) {
+		// WIP
+		std::cout << "Inspector::onPropertyValueSubmit::ERROR Did not set value for the array type. Setting value of array types are still a WIP." << std::endl;
+	}
+	else {
+		if (prop.type.isBool()) {
+			Mirror::polySetValue(prop, instance, value);
+		}
+		else {
+			throw std::invalid_argument("Inspector::onPropertyValueToggle::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
 		}
 	}
 }
@@ -169,8 +199,8 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 	if (prop.type.isNumber() && !prop.type.isCArray()) {
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
-		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		Text* propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
 		propLabel.setParent(propField);
 
 		// Input Field
@@ -192,7 +222,7 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
 		Text* propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
 		propLabel.setParent(propField);
 
 		// Input Field
@@ -207,18 +237,35 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		inputFieldComponent->onSubmit = Core::bind(this, &Inspector::onPropertyValueSubmit);
 		inputField.setParent(propField);
 	}
+	else if (prop.type.isBool() && !prop.type.isCArray()) {
+		// Property Name
+		EntityHandle propLabel = createEntity(fieldName + "_Label");
+		Text* propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
+		propLabel.setParent(propField);
+
+		// Property Value
+		std::wstring propValueString = propertyValueToString(prop, component);
+		EntityHandle propValue = createEntity(fieldName + "_Value",
+			RectTransform(0, 0, 20, 20, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+		);
+		CheckBox* checkBox = propValue.addComponent<CheckBox>();
+		checkBox->setToggle(Mirror::polyGetValue<bool>(prop, component));
+		checkBox->onToggle = Core::bind(this, &Inspector::onPropertyValueToggle);
+		propValue.setParent(propField);
+	}
 	else {
 		// Property Name
 		EntityHandle propLabel = createEntity(fieldName + "_Label");
 		Text * propText = propLabel.addComponent(Text(prop.name + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
 		propLabel.setParent(propField);
 
 		// Property Value
 		std::wstring propValueString = propertyValueToString(prop, component);
 		EntityHandle propValue = createEntity(fieldName + "_Value");
 		Text * propValueText = propValue.addComponent(Text(propValueString, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propValue.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
+		propValue.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
 		propValue.setParent(propField);
 	}
 	// -- End of Field Body
@@ -226,15 +273,12 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 	return propField;
 }
 
-void Inspector::addComponentEntry(Component* component) {
+void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	// Reflection Data
 	Mirror::Class type = component->getType();
-	// Check for reset for counter
-	if (entryCount == std::numeric_limits<std::size_t>::max()) entryCount = 0;
 
 	RectTransform* rect = owner.getComponent<RectTransform>();
-	std::size_t entryIndex = entryCount++;
-	std::string entryName = "Inspector_Component_" + std::to_string(entryIndex);
+	std::string entryName = "Inspector_Component_" + std::to_string(id);
 
 	// Entry
 	EntityHandle entry = createEntity(entryName,
@@ -279,8 +323,9 @@ void Inspector::inspect(EntityHandle entity) {
 		// Clear old target component list
 		clearEntries();
 		// Get components and their reflection data
+		std::size_t i = 0;
 		for (Component* component : entity.getComponents()) {
-			addComponentEntry(component);
+			addComponentEntry(component, i++);
 		}
 	}
 }

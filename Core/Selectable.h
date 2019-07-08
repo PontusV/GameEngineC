@@ -11,8 +11,8 @@ namespace Core {
 		Selectable();
 		virtual ~Selectable();
 
-		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
-		void onMouseButtonPressed(int buttoncode, int mods) override;
+		void select();
+		void deselect();
 		virtual void onSelect() {}
 		virtual void onDeselect() {}
 		bool isSelected();

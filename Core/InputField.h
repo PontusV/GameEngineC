@@ -46,7 +46,7 @@ namespace Core {
 		PROPERTY()
 		std::wstring initText;
 		PROPERTY()
-		ComponentFunctionHandle<std::wstring> onSubmit;
+		ComponentFunctionHandle<void, std::wstring> onSubmit;
 		PROPERTY()
 		std::size_t characterLimit = 255;
 		PROPERTY()

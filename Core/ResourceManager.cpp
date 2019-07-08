@@ -27,8 +27,10 @@ Shader ResourceManager::loadShader(const std::string shaderFileName) {
 	auto it = shaders.find(name);
 	if (it != shaders.end())
 		return it->second;
-	shaders[name] = loadShaderFromFile(vShaderFile.c_str(), fShaderFile.c_str());
-	return shaders[name];
+	Shader shader = loadShaderFromFile(vShaderFile.c_str(), fShaderFile.c_str());
+	updateShader(shader); // init projection matrix
+	shaders[name] = shader;
+	return shader;
 }
 
 Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartCoords) {
@@ -81,9 +83,18 @@ void ResourceManager::clear()
 		delete it.second;
 }
 
+void ResourceManager::updateShader(Shader& shader) {
+	updateShader(shader, projection);
+}
+
+void ResourceManager::updateShader(Shader& shader, const glm::mat4& projection) {
+	shader.setMatrix4("projection", projection, true);
+}
+
 void ResourceManager::updateShaders(const glm::mat4& projection) {
+	this->projection = projection;
 	for (auto it = shaders.begin(); it != shaders.end(); ++it) {
-		it->second.setMatrix4("projection", projection, true);
+		updateShader(it->second, projection);
 	}
 }
 

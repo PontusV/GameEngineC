@@ -35,6 +35,8 @@ namespace Core {
 
 		// De-allocates all loaded resources
 		void clear();
+		void updateShader(Shader& shader);
+		void updateShader(Shader& shader, const glm::mat4& projection);
 		// Updates Projection matrix of all shaders
 		void updateShaders(const glm::mat4& projection);
 		// Initializes all shaders. Prepares them for use in rendering.
@@ -56,6 +58,7 @@ namespace Core {
 		std::map<std::string, Shader> shaders;
 		std::map<std::string, Texture2D> textures;
 		std::map<std::string, FontManager*> fontManagers;
+		glm::mat4 projection = glm::mat4(1.0f);
 	};
 }
 #endif
