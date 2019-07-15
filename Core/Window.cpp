@@ -54,7 +54,7 @@ bool Window::init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// Stencil (Test)
 	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glStencilMask(0x00); // Disable stencil writes
 	// End of config
 

@@ -9,6 +9,18 @@ namespace Core {
 	struct Rect {
 		Rect(float x, float y, float w, float h) : x(x), y(y), w(w), h(h) {}
 		float x, y, w, h;
+		bool operator==(const Rect& other) {
+			return (x == other.x &&
+				y == other.y &&
+				w == other.w &&
+				h == other.h);
+		}
+		bool operator!=(const Rect& other) {
+			return (x != other.x ||
+				y != other.y ||
+				w != other.w ||
+				h != other.h);
+		}
 	};
 
 	#include "RectTransform.RectTransform.generated.h"
@@ -32,6 +44,8 @@ namespace Core {
 		/* Returns a rectangle in local space. */
 		Rect getRect() const;
 		glm::vec2 getRectOffset() const;
+		std::array<glm::vec2, 4> getVertices() const;
+		glm::vec2 getVertex(std::size_t index) const;
 
 	private:
 		/* Notifies UIBehaviours of a change in size */

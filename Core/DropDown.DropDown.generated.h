@@ -96,6 +96,45 @@ static Mirror::Class createType() {\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
+	newProperty.name = "border";\
+	newProperty.type.name = "bool";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "borderSize";\
+	newProperty.type.name = "int";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
+	newProperty.name = "borderColor";\
+	newProperty.type.name = "Core::Color";\
+	newProperty.type.isConst = false;\
+	newProperty.type.isPointer = false;\
+	newProperty.type.isReference = false;\
+	newProperty.type.isArray = false;\
+	newProperty.type.arraySize = 0;\
+	newProperty.isStatic = false;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newClass.properties.push_back(newProperty);\
+\
+	newProperty = {};\
 	newProperty.name = "text";\
 	newProperty.type.name = "Core::Text";\
 	newProperty.type.isConst = false;\
@@ -123,6 +162,9 @@ int getValue2515107422000(std::string propertyName) {\
 	if (propertyName == "optionHeight") {\
 		return this->optionHeight;\
 	}\
+	if (propertyName == "borderSize") {\
+		return this->borderSize;\
+	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
 Core::Font getValue1469732627000(std::string propertyName) {\
@@ -134,6 +176,15 @@ Core::Font getValue1469732627000(std::string propertyName) {\
 Core::Color getValue1701103765000(std::string propertyName) {\
 	if (propertyName == "optionTextColor") {\
 		return this->optionTextColor;\
+	}\
+	if (propertyName == "borderColor") {\
+		return this->borderColor;\
+	}\
+	throw std::invalid_argument("Could not find the property!");\
+}\
+bool getValue3365180733000(std::string propertyName) {\
+	if (propertyName == "border") {\
+		return this->border;\
 	}\
 	throw std::invalid_argument("Could not find the property!");\
 }\
@@ -162,6 +213,15 @@ T getValue_impl(std::string propertyName) {\
 			return Mirror::convertType<Core::Font, T>(getValue1469732627000(propertyName));\
 		}\
 		if (propertyName == "optionTextColor") {\
+			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
+		}\
+		if (propertyName == "border") {\
+			return Mirror::convertType<bool, T>(getValue3365180733000(propertyName));\
+		}\
+		if (propertyName == "borderSize") {\
+			return Mirror::convertType<int, T>(getValue2515107422000(propertyName));\
+		}\
+		if (propertyName == "borderColor") {\
 			return Mirror::convertType<Core::Color, T>(getValue1701103765000(propertyName));\
 		}\
 		if (propertyName == "text") {\
@@ -197,6 +257,15 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "optionTextColor") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "border") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "borderSize") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "borderColor") {\
 			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "text") {\
@@ -240,6 +309,18 @@ bool setValue_impl(std::string propertyName, T value) {\
 			this->optionTextColor = Mirror::convertType<T, Core::Color>(value);\
 			return true;\
 		}\
+		if (propertyName == "border") {\
+			this->border = Mirror::convertType<T, bool>(value);\
+			return true;\
+		}\
+		if (propertyName == "borderSize") {\
+			this->borderSize = Mirror::convertType<T, int>(value);\
+			return true;\
+		}\
+		if (propertyName == "borderColor") {\
+			this->borderColor = Mirror::convertType<T, Core::Color>(value);\
+			return true;\
+		}\
 		if (propertyName == "text") {\
 			this->text = Mirror::convertType<T, Core::Text>(value);\
 			return true;\
@@ -272,6 +353,15 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "optionTextColor") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "border") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "borderSize") {\
+			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+		}\
+		if (propertyName == "borderColor") {\
 			throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
 		}\
 		if (propertyName == "text") {\
@@ -316,6 +406,9 @@ virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(optionHeight, os);\
 		Mirror::serialize(optionFont, os);\
 		Mirror::serialize(optionTextColor, os);\
+		Mirror::serialize(border, os);\
+		Mirror::serialize(borderSize, os);\
+		Mirror::serialize(borderColor, os);\
 		Mirror::serialize(text, os);\
 	Core::Behaviour::serialize(os);\
 	Core::Component::serialize(os);\
@@ -327,6 +420,9 @@ virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(optionHeight, is);\
 		Mirror::deserialize(optionFont, is);\
 		Mirror::deserialize(optionTextColor, is);\
+		Mirror::deserialize(border, is);\
+		Mirror::deserialize(borderSize, is);\
+		Mirror::deserialize(borderColor, is);\
 		Mirror::deserialize(text, is);\
 	Core::Behaviour::deserialize(is);\
 	Core::Component::deserialize(is);\

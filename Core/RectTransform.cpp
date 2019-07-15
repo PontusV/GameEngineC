@@ -13,6 +13,32 @@ RectTransform::RectTransform() {
 RectTransform::~RectTransform() {
 }
 
+std::array<glm::vec2, 4> RectTransform::getVertices() const {
+	return {
+		getVertex(0),
+		getVertex(1),
+		getVertex(2),
+		getVertex(3)
+	};
+}
+
+glm::vec2 RectTransform::getVertex(std::size_t index) const {
+	glm::vec2 pos = getLocalPosition() + getRectOffset();
+	if (index == 0) {
+		return localToWorldMatrix * pos;
+	}
+	else if (index == 1) {
+		return localToWorldMatrix * glm::vec2(pos.x + size.x, pos.y);
+	}
+	else if (index == 2) {
+		return localToWorldMatrix * glm::vec2(pos.x + size.x, pos.y + size.y);
+	}
+	else if (index == 3) {
+		return localToWorldMatrix * glm::vec2(pos.x, pos.y + size.y);
+	}
+	throw std::invalid_argument("RectTransform::getVertex::ERROR Vertex index out of bounds!");
+}
+
 Rect RectTransform::getRect() const {
 	glm::vec2 rectPos = getRectOffset();
 	return Rect(rectPos.x, rectPos.y, size.x, size.y);

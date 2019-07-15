@@ -11,7 +11,8 @@ namespace Core {
 
 	struct DropDownOption {
 		std::string text;
-		ComponentFunctionHandle<> function;
+		ComponentFunctionHandle<void> function;
+		std::vector<DropDownOption> options; // Nested
 	};
 
 	/* Adds a Text and Rect component on start() */
@@ -24,7 +25,7 @@ namespace Core {
 
 		void open();
 		void close();
-		void addOption(std::string label, ComponentFunctionHandle<> function);
+		void addOption(std::string label, ComponentFunctionHandle<void> function, std::vector<DropDownOption> nest = {});
 
 		void awake() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
@@ -49,6 +50,12 @@ namespace Core {
 		Font optionFont = Font("resources/fonts/segoeui.ttf", 14);
 		PROPERTY()
 		Color optionTextColor = { 255,255,255,255 };
+		PROPERTY()
+		bool border = true;
+		PROPERTY()
+		int borderSize = 1;
+		PROPERTY()
+		Color borderColor = Color(100, 100, 100, 255);
 
 	private:
 		PROPERTY()

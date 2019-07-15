@@ -41,7 +41,12 @@ bool LayoutController::isDirty() {
 }
 
 glm::vec2 LayoutController::getMinSize(Handle entity) {
-	std::vector<ILayoutElement*> layoutElements = getLayoutElements(entity);
+	// Check element first
+	if (LayoutElement* element = entity.getComponent<LayoutElement>())
+		if (element->getMinSizeEnabled())
+			return element->getMinSize();
+
+	std::vector<ILayoutElement*> layoutElements = getLayoutGroups(entity);
 	glm::vec2 minSize(0,0); // Default value if no ILayoutElement components are found
 	if (!layoutElements.empty()) {
 		// Init
@@ -55,14 +60,19 @@ glm::vec2 LayoutController::getMinSize(Handle entity) {
 	}
 	else {
 		// Default value for children without any ILayoutElement components
-		if (RectTransform * childRectTransform = entity.getComponent<RectTransform>())
+		if (RectTransform* childRectTransform = entity.getComponent<RectTransform>())
 			minSize = childRectTransform->getSize();
 	}
 	return minSize;
 }
 
 glm::vec2 LayoutController::getPrefSize(Handle entity) {
-	std::vector<ILayoutElement*> layoutElements = getLayoutElements(entity);
+	// Check element first
+	if (LayoutElement* element = entity.getComponent<LayoutElement>())
+		if (element->getPrefSizeEnabled())
+			return element->getPrefSize();
+
+	std::vector<ILayoutElement*> layoutElements = getLayoutGroups(entity);
 	glm::vec2 prefSize(0,0);
 	if (!layoutElements.empty()) {
 		// Init
@@ -83,7 +93,12 @@ glm::vec2 LayoutController::getPrefSize(Handle entity) {
 }
 
 glm::vec2 LayoutController::getFlexibleSize(Handle entity) {
-	std::vector<ILayoutElement*> layoutElements = getLayoutElements(entity);
+	// Check element first
+	if (LayoutElement* element = entity.getComponent<LayoutElement>())
+		if (element->getFlexibleSizeEnabled())
+			return element->getFlexibleSize();
+
+	std::vector<ILayoutElement*> layoutElements = getLayoutGroups(entity);
 	glm::vec2 flexibleSize(1,1); // Default value if no ILayoutElement components are found
 	if (!layoutElements.empty()) {
 		// Init
@@ -98,14 +113,10 @@ glm::vec2 LayoutController::getFlexibleSize(Handle entity) {
 	return flexibleSize;
 }
 
-std::vector<ILayoutElement*> LayoutController::getLayoutElements(Handle entity) {
+std::vector<ILayoutElement*> LayoutController::getLayoutGroups(Handle entity) {
 	std::vector<ILayoutElement*> layoutElements;
-	std::vector<LayoutElement*> elements = entity.getComponents<LayoutElement>();
 	std::vector<LayoutGroup*> groups = entity.getComponents<LayoutGroup>();
-	layoutElements.reserve(groups.size() + elements.size());
-	for (LayoutElement* element : elements) {
-		layoutElements.push_back(static_cast<ILayoutElement*>(element));
-	}
+	layoutElements.reserve(groups.size());
 	for (LayoutGroup* group : groups) {
 		layoutElements.push_back(static_cast<ILayoutElement*>(group));
 	}

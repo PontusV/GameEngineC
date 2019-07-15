@@ -155,13 +155,15 @@ void Inspector::awake() {
 
 		scrollPanel = createEntity("Inspector_Scroll_Panel",
 			RectSprite(Color(150, 0, 0)),
-			RectTransform(0, 0, 100, 100, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
+			Panel(),
+			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
 		element->setFlexibleSize(glm::vec2(1, 1));
-		element->setPrefSize(glm::vec2(1, 1));
-		element->setMinSize(glm::vec2(1, 1));
 		element->setFlexibleSizeEnabled(true);
+		element->setPrefSizeEnabled(true);
+		element->setMinSize(glm::vec2(400, 550/*470*/));
+		element->setMinSizeEnabled(true);
 		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
 		group->childForceExpandHeight = false;
 		group->childForceExpandWidth = true;
@@ -285,9 +287,6 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		RectSprite(Color(50, 50, 50)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
 	);
-	LayoutElement* element = entry.addComponent<LayoutElement>();
-	element->setFlexibleSize(glm::vec2(1, 1));
-	element->setFlexibleSizeEnabled(true);
 	VerticalLayoutGroup* group = entry.addComponent<VerticalLayoutGroup>();
 	group->paddingTop = 5;
 	group->paddingLeft = 5;

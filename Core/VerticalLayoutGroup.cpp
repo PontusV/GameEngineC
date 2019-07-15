@@ -16,8 +16,8 @@ VerticalLayoutGroup::~VerticalLayoutGroup() {
 void VerticalLayoutGroup::updateLayout() {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
-		glm::vec2 allocatedSpace = getAllocatedSpace();
 		std::vector<LayoutElementData> elements = getLayoutElementData(shrinkableChildWidth, shrinkableChildHeight);
+		glm::vec2 allocatedSpace = getAllocatedSpace(elements);
 		float totalMinHeight = getTotalMinHeight(elements);
 		float totalPrefHeight = getTotalPrefHeight(elements);
 		float totalPrefHeightDif = totalPrefHeight - totalMinHeight;

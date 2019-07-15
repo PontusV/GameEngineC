@@ -83,6 +83,8 @@ namespace Core {
 		Entity generateEntity(std::string name);
 		void removeEntity(Entity entity, bool destroy = true);
 		void removeComponent(Entity entity, ComponentTypeID type);
+		/* @return Returns true if the Entity had a name to remove. */
+		bool removeEntityName(Entity entity);
 
 		void removeArchetype(Archetype* archetype);
 		Archetype* createArchetype(std::vector<IComponentTypeInfo> types);

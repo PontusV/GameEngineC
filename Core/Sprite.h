@@ -2,6 +2,7 @@
 #define SPRITE_H
 
 #include "BoxComponent.h"
+#include "RectTransform.h"
 #include "Color.h"
 #include <glm/glm.hpp>
 #include "Sprite.Sprite.generated.h"
@@ -16,9 +17,9 @@ namespace Core {
 		const Color& getColor() const;
 		void setColor(Color value);
 
-		const std::vector<glm::vec2>& getClipMaskVertices() const;
+		const std::vector<RectTransform>& getMasks() const;
 		/* Cuts away Drawable area that is outside of the rect parameter. */
-		void clip(glm::vec2 clipVertices[4]);
+		void clip(RectTransform mask);
 		void resetClipping();
 		bool isClipEnabled() const;
 
@@ -30,7 +31,7 @@ namespace Core {
 		Color color;
 
 		bool clipEnabled = false;
-		std::vector<glm::vec2> clipMaskVertices;
+		std::vector<RectTransform> masks;
 	};
 }
 #endif

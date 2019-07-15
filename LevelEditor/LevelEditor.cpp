@@ -109,7 +109,7 @@ int LevelEditor::initiate() {
 	// ---------------------------------------------------Inspector-----------------------------------------------------------------
 	// Right Panel.
 	int inspectorWidth = 400;
-	int inspectorHeight = 1000;
+	int inspectorHeight = 500;
 	EntityHandle rightPanel = level->createEntity("Right_Panel",
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),

@@ -69,11 +69,9 @@ void Graphics::render(float deltaTime) {
 		const Color&			color			= rect.getColor();
 		bool					clipEnabled		= rect.isClipEnabled();
 		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
-		const std::vector<glm::vec2>& clipMaskVertices = rect.getClipMaskVertices();
+		const std::vector<RectTransform>& masks = rect.getMasks();
 
-		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
-		// Reset clipping
-		renderableRects.rects[i].resetClipping();
+		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
 	}
 
 	// Images
@@ -88,9 +86,9 @@ void Graphics::render(float deltaTime) {
 		const Color&			color		= image.getColor();
 		bool					clipEnabled = image.isClipEnabled();
 		unsigned char			layerIndex	= image.getOwner().getEntityLayer();
-		const std::vector<glm::vec2>& clipMaskVertices = image.getClipMaskVertices();
+		const std::vector<RectTransform>& masks = image.getMasks();
 
-		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, clipMaskVertices, layerIndex);
+		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, masks, layerIndex);
 		// Reset clipping
 		renderableImages.images[i].resetClipping();
 	}
@@ -100,11 +98,9 @@ void Graphics::render(float deltaTime) {
 		const Text&						text				= renderableTexts.texts[i];
 		bool							clipEnabled			= text.isClipEnabled();
 		const unsigned char&			layerIndex			= text.getOwner().getEntityLayer();
-		const std::vector<glm::vec2>&	clipMaskVertices	= text.getClipMaskVertices();
+		const std::vector<RectTransform>&	masks			= text.getMasks();
 
-		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, clipMaskVertices, layerIndex);
-		// Reset clippingcolor
-		renderableTexts.texts[i].resetClipping();
+		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, masks, layerIndex);
 	}
 
 	// Borders
@@ -118,7 +114,7 @@ void Graphics::render(float deltaTime) {
 		const glm::ivec2&		size			= transform.getSize();
 		bool					clipEnabled		= border.isClipEnabled();
 		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
-		const std::vector<glm::vec2>& clipMaskVertices = border.getClipMaskVertices();
+		const std::vector<RectTransform>& masks	= border.getMasks();
 
 
 		for (std::size_t side = 0; side < 4; side++) { // 4 lines
@@ -157,11 +153,9 @@ void Graphics::render(float deltaTime) {
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
 
-				renderer->submit(texture, lineTransform, spriteShader.ID, color, clipEnabled, clipMaskVertices, layerIndex);
+				renderer->submit(texture, lineTransform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
 			}
 		}
-		// Reset clipping
-		renderableBorders.borders[i].resetClipping();
 	}
 
 	// Clear, Draw & Update window
@@ -171,31 +165,18 @@ void Graphics::render(float deltaTime) {
 }
 
 void Graphics::update(float dt) {
+	// Reset mask for all sprites
+	for (std::size_t i = 0; i < spriteGroup.sprites.size(); i++) {
+		spriteGroup.sprites[i].resetClipping();
+	}
 	// Update all panels
 	for (std::size_t i = 0; i < panelGroup.panels.size(); i++) {
 		Panel&			panel		= panelGroup.panels[i];
 		RectTransform&	transform	= panelGroup.transforms[i];
 
-		const glm::vec2& size = transform.getSize();
-		float x = transform.getLocalPosition().x + transform.getRectOffset().x;
-		float y = transform.getLocalPosition().y + transform.getRectOffset().y;
-		const glm::mat4& localToWorldMatrix = transform.getLocalToWorldMatrix();
-
 		std::vector<Sprite*> children = panel.getOwner().getComponentsInChildren<Sprite>();
-
-		glm::vec2 clipMaskVertices[4] = {
-			glm::vec2(x,y),
-			glm::vec2(x+size.x,y),
-			glm::vec2(x+size.x,y+size.y),
-			glm::vec2(x,y+size.y)
-		};
-
-		for (std::size_t i = 0; i < 4; i++) {
-			clipMaskVertices[i] = localToWorldMatrix * clipMaskVertices[i];
-		}
-
 		for (Sprite* child : children) {
-			child->clip(clipMaskVertices);
+			child->clip(transform);
 		}
 	}
 	// Update UI

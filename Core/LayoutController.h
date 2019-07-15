@@ -44,7 +44,7 @@ namespace Core {
 		/* Returns LayoutElement flexibleSize from the given Entity. */
 		static glm::vec2 getFlexibleSize(Handle entity);
 		/* Returns all components inheriting from the Layout Element Interface (ILayoutElement) */
-		static std::vector<ILayoutElement*> getLayoutElements(Handle entity);
+		static std::vector<ILayoutElement*> getLayoutGroups(Handle entity);
 
 	private:
 		virtual void updateLayout() = 0;

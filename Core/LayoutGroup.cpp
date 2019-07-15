@@ -1,5 +1,6 @@
 #include "LayoutGroup.h"
 #include "RectTransform.h"
+#include "LayoutElement.h"
 
 using namespace Core;
 
@@ -10,10 +11,23 @@ LayoutGroup::LayoutGroup() {
 LayoutGroup::~LayoutGroup() {
 }
 
-glm::vec2 LayoutGroup::getAllocatedSpace() {
+glm::vec2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& elements) {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
 		glm::vec2 allocatedSpace = rectTransform->getSize(); // Allocated space for all LayoutElements
+		if (LayoutElement* element = owner.getComponent<LayoutElement>()) {
+			if (element->getFlexibleSizeEnabled()) {
+				glm::vec2 maxSpace;
+				if (RectTransform* parentRect = owner.getParent().getComponent<RectTransform>()) {
+					maxSpace = element->getFlexibleSize() * parentRect->getSize();
+				}
+				else {
+					maxSpace = glm::vec2(getTotalPrefWidth(elements), getTotalPrefHeight(elements));
+				}
+				allocatedSpace.x = std::max(maxSpace.x, allocatedSpace.x);
+				allocatedSpace.y = std::max(maxSpace.y, allocatedSpace.y);
+			}
+		}
 		allocatedSpace.x -= paddingLeft + paddingRight;
 		allocatedSpace.y -= paddingTop + paddingBottom;
 		return allocatedSpace;

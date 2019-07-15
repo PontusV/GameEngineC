@@ -238,7 +238,7 @@ void BatchRenderer2D::flush() {
 			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);	// Enable drawing to color buffer
 
 			glStencilMask(0x00);				// Disable stencil writes
-			glStencilFunc(GL_LEQUAL, 1, 0xFF);	// Only draw on mask
+			glStencilFunc(GL_LEQUAL, segment.clipMaskCount, 0xFF);	// Only draw on mask
 		}
 		glUseProgram(shaderID);
 

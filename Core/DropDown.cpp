@@ -87,7 +87,6 @@ void DropDown::open() {
 		RectSprite(Color(20, 20, 20, 255))
 	);
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
-	// Text Alignment? Left by default
 
 	// Menu Option settings
 	int optionWidth = boxWidth - (int)(boxPaddingX*2);
@@ -109,9 +108,15 @@ void DropDown::open() {
 		menuOption.setParent(menuBox.getEntity());
 
 		// Button Text
+		Alignment textAlignment = Alignment::LEFT;
+		glm::vec2 textPivot = Anchor(textAlignment);
+		std::size_t textPaddingX = 5.0f;
+		std::size_t textPaddingY = 0.0f;
+		float textPosX = textPaddingX + (optionWidth  - textPaddingX * 2) * textPivot.x;
+		float textPosY = textPaddingY + (optionHeight - textPaddingY * 2) * textPivot.y;
 		EntityHandle menuOptionText = createEntity(owner.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),
 			Text(label, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
-			RectTransform(5.0f, (float)optionHeight / 2, 0, 0, z + 0.1f, Alignment::LEFT)
+			RectTransform(textPosX, textPosY, 0, 0, z + 0.1f, textAlignment)
 		);
 		menuOptionText.setParent(menuOption.getEntity());
 
@@ -121,9 +126,6 @@ void DropDown::open() {
 	menuBox.addComponent(RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT));
 
 	// Box Border
-	bool border = true;
-	int borderSize = 1;
-	Color borderColor = Color(100,100,100,255);
 	if (border) {
 		// left, bottom, right
 		EntityHandle menuBoxBorder = createEntity(owner.getEntityName() + "_DropDownBox_Border",
@@ -152,8 +154,8 @@ void DropDown::close() {
 	// Set to Default color
 	owner.getComponent<RectSprite>()->setColor(Color(80, 80, 80, 255));
 }
-void DropDown::addOption(std::string label, ComponentFunctionHandle<> function) {
-	options.push_back({label, function});
+void DropDown::addOption(std::string label, ComponentFunctionHandle<void> function, std::vector<DropDownOption> nest) {
+	options.push_back({label, function, nest});
 }
 
 void DropDown::test() {

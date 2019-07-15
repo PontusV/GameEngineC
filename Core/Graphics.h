@@ -44,6 +44,9 @@ namespace Core {
 		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
 		ComponentArray<Panel>&			panels		= getComponentArray<Panel>();
 	};
+	struct SpriteCollection : public ComponentGroup<Sprite> {
+		ComponentArray<Sprite>& sprites = getComponentArray<Sprite>();
+	};
 
 	/* Manages the window, renderer and UISystem */
 	class Graphics {
@@ -74,6 +77,7 @@ namespace Core {
 		RenderableTexts renderableTexts;
 		RenderableBorders renderableBorders;
 		PanelGroup panelGroup;
+		SpriteCollection spriteGroup;
 	};
 }
 #endif

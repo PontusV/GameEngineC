@@ -19,21 +19,18 @@ void Sprite::setColor(Color value) {
 	color = value;
 }
 
-const std::vector<glm::vec2>& Sprite::getClipMaskVertices() const {
-	return clipMaskVertices;
+const std::vector<RectTransform>& Sprite::getMasks() const {
+	return masks;
 }
 
-void Sprite::clip(glm::vec2 clipVertices[4]) {
+void Sprite::clip(RectTransform mask) {
 	clipEnabled = true;
-	// Add mask to list
-	for (int i = 0; i < 4; i++) {
-		clipMaskVertices.push_back(clipVertices[i]);
-	}
+	masks.push_back(mask);
 }
 
 void Sprite::resetClipping() {
 	clipEnabled = false;
-	clipMaskVertices.clear();
+	masks.clear();
 }
 
 bool Sprite::isClipEnabled() const {

@@ -15,6 +15,7 @@ namespace Core {
 			RectTransform rect;
 			Texture2D texture;
 			std::size_t id;
+			std::vector<RectTransform> masks;
 		};
 
 		/* Returns true if the position is inside the rect. */
@@ -30,14 +31,23 @@ namespace Core {
 			);
 		}
 
+		/* Returns true if all RectTransforms were hit. */
+		bool hitCheckCollection(float posX, float posY, const std::vector<RectTransform>& transforms) {
+			for (const RectTransform& transform : transforms) {
+				if (!hitCheck(posX, posY, transform)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
 		/* Returns the id of the TexturedRectTransform that is infront if there are any at the position. Returns 0 if none was found. */
 		std::size_t hitDetect(const float xPoint, const float yPoint, const std::vector<RectTransformEntry>& rectTransforms, bool alpha = false) {
 			std::vector<RectTransformEntry> interactables;
 
 			for (const RectTransformEntry& rectTransform : rectTransforms) {
 				// Simple hit detection
-				if (hitCheck(xPoint, yPoint, rectTransform.rect))
-				{
+				if (hitCheck(xPoint, yPoint, rectTransform.rect) && hitCheckCollection(xPoint, yPoint, rectTransform.masks)) {
 					if (!alpha || rectTransform.texture.getAlphaAtPoint((int)(xPoint - rectTransform.rect.getPosition().x), (int)(yPoint - rectTransform.rect.getPosition().y)) > 0.0f) // Expensive
 						interactables.push_back(rectTransform);
 				}
