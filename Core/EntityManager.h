@@ -52,6 +52,7 @@ namespace Core {
 		std::vector<T*> getComponents(Entity entity);
 		std::vector<IComponentTypeInfo> getComponentTypes(Entity entity);
 
+		void setParent(Handle entity, Handle parent);
 		Handle getParent(Entity entity);
 		Handle getChild(Entity entity, int index);
 		std::size_t getImmediateChildCount(Entity entity);
@@ -76,12 +77,14 @@ namespace Core {
 		T* addComponentQueued(Entity entity, T& component);
 		template<typename T>
 		void removeComponentQueued(Entity entity);
+		void setParentQueued(Handle entity, Handle parent);
 
 	private:
 		template <typename... Ts>
 		Handle addEntity(Entity entity, Ts&... components);
 		Entity generateEntity(std::string name);
-		void removeEntity(Entity entity, bool destroy = true);
+		void removeEntity(Entity entity);
+		void removeEntity(Entity entity, Archetype* archetype);
 		void removeComponent(Entity entity, ComponentTypeID type);
 		/* @return Returns true if the Entity had a name to remove. */
 		bool removeEntityName(Entity entity);
@@ -100,9 +103,16 @@ namespace Core {
 
 		/* Awakes all scripts attached to the Entity. */
 		void awakeEntity(Entity entity);
+		/* Awakes all scripts attached to the Entity. */
+		void awakeEntity(Handle entity);
 
 		/* Awakes the component if it is a type of Script. */
 		void awakeComponent(Entity entity, ComponentType type);
+
+		void onEntityCreated(Entity entity); // Used by queue
+		void onEntityCreated(Handle entity);
+		void onEntityDestroyed(Entity entity);
+		void onEntityChanged(Handle entity);
 
 	private:
 		std::map<Entity, Archetype*> entityMap;
@@ -125,8 +135,7 @@ namespace Core {
 		Entity entity = generateEntity(name);
 		Handle handle = addEntity(entity, components...);
 
-		// Awake the entity
-		awakeEntity(entity);
+		onEntityCreated(handle);
 
 		return handle;
 	}
@@ -185,7 +194,6 @@ namespace Core {
 	/* Adds given components to the given Entity. */
 	template <typename T>
 	void EntityManager::addComponent(Entity entity, T& component) {
-
 		Archetype* src = entityMap.at(entity);
 		std::vector<IComponentTypeInfo> destTypes = src->getTypes();
 		destTypes.push_back(IComponentTypeInfo(typeof(T), nameof(T), sizeof(T)));
@@ -198,6 +206,7 @@ namespace Core {
 
 		// Awake the component
 		awakeComponent(entity, typeof(T));
+		onEntityChanged(owner);
 	}
 
 	/* Removes components with types (specified in template) from the given Entity. */
@@ -218,7 +227,7 @@ namespace Core {
 	Entity EntityManager::createEntityQueued(std::string name, Ts&... components) {
 		Entity entity = generateEntity(name);
 		functionQueue.push(new FunctionCaller<Handle, EntityManager, Entity, Ts&...>(&EntityManager::addEntity<Ts...>, *this, entity, components...));
-		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::awakeEntity, *this, entity));
+		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::onEntityCreated, *this, entity));
 		return entity;
 	}
 	template<typename T>

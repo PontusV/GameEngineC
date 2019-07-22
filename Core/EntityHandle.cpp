@@ -28,14 +28,7 @@ void EntityHandle::setParent(const Entity& entity) {
 }
 
 void EntityHandle::setParent(EntityHandle entity) {
-	update();
-	ParentEntity* parentComponent = getComponent<ParentEntity>();
-	if (parentComponent) {
-		parentComponent->setParent(entity);
-	}
-	else {
-		addComponent<ParentEntity>(entity);
-	}
+	manager->setParentQueued(*this, entity);
 }
 
 bool EntityHandle::isChild(Entity entity) {

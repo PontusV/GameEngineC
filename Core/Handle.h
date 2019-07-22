@@ -19,6 +19,7 @@ namespace Core {
 		Handle(Entity entity, EntityManager* manager);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
+		bool operator==(const Handle& other);
 
 		const Entity& getEntity() const;
 

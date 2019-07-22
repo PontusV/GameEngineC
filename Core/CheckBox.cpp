@@ -21,7 +21,7 @@ void CheckBox::showTick() {
 		hideTick(); // Make sure tick is destroyed
 		tick = createEntity(owner.getEntityName() + "_Tick",
 			Image("resources/images/ui/CheckBox-tick.png", shader, Color(0, 0, 0, 255)),
-			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ() + 0.0002, Alignment::TOP_LEFT)
+			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ() + 0.0002f, Alignment::TOP_LEFT)
 		);
 		tick.setParent(owner);
 		tick.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
@@ -48,7 +48,7 @@ void CheckBox::awake() {
 		background.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
 		EntityHandle border = createEntity(owner.getEntityName() + "_Border",
 			Image("resources/images/ui/CheckBox-border.png", shader, Color(0, 0, 0, 255)),
-			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001, Alignment::TOP_LEFT)
+			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001f, Alignment::TOP_LEFT)
 		);
 		border.setParent(owner);
 		border.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);

@@ -10,11 +10,10 @@
 namespace Core {
 	class ConstBatchConfig {
 	public:
-		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID, bool clipEnabled, const std::vector<glm::vec2>& clipMaskVertices) : textureID(textureID), shaderID(shaderID), clipEnabled(clipEnabled), clipMaskVertices(clipMaskVertices) {}
+		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID, const std::vector<glm::vec2>& clipMaskVertices) : textureID(textureID), shaderID(shaderID), clipMaskVertices(clipMaskVertices) {}
 
 		const unsigned int&				textureID;
 		const unsigned int&				shaderID;
-		bool							clipEnabled;
 		const std::vector<glm::vec2>&	clipMaskVertices;
 	};
 
@@ -37,14 +36,7 @@ namespace Core {
 		}
 
 		inline bool equal(const ConstBatchConfig& other) {
-			if (clipEnabled) {
-				if (!other.clipEnabled) return false;
-				return (shaderID == other.shaderID && clipMaskVertices == other.clipMaskVertices);
-			}
-			else {
-				if (other.clipEnabled) return false;
-				return (shaderID == other.shaderID);
-			}
+			return (shaderID == other.shaderID && clipMaskVertices == other.clipMaskVertices);
 		}
 
 		BatchConfig(const unsigned int& textureID = 0, const unsigned int& shaderID = 0) : shaderID(shaderID) {
@@ -52,8 +44,7 @@ namespace Core {
 		}
 		BatchConfig(const ConstBatchConfig& other) {
 			textureIDs.push_back(other.textureID);
-			shaderID	= other.shaderID;
-			clipEnabled	= other.clipEnabled;
+			shaderID = other.shaderID;
 			clipMaskVertices = other.clipMaskVertices;
 		}
 
@@ -67,7 +58,6 @@ namespace Core {
 
 		unsigned int				shaderID;
 		std::vector<glm::vec2>		clipMaskVertices;
-		bool						clipEnabled;
 		std::vector<unsigned int>	textureIDs;
 	};
 }

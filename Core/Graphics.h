@@ -7,7 +7,6 @@
 #include "RectTransform.h"
 #include "Texture2D.h"
 #include "RectSprite.h"
-#include "Panel.h"
 #include "Border.h"
 
 #include "ComponentArrayManager.h"
@@ -40,14 +39,6 @@ namespace Core {
 		ComponentArray<Border>&			borders		= getComponentArray<Border>();
 	};
 
-	struct PanelGroup : public ComponentGroup<RectTransform, Panel> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<Panel>&			panels		= getComponentArray<Panel>();
-	};
-	struct SpriteCollection : public ComponentGroup<Sprite> {
-		ComponentArray<Sprite>& sprites = getComponentArray<Sprite>();
-	};
-
 	/* Manages the window, renderer and UISystem */
 	class Graphics {
 	public:
@@ -76,8 +67,6 @@ namespace Core {
 		RenderableImages renderableImages;
 		RenderableTexts renderableTexts;
 		RenderableBorders renderableBorders;
-		PanelGroup panelGroup;
-		SpriteCollection spriteGroup;
 	};
 }
 #endif

@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(25);\
+	Mirror::Class newClass(24);\
 	newClass.name = "Core::HorizontalLayoutGroup";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutGroup" });\
@@ -181,14 +181,6 @@ T getValue_impl(std::string propertyName) {\
 		}\
 		if (Core::LayoutGroup::hasProperty(propertyName))\
 			return Core::LayoutGroup::getValue_impl<T>(propertyName);\
-		if (Core::LayoutController::hasProperty(propertyName))\
-			return Core::LayoutController::getValue_impl<T>(propertyName);\
-		if (Core::UIBehaviour::hasProperty(propertyName))\
-			return Core::UIBehaviour::getValue_impl<T>(propertyName);\
-		if (Core::Behaviour::hasProperty(propertyName))\
-			return Core::Behaviour::getValue_impl<T>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
@@ -213,14 +205,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 		}\
 		if (Core::LayoutGroup::hasProperty(propertyName))\
 			return Core::LayoutGroup::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::LayoutController::hasProperty(propertyName))\
-			return Core::LayoutController::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::UIBehaviour::hasProperty(propertyName))\
-			return Core::UIBehaviour::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::Behaviour::hasProperty(propertyName))\
-			return Core::Behaviour::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " cannot be converted to the specified type!");\
@@ -248,10 +232,6 @@ bool setValue_impl(std::string propertyName, T value) {\
 			return true;\
 		}\
 		if (Core::LayoutGroup::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::LayoutController::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::UIBehaviour::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
@@ -275,10 +255,6 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 			throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
 		}\
 		if (Core::LayoutGroup::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::LayoutController::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::UIBehaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " was set to a value with an incompatible type!");\
@@ -315,10 +291,6 @@ virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(childForceExpandWidth, os);\
 		Mirror::serialize(childForceExpandHeight, os);\
 	Core::LayoutGroup::serialize(os);\
-	Core::LayoutController::serialize(os);\
-	Core::UIBehaviour::serialize(os);\
-	Core::Behaviour::serialize(os);\
-	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(shrinkableChildWidth, is);\
@@ -326,9 +298,5 @@ virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(childForceExpandWidth, is);\
 		Mirror::deserialize(childForceExpandHeight, is);\
 	Core::LayoutGroup::deserialize(is);\
-	Core::LayoutController::deserialize(is);\
-	Core::UIBehaviour::deserialize(is);\
-	Core::Behaviour::deserialize(is);\
-	Core::Component::deserialize(is);\
 }
 #endif

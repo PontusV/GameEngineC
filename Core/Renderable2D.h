@@ -17,7 +17,6 @@ namespace Core {
 		unsigned char	layerIndex;
 
 		// Clipping with Stencil Buffer
-		bool			clipEnabled;
 		std::vector<glm::vec2> clipMaskVertices;
 	};
 }

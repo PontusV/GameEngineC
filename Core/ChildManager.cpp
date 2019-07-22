@@ -8,32 +8,16 @@ ChildManager::~ChildManager()
 {
 }
 
-void ChildManager::childAdded(Handle entity) {
-	// Check if update
-	for (Handle& child : children) {
-		if (child.getEntity() == entity.getEntity()) {
-			child = entity; // Update child reference
-		}
-	}
-	// No update
+void ChildManager::onChildAdded(Handle entity) {
 	children.push_back(entity);
-	// Notify scripts
-	std::vector<Behaviour*> scripts = owner.getComponents<Behaviour>();
-	for (Behaviour* script : scripts) {
-		script->onChildrenChanged();
-	}
 }
 
-void ChildManager::childRemoved(Entity entity) {
-	for (std::size_t i = 0; i < children.size(); i++) {
-		if (children[i].getEntity() == entity) {
-			children.erase(children.begin() + i);
+void ChildManager::onChildRemoved(Handle entity) {
+	for (auto it = children.begin(); it != children.end(); it++) {
+		if (*it == entity) {
+			children.erase(it);
+			return;
 		}
-	}
-	// Notify scripts
-	std::vector<Behaviour*> scripts = owner.getComponents<Behaviour>();
-	for (Behaviour* script : scripts) {
-		script->onChildrenChanged();
 	}
 }
 

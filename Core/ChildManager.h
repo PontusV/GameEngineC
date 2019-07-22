@@ -17,8 +17,8 @@ namespace Core {
 		~ChildManager();
 
 		/* Adds entity to collection if no reference to the child already exists; otherwise the reference held to the child will be replace with the parameter value. */
-		void childAdded(Handle entity);
-		void childRemoved(Entity entity);
+		void onChildAdded(Handle entity);
+		void onChildRemoved(Handle entity);
 
 		std::size_t getChildCount();
 		Handle getChild(std::size_t index);

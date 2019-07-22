@@ -113,6 +113,7 @@ const float& Transform::getZ() const {
 void Transform::setZ(float value) {
 	z = value;
 }
+
 bool Transform::hasChanged() {
 	return changed;
 }

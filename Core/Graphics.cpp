@@ -69,7 +69,7 @@ void Graphics::render(float deltaTime) {
 		const Color&			color			= rect.getColor();
 		bool					clipEnabled		= rect.isClipEnabled();
 		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
-		const std::vector<RectTransform>& masks = rect.getMasks();
+		const std::vector<std::array<glm::vec2, 4>>& masks = rect.getMasks();
 
 		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
 	}
@@ -86,11 +86,9 @@ void Graphics::render(float deltaTime) {
 		const Color&			color		= image.getColor();
 		bool					clipEnabled = image.isClipEnabled();
 		unsigned char			layerIndex	= image.getOwner().getEntityLayer();
-		const std::vector<RectTransform>& masks = image.getMasks();
+		const std::vector<std::array<glm::vec2, 4>>& masks = image.getMasks();
 
 		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, masks, layerIndex);
-		// Reset clipping
-		renderableImages.images[i].resetClipping();
 	}
 
 	// Texts
@@ -98,7 +96,7 @@ void Graphics::render(float deltaTime) {
 		const Text&						text				= renderableTexts.texts[i];
 		bool							clipEnabled			= text.isClipEnabled();
 		const unsigned char&			layerIndex			= text.getOwner().getEntityLayer();
-		const std::vector<RectTransform>&	masks			= text.getMasks();
+		const std::vector<std::array<glm::vec2, 4>>&	masks			= text.getMasks();
 
 		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, masks, layerIndex);
 	}
@@ -114,7 +112,7 @@ void Graphics::render(float deltaTime) {
 		const glm::ivec2&		size			= transform.getSize();
 		bool					clipEnabled		= border.isClipEnabled();
 		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
-		const std::vector<RectTransform>& masks	= border.getMasks();
+		const std::vector<std::array<glm::vec2, 4>>& masks	= border.getMasks();
 
 
 		for (std::size_t side = 0; side < 4; side++) { // 4 lines
@@ -165,20 +163,6 @@ void Graphics::render(float deltaTime) {
 }
 
 void Graphics::update(float dt) {
-	// Reset mask for all sprites
-	for (std::size_t i = 0; i < spriteGroup.sprites.size(); i++) {
-		spriteGroup.sprites[i].resetClipping();
-	}
-	// Update all panels
-	for (std::size_t i = 0; i < panelGroup.panels.size(); i++) {
-		Panel&			panel		= panelGroup.panels[i];
-		RectTransform&	transform	= panelGroup.transforms[i];
-
-		std::vector<Sprite*> children = panel.getOwner().getComponentsInChildren<Sprite>();
-		for (Sprite* child : children) {
-			child->clip(transform);
-		}
-	}
 	// Update UI
 	userInterfaceSystem.update();
 }

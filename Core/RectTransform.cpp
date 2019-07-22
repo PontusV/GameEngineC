@@ -14,27 +14,33 @@ RectTransform::~RectTransform() {
 }
 
 std::array<glm::vec2, 4> RectTransform::getVertices() const {
+	glm::mat4 localModelMatrix = getLocalModelMatrix();
 	return {
-		getVertex(0),
-		getVertex(1),
-		getVertex(2),
-		getVertex(3)
+		getVertex(0, localModelMatrix),
+		getVertex(1, localModelMatrix),
+		getVertex(2, localModelMatrix),
+		getVertex(3, localModelMatrix)
 	};
 }
 
 glm::vec2 RectTransform::getVertex(std::size_t index) const {
-	glm::vec2 pos = getLocalPosition() + getRectOffset();
+	glm::mat4 localModelMatrix = getLocalModelMatrix();
+	return getVertex(index, localModelMatrix);
+}
+
+glm::vec2 RectTransform::getVertex(std::size_t index, glm::mat4& localModelMatrix) const {
+	glm::vec2 pos = getRectOffset();
 	if (index == 0) {
-		return localToWorldMatrix * pos;
+		return localToWorldMatrix * localModelMatrix * pos;
 	}
 	else if (index == 1) {
-		return localToWorldMatrix * glm::vec2(pos.x + size.x, pos.y);
+		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x, pos.y + size.y);
 	}
 	else if (index == 2) {
-		return localToWorldMatrix * glm::vec2(pos.x + size.x, pos.y + size.y);
+		return localToWorldMatrix * localModelMatrix * pos + size;
 	}
 	else if (index == 3) {
-		return localToWorldMatrix * glm::vec2(pos.x, pos.y + size.y);
+		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x + size.x, pos.y);
 	}
 	throw std::invalid_argument("RectTransform::getVertex::ERROR Vertex index out of bounds!");
 }

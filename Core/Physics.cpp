@@ -1,5 +1,6 @@
 #include "Physics.h"
 #include "BoxComponent.h"
+#include "Behaviour.h"
 using namespace Core;
 
 
@@ -40,6 +41,12 @@ void updateTransformModel(Transform& root, glm::mat4 modelMatrix, bool matrixCha
 		Transform* childTransform = root.getOwner().getChild(childIndex).getComponent<Transform>();
 		if (childTransform) {
 			updateTransformModel(*childTransform, modelMatrix, matrixChanged);
+		}
+	}
+	// Notify behaviours of change in transform
+	if (matrixChanged) {
+		for (Behaviour* behaviour : root.getOwner().getComponents<Behaviour>()) {
+			behaviour->onTransformChanged();
 		}
 	}
 }

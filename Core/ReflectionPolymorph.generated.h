@@ -4,38 +4,38 @@
 #include <ReflectionParser/TypeList.h>
 #include <stdexcept>
 
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Component.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Transform.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/BoxComponent.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/RectTransform.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Behaviour.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Sprite.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Border.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Image.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Button.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/CheckBox.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/ChildManager.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/ParentEntity.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/UIBehaviour.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/LayoutController.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/ContentSizeFitter.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Panel.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/RectSprite.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Text.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/RectButton.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/DropDown.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/WindowAnchor.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/WindowScale.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/MouseDrag.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/LayoutGroup.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/LayoutElement.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/HorizontalLayoutGroup.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/VerticalLayoutGroup.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/GridLayoutGroup.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/DragAndResize.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Inspector.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/Selectable.h"
-#include "C:/Users/Pontus/Documents/GitHub/GameEngineC/Core/InputField.h"
+#include "G:/Projects/ProjectGE/Core/Component.h"
+#include "G:/Projects/ProjectGE/Core/Transform.h"
+#include "G:/Projects/ProjectGE/Core/BoxComponent.h"
+#include "G:/Projects/ProjectGE/Core/RectTransform.h"
+#include "G:/Projects/ProjectGE/Core/Behaviour.h"
+#include "G:/Projects/ProjectGE/Core/Sprite.h"
+#include "G:/Projects/ProjectGE/Core/Border.h"
+#include "G:/Projects/ProjectGE/Core/Image.h"
+#include "G:/Projects/ProjectGE/Core/Button.h"
+#include "G:/Projects/ProjectGE/Core/CheckBox.h"
+#include "G:/Projects/ProjectGE/Core/ChildManager.h"
+#include "G:/Projects/ProjectGE/Core/ParentEntity.h"
+#include "G:/Projects/ProjectGE/Core/UIBehaviour.h"
+#include "G:/Projects/ProjectGE/Core/LayoutController.h"
+#include "G:/Projects/ProjectGE/Core/ContentSizeFitter.h"
+#include "G:/Projects/ProjectGE/Core/RectSprite.h"
+#include "G:/Projects/ProjectGE/Core/Text.h"
+#include "G:/Projects/ProjectGE/Core/RectButton.h"
+#include "G:/Projects/ProjectGE/Core/DropDown.h"
+#include "G:/Projects/ProjectGE/Core/WindowAnchor.h"
+#include "G:/Projects/ProjectGE/Core/WindowScale.h"
+#include "G:/Projects/ProjectGE/Core/MouseDrag.h"
+#include "G:/Projects/ProjectGE/Core/LayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/LayoutElement.h"
+#include "G:/Projects/ProjectGE/Core/HorizontalLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/VerticalLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/GridLayoutGroup.h"
+#include "G:/Projects/ProjectGE/Core/DragAndResize.h"
+#include "G:/Projects/ProjectGE/Core/Inspector.h"
+#include "G:/Projects/ProjectGE/Core/Selectable.h"
+#include "G:/Projects/ProjectGE/Core/InputField.h"
+#include "G:/Projects/ProjectGE/Core/RectMask.h"
 
 namespace Mirror {
 /* Converts the given pointer to the derived type. Calls invoke on the function instance with the casted pointer. */
@@ -71,8 +71,6 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::LayoutController*>(instance), args...);
 	else if (instance->getType().name == "Core::ContentSizeFitter")
 		return fun.invoke(reinterpret_cast<Core::ContentSizeFitter*>(instance), args...);
-	else if (instance->getType().name == "Core::Panel")
-		return fun.invoke(reinterpret_cast<Core::Panel*>(instance), args...);
 	else if (instance->getType().name == "Core::RectSprite")
 		return fun.invoke(reinterpret_cast<Core::RectSprite*>(instance), args...);
 	else if (instance->getType().name == "Core::Text")
@@ -105,6 +103,8 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::Selectable*>(instance), args...);
 	else if (instance->getType().name == "Core::InputField")
 		return fun.invoke(reinterpret_cast<Core::InputField*>(instance), args...);
+	else if (instance->getType().name == "Core::RectMask")
+		return fun.invoke(reinterpret_cast<Core::RectMask*>(instance), args...);
 	throw std::invalid_argument("polyInvoke::ERROR");
 }
 template<typename T, typename ClassType>
@@ -139,8 +139,6 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::LayoutController*>(instance));
 	else if (instance->getType().name == "Core::ContentSizeFitter")
 		return prop.getValue<T>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
-	else if (instance->getType().name == "Core::Panel")
-		return prop.getValue<T>(reinterpret_cast<Core::Panel*>(instance));
 	else if (instance->getType().name == "Core::RectSprite")
 		return prop.getValue<T>(reinterpret_cast<Core::RectSprite*>(instance));
 	else if (instance->getType().name == "Core::Text")
@@ -173,6 +171,8 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::Selectable*>(instance));
 	else if (instance->getType().name == "Core::InputField")
 		return prop.getValue<T>(reinterpret_cast<Core::InputField*>(instance));
+	else if (instance->getType().name == "Core::RectMask")
+		return prop.getValue<T>(reinterpret_cast<Core::RectMask*>(instance));
 	throw std::invalid_argument("polyGetValue::ERROR");
 }
 template<typename T, std::size_t N, typename ClassType>
@@ -207,8 +207,6 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance));
 	else if (instance->getType().name == "Core::ContentSizeFitter")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance));
-	else if (instance->getType().name == "Core::Panel")
-		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance));
 	else if (instance->getType().name == "Core::RectSprite")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance));
 	else if (instance->getType().name == "Core::Text")
@@ -241,6 +239,8 @@ std::array<T, N> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::Selectable*>(instance));
 	else if (instance->getType().name == "Core::InputField")
 		return prop.getArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance));
+	else if (instance->getType().name == "Core::RectMask")
+		return prop.getArrayValue<T, N>(reinterpret_cast<Core::RectMask*>(instance));
 	throw std::invalid_argument("polyGetArrayValue::ERROR");
 }
 template<typename T, typename ClassType>
@@ -275,8 +275,6 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::LayoutController*>(instance), value);
 	else if (instance->getType().name == "Core::ContentSizeFitter")
 		return prop.setValue(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
-	else if (instance->getType().name == "Core::Panel")
-		return prop.setValue(reinterpret_cast<Core::Panel*>(instance), value);
 	else if (instance->getType().name == "Core::RectSprite")
 		return prop.setValue(reinterpret_cast<Core::RectSprite*>(instance), value);
 	else if (instance->getType().name == "Core::Text")
@@ -309,6 +307,8 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::Selectable*>(instance), value);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.setValue(reinterpret_cast<Core::InputField*>(instance), value);
+	else if (instance->getType().name == "Core::RectMask")
+		return prop.setValue(reinterpret_cast<Core::RectMask*>(instance), value);
 	throw std::invalid_argument("polySetValue::ERROR");
 }
 template<typename T, std::size_t N, typename ClassType>
@@ -343,8 +343,6 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::LayoutController*>(instance), value);
 	else if (instance->getType().name == "Core::ContentSizeFitter")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ContentSizeFitter*>(instance), value);
-	else if (instance->getType().name == "Core::Panel")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Panel*>(instance), value);
 	else if (instance->getType().name == "Core::RectSprite")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectSprite*>(instance), value);
 	else if (instance->getType().name == "Core::Text")
@@ -377,9 +375,11 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Selectable*>(instance), value);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance), value);
+	else if (instance->getType().name == "Core::RectMask")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectMask*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
 }
-typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::CheckBox,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::Panel,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField> ReflectedTypes;
+typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::CheckBox,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField,Core::RectMask> ReflectedTypes;
 }
 
 #endif

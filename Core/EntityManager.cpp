@@ -30,8 +30,12 @@ void EntityManager::awake() {
 }
 
 void EntityManager::awakeEntity(Entity entity) {
+	awakeEntity(getEntityHandle(entity));
+}
+
+void EntityManager::awakeEntity(Handle entity) {
 	if (!isAwake) return; // This instance has to be awake first
-	std::vector<Behaviour*> scripts = getComponents<Behaviour>(entity);
+	std::vector<Behaviour*> scripts = entity.getComponents<Behaviour>();
 	for (Behaviour* script : scripts) {
 		script->awake();
 	}
@@ -45,6 +49,74 @@ void EntityManager::awakeComponent(Entity entity, ComponentType type) {
 		if (script) {
 			script->awake();
 		}
+	}
+}
+void EntityManager::setParent(Handle entityHandle, Handle parentHandle) {
+	if (parentHandle.getEntity().getID() == Entity::INVALID_ID) return; // Cannot set Invalid Entity to parent
+	Entity entity = entityHandle.getEntity();
+	Entity parent = parentHandle.getEntity();
+	// Notify previous parent of removal
+	Handle currentParent = getParent(entity);
+	if (currentParent.refresh()) {
+		for (Behaviour* behaviour : currentParent.getComponents<Behaviour>()) {
+			behaviour->onChildRemoved(entityHandle);
+		}
+
+		ChildManager* childManager = currentParent.getComponent<ChildManager>();
+		childManager->onChildRemoved(entityHandle);
+		if (childManager->getChildCount() == 0)
+			removeComponent<ChildManager>(currentParent.getEntity());
+	}
+
+	// Add ChildManager to new parent if none already exists
+	if (!hasComponent<ChildManager>(parent)) {
+		ChildManager childManager;
+		addComponent<ChildManager>(parent, childManager);
+	}
+
+	// Modify ParentEntity component
+	ParentEntity* parentComponent = getComponent<ParentEntity>(entity);
+	if (!parentComponent) {
+		ParentEntity component;
+		addComponent<ParentEntity>(entity, component);
+		parentComponent = getComponent<ParentEntity>(entity);
+	}
+	parentComponent->setParent(parentHandle);
+
+	// Notify new parent of added child
+	parentHandle.getComponent<ChildManager>()->onChildAdded(entityHandle);
+	for (Behaviour* behaviour : parentHandle.getComponentsUpwards<Behaviour>()) {
+		behaviour->onChildAdded(entityHandle);
+	}
+}
+
+void EntityManager::onEntityCreated(Entity entity) {
+	onEntityCreated(getEntityHandle(entity));
+}
+
+void EntityManager::onEntityCreated(Handle entity) {
+	// Awake the entity
+	awakeEntity(entity);
+
+	// Should not have to handle any ParentEntiy component here
+}
+void EntityManager::onEntityDestroyed(Entity entity) {
+	Handle handle = getEntityHandle(entity);
+	// Check for parent & call onChildDestroyed
+	Handle parent = handle.getParent();
+	if (parent.refresh()) {
+		parent.getComponent<ChildManager>()->onChildRemoved(handle);
+		for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
+			behaviour->onChildRemoved(handle);
+		}
+	}
+}
+
+void EntityManager::onEntityChanged(Handle entity) {
+	// Check for parent & call onChildChanged
+	Handle parent = entity.getParent();
+	for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
+		behaviour->onChildChanged(entity);
 	}
 }
 
@@ -135,66 +207,81 @@ void EntityManager::setEntityHideFlags(Entity entity, HideFlags hideFlags) {
 }
 
 void EntityManager::destroyEntity(Entity entity) {
-	removeEntity(entity, true);
+	// Exception check
+	auto it = entityMap.find(entity);
+	if (it == entityMap.end()) {
+		std::cout << "EntityManager::destroyEntity::ERROR The entity does not exist in this manager!\n";
+		throw std::invalid_argument("EntityManager::destroyEntity::ERROR The entity does not exist in this manager!");
+	}
+	Archetype* archetype = it->second;
+	onEntityDestroyed(entity);
+
+	// Call onDestroy
+	std::vector<Behaviour*> scripts = getComponents<Behaviour>(entity);
+	for (Behaviour* script : scripts) {
+		script->onDestroy();
+	}
+
+	// Destroy children first. The children will destroy their own children.
+	// Destroy Children
+	ChildManager* childManager = getComponent<ChildManager>(entity);
+	if (childManager) {
+		bool updateIt = childManager->getChildCount() > 0;
+		while (childManager->getChildCount() > 0) {
+			destroyEntity(getChild(entity, 0).getEntity()); // TODO: Tell it to not remove the ChildManager component to prevent unnecessary work.
+		}
+		// Update the iterator if children were removed.
+		if (updateIt > 0) {
+			it = entityMap.find(entity);
+		}
+	}
+
+	// Remove hideflags entry
+	auto iterator = entityHideFlags.find(entity);
+	if (iterator == entityHideFlags.end()) {
+		std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << entity.getID() << std::endl;
+		throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have hideflags!");
+	}
+	entityHideFlags.erase(iterator);
+	removeEntityName(entity);
+
+	removeEntity(entity, archetype);
+	entityMap.erase(it);
+
+	archetype->destroyEntity(entity);
+
+	if (archetype->isEmpty()) {
+		removeArchetype(archetype);
+	}
 }
 
-/* Removes specified entity and its components from the Archetype that stores it. Destroy shows if the Entity is being moved or not. */
-void EntityManager::removeEntity(Entity entity, bool destroy) {
+/* Removes specified entity and its components from the Archetype that stores it. */
+void EntityManager::removeEntity(Entity entity) {
 	// Exception check
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) {
 		std::cout << "EntityManager::removeEntity::ERROR The entity does not exist in this manager!\n";
 		throw std::invalid_argument("EntityManager::removeEntity::ERROR The entity does not exist in this manager!");
 	}
-
-	// Destroy children first. The children will destroy their own children.
-	if (destroy) {
-		bool updateIterator = getImmediateChildCount(entity) > 0;
-		while (getImmediateChildCount(entity) > 0) {
-			destroyEntity(getChild(entity, 0).getEntity());
-		}
-		// Update the iterator if children were removed.
-		if (updateIterator) {
-			it = entityMap.find(entity);
-		}
-
-		// Remove hideflags entry
-		auto iterator = entityHideFlags.find(entity);
-		if (iterator == entityHideFlags.end()) {
-			std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << entity.getID() << std::endl;
-			throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have hideflags!");
-		}
-		entityHideFlags.erase(iterator);
-		removeEntityName(entity);
-	}
-
-	// Notify parent
-	Handle parent = getParent(entity);
-	ChildManager* childManager = parent.getComponent<ChildManager>();
-	if (childManager) {
-		childManager->childRemoved(entity);
-		// Remove child ref container if no children exist
-		if (childManager->getChildCount() == 0) {
-			removeComponent<ChildManager>(parent.getEntity());
-		}
-	}
-
-	// Remove
 	Archetype* archetype = it->second;
 
-	std::vector<Component*> components = archetype->getComponents(entity);
-	for (Component* component : components) {
-		// If the Entity is being destroyed, destroy its components
-		// The chunk will call the destructors of all components if the whole Entity is being destroyed
-		if (!destroy && component->isDestroyed()) {
-			component->~Component();
-		}
-	}
+	removeEntity(entity, archetype);
 	entityMap.erase(it);
-	archetype->removeEntity(entity, destroy);
+
+	archetype->removeEntity(entity);
 
 	if (archetype->isEmpty()) {
 		removeArchetype(archetype);
+	}
+}
+
+void EntityManager::removeEntity(Entity entity, Archetype* archetype) {
+	// Call destructor on components marked for destruction
+	std::vector<Component*> components = archetype->getComponents(entity);
+	for (Component* component : components) {
+		if (component->isDestroyed()) {
+			component->~Component();
+		}
 	}
 }
 
@@ -217,27 +304,6 @@ void EntityManager::prepEntity(Entity entity, Handle owner, Archetype* target) {
 			}
 		}
 	}
-
-	// Notify parent
-	ParentEntity* parentCmp = getComponent<ParentEntity>(entity);
-	if (parentCmp) {
-		Handle parent = parentCmp->getParent();
-		if (parent.refresh()) {
-			Entity currentParent = parent.getEntity();
-			ChildManager* childManager = getComponent<ChildManager>(currentParent);
-			if (childManager == nullptr) {
-				ChildManager newChildManager;
-				addComponent(currentParent, newChildManager);
-				childManager = getComponent<ChildManager>(currentParent);
-				parentCmp->getParent().update();
-			}
-			childManager->childAdded(owner); // Notify parent
-		}
-		else { // If parent is invalid. Throw exception
-			std::cout << "EntityManager::prepEntity::ERROR Cannot add invalid Parent to Entity(" << entity.getID() << ")\n";
-			throw std::invalid_argument("EntityManager::prepEntity::ERROR Cannot add invalid Parent!");
-		}
-	}
 }
 
 void EntityManager::removeComponent(Entity entity, ComponentTypeID typeID) {
@@ -251,6 +317,7 @@ void EntityManager::removeComponent(Entity entity, ComponentTypeID typeID) {
 		Archetype* dest = getArchetype(srcTypes);
 		Handle owner = moveEntity(entity, src, dest);
 		prepEntity(entity, owner, dest);
+		onEntityChanged(owner);
 	}
 }
 
@@ -326,7 +393,7 @@ Handle EntityManager::moveEntity(Entity entity, Archetype* src, Archetype* dest)
 	EntityLocation location = dest->addEntity(entity);
 	owner.updateLocation(location);
 	dest->copyEntity(entity, src->getComponentDataBlocks(entity));
-	removeEntity(entity, false);
+	removeEntity(entity);
 	entityMap.insert(std::make_pair(entity, dest));
 	return owner;
 }
@@ -361,4 +428,8 @@ void EntityManager::processQueue() {
 void EntityManager::destroyEntityQueued(Entity entity) {
 	removeEntityName(entity);
 	functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
+}
+
+void EntityManager::setParentQueued(Handle entity, Handle parent) {
+	functionQueue.push(new FunctionCaller<void, EntityManager, Handle, Handle>(&EntityManager::setParent, *this, entity, parent));
 }

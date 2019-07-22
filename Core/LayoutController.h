@@ -29,7 +29,8 @@ namespace Core {
 
 		void onRectTransformResized() override;
 		void onChildRectTransformResized() override;
-		void onChildrenChanged() override;
+		void onChildAdded(Handle entity) override;
+		void onChildRemoved(Handle entity) override;
 
 		/* Updates layout and sets dirty to false. */
 		void refresh();

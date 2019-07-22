@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
+#include <array>
 
 namespace Core {
 
@@ -28,10 +29,10 @@ namespace Core {
 		unsigned char createLayer();
 
 		/* Render sprite. Submits a Renderable2D to a batchRenderer2D. */
-		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<RectTransform>& clipMaskVertices, const unsigned char& layerIndex);
+		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned char& layerIndex);
 
 		/* Render text. Submits text to a batchRenderer2D. */
-		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<RectTransform>& clipMaskVertices, const unsigned int& layerIndex);
+		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned int& layerIndex);
 
 		/* Draws everything submitted to this renderer since the last render() call. */
 		void render(float deltaTime);
@@ -45,10 +46,10 @@ namespace Core {
 
 	private:
 		Renderable2D renderableBuffer[MAX_RENDERABLES];
-		std::size_t renderablesSize;
+		std::size_t renderablesSize = 0;
 		BatchRenderer2D	batch;
 
-		unsigned char layerAmount; // To keep track of next LayerID
+		unsigned char layerAmount = 0; // To keep track of next LayerID
 		PostProcessor postProcessor;
 
 		// Shader

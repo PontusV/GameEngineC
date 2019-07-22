@@ -12,7 +12,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(16);\
+	Mirror::Class newClass(15);\
 	newClass.name = "Core::RectSprite";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
@@ -37,8 +37,6 @@ T getValue_impl(std::string propertyName) {\
 	try {\
 		if (Core::Sprite::hasProperty(propertyName))\
 			return Core::Sprite::getValue_impl<T>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::RectSprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::RectSprite::" + propertyName + " cannot be converted to the specified type!");\
@@ -51,8 +49,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 	try {\
 		if (Core::Sprite::hasProperty(propertyName))\
 			return Core::Sprite::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::RectSprite::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::RectSprite::" + propertyName + " cannot be converted to the specified type!");\
@@ -64,7 +60,6 @@ template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::RectSprite::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::RectSprite::" + propertyName + " was set to a value with an incompatible type!");\
@@ -76,7 +71,6 @@ template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
 		if (Core::Sprite::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::RectSprite::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::RectSprite::" + propertyName + " was set to a value with an incompatible type!");\
@@ -109,10 +103,8 @@ virtual Mirror::Class getType() {\
 }\
 virtual void serialize(std::ostream& os) const {\
 	Core::Sprite::serialize(os);\
-	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 	Core::Sprite::deserialize(is);\
-	Core::Component::deserialize(is);\
 }
 #endif

@@ -33,25 +33,31 @@ Chunk::Chunk(std::vector<IComponentTypeInfo> infoVec) : size(0), id(idCounter++)
 Chunk::~Chunk() {
 	// Call destructors
 	while (!isEmpty()) {
-		remove(size - 1, true);
+		destroy(size - 1);
 	}
 	delete[] buffer;
 }
 
-void Chunk::remove(Entity entity, bool destruct) {
+void Chunk::destroy(Entity entity) {
 	int index = getIndex(entity);
-	remove(index, destruct);
+	destroy(index);
 }
 
-void Chunk::remove(std::size_t index, bool destruct) {
-	std::vector<Component*> iComponents = getComponents(index);
-
-	if (destruct) {
-		// Call component destructors (destroy object without releasing memory from buffer)
-		for (Component* component : iComponents) {
-			component->~Component();
-		}
+void Chunk::destroy(std::size_t index) {
+	// Call component destructors (destroy object without releasing memory from buffer)
+	for (Component* component : getComponents(index)) {
+		component->~Component();
 	}
+	remove(index);
+}
+
+void Chunk::remove(Entity entity) {
+	int index = getIndex(entity);
+	remove(index);
+}
+
+void Chunk::remove(std::size_t index) {
+	std::vector<Component*> iComponents = getComponents(index);
 
 	if (index < size - 1) { // Only swap if index isnt back of active chunk
 		std::vector<Component*> lComponents = getComponents(size - 1);

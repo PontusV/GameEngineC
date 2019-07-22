@@ -20,29 +20,24 @@ unsigned char Renderer2D::createLayer() {
 	return layerAmount++;
 }
 
-void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<RectTransform>& masks, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& masks, const unsigned char& layerIndex) {
 
 	std::vector<glm::vec2> clipMaskVertices;
 	clipMaskVertices.reserve(masks.size()*4);
-	for (const RectTransform& maskRect : masks) {
-		auto vertices = maskRect.getVertices();
-		for (auto vertex : maskRect.getVertices()) {
-			clipMaskVertices.push_back(vertex);
+	for (const std::array<glm::vec2, 4>& vertices : masks) {
+		for (std::size_t i = 0; i < 4; i++) {
+			clipMaskVertices.push_back(vertices[i]);
 		}
 	}
 
 	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
-	
-	glm::mat4 localModelMatrix = transform.getLocalModelMatrix();
-	glm::mat4 localToWorldMatrix = transform.getLocalToWorldMatrix();
-	glm::vec2 rectOffset = transform.getRectOffset();
-	glm::vec2 rSize = transform.getSize();
 
-	renderable.vertices[0] = localToWorldMatrix * localModelMatrix * transform.getRectOffset();
-	renderable.vertices[1] = localToWorldMatrix * localModelMatrix * glm::vec2(rectOffset.x, rectOffset.y + rSize.y);
-	renderable.vertices[2] = localToWorldMatrix * localModelMatrix * (rectOffset + rSize);
-	renderable.vertices[3] = localToWorldMatrix * localModelMatrix * glm::vec2(rectOffset.x + rSize.x, rectOffset.y);
+	auto vertices = transform.getVertices();
+	renderable.vertices[0] = vertices[0];
+	renderable.vertices[1] = vertices[1];
+	renderable.vertices[2] = vertices[2];
+	renderable.vertices[3] = vertices[3];
 
 	std::copy(std::begin(texture.uvCoords), std::end(texture.uvCoords), std::begin(renderable.uvCoords)); // uv coords
 	renderable.z = transform.getZ();
@@ -50,7 +45,6 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 	renderable.color = color;
 	renderable.layerIndex = layerIndex;
 
-	renderable.clipEnabled = clipEnabled;
 	renderable.clipMaskVertices = clipMaskVertices;
 
 	renderablesSize++;
@@ -83,10 +77,10 @@ void Renderer2D::flush() {
 		if (r.textureID > l.textureID) return false;
 
 		// Clipping values
-		if (!l.clipEnabled && !r.clipEnabled) return false; // They are equal, no need to check the rest
+		if (l.clipMaskVertices.size() == 0 && !r.clipMaskVertices.size() == 0) return false; // They are equal, no need to check the rest
 
-		if (l.clipEnabled < r.clipEnabled) return true;
-		if (r.clipEnabled < l.clipEnabled) return false;
+		if (l.clipMaskVertices.size() == 0 && r.clipMaskVertices.size() != 0) return true;
+		if (r.clipMaskVertices.size() == 0 && l.clipMaskVertices.size() != 0) return false;
 
 		// Stencil Buffer Clip Mask Vertices compare
 		std::size_t vertexAmount = std::min(l.clipMaskVertices.size(), r.clipMaskVertices.size());
@@ -109,7 +103,7 @@ void Renderer2D::flush() {
 	bool batchBegun = false;
 	for (std::size_t i = 0; i < renderablesSize; i++) {
 		Renderable2D& renderable = renderableBuffer[i];
-		ConstBatchConfig config(renderable.textureID, renderable.shaderID, renderable.clipEnabled, renderable.clipMaskVertices);
+		ConstBatchConfig config(renderable.textureID, renderable.shaderID, renderable.clipMaskVertices);
 
 		if (!batch.hasRoom()) {
 			batch.end();
@@ -135,7 +129,7 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<RectTransform>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 

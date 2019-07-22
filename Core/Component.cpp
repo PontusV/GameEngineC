@@ -3,11 +3,15 @@
 
 using namespace Core;
 
+UIDContainer<1000000> Component::uniqueIDContainer = UIDContainer<1000000>();
 
 Component::Component() {
+	//componentID = uniqueIDContainer.getUID();
+	componentID = uniqueIDContainer.getUID();
 }
 
 Component::~Component() {
+	uniqueIDContainer.recycle(componentID);
 }
 
 void Component::setOwner(Handle owner) {
@@ -24,4 +28,23 @@ void Component::destroy() {
 
 bool Component::isDestroyed() {
 	return destruct;
+}
+
+ComponentID Component::getComponentID() const {
+	return componentID;
+}
+
+Component::Component(const Component& other) {
+	owner = other.owner;
+	componentID = other.componentID;
+	destruct = other.destruct;
+	uniqueIDContainer.useID(componentID);
+}
+
+Component& Component::operator=(const Component& other) {
+	owner = other.owner;
+	componentID = other.componentID;
+	destruct = other.destruct;
+	uniqueIDContainer.useID(componentID);
+	return *this;
 }

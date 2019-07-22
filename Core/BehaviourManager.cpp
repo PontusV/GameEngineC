@@ -29,6 +29,32 @@ void BehaviourManager::update(float deltaTime) {
 			behaviourGroup.behaviours[i].update(deltaTime);
 		}
 	}
+	// LateUpdate
+	for (std::size_t i = 0; i < scriptAmount; i++) {
+		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
+			behaviourGroup.behaviours[i].lateUpdate(deltaTime);
+		}
+	}
+}
+
+void BehaviourManager::onPreRender() {
+	std::size_t scriptAmount = behaviourGroup.behaviours.size();
+	// Run scripts
+	for (std::size_t i = 0; i < scriptAmount; i++) {
+		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
+			behaviourGroup.behaviours[i].onPreRender();
+		}
+	}
+}
+
+void BehaviourManager::onPostRender() {
+	std::size_t scriptAmount = behaviourGroup.behaviours.size();
+	// Run scripts
+	for (std::size_t i = 0; i < scriptAmount; i++) {
+		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
+			behaviourGroup.behaviours[i].onPostRender();
+		}
+	}
 }
 
 ComponentArray<Behaviour>& BehaviourManager::getAllScripts() {

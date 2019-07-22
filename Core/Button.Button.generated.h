@@ -68,8 +68,6 @@ T getValue_impl(std::string propertyName) {\
 		}\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getValue_impl<T>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Button::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::Button::" + propertyName + " cannot be converted to the specified type!");\
@@ -88,8 +86,6 @@ std::array<T, N> getArrayValue_impl(std::string propertyName) {\
 		}\
 		if (Core::Behaviour::hasProperty(propertyName))\
 			return Core::Behaviour::getArrayValue_impl<T, N>(propertyName);\
-		if (Core::Component::hasProperty(propertyName))\
-			return Core::Component::getArrayValue_impl<T, N>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Button::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::Button::" + propertyName + " cannot be converted to the specified type!");\
@@ -107,7 +103,6 @@ bool setValue_impl(std::string propertyName, T value) {\
 			throw std::invalid_argument("The property Core::Button::" + propertyName + " is an array!");\
 		}\
 		if (Core::Behaviour::setValue_impl<T>(propertyName, value)) return true;\
-		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Button::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::Button::" + propertyName + " was set to a value with an incompatible type!");\
@@ -131,7 +126,6 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 			return true;\
 		}\
 		if (Core::Behaviour::setArrayValue_impl<T, N>(propertyName, value)) return true;\
-		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Button::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::Button::" + propertyName + " was set to a value with an incompatible type!");\
@@ -166,12 +160,10 @@ virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(images, os);\
 		Mirror::serialize(colors, os);\
 	Core::Behaviour::serialize(os);\
-	Core::Component::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(images, is);\
 		Mirror::deserialize(colors, is);\
 	Core::Behaviour::deserialize(is);\
-	Core::Component::deserialize(is);\
 }
 #endif

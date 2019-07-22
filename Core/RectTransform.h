@@ -46,6 +46,7 @@ namespace Core {
 		glm::vec2 getRectOffset() const;
 		std::array<glm::vec2, 4> getVertices() const;
 		glm::vec2 getVertex(std::size_t index) const;
+		glm::vec2 getVertex(std::size_t index, glm::mat4& localModelMatrix) const;
 
 	private:
 		/* Notifies UIBehaviours of a change in size */

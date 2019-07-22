@@ -38,7 +38,6 @@ int LevelEditor::initiate() {
 	LevelPtr level = engine.createLevel();
 	unsigned char editorLayer = engine.getGraphics().createLayer();
 	engine.setCurrentLevel(level);
-
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }),
@@ -105,7 +104,6 @@ int LevelEditor::initiate() {
 	file->optionHeight = 25;
 	file->boxWidth = 300;
 	file->addOption("Create Empty Object", Core::bind(file, &DropDown::test));
-
 	// ---------------------------------------------------Inspector-----------------------------------------------------------------
 	// Right Panel.
 	int inspectorWidth = 400;

@@ -18,6 +18,10 @@ Handle::Handle() : entity(0) {
 Handle::~Handle() {
 }
 
+bool Handle::operator==(const Handle& other) {
+	return entity == other.entity && manager == other.manager;
+}
+
 const Entity& Handle::getEntity() const {
 	return entity;
 }
@@ -52,7 +56,7 @@ const EntityLocation& Handle::getLocation() const {
 }
 
 bool Handle::hasComponent(ComponentType type) {
-	return manager->hasComponent(entity, type);
+	return getComponent(type) != nullptr; // Faster than EntityManager::hasComponent
 }
 
 Component* Handle::getComponent(ComponentTypeID typeID) {

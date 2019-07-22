@@ -20,8 +20,14 @@ namespace Core {
 		virtual void start() {};
 		/* Called every frame. */
 		virtual void update(float deltaTime) {};
+		/* Called every frame, after update has been called in all behaviours. */
+		virtual void lateUpdate(float deltaTime) {};
 		/* Called when this component is destroyed. */
 		virtual void onDestroy() {};
+
+		//
+		virtual void onPreRender() {};
+		virtual void onPostRender() {};
 
 		// Input
 		/* Called when a mouse button was pressed. */
@@ -43,10 +49,14 @@ namespace Core {
 		/* Called when the mouse scroll is moved while the mouse points on the owner. */
 		virtual void onScroll(float xoffset, float yoffset) {}
 
+		virtual void onTransformChanged() {}
+
 		// Hierarchy
-		/* Called when a new child has been added, moved in the hierarchy or removed. */
-		virtual void onChildrenChanged() {}
-		/* Called when another parent has been set or if the parent was lost. */
+		virtual void onChildAdded(Handle entity) {}
+		virtual void onChildRemoved(Handle entity) {}
+		/* Called when a child has been changed; either by having a component removed or added. */
+		virtual void onChildChanged(Handle entity) {}
+		/* WIP. Called when another parent has been set or if the parent was lost. */
 		virtual void onParentChanged() {}
 
 		void enable();

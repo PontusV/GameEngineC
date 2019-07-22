@@ -36,16 +36,16 @@ namespace Core {
 		
 		/* Sets the position in local space. */
 		void setLocalPosition(glm::vec2 pos);
+		/* Sets local x coord */
+		void setLocalX(float value);
+		/* Sets local y coord */
+		void setLocalY(float value);
 		/* Sets the position in world space. */
 		void setPosition(glm::vec2 pos);
 		/* Sets x coord in world space. */
 		void setX(float value);
 		/* Sets y coord in world space. */
 		void setY(float value);
-		/* Sets local x coord */
-		void setLocalX(float value);
-		/* Sets local y coord */
-		void setLocalY(float value);
 		void setZ(float value);
 
 		bool hasChanged();

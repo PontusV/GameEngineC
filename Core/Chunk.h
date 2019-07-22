@@ -37,7 +37,8 @@ namespace Core {
 		/* Adds entity and components to the back of the chunk. */
 		template<typename... Ts>
 		void add(Entity entity, Ts&... componentPack);
-		void remove(Entity entity, bool destruct = true);
+		void destroy(Entity entity);
+		void remove(Entity entity);
 
 		template<typename T>
 		void setComponent(Entity entity, T& component);
@@ -82,7 +83,8 @@ namespace Core {
 		std::size_t getStride();
 
 	private:
-		void remove(std::size_t index, bool destroy = true);
+		void destroy(std::size_t index);
+		void remove(std::size_t index);
 		char* getComponentBeginPtr(ComponentTypeID typeID);
 		Component* getComponent(std::size_t index, ComponentDataArrayInfo& type);
 

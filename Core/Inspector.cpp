@@ -3,7 +3,7 @@
 #include "VerticalLayoutGroup.h"
 #include "RectTransform.h"
 #include "RectSprite.h"
-#include "Panel.h"
+#include "RectMask.h"
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
@@ -155,7 +155,7 @@ void Inspector::awake() {
 
 		scrollPanel = createEntity("Inspector_Scroll_Panel",
 			RectSprite(Color(150, 0, 0)),
-			Panel(),
+			RectMask(),
 			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
@@ -208,7 +208,7 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		// Input Field
 		EntityHandle inputField = createEntity(fieldName + "_InputField",
 			RectSprite(Color(255, 255, 255)),
-			Panel(),
+			RectMask(),
 			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 		);
 		InputField* inputFieldComponent = inputField.addComponent<InputField>();
@@ -230,7 +230,7 @@ EntityHandle Inspector::createPropertyField(std::string fieldName, Mirror::Prope
 		// Input Field
 		EntityHandle inputField = createEntity(fieldName + "_InputField",
 			RectSprite(Color(255, 255, 255)),
-			Panel(),
+			RectMask(),
 			RectTransform(0, 0, 250, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 		);
 		InputField* inputFieldComponent = inputField.addComponent<InputField>();

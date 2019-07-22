@@ -209,7 +209,9 @@ int Engine::start() {
 		currentLevel->getEntityManager().lock()->processQueue(); // Process Queue
 		debugLevel->getEntityManager().lock()->processQueue(); // Temporary for testing (ugly solution for updating all levels)
 		physics.update(deltaTime);
+		behaviourManager.onPreRender();
 		graphics.update(deltaTime);
+		behaviourManager.onPostRender();
 
 		// Render
 		graphics.render(deltaTime);

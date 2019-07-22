@@ -21,8 +21,8 @@ namespace Core {
 
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts&... components);
-		/* @param destruct decides if the destructor of all the attached components should be called or not */
-		void removeEntity(Entity entity, bool destruct = true);
+		void destroyEntity(Entity entity);
+		void removeEntity(Entity entity);
 		void copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
 		template<typename T>

@@ -20,6 +20,10 @@ namespace Core {
 
 		/* Calls Behaviour::update() on all behaviours. */
 		void update(float deltaTime);
+		/* Calls Behavior::onPreRender() on all behaviours */
+		void onPreRender();
+		/* Calls Behavior::onPostRender() on all behaviours */
+		void onPostRender();
 
 		ComponentArray<Behaviour>& getAllScripts();
 

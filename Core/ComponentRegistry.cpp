@@ -40,7 +40,7 @@ void registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
 	ComponentTypeInfo<T>::setTypeID(I);
 	ComponentTypeInfo<T>::setMatchingTypeIDs(matchList);
 	registerToLoader<T>();
-	//ComponentTypeInfo<T>::print(); // Debug information
+	ComponentTypeInfo<T>::print(); // Debug information
 
 	// Continue registry
 	registerComponentTypes_impl<I+1>(Mirror::TypeList<Ts...>{});

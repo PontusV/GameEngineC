@@ -71,6 +71,12 @@ namespace Mirror {
 		os.write(value.c_str(), sizeof(char) * (value.size() + 1));
 	}
 
+	// std::wstring
+	template<>
+	static void serialize<std::wstring>(const std::wstring& value, std::ostream& os) {
+		os.write((char*)value.c_str(), sizeof(wchar_t) * (value.size() + 1));
+	}
+
 	//---------------------------------------DESERIALIZE-----------------------------------------------
 	// Literal type
 	template<typename T>
@@ -107,6 +113,19 @@ namespace Mirror {
 	template<>
 	static void deserialize<std::string>(std::string& value, std::istream& is) {
 		std::getline(is, value, '\0');
+	}
+
+	// std::wstring
+	template<>
+	static void deserialize<std::wstring>(std::wstring& value, std::istream& is) {
+		while (!is.eof()) {
+			wchar_t wChar;
+			is.read((char*)&wChar, sizeof(wchar_t));
+			if (wChar == L'\0')
+				break;
+			else
+				value = value + wChar;
+		}
 	}
 }
 #endif
