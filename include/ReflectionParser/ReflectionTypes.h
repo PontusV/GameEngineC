@@ -6,83 +6,31 @@
 #include <string>
 #include <stdexcept>
 #include <type_traits>
-#include <array>
 #include <tuple>
 #include <functional> // std::ref
+#include "Utility.h"
 
 
 namespace Mirror {
-	// Type Conversion helper for the generated headers
-	template<typename From, typename To>
-	std::enable_if_t<std::is_convertible<From, To>::value, To> convertType(From from) {
-		return static_cast<To>(from);
-	}
-
-	template<typename From, typename To>
-	std::enable_if_t<!std::is_convertible<From, To>::value, To> convertType(From from) {
-		throw std::invalid_argument("Cannot convert type!\n");
-	}
-
-	// Array
-	/*template<typename From, typename To>
-	std::enable_if_t<std::is_array<From>::value && std::is_array<To>::value && std::is_same<From, To>::value, To*> convertType(From from) {
-		return from;
-	}
-
-	template<typename From, typename To>
-	std::enable_if_t<!std::is_array<From>::value && std::is_array<To>::value, To*> convertType(From from) {
-		throw std::invalid_argument("Cannot convert type!\n");
-	}
-
-	template<typename From, typename To>
-	std::enable_if_t<std::is_array<From>::value && !std::is_array<To>::value, To*> convertType(From from) {
-		throw std::invalid_argument("Cannot convert type!\n");
-	}
-
-	template<typename From, typename To>
-	std::enable_if_t<std::is_array<From>::value && std::is_array<To>::value && !std::is_same<From, To>::value, To*> convertType(From from) {
-		throw std::invalid_argument("Cannot convert type!\n");
-	}*/
-
-	// Array
-	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
-	std::enable_if_t<std::is_convertible<From, To>::value, std::array<To, ToN>> convertArrayType(From from[FromN]) {
-		// Array conversion for each element
-		if (FromN > ToN)
-			throw std::invalid_argument("Too many elements given!");
-		else if (ToN < FromN)
-			throw std::invalid_argument("Too few elements given!");
-		std::array<To, ToN> result;
-		for (std::size_t i = 0; i < FromN; i++) {
-			result[i] = static_cast<To>(from[i]);
-		}
-		return result;
-	}
-
-	template<typename From, std::size_t FromN, typename To, std::size_t ToN>
-	std::enable_if_t<!std::is_convertible<From, To>::value, std::array<To, ToN>> convertArrayType(From from[FromN]) {
-		throw std::invalid_argument("Cannot convert type!\n");
-	}
-
 	// Helper for invoke
 	// Invoke const member function
 	template<typename R, typename Class, typename... FnArgs, typename ClassType, typename... Args>
-	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...) const, ClassType, Args&&...>::value, void> invoke(R(Class::*callable)(FnArgs...) const, ClassType* instance, Args&&... args) {
+	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...) const, ClassType, Args&& ...>::value, void> invoke(R(Class::* callable)(FnArgs...) const, ClassType* instance, Args&& ... args) {
 		(instance->*callable)(args...);
 	}
 	// Invoke non-const member function
 	template<typename R, typename Class, typename... FnArgs, typename ClassType, typename... Args>
-	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...), ClassType, Args&&...>::value, void> invoke(R(Class::* callable)(FnArgs...), ClassType* instance, Args&&... args) {
+	std::enable_if_t<std::is_invocable<R(Class::*)(FnArgs...), ClassType, Args&& ...>::value, void> invoke(R(Class::* callable)(FnArgs...), ClassType* instance, Args&& ... args) {
 		(instance->*callable)(args...);
 	}
 	// Invoke static function
 	template<typename R, typename... FnArgs, typename ClassType, typename... Args>
-	std::enable_if_t<std::is_invocable<R(*)(FnArgs...), Args&&...>::value, void> invoke(R(*callable)(FnArgs...), ClassType* instance, Args&&... args) {
+	std::enable_if_t<std::is_invocable<R(*)(FnArgs...), Args&& ...>::value, void> invoke(R(*callable)(FnArgs...), ClassType* instance, Args&& ... args) {
 		(*callable)((FnArgs)args...);
 	}
 
 	template<typename Fn, typename... Args>
-	std::enable_if_t<!std::is_invocable<Fn, Args&&...>::value, void> invoke(Fn callable, Args&&... args) {
+	std::enable_if_t<!std::is_invocable<Fn, Args&& ...>::value, void> invoke(Fn callable, Args&& ... args) {
 		std::cout << "Cannot invoke with incompatible arguments!\n";
 	}
 
@@ -101,18 +49,27 @@ namespace Mirror {
 		bool isPointer = false;
 		bool isReference = false;
 		bool isConst = false;
+		bool isEnumeration = false;
 		bool isArray = false;
 		std::size_t arraySize = 0;
+		std::vector<VariableType> templateParams;
 		bool operator==(const VariableType& other) const {
 			int pointerCount = isPointer + isArray;
 			int otherPointerCount = other.isPointer + other.isArray;
 			return isReference == other.isReference &&
 				isConst == other.isConst &&
 				pointerCount == otherPointerCount &&
-				name == other.name;
+				name == other.name &&
+				templateParams == other.templateParams;
 		}
 		bool operator!=(const VariableType& other) const {
 			return !(*this == other);
+		}
+		bool isTemplate() const {
+			return templateParams.size() > 0;
+		}
+		std::vector<VariableType> getTemplateParameters() {
+			return templateParams;
 		}
 		// Data Type Queries
 		bool isDecimal() const {
@@ -183,32 +140,16 @@ namespace Mirror {
 			if (name == "std::wstring") return true;
 			return false;
 		}
-		bool isVector() const {
-			if (name.find("std::vector<") != std::string::npos) return true;
-			return false;
-		}
 		bool isEnum() const {
-			return false;
+			return isEnumeration;
 		}
 		bool isObject() const {
-			if (isNumber() || isBool() || isString() || isVector() || isEnum())
+			if (isNumber() || isBool() || isChar() || isEnum())
 				return false;
 			else
 				return true;
 		}
 		// End of Data Type Queries
-		/* Returns the Type from the template. */
-		Type getTemplateType() const {
-			std::size_t index = name.find('<');
-			if (index != std::string::npos) {
-				std::size_t endIndex = name.find('>');
-				if (endIndex != std::string::npos) {
-					std::string typeName = name.substr(index + 1, endIndex - index);
-					return Type{ typeName };
-				}
-			}
-			return Type{};
-		}
 	};
 
 	struct Variable {
@@ -246,10 +187,10 @@ namespace Mirror {
 			}
 			return Annotation();
 		}
-		const std::vector<std::string>& getAnnotationValue(std::size_t index) const {
+		std::vector<std::string> getAnnotationValue(std::size_t index) const {
 			return annotatedAttributes[index].values;
 		}
-		const std::vector<std::string>& getAnnotationValue(std::string name) const {
+		std::vector<std::string> getAnnotationValue(std::string name) const {
 			for (std::size_t i = 0; i < annotatedAttributes.size(); i++) {
 				if (annotatedAttributes[i].name == name)
 					return getAnnotationValue(i);
@@ -268,9 +209,13 @@ namespace Mirror {
 		T getValue(ClassType* instance) {
 			return instance->getValue_impl<T>(name);
 		}
-		template<typename T, std::size_t N, typename ClassType>
-		std::array<T, N> getArrayValue(ClassType* instance) {
-			return instance->getArrayValue_impl<T, N>(name);
+		template<typename T, typename ClassType>
+		std::vector<T> getArrayValue(ClassType* instance) {
+			return instance->getArrayValue_impl<T>(name);
+		}
+		template<typename T, typename ClassType>
+		T getArrayElementValue(ClassType* instance, std::size_t index) {
+			return instance->getArrayElementValue_impl<T>(name, index);
 		}
 		template<typename ClassType, typename T>
 		void setValue(ClassType* instance, T value) {
@@ -279,6 +224,10 @@ namespace Mirror {
 		template<typename T, std::size_t N, typename ClassType>
 		void setArrayValue(ClassType* instance, T(&value)[N]) {
 			instance->setArrayValue_impl<T, N>(name, value);
+		}
+		template<typename T, typename ClassType>
+		void setArrayElementValue(ClassType* instance, std::size_t index, T value) {
+			instance->setArrayElementValue_impl<T>(name, index, value);
 		}
 	};
 
@@ -295,7 +244,7 @@ namespace Mirror {
 		bool operator==(const Function& other) const {
 			if (name != other.name) return false;
 			if (parameters.size() != other.parameters.size()) return false;
-			for (std::size_t i = 0; i < parameters.size();i++) {
+			for (std::size_t i = 0; i < parameters.size(); i++) {
 				if (parameters[i] != other.parameters[i]) return false;
 			}
 			return true;

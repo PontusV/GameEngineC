@@ -276,6 +276,9 @@
     <ClCompile Include="UIDContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PropertyField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource2.h">
@@ -540,6 +543,12 @@
       <Filter>Header Files\Systems\Entity\Component</Filter>
     </ClInclude>
     <ClInclude Include="UIDContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

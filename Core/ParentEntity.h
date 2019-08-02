@@ -3,7 +3,7 @@
 
 #include "Component.h"
 #include "Handle.h"
-#include "ParentEntity.ParentEntity.generated.h"
+#include "ParentEntity.generated.h"
 
 namespace Core {
 

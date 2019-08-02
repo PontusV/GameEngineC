@@ -231,7 +231,7 @@ void EntityManager::destroyEntity(Entity entity) {
 			destroyEntity(getChild(entity, 0).getEntity()); // TODO: Tell it to not remove the ChildManager component to prevent unnecessary work.
 		}
 		// Update the iterator if children were removed.
-		if (updateIt > 0) {
+		if (updateIt) {
 			it = entityMap.find(entity);
 		}
 	}

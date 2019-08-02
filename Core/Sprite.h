@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <vector>
 #include <array>
-#include "Sprite.Sprite.generated.h"
+#include "Sprite.generated.h"
 
 namespace Core {
 	/* 2D Graphic. */

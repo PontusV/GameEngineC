@@ -6,7 +6,7 @@
 
 namespace Core {
 
-	#include "Transform.Transform.generated.h"
+	#include "Transform.generated.h"
 
 	CLASS() Transform : public Component {
 		GENERATED_BODY()

@@ -14,8 +14,4 @@
 #define FUNCTION(...)
 #endif
 
-// Annotations
-#define Update
-#define Category
-
 #endif

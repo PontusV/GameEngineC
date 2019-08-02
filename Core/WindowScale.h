@@ -1,7 +1,7 @@
 #ifndef WINDOW_SCALE_H
 #define WINDOW_SCALE_H
 #include "UIBehaviour.h"
-#include "WindowScale.WindowScale.generated.h"
+#include "WindowScale.generated.h"
 namespace Core {
 	/* Scales the size of a RectTransform component that is attached to the same Entity. */
 	CLASS() WindowScale : public UIBehaviour {

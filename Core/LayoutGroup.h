@@ -4,7 +4,7 @@
 #include "ILayoutElement.h"
 #include "Alignment.h"
 #include <glm/glm.hpp>
-#include "LayoutGroup.LayoutGroup.generated.h"
+#include "LayoutGroup.generated.h"
 
 namespace Core {
 	CLASS() LayoutGroup : public LayoutController, public ILayoutElement {

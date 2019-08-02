@@ -3,7 +3,7 @@
 #include "LayoutController.h"
 #include "LayoutGroup.h"
 #include <vector>
-#include "VerticalLayoutGroup.VerticalLayoutGroup.generated.h"
+#include "VerticalLayoutGroup.generated.h"
 namespace Core {
 
 	CLASS() VerticalLayoutGroup : public LayoutGroup {

@@ -236,6 +236,7 @@
     <ClCompile Include="LayoutController.cpp" />
     <ClCompile Include="LayoutGroup.cpp" />
     <ClCompile Include="MouseDrag.cpp" />
+    <ClCompile Include="PropertyField.cpp" />
     <ClCompile Include="RectButton.cpp" />
     <ClCompile Include="RectTransform.cpp" />
     <ClCompile Include="Selectable.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="LayoutController.h" />
     <ClInclude Include="LayoutGroup.h" />
     <ClInclude Include="MouseDrag.h" />
+    <ClInclude Include="PropertyField.h" />
     <ClInclude Include="RectButton.h" />
     <ClInclude Include="RectTransform.h" />
     <ClInclude Include="ReflectionMacros.h" />
@@ -343,6 +345,7 @@
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="BehaviourManager.h" />
+    <ClInclude Include="TArray.h" />
     <ClInclude Include="TransformMaths.h" />
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />

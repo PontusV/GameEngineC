@@ -2,7 +2,7 @@
 #define DRAG_AND_RESIZE_H
 #include "Behaviour.h"
 #include <glm/glm.hpp>
-#include "DragAndResize.DragAndResize.generated.h"
+#include "DragAndResize.generated.h"
 
 namespace Core {
 

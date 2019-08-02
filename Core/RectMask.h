@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <map>
 #include <array>
-#include "RectMask.RectMask.generated.h"
+#include "RectMask.generated.h"
 
 namespace Core {
 

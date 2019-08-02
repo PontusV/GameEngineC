@@ -3,7 +3,7 @@
 #include "UIBehaviour.h"
 #include "ILayoutElement.h"
 #include <glm/glm.hpp>
-#include "LayoutController.LayoutController.generated.h"
+#include "LayoutController.generated.h"
 namespace Core {
 
 	class LayoutElement;

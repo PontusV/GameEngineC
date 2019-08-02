@@ -7,7 +7,7 @@
 #include "Shader.h"
 #include <glm/glm.hpp>
 #include <string>
-#include "Image.Image.generated.h"
+#include "Image.generated.h"
 
 namespace Core {
 	class Texture;

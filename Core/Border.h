@@ -4,7 +4,7 @@
 #include "Sprite.h"
 #include "Color.h"
 #include <cstddef>
-#include "Border.Border.generated.h"
+#include "Border.generated.h"
 
 namespace Core {
 	CLASS() Border : public Sprite {

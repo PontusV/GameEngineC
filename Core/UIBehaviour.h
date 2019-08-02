@@ -1,7 +1,7 @@
 #ifndef UI_BEHAVIOUR_H
 #define UI_BEHAVIOUR_H
 #include "Behaviour.h"
-#include "UIBehaviour.UIBehaviour.generated.h"
+#include "UIBehaviour.generated.h"
 namespace Core {
 	/* A behaviour with additional onEvent functions related to UI. */
 	CLASS() UIBehaviour : public Behaviour {

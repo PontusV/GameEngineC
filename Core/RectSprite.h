@@ -3,7 +3,7 @@
 
 #include "Sprite.h"
 #include "Color.h"
-#include "RectSprite.RectSprite.generated.h"
+#include "RectSprite.generated.h"
 
 namespace Core {
 	CLASS() RectSprite : public Sprite {

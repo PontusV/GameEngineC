@@ -4,7 +4,7 @@
 #include "Color.h"
 #include "ComponentFunctionHandle.h"
 #include <memory>
-#include "RectButton.RectButton.generated.h"
+#include "RectButton.generated.h"
 namespace Core {
 	CLASS() RectButton : public Behaviour {
 		GENERATED_BODY()

@@ -104,7 +104,7 @@ namespace Mirror {
 	// std::vector
 	template<typename T>
 	static void deserialize(std::vector<T>& vector, std::istream& is) {
-		for (const T& value : vector) {
+		for (T& value : vector) {
 			deserialize(value, is);
 		}
 	}
@@ -120,7 +120,7 @@ namespace Mirror {
 	static void deserialize<std::wstring>(std::wstring& value, std::istream& is) {
 		while (!is.eof()) {
 			wchar_t wChar;
-			is.read((char*)&wChar, sizeof(wchar_t));
+			is.read((char*)& wChar, sizeof(wchar_t));
 			if (wChar == L'\0')
 				break;
 			else

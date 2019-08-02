@@ -23,7 +23,7 @@ namespace Core {
 		}
 	};
 
-	#include "RectTransform.RectTransform.generated.h"
+	#include "RectTransform.generated.h"
 
 	/* A Transform with a size and pivot. */
 	CLASS() RectTransform : public Transform {

@@ -7,7 +7,7 @@ namespace Core {
 	class Input;
 	class Window;
 
-	#include "Behaviour.Behaviour.generated.h"
+	#include "Behaviour.generated.h"
 
 	CLASS() Behaviour : public Component {
 		GENERATED_BODY()

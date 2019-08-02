@@ -3,7 +3,7 @@
 #include "UIBehaviour.h"
 #include "Anchor.h"
 #include <glm/glm.hpp>
-#include "WindowAnchor.WindowAnchor.generated.h"
+#include "WindowAnchor.generated.h"
 namespace Core {
 
 	/* Manages the position of a Transform component. The position depends on the anchor value, the size of the window and the offset. */

@@ -3,7 +3,7 @@
 #include "LayoutController.h"
 #include "Alignment.h"
 #include <vector>
-#include "GridLayoutGroup.GridLayoutGroup.generated.h"
+#include "GridLayoutGroup.generated.h"
 
 namespace Core {
 

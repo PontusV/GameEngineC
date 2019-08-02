@@ -2,7 +2,7 @@
 #define SELECTABLE_H
 
 #include "Behaviour.h"
-#include "Selectable.Selectable.generated.h"
+#include "Selectable.generated.h"
 
 namespace Core {
 	CLASS() Selectable : public Behaviour {

@@ -4,7 +4,7 @@
 #include "Component.h"
 #include "Bounds.h"
 #include <glm/glm.hpp>
-#include "BoxComponent.BoxComponent.generated.h"
+#include "BoxComponent.generated.h"
 
 namespace Core {
 	/* A type of component with a size.

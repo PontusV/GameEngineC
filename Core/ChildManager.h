@@ -6,7 +6,7 @@
 #include "Handle.h"
 #include <vector>
 #include <cstddef>
-#include "ChildManager.ChildManager.generated.h"
+#include "ChildManager.generated.h"
 
 namespace Core {
 

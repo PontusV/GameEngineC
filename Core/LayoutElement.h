@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "ILayoutElement.h"
 #include <glm/glm.hpp>
-#include "LayoutElement.LayoutElement.generated.h"
+#include "LayoutElement.generated.h"
 
 namespace Core {
 

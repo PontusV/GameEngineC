@@ -7,7 +7,7 @@
 #include "Sprite.h"
 #include "Color.h"
 #include <glm/glm.hpp>
-#include "Text.Text.generated.h"
+#include "Text.generated.h"
 
 namespace Core {
 	CLASS() Text : public Sprite {

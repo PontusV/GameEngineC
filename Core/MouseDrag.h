@@ -2,7 +2,7 @@
 #define MOUSE_DRAG_H
 #include "Behaviour.h"
 #include <glm/glm.hpp>
-#include "MouseDrag.MouseDrag.generated.h"
+#include "MouseDrag.generated.h"
 namespace Core {
 	CLASS() MouseDrag : public Behaviour {
 		GENERATED_BODY()

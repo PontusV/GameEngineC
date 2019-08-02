@@ -2,7 +2,7 @@
 #define HORIZONTAL_LAYOUT_GROUP_H
 #include "LayoutGroup.h"
 #include <vector>
-#include "HorizontalLayoutGroup.HorizontalLayoutGroup.generated.h"
+#include "HorizontalLayoutGroup.generated.h"
 
 namespace Core {
 

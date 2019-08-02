@@ -7,7 +7,7 @@
 #include <string>
 #include <cstddef>
 #include <glm/glm.hpp>
-#include "InputField.InputField.generated.h"
+#include "InputField.generated.h"
 
 namespace Core {
 

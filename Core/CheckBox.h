@@ -3,7 +3,7 @@
 #include "Behaviour.h"
 #include "ComponentFunctionHandle.h"
 #include <glm/glm.hpp>
-#include "CheckBox.CheckBox.generated.h"
+#include "CheckBox.generated.h"
 namespace Core {
 	CLASS() CheckBox : public Behaviour {
 		GENERATED_BODY()

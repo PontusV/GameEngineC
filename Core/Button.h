@@ -9,7 +9,7 @@
 
 namespace Core {
 
-	#include "Button.Button.generated.h"
+	#include "Button.generated.h"
 	/* A button which manipulates the image component in the same Entity. A button does not function without an image. */
 	CLASS() Button : public Behaviour {
 		GENERATED_BODY()

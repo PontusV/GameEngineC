@@ -6,7 +6,7 @@
 #include "ComponentFunctionHandle.h"
 #include "Font.h"
 #include <cstddef>
-#include "DropDown.DropDown.generated.h"
+#include "DropDown.generated.h"
 namespace Core {
 
 	struct DropDownOption {
