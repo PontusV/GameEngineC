@@ -336,6 +336,54 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "paddingTop") {\
+		return &paddingTop;\
+	}\
+	if (propertyName == "paddingRight") {\
+		return &paddingRight;\
+	}\
+	if (propertyName == "paddingBottom") {\
+		return &paddingBottom;\
+	}\
+	if (propertyName == "paddingLeft") {\
+		return &paddingLeft;\
+	}\
+	if (propertyName == "spacing") {\
+		return &spacing;\
+	}\
+	if (propertyName == "childAlignment") {\
+		return &childAlignment;\
+	}\
+	if (Core::LayoutController::hasProperty(propertyName))\
+		return Core::LayoutController::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::LayoutGroup::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "paddingTop") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "paddingRight") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "paddingBottom") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "paddingLeft") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "spacing") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "childAlignment") {\
+		throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (Core::LayoutController::hasProperty(propertyName))\
+		return Core::LayoutController::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::LayoutGroup::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutGroup::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(paddingTop, os);\
 		Mirror::serialize(paddingRight, os);\

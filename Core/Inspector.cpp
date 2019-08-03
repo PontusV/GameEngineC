@@ -123,8 +123,6 @@ bool Inspector::getSelectedProperty(PropertyInstance& ref) {
 		std::size_t entryChildCount = entry.getImmediateChildCount();
 		for (std::size_t ii = 0; ii < entryChildCount; ii++) {
 			EntityHandle propField = entry.getChild(ii);
-			std::cout << propField.getEntityName() << std::endl;
-			std::cout << entry.getEntityName() << std::endl;
 			if (propField.getComponent<Selectable>()->isSelected()) {
 				// Component i, Property ii
 				std::size_t lineIndex = 0;
@@ -333,10 +331,10 @@ EntityHandle Inspector::createPropertyFieldLine(std::string propName, Mirror::Va
 }
 
 template<typename T>
-void addArrayPropertyFieldLine(Inspector* inspector, EntityHandle& field, Mirror::Property& prop, Component* component) {
+static void createPropertyFieldLines(Inspector* inspector, EntityHandle& field, Mirror::Property& prop, Component* component) {
 	std::size_t i = 0;
 	for (T value : Mirror::polyGetArrayValue<T>(prop, component)) {
-		EntityHandle line = inspector->createPropertyFieldLine(prop.name + "[" + std::to_string(i) + "]", prop.type, toWString<T>(value), field.getEntityName() + "_line_" + std::to_string(i));
+		EntityHandle line = inspector->createPropertyFieldLine(prop.name + "[" + std::to_string(i) + "]", prop.type, toWString(value), field.getEntityName() + "_line_" + std::to_string(i));
 		line.setParent(field);
 		i++;
 	}
@@ -354,43 +352,66 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 	fieldLayout->spacing = 3;
 
 	// Create Field Body
-	if (prop.type.isCArray() || prop.type.name == "std::vector" || prop.type.name == "std::array") {
-		/*if (prop.type.isChar()) {
-			addArrayPropertyFieldLine<char>(this, propField, prop, component);
+	if (Mirror::isArrayType(prop.type)) {
+		Mirror::VariableType& type = prop.type;
+		if (prop.type.name == "std::vector") {
+			type = prop.type.templateParams[0];
 		}
-		else if (prop.type.isNumber()) {
-			if (prop.type.isDecimal()) {
-				addArrayPropertyFieldLine<double>(this, propField, prop, component);
+		else if (prop.type.name == "std::array") {
+			type = prop.type.templateParams[0];
+		}
+		//
+		if (type.isChar()) {
+			createPropertyFieldLines<char>(this, propField, prop, component);
+		}
+		else if (type.isNumber()) {
+			if (type.isDecimal()) {
+				createPropertyFieldLines<double>(this, propField, prop, component);
 			}
-			else if (prop.type.isSignedNumber()) {
-				addArrayPropertyFieldLine<int>(this, propField, prop, component);
+			else if (type.isSignedNumber()) {
+				createPropertyFieldLines<int>(this, propField, prop, component);
 			}
-			else if (prop.type.isUnsignedNumber()) {
-				addArrayPropertyFieldLine<unsigned int>(this, propField, prop, component);
+			else if (type.isUnsignedNumber()) {
+				createPropertyFieldLines<unsigned int>(this, propField, prop, component);
 			}
 		}
-		else if (prop.type.isBool()) {
-			addArrayPropertyFieldLine<bool>(this, propField, prop, component);
+		else if (type.isBool()) {
+			createPropertyFieldLines<bool>(this, propField, prop, component);
 		}
-		else if (prop.type.isString()) {
-			addArrayPropertyFieldLine<std::string>(this, propField, prop, component);
+		else if (type.isString()) {
+			createPropertyFieldLines<std::string>(this, propField, prop, component);
 		}
-		else if (prop.type.isWideString()) {
-			addArrayPropertyFieldLine<std::wstring>(this, propField, prop, component);
+		else if (type.isWideString()) {
+			createPropertyFieldLines<std::wstring>(this, propField, prop, component);
 		}
-		else if (prop.type.name == "glm::vec2") {
+		else if (type.name == "glm::vec2") {
 
 		}
-		else if (Mirror::isReflected(prop.type.name)) {
-			// WIP. Atm it is just assumed that the object is reflected. TODO: Implement an isReflected(std::string className) function in ReflectionPolymorp.generated.h
-			//Mirror::isReflected(prop.type.name)
+		else if (Mirror::isReflected(type.name)) {
+			// WIP
 			//Mirror::getType(prop.type.name);
-		}*/
+			//TODO: get pointer of property
+			Mirror::Class classType = Mirror::getType(type.name);
+			//void* instance = prop.getPointer(component);
+			std::vector<void*> instances = prop.getArrayElementPointers(component);
+			std::size_t instanceIndex = 0;
+
+			for (void* instance : instances) {
+				for (std::size_t i = 0; i < classType.properties.size(); i++) {
+					EntityHandle innerField = createPropertyField(name + "_Reflected_Property_" + std::to_string(instanceIndex) + "_Property_" + std::to_string(i), classType.properties[i], static_cast<Component*>(instance));
+					innerField.setParent(propField);
+				}
+				instanceIndex++;
+			}
+		}
+		else {
+			std::cout << "Inspector: Unknown property type(" << type.name << ")" << std::endl;
+		}
 
 	}
 	else {
 		//createPropertyLine
-		EntityHandle line = createPropertyFieldLine(prop.name, prop.type, propertyValueToString(prop, component), name + "_line_0");
+		EntityHandle line = createPropertyFieldLine(prop.name, prop.type, propertyValueToString(prop, component), name + "_line");
 		line.setParent(propField);
 	}
 

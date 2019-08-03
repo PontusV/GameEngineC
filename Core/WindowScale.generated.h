@@ -261,6 +261,42 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "stretchWidth") {\
+		return &stretchWidth;\
+	}\
+	if (propertyName == "stretchHeight") {\
+		return &stretchHeight;\
+	}\
+	if (propertyName == "widthScale") {\
+		return &widthScale;\
+	}\
+	if (propertyName == "heightScale") {\
+		return &heightScale;\
+	}\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::WindowScale::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "stretchWidth") {\
+		throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "stretchHeight") {\
+		throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "widthScale") {\
+		throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "heightScale") {\
+		throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " is not an array!");\
+	}\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::WindowScale::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::WindowScale::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(stretchWidth, os);\
 		Mirror::serialize(stretchHeight, os);\

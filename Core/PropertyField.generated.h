@@ -113,6 +113,18 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::PropertyField::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyField::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::PropertyField::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyField::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 	Core::Behaviour::serialize(os);\
 }\

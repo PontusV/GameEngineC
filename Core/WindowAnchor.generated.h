@@ -187,6 +187,30 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "anchor") {\
+		return &anchor;\
+	}\
+	if (propertyName == "offset") {\
+		return &offset;\
+	}\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "anchor") {\
+		throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "offset") {\
+		throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " is not an array!");\
+	}\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(anchor, os);\
 		Mirror::serialize(offset, os);\

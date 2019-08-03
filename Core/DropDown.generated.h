@@ -483,6 +483,78 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "boxWidth") {\
+		return &boxWidth;\
+	}\
+	if (propertyName == "boxPaddingX") {\
+		return &boxPaddingX;\
+	}\
+	if (propertyName == "boxPaddingY") {\
+		return &boxPaddingY;\
+	}\
+	if (propertyName == "optionHeight") {\
+		return &optionHeight;\
+	}\
+	if (propertyName == "optionFont") {\
+		return &optionFont;\
+	}\
+	if (propertyName == "optionTextColor") {\
+		return &optionTextColor;\
+	}\
+	if (propertyName == "border") {\
+		return &border;\
+	}\
+	if (propertyName == "borderSize") {\
+		return &borderSize;\
+	}\
+	if (propertyName == "borderColor") {\
+		return &borderColor;\
+	}\
+	if (propertyName == "text") {\
+		return &text;\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "boxWidth") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "boxPaddingX") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "boxPaddingY") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "optionHeight") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "optionFont") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "optionTextColor") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "border") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "borderSize") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "borderColor") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "text") {\
+		throw std::invalid_argument("The property Core::DropDown::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::DropDown::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::DropDown::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(boxWidth, os);\
 		Mirror::serialize(boxPaddingX, os);\

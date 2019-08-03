@@ -203,6 +203,38 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "images") {\
+		return &images;\
+	}\
+	if (propertyName == "colors") {\
+		return &colors;\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::Button::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Button::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "images") {\
+		std::vector<void*> vec(3);\
+		for (std::size_t i = 0; i < vec.size(); i++) {\
+			vec[i] = &images[i];\
+		}\
+		return vec;\
+	}\
+	if (propertyName == "colors") {\
+		std::vector<void*> vec(3);\
+		for (std::size_t i = 0; i < vec.size(); i++) {\
+			vec[i] = &colors[i];\
+		}\
+		return vec;\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::Button::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Button::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(images, os);\
 		Mirror::serialize(colors, os);\

@@ -316,6 +316,48 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "initText") {\
+		return &initText;\
+	}\
+	if (propertyName == "onSubmit") {\
+		return &onSubmit;\
+	}\
+	if (propertyName == "characterLimit") {\
+		return &characterLimit;\
+	}\
+	if (propertyName == "markColor") {\
+		return &markColor;\
+	}\
+	if (propertyName == "highlightColor") {\
+		return &highlightColor;\
+	}\
+	if (Core::Selectable::hasProperty(propertyName))\
+		return Core::Selectable::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::InputField::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::InputField::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "initText") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "onSubmit") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "characterLimit") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "markColor") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "highlightColor") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Selectable::hasProperty(propertyName))\
+		return Core::Selectable::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::InputField::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::InputField::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(initText, os);\
 		Mirror::serialize(onSubmit, os);\

@@ -150,6 +150,24 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "parent") {\
+		return &parent;\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::ParentEntity::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::ParentEntity::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "parent") {\
+		throw std::invalid_argument("The property Core::ParentEntity::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::ParentEntity::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::ParentEntity::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(parent, os);\
 	Core::Component::serialize(os);\

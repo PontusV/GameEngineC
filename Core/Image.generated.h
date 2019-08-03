@@ -243,6 +243,36 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "fileName") {\
+		return &fileName;\
+	}\
+	if (propertyName == "texture") {\
+		return &texture;\
+	}\
+	if (propertyName == "shader") {\
+		return &shader;\
+	}\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "fileName") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "texture") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "shader") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(fileName, os);\
 		Mirror::serialize(texture, os);\

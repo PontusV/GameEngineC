@@ -363,6 +363,42 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "shrinkableChildWidth") {\
+		return &shrinkableChildWidth;\
+	}\
+	if (propertyName == "shrinkableChildHeight") {\
+		return &shrinkableChildHeight;\
+	}\
+	if (propertyName == "childForceExpandWidth") {\
+		return &childForceExpandWidth;\
+	}\
+	if (propertyName == "childForceExpandHeight") {\
+		return &childForceExpandHeight;\
+	}\
+	if (Core::LayoutGroup::hasProperty(propertyName))\
+		return Core::LayoutGroup::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "shrinkableChildWidth") {\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "shrinkableChildHeight") {\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "childForceExpandWidth") {\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "childForceExpandHeight") {\
+		throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (Core::LayoutGroup::hasProperty(propertyName))\
+		return Core::LayoutGroup::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::HorizontalLayoutGroup::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(shrinkableChildWidth, os);\
 		Mirror::serialize(shrinkableChildHeight, os);\

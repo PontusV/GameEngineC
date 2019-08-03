@@ -229,6 +229,14 @@ namespace Mirror {
 		void setArrayElementValue(ClassType* instance, std::size_t index, T value) {
 			instance->setArrayElementValue_impl<T>(name, index, value);
 		}
+		template<typename ClassType>
+		void* getPointer(ClassType* instance) {
+			return instance->getPointer(name);
+		}
+		template<typename ClassType>
+		std::vector<void*> getArrayElementPointers(ClassType* instance) {
+			return instance->getArrayElementPointers(name);
+		}
 	};
 
 	struct Function : public ClassMember {

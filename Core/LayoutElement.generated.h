@@ -336,6 +336,54 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "minSize") {\
+		return &minSize;\
+	}\
+	if (propertyName == "prefSize") {\
+		return &prefSize;\
+	}\
+	if (propertyName == "flexibleSize") {\
+		return &flexibleSize;\
+	}\
+	if (propertyName == "minSizeEnabled") {\
+		return &minSizeEnabled;\
+	}\
+	if (propertyName == "prefSizeEnabled") {\
+		return &prefSizeEnabled;\
+	}\
+	if (propertyName == "flexibleSizeEnabled") {\
+		return &flexibleSizeEnabled;\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "minSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "prefSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "flexibleSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "minSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "prefSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "flexibleSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(minSize, os);\
 		Mirror::serialize(prefSize, os);\

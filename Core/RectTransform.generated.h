@@ -255,6 +255,30 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "size") {\
+		return &size;\
+	}\
+	if (propertyName == "pivot") {\
+		return &pivot;\
+	}\
+	if (Core::Transform::hasProperty(propertyName))\
+		return Core::Transform::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::RectTransform::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "size") {\
+		throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "pivot") {\
+		throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Transform::hasProperty(propertyName))\
+		return Core::Transform::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::RectTransform::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(size, os);\
 		Mirror::serialize(pivot, os);\

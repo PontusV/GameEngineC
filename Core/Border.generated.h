@@ -372,6 +372,60 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "top") {\
+		return &top;\
+	}\
+	if (propertyName == "right") {\
+		return &right;\
+	}\
+	if (propertyName == "bottom") {\
+		return &bottom;\
+	}\
+	if (propertyName == "left") {\
+		return &left;\
+	}\
+	if (propertyName == "inner") {\
+		return &inner;\
+	}\
+	if (propertyName == "borderThickness") {\
+		return &borderThickness;\
+	}\
+	if (propertyName == "color") {\
+		return &color;\
+	}\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::Border::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Border::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "top") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "right") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "bottom") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "left") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "inner") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "borderThickness") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "color") {\
+		throw std::invalid_argument("The property Core::Border::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::Border::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Border::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(top, os);\
 		Mirror::serialize(right, os);\

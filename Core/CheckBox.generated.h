@@ -205,6 +205,30 @@ public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
 }\
+virtual void* getPointer(std::string propertyName) {\
+	if (propertyName == "onToggle") {\
+		return &onToggle;\
+	}\
+	if (propertyName == "toggle") {\
+		return &toggle;\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getPointer(propertyName);\
+	std::cout << "Warning: The property Core::CheckBox::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::CheckBox::" + propertyName + " does not exist or the property is const!");\
+}\
+virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
+	if (propertyName == "onToggle") {\
+		throw std::invalid_argument("The property Core::CheckBox::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "toggle") {\
+		throw std::invalid_argument("The property Core::CheckBox::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArrayElementPointers(propertyName);\
+	std::cout << "Warning: The property Core::CheckBox::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::CheckBox::" + propertyName + " does not exist or the property is const!");\
+}\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(onToggle, os);\
 		Mirror::serialize(toggle, os);\
