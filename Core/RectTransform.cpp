@@ -37,7 +37,7 @@ glm::vec2 RectTransform::getVertex(std::size_t index, glm::mat4& localModelMatri
 		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x, pos.y + size.y);
 	}
 	else if (index == 2) {
-		return localToWorldMatrix * localModelMatrix * pos + size;
+		return localToWorldMatrix * localModelMatrix * (pos + size);
 	}
 	else if (index == 3) {
 		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x + size.x, pos.y);

@@ -225,7 +225,7 @@ void Inspector::awake() {
 		element->setFlexibleSize(glm::vec2(1, 1));
 		element->setFlexibleSizeEnabled(true);
 		element->setPrefSizeEnabled(true);
-		element->setMinSize(glm::vec2(400, 550/*470*/));
+		element->setMinSize(glm::vec2(400, 1000/*470*/));
 		element->setMinSizeEnabled(true);
 		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
 		group->childForceExpandHeight = false;
@@ -394,14 +394,12 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 			Mirror::Class classType = Mirror::getType(type.name);
 			//void* instance = prop.getPointer(component);
 			std::vector<void*> instances = prop.getArrayElementPointers(component);
-			std::size_t instanceIndex = 0;
 
-			for (void* instance : instances) {
+			for (std::size_t instanceIndex = 0; instanceIndex < instances.size(); instanceIndex++) {
 				for (std::size_t i = 0; i < classType.properties.size(); i++) {
-					EntityHandle innerField = createPropertyField(name + "_Reflected_Property_" + std::to_string(instanceIndex) + "_Property_" + std::to_string(i), classType.properties[i], static_cast<Component*>(instance));
+					EntityHandle innerField = createPropertyField(name + "_Reflected_Property_" + std::to_string(instanceIndex) + "_Property_" + std::to_string(i), classType.properties[i], static_cast<Component*>(instances[instanceIndex]));
 					innerField.setParent(propField);
 				}
-				instanceIndex++;
 			}
 		}
 		else {
