@@ -276,7 +276,13 @@
     <ClCompile Include="UIDContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PropertyField.cpp">
+    <ClCompile Include="ReflectedObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectedObjectHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -545,10 +551,19 @@
     <ClInclude Include="UIDContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PropertyField.h">
+    <ClInclude Include="TArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TArray.h">
+    <ClInclude Include="ReflectedObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectedObjectHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyValueID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

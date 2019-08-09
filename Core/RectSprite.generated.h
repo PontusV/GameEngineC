@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(15);\
+	Mirror::Class newClass(16);\
 	newClass.name = "Core::RectSprite";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
@@ -129,6 +129,12 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::RectSprite::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::RectSprite::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (Core::Sprite::hasProperty(propertyName))\

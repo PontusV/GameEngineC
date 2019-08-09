@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(25);\
+	Mirror::Class newClass(26);\
 	newClass.name = "Core::VerticalLayoutGroup";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutGroup" });\
@@ -362,6 +362,24 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "shrinkableChildWidth") {\
+		throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "shrinkableChildHeight") {\
+		throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "childForceExpandWidth") {\
+		throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "childForceExpandHeight") {\
+		throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " is not an array!");\
+	}\
+	if (Core::LayoutGroup::hasProperty(propertyName))\
+		return Core::LayoutGroup::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::VerticalLayoutGroup::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::VerticalLayoutGroup::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "shrinkableChildWidth") {\

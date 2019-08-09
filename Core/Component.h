@@ -1,16 +1,16 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
-#include "ReflectionMacros.h"
 #include "Serializable.h"
 #include "EntityHandle.h"
 #include "UIDContainer.h"
 #include "Component.generated.h"
+#include "ReflectedObject.h"
 
 typedef std::size_t ComponentTypeID; // Should not be needed here. Remove
 typedef std::size_t ComponentID;
 
 namespace Core {
-	CLASS() Component : public Serializable {
+	CLASS() Component : public ReflectedObject, public Serializable {
 		GENERATED_BODY()
 	protected:
 		Component();

@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(13);\
+	Mirror::Class newClass(14);\
 	newClass.name = "Core::LayoutController";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::UIBehaviour" });\
@@ -112,6 +112,12 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::LayoutController::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutController::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (Core::UIBehaviour::hasProperty(propertyName))\

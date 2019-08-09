@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(19);\
+	Mirror::Class newClass(20);\
 	newClass.name = "Core::WindowAnchor";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::UIBehaviour" });\
@@ -186,6 +186,18 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "anchor") {\
+		throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "offset") {\
+		throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " is not an array!");\
+	}\
+	if (Core::UIBehaviour::hasProperty(propertyName))\
+		return Core::UIBehaviour::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::WindowAnchor::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "anchor") {\

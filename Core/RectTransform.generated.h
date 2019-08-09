@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(3);\
+	Mirror::Class newClass(4);\
 	newClass.name = "Core::RectTransform";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Transform" });\
@@ -254,6 +254,18 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "size") {\
+		throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "pivot") {\
+		throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Transform::hasProperty(propertyName))\
+		return Core::Transform::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::RectTransform::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::RectTransform::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "size") {\

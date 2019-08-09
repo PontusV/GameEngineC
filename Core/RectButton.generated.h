@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(17);\
+	Mirror::Class newClass(18);\
 	newClass.name = "Core::RectButton";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -203,6 +203,18 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "colors") {\
+		return 3;\
+	}\
+	if (propertyName == "clickFunction") {\
+		throw std::invalid_argument("The property Core::RectButton::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::RectButton::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::RectButton::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "colors") {\

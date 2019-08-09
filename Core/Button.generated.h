@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(8);\
+	Mirror::Class newClass(9);\
 	newClass.name = "Core::Button";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -202,6 +202,18 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "images") {\
+		return 3;\
+	}\
+	if (propertyName == "colors") {\
+		return 3;\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::Button::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Button::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "images") {\

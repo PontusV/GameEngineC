@@ -24,7 +24,6 @@ Image::~Image() {
 
 void Image::reload(bool force) {
 	if (texture.ID == 0 || force) {
-		
 		texture = ResourceManager::getInstance().loadTexture(fileName.c_str());
 	}
 }

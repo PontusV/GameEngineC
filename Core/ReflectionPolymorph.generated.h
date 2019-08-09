@@ -4,6 +4,7 @@
 #include <ReflectionParser/TypeList.h>
 #include <stdexcept>
 
+#include "G:/Projects/ProjectGE/Core/ReflectedObject.h"
 #include "G:/Projects/ProjectGE/Core/Component.h"
 #include "G:/Projects/ProjectGE/Core/Transform.h"
 #include "G:/Projects/ProjectGE/Core/BoxComponent.h"
@@ -35,14 +36,16 @@
 #include "G:/Projects/ProjectGE/Core/Inspector.h"
 #include "G:/Projects/ProjectGE/Core/Selectable.h"
 #include "G:/Projects/ProjectGE/Core/InputField.h"
-#include "G:/Projects/ProjectGE/Core/PropertyField.h"
+#include "G:/Projects/ProjectGE/Core/PropertyEditor.h"
 #include "G:/Projects/ProjectGE/Core/RectMask.h"
 
 namespace Mirror {
 /* Converts the given pointer to the derived type. Calls invoke on the function instance with the casted pointer. */
 template<typename ClassType, typename... Args>
 void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return fun.invoke(reinterpret_cast<Core::ReflectedObject*>(instance), args...);
+	else if (instance->getType().name == "Core::Component")
 		return fun.invoke(reinterpret_cast<Core::Component*>(instance), args...);
 	else if (instance->getType().name == "Core::Transform")
 		return fun.invoke(reinterpret_cast<Core::Transform*>(instance), args...);
@@ -104,15 +107,17 @@ void polyInvoke(Mirror::Function fun, ClassType* instance, Args... args) {
 		return fun.invoke(reinterpret_cast<Core::Selectable*>(instance), args...);
 	else if (instance->getType().name == "Core::InputField")
 		return fun.invoke(reinterpret_cast<Core::InputField*>(instance), args...);
-	else if (instance->getType().name == "Core::PropertyField")
-		return fun.invoke(reinterpret_cast<Core::PropertyField*>(instance), args...);
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return fun.invoke(reinterpret_cast<Core::PropertyEditor*>(instance), args...);
 	else if (instance->getType().name == "Core::RectMask")
 		return fun.invoke(reinterpret_cast<Core::RectMask*>(instance), args...);
 	throw std::invalid_argument("polyInvoke::ERROR");
 }
 template<typename T, typename ClassType>
 T polyGetValue(Mirror::Property prop, ClassType* instance) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.getValue<T>(reinterpret_cast<Core::ReflectedObject*>(instance));
+	else if (instance->getType().name == "Core::Component")
 		return prop.getValue<T>(reinterpret_cast<Core::Component*>(instance));
 	else if (instance->getType().name == "Core::Transform")
 		return prop.getValue<T>(reinterpret_cast<Core::Transform*>(instance));
@@ -174,15 +179,17 @@ T polyGetValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getValue<T>(reinterpret_cast<Core::Selectable*>(instance));
 	else if (instance->getType().name == "Core::InputField")
 		return prop.getValue<T>(reinterpret_cast<Core::InputField*>(instance));
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.getValue<T>(reinterpret_cast<Core::PropertyField*>(instance));
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.getValue<T>(reinterpret_cast<Core::PropertyEditor*>(instance));
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.getValue<T>(reinterpret_cast<Core::RectMask*>(instance));
 	throw std::invalid_argument("polyGetValue::ERROR");
 }
 template<typename T, typename ClassType>
 std::vector<T> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.getArrayValue<T>(reinterpret_cast<Core::ReflectedObject*>(instance));
+	else if (instance->getType().name == "Core::Component")
 		return prop.getArrayValue<T>(reinterpret_cast<Core::Component*>(instance));
 	else if (instance->getType().name == "Core::Transform")
 		return prop.getArrayValue<T>(reinterpret_cast<Core::Transform*>(instance));
@@ -244,15 +251,17 @@ std::vector<T> polyGetArrayValue(Mirror::Property prop, ClassType* instance) {
 		return prop.getArrayValue<T>(reinterpret_cast<Core::Selectable*>(instance));
 	else if (instance->getType().name == "Core::InputField")
 		return prop.getArrayValue<T>(reinterpret_cast<Core::InputField*>(instance));
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.getArrayValue<T>(reinterpret_cast<Core::PropertyField*>(instance));
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.getArrayValue<T>(reinterpret_cast<Core::PropertyEditor*>(instance));
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.getArrayValue<T>(reinterpret_cast<Core::RectMask*>(instance));
 	throw std::invalid_argument("polyGetArrayValue::ERROR");
 }
 template<typename T, typename ClassType>
 T polyGetArrayElementValue(Mirror::Property prop, std::size_t index, ClassType* instance) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.getArrayElementValue<T>(reinterpret_cast<Core::ReflectedObject*>(instance), index);
+	else if (instance->getType().name == "Core::Component")
 		return prop.getArrayElementValue<T>(reinterpret_cast<Core::Component*>(instance), index);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.getArrayElementValue<T>(reinterpret_cast<Core::Transform*>(instance), index);
@@ -314,15 +323,17 @@ T polyGetArrayElementValue(Mirror::Property prop, std::size_t index, ClassType* 
 		return prop.getArrayElementValue<T>(reinterpret_cast<Core::Selectable*>(instance), index);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.getArrayElementValue<T>(reinterpret_cast<Core::InputField*>(instance), index);
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.getArrayElementValue<T>(reinterpret_cast<Core::PropertyField*>(instance), index);
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.getArrayElementValue<T>(reinterpret_cast<Core::PropertyEditor*>(instance), index);
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.getArrayElementValue<T>(reinterpret_cast<Core::RectMask*>(instance), index);
 	throw std::invalid_argument("polyGetArrayElementValue::ERROR");
 }
 template<typename T, typename ClassType>
 void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.setValue(reinterpret_cast<Core::ReflectedObject*>(instance), value);
+	else if (instance->getType().name == "Core::Component")
 		return prop.setValue(reinterpret_cast<Core::Component*>(instance), value);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.setValue(reinterpret_cast<Core::Transform*>(instance), value);
@@ -384,15 +395,17 @@ void polySetValue(Mirror::Property prop, ClassType* instance, T value) {
 		return prop.setValue(reinterpret_cast<Core::Selectable*>(instance), value);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.setValue(reinterpret_cast<Core::InputField*>(instance), value);
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.setValue(reinterpret_cast<Core::PropertyField*>(instance), value);
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.setValue(reinterpret_cast<Core::PropertyEditor*>(instance), value);
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.setValue(reinterpret_cast<Core::RectMask*>(instance), value);
 	throw std::invalid_argument("polySetValue::ERROR");
 }
 template<typename T, std::size_t N, typename ClassType>
 void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N]) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::ReflectedObject*>(instance), value);
+	else if (instance->getType().name == "Core::Component")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Component*>(instance), value);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Transform*>(instance), value);
@@ -454,15 +467,17 @@ void polySetArrayValue(Mirror::Property prop, ClassType* instance, T(&value)[N])
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::Selectable*>(instance), value);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::InputField*>(instance), value);
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.setArrayValue<T, N>(reinterpret_cast<Core::PropertyField*>(instance), value);
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.setArrayValue<T, N>(reinterpret_cast<Core::PropertyEditor*>(instance), value);
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.setArrayValue<T, N>(reinterpret_cast<Core::RectMask*>(instance), value);
 	throw std::invalid_argument("polySetArrayValue::ERROR");
 }
 template<typename T, typename ClassType>
 void polySetArrayElementValue(Mirror::Property prop, std::size_t index, ClassType* instance, T value) {
-	if (instance->getType().name == "Core::Component")
+	if (instance->getType().name == "Core::ReflectedObject")
+		return prop.setArrayElementValue(reinterpret_cast<Core::ReflectedObject*>(instance), index, value);
+	else if (instance->getType().name == "Core::Component")
 		return prop.setArrayElementValue(reinterpret_cast<Core::Component*>(instance), index, value);
 	else if (instance->getType().name == "Core::Transform")
 		return prop.setArrayElementValue(reinterpret_cast<Core::Transform*>(instance), index, value);
@@ -524,8 +539,8 @@ void polySetArrayElementValue(Mirror::Property prop, std::size_t index, ClassTyp
 		return prop.setArrayElementValue(reinterpret_cast<Core::Selectable*>(instance), index, value);
 	else if (instance->getType().name == "Core::InputField")
 		return prop.setArrayElementValue(reinterpret_cast<Core::InputField*>(instance), index, value);
-	else if (instance->getType().name == "Core::PropertyField")
-		return prop.setArrayElementValue(reinterpret_cast<Core::PropertyField*>(instance), index, value);
+	else if (instance->getType().name == "Core::PropertyEditor")
+		return prop.setArrayElementValue(reinterpret_cast<Core::PropertyEditor*>(instance), index, value);
 	else if (instance->getType().name == "Core::RectMask")
 		return prop.setArrayElementValue(reinterpret_cast<Core::RectMask*>(instance), index, value);
 	throw std::invalid_argument("polySetValue::ERROR");
@@ -534,6 +549,8 @@ void polySetArrayElementValue(Mirror::Property prop, std::size_t index, ClassTyp
 using namespace Mirror;
 
 inline bool isReflected(std::string className) {
+	if (className == "Core::ReflectedObject")
+		return true;
 	if (className == "Core::Component")
 		return true;
 	if (className == "Core::Transform")
@@ -596,13 +613,15 @@ inline bool isReflected(std::string className) {
 		return true;
 	if (className == "Core::InputField")
 		return true;
-	if (className == "Core::PropertyField")
+	if (className == "Core::PropertyEditor")
 		return true;
 	if (className == "Core::RectMask")
 		return true;
 	return false;
 }
 inline Mirror::Class getType(std::string className) {
+	if (className == "Core::ReflectedObject")
+		return Core::ReflectedObject::getClassType();
 	if (className == "Core::Component")
 		return Core::Component::getClassType();
 	if (className == "Core::Transform")
@@ -665,8 +684,8 @@ inline Mirror::Class getType(std::string className) {
 		return Core::Selectable::getClassType();
 	if (className == "Core::InputField")
 		return Core::InputField::getClassType();
-	if (className == "Core::PropertyField")
-		return Core::PropertyField::getClassType();
+	if (className == "Core::PropertyEditor")
+		return Core::PropertyEditor::getClassType();
 	if (className == "Core::RectMask")
 		return Core::RectMask::getClassType();
 	throw std::invalid_argument("Mirror::getType::ERROR There is no such reflected class!");
@@ -679,7 +698,7 @@ inline bool isArrayType(const Mirror::VariableType& type) {
 		return true;
 	return false;
 }
-typedef TypeList<Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::CheckBox,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField,Core::PropertyField,Core::RectMask> ReflectedTypes;
+typedef TypeList<Core::ReflectedObject,Core::Component,Core::Transform,Core::BoxComponent,Core::RectTransform,Core::Behaviour,Core::Sprite,Core::Border,Core::Image,Core::Button,Core::CheckBox,Core::ChildManager,Core::ParentEntity,Core::UIBehaviour,Core::LayoutController,Core::ContentSizeFitter,Core::RectSprite,Core::Text,Core::RectButton,Core::DropDown,Core::WindowAnchor,Core::WindowScale,Core::MouseDrag,Core::LayoutGroup,Core::LayoutElement,Core::HorizontalLayoutGroup,Core::VerticalLayoutGroup,Core::GridLayoutGroup,Core::DragAndResize,Core::Inspector,Core::Selectable,Core::InputField,Core::PropertyEditor,Core::RectMask> ReflectedTypes;
 }
 
 #endif

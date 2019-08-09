@@ -237,6 +237,10 @@ namespace Mirror {
 		std::vector<void*> getArrayElementPointers(ClassType* instance) {
 			return instance->getArrayElementPointers(name);
 		}
+		template<typename ClassType>
+		std::size_t getArraySize(ClassType* instance) {
+			return instance->getArraySize(name);
+		}
 	};
 
 	struct Function : public ClassMember {

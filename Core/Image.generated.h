@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(7);\
+	Mirror::Class newClass(8);\
 	newClass.name = "Core::Image";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
@@ -242,6 +242,21 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "fileName") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "texture") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "shader") {\
+		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Sprite::hasProperty(propertyName))\
+		return Core::Sprite::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "fileName") {\

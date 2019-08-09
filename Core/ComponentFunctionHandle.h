@@ -29,8 +29,9 @@ namespace Core {
 
 	template<typename T, typename R, typename... Args>
 	ComponentFunctionHandleImpl<T, R, Args...> bind(T* component, R(T::*ptr)(Args...)) {
-		return ComponentFunctionHandleImpl(ComponentHandle(typeIDof(T), component->getOwner()), ptr);
+		return ComponentFunctionHandleImpl(ComponentHandle(component->getComponentID(), component->getOwner()), ptr);
 	}
+
 
 	template<typename R, typename... Args>
 	class ComponentFunctionHandle {

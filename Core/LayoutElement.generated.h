@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(23);\
+	Mirror::Class newClass(24);\
 	newClass.name = "Core::LayoutElement";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
@@ -335,6 +335,30 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "minSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "prefSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "flexibleSize") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "minSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "prefSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "flexibleSizeEnabled") {\
+		throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::LayoutElement::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "minSize") {\

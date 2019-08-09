@@ -226,12 +226,18 @@ namespace Core {
 	template<typename... Ts>
 	Entity EntityManager::createEntityQueued(std::string name, Ts&... components) {
 		Entity entity = generateEntity(name);
+		std::vector<Component*> componentVec = { static_cast<Component*>(&components)... };
+		for (Component* component : componentVec) {
+			component->setOwner(Handle(entity, this));
+		}
+
 		functionQueue.push(new FunctionCaller<Handle, EntityManager, Entity, Ts&...>(&EntityManager::addEntity<Ts...>, *this, entity, components...));
 		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::onEntityCreated, *this, entity));
 		return entity;
 	}
 	template<typename T>
 	T* EntityManager::addComponentQueued(Entity entity, T& component) {
+		component.setOwner(Handle(entity, this));
 		auto function = new FunctionCaller<void, EntityManager, Entity, T&>(&EntityManager::addComponent<T>, *this, entity, component);
 		functionQueue.push(function);
 		return function->getArgument<T>();

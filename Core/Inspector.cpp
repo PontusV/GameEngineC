@@ -1,4 +1,5 @@
 #include "Inspector.h"
+#include "ReflectedObject.h"
 #include "Input.h"
 #include "HorizontalLayoutGroup.h"
 #include "VerticalLayoutGroup.h"
@@ -24,187 +25,6 @@ Inspector::~Inspector()
 {
 }
 
-
-template<typename T>
-std::wstring toWString(T value);
-
-// Char
-template<>
-std::wstring toWString<char>(char value) {
-	return std::to_wstring(value);
-}
-
-// Number
-template<>
-std::wstring toWString<int>(int value) {
-	return std::to_wstring(value);
-}
-
-// Unsigned Number
-template<>
-std::wstring toWString<unsigned int>(unsigned int value) {
-	return std::to_wstring(value);
-}
-
-// Decimal Number
-template<>
-std::wstring toWString<double>(double value) {
-	std::wstring result = std::to_wstring(value);
-	// Removes trailing 0s
-	std::size_t offset = result.at(result.find_last_not_of('0')) == '.' ? 2 : 1;
-	result.erase(result.find_last_not_of('0') + offset, std::string::npos);
-	return result;
-}
-
-// Bool
-template<>
-std::wstring toWString<bool>(bool value) {
-	if (value)
-		return L"true";
-	else
-		return L"false";
-}
-
-// String
-template<>
-std::wstring toWString<std::string>(std::string value) {
-	return std::wstring(value.begin(), value.end());
-}
-
-// WString
-template<>
-std::wstring toWString<std::wstring>(std::wstring value) {
-	return value;
-}
-
-std::wstring Inspector::propertyValueToString(Mirror::Property& prop, Component* component) const {
-	if (prop.type.isChar()) {
-		return toWString(Mirror::polyGetValue<char>(prop, component));
-	}
-	else if (prop.type.isNumber()) {
-		if (prop.type.isDecimal()) {
-			return toWString(Mirror::polyGetValue<double>(prop, component));
-		}
-		else if (prop.type.isSignedNumber())
-			return toWString(Mirror::polyGetValue<int>(prop, component));
-		else if (prop.type.isUnsignedNumber())
-			return toWString(Mirror::polyGetValue<unsigned int>(prop, component));
-	}
-	else if (prop.type.isBool()) {
-		return toWString(Mirror::polyGetValue<bool>(prop, component));
-	}
-	else if (prop.type.isString()) {
-		return toWString(Mirror::polyGetValue<std::string>(prop, component));
-	}
-	else if (prop.type.isWideString()) {
-		return Mirror::polyGetValue<std::wstring>(prop, component);
-	}
-	else if (prop.type.isObject()) {
-		if (prop.type.name == "glm::vec2") {
-			glm::vec2 size = Mirror::polyGetValue<glm::vec2>(prop, component);
-			return L"x: " + std::to_wstring(size.x) + L", y: " + std::to_wstring(size.y);
-		}
-		else {
-			return L"instance of " + std::wstring(prop.type.name.begin(), prop.type.name.end());
-		}
-	}
-	return L"ERROR!";
-}
-
-std::wstring Inspector::propertyArrayValueToString(Mirror::Property& prop, Component* component, std::size_t index) const {
-	// WIP
-	return L"ERROR!";
-}
-
-bool Inspector::getSelectedProperty(PropertyInstance& ref) {
-	std::size_t childCount = scrollPanel.getImmediateChildCount();
-	for (std::size_t i = 0; i < childCount; i++) {
-		EntityHandle entry = scrollPanel.getChild(i);
-		std::size_t entryChildCount = entry.getImmediateChildCount();
-		for (std::size_t ii = 0; ii < entryChildCount; ii++) {
-			EntityHandle propField = entry.getChild(ii);
-			if (propField.getComponent<Selectable>()->isSelected()) {
-				// Component i, Property ii
-				std::size_t lineIndex = 0;
-				bool lineFound = false;
-
-				// Get selected line index of the propField
-				std::size_t totalLineAmount = propField.getImmediateChildCount();
-				for (std::size_t currentLineIndex = 0; currentLineIndex < totalLineAmount; currentLineIndex++) {
-					EntityHandle line = propField.getChild(currentLineIndex);
-					if (line.getComponent<Selectable>()->isSelected()) {
-						lineIndex = currentLineIndex;
-						lineFound = true;
-						break;
-					}
-				}
-				if (!lineFound) throw "Inspector::getSelectedProperty::ERROR Selected line was not found!";
-
-				std::vector<Component*> components = currentTarget.getComponents();
-				Component* instance = components[i];
-				ref = { lineIndex, instance, instance->getType().properties[ii - 1] };
-				return true;
-			}
-
-		}
-	}
-	return false;
-}
-
-void Inspector::onPropertyValueSubmit(std::wstring value) {
-	PropertyInstance propInstance;
-	if (!getSelectedProperty(propInstance)) return;
-
-
-	Component* instance = propInstance.instance;
-	Mirror::Property prop = propInstance.prop;
-	if (prop.type.isCArray()) {
-		std::size_t lineIndex = propInstance.lineIndex;
-		//auto arrayType = Mirror::polyGetArrayValue<std::string>(prop, instance);
-		// WIP
-		std::cout << "Inspector::onPropertyValueSubmit::ERROR Did not set value for the array type. Setting value of array types are still a WIP." << std::endl;
-	}
-	else {
-		if (prop.type.isNumber()) {
-			if (prop.type.isDecimal()) {
-				Mirror::polySetValue(prop, instance, std::stod(value));
-			}
-			else {
-				Mirror::polySetValue(prop, instance, std::stoi(value));
-			}
-		}
-		else if (prop.type.isString()) {
-			Mirror::polySetValue(prop, instance, std::string(value.begin(), value.end()));
-		}
-		else if (prop.type.isWideString()) {
-			Mirror::polySetValue(prop, instance, value);
-		}
-		else {
-			throw std::invalid_argument("Inspector::onPropertyValueSubmit::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
-		}
-	}
-}
-
-void Inspector::onPropertyValueToggle(bool value) {
-	PropertyInstance propInstance;
-	if (!getSelectedProperty(propInstance)) return;
-
-	Component* instance = propInstance.instance;
-	Mirror::Property prop = propInstance.prop;
-	if (prop.type.isCArray()) {
-		// WIP
-		std::cout << "Inspector::onPropertyValueSubmit::ERROR Did not set value for the array type. Setting value of array types are still a WIP." << std::endl;
-	}
-	else {
-		if (prop.type.isBool()) {
-			Mirror::polySetValue(prop, instance, value);
-		}
-		else {
-			std::cout << "Inspector::onPropertyValueToggle::ERROR The property is not a valid type(" + prop.type.name + ") for this function." << std::endl;
-			throw std::invalid_argument("Inspector::onPropertyValueToggle::ERROR The property is not a valid type(" + prop.type.name + ") for this function.");
-		}
-	}
-}
 
 void Inspector::awake() {
 	// create scroll panel for targetComponentList
@@ -247,27 +67,51 @@ void Inspector::clearEntries() {
 	targetComponentList.clear();
 }
 
-EntityHandle Inspector::createPropertyFieldLine(std::string propName, Mirror::VariableType& propType, std::wstring propValue, std::string lineName) {
+ReflectedObject* getInstanceOfValue(ReflectedObject* instance, PropertyValueID value) {
+	if (value.isArrayElement) {
+		return static_cast<ReflectedObject*>(instance->getArrayElementPointers(value.prop.name)[value.arrayIndex]);
+	}
+	else {
+		return static_cast<ReflectedObject*>(instance->getPointer(value.prop.name));
+	}
+}
+
+EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValueID value, Component* root, ReflectedObject* instance, std::string entityName) {
+	std::size_t offset = reinterpret_cast<unsigned char*>(instance) - reinterpret_cast<unsigned char*>(root);
+	ReflectedObjectHandle instanceHandle(ComponentHandle(root), offset);
+
 	RectTransform* rect = owner.getComponent<RectTransform>();
-	EntityHandle propLine = createEntity(lineName,
+	EntityHandle propValueField = createEntity(entityName,
 		Selectable(),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
-	HorizontalLayoutGroup* fieldLayout = propLine.addComponent<HorizontalLayoutGroup>();
-	fieldLayout->spacing = 10;
-
+	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, instanceHandle));
+	if (Mirror::isReflected(value.prop.type.name)) {
+		VerticalLayoutGroup* fieldLayout = propValueField.addComponent<VerticalLayoutGroup>();
+		fieldLayout->spacing = 3;
+		fieldLayout->shrinkableChildHeight = false;
+		fieldLayout->shrinkableChildWidth = false;
+	}
+	else {
+		HorizontalLayoutGroup* fieldLayout = propValueField.addComponent<HorizontalLayoutGroup>();
+		fieldLayout->spacing = 10;
+		fieldLayout->shrinkableChildHeight = false;
+		fieldLayout->shrinkableChildWidth = false;
+	}
+	// -------------- Content --------------
+	Mirror::VariableType& propType = value.prop.type;
+	std::wstring propValue = PropertyEditor::propertyValueToString(value, instanceHandle);
+	// Label
+	EntityHandle propLabel = createEntity(entityName + "_Label");
+	Text* propText = propLabel.addComponent(Text(label + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
+	propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
+	propLabel.setParent(propValueField);
+	// Value Display & Input
 	if (propType.isNumber()) {
-		// Property Name
-		EntityHandle propLabel = createEntity(lineName + "_Label");
-		Text* propText = propLabel.addComponent(Text(propName + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
-		propLabel.setParent(propLine);
-
-		// Input Field
-		EntityHandle inputField = createEntity(lineName + "_InputField",
+		EntityHandle inputField = createEntity(entityName + "_InputField",
 			RectSprite(Color(255, 255, 255)),
 			RectMask(),
-			RectTransform(0, 0, 100, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+			RectTransform(0, 0, 100, 16, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
 		InputField* inputFieldComponent = inputField.addComponent<InputField>();
 		inputFieldComponent->setText(propValue);
@@ -275,141 +119,80 @@ EntityHandle Inspector::createPropertyFieldLine(std::string propName, Mirror::Va
 			inputFieldComponent->contentType = InputField::ContentType::Decimal;
 		else
 			inputFieldComponent->contentType = InputField::ContentType::Integer;
-		inputFieldComponent->onSubmit = Core::bind(this, &Inspector::onPropertyValueSubmit);
-		inputField.setParent(propLine);
+		inputFieldComponent->onSubmit = Core::bind(editor, &PropertyEditor::onTextSubmit);
+		inputField.setParent(propValueField);
 	}
 	else if (propType.isString() || propType.isWideString()) {
-		// Property Name
-		EntityHandle propLabel = createEntity(lineName + "_Label");
-		Text* propText = propLabel.addComponent(Text(propName + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
-		propLabel.setParent(propLine);
-
-		// Input Field
-		EntityHandle inputField = createEntity(lineName + "_InputField",
+		EntityHandle inputField = createEntity(entityName + "_InputField",
 			RectSprite(Color(255, 255, 255)),
 			RectMask(),
-			RectTransform(0, 0, 250, 16, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+			RectTransform(0, 0, 250, 16, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
 		InputField* inputFieldComponent = inputField.addComponent<InputField>();
 		inputFieldComponent->setText(propValue);
 		inputFieldComponent->contentType = InputField::ContentType::Standard;
-		inputFieldComponent->onSubmit = Core::bind(this, &Inspector::onPropertyValueSubmit);
-		inputField.setParent(propLine);
+		inputFieldComponent->onSubmit = Core::bind(editor, &PropertyEditor::onTextSubmit);
+		inputField.setParent(propValueField);
 	}
 	else if (propType.isBool()) {
-		// Property Name
-		EntityHandle propLabel = createEntity(lineName + "_Label");
-		Text* propText = propLabel.addComponent(Text(propName + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
-		propLabel.setParent(propLine);
-
-		// Property Value
-		EntityHandle propValueField = createEntity(lineName + "_Value",
-			RectTransform(0, 0, 20, 20, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+		EntityHandle propValueDisplay = createEntity(entityName + "_Value",
+			RectTransform(0, 0, 20, 20, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
-		CheckBox* checkBox = propValueField.addComponent<CheckBox>();
+		CheckBox* checkBox = propValueDisplay.addComponent<CheckBox>();
 		checkBox->setToggle(propValue == L"true");
-		checkBox->onToggle = Core::bind(this, &Inspector::onPropertyValueToggle);
-		propValueField.setParent(propLine);
+		checkBox->onToggle = Core::bind(editor, &PropertyEditor::onBoolSubmit);
+		propValueDisplay.setParent(propValueField);
 	}
-	// -------- DEFAULT --------------
+	else if (Mirror::isReflected(propType.name)) {
+		ReflectedObject* propInstance = getInstanceOfValue(instance, value); // instance->getPointer(value.prop.name)
+		Mirror::Class classType = propInstance->getType();
+		for (std::size_t i = 0; i < classType.properties.size(); i++) {
+			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, propInstance);
+			propField.setParent(propValueField);
+			std::cout << classType.properties[i].name << std::endl;
+		}
+	}
 	else {
-		// Property Name
-		EntityHandle propLabel = createEntity(lineName + "_Label");
-		Text* propText = propLabel.addComponent(Text(propName + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
-		propLabel.setParent(propLine);
-
-		// Property Value
-		EntityHandle propValueField = createEntity(lineName + "_Value");
-		Text* propValueText = propValueField.addComponent(Text(propValue, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propValueField.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
-		propValueField.setParent(propLine);
+		EntityHandle propValueDisplay = createEntity(entityName + "_Value");
+		Text* propValueText = propValueDisplay.addComponent(Text(propValue, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
+		propValueDisplay.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.3f, Alignment::LEFT));
+		propValueDisplay.setParent(propValueField);
 	}
-	return propLine;
+	// -------------- End of Content --------------
+	return propValueField;
 }
 
-template<typename T>
-static void createPropertyFieldLines(Inspector* inspector, EntityHandle& field, Mirror::Property& prop, Component* component) {
-	std::size_t i = 0;
-	for (T value : Mirror::polyGetArrayValue<T>(prop, component)) {
-		EntityHandle line = inspector->createPropertyFieldLine(prop.name + "[" + std::to_string(i) + "]", prop.type, toWString(value), field.getEntityName() + "_line_" + std::to_string(i));
-		line.setParent(field);
-		i++;
-	}
-}
-
-EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& prop, Component* component) {
+EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& prop, Component* component, ReflectedObject* instance) {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 
 	// Create Field
 	EntityHandle propField = createEntity(name,
 		Selectable(),
+		//Border(1, Color(255,255,255,125)),
+		//RectSprite(Color(40, 40, 40, 255)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
 	VerticalLayoutGroup* fieldLayout = propField.addComponent<VerticalLayoutGroup>();
 	fieldLayout->spacing = 3;
+	fieldLayout->paddingTop = 5;
+	fieldLayout->paddingBottom = 5;
+	fieldLayout->paddingRight = 5;
+	fieldLayout->paddingLeft = 5;
 
 	// Create Field Body
 	if (Mirror::isArrayType(prop.type)) {
-		Mirror::VariableType& type = prop.type;
-		if (prop.type.name == "std::vector") {
-			type = prop.type.templateParams[0];
-		}
-		else if (prop.type.name == "std::array") {
-			type = prop.type.templateParams[0];
-		}
-		//
-		if (type.isChar()) {
-			createPropertyFieldLines<char>(this, propField, prop, component);
-		}
-		else if (type.isNumber()) {
-			if (type.isDecimal()) {
-				createPropertyFieldLines<double>(this, propField, prop, component);
-			}
-			else if (type.isSignedNumber()) {
-				createPropertyFieldLines<int>(this, propField, prop, component);
-			}
-			else if (type.isUnsignedNumber()) {
-				createPropertyFieldLines<unsigned int>(this, propField, prop, component);
-			}
-		}
-		else if (type.isBool()) {
-			createPropertyFieldLines<bool>(this, propField, prop, component);
-		}
-		else if (type.isString()) {
-			createPropertyFieldLines<std::string>(this, propField, prop, component);
-		}
-		else if (type.isWideString()) {
-			createPropertyFieldLines<std::wstring>(this, propField, prop, component);
-		}
-		else if (type.name == "glm::vec2") {
+		std::size_t arraySize = prop.getArraySize(instance);
+		for (std::size_t i = 0; i < arraySize; i++) {
+			PropertyValueID value(prop, i);
 
+			EntityHandle line = createPropertyValueField(prop.name + "[" + std::to_string(i) + "]", value, component, instance, name + "_line_" + std::to_string(i));
+			line.setParent(propField);
 		}
-		else if (Mirror::isReflected(type.name)) {
-			// WIP
-			//Mirror::getType(prop.type.name);
-			//TODO: get pointer of property
-			Mirror::Class classType = Mirror::getType(type.name);
-			//void* instance = prop.getPointer(component);
-			std::vector<void*> instances = prop.getArrayElementPointers(component);
-
-			for (std::size_t instanceIndex = 0; instanceIndex < instances.size(); instanceIndex++) {
-				for (std::size_t i = 0; i < classType.properties.size(); i++) {
-					EntityHandle innerField = createPropertyField(name + "_Reflected_Property_" + std::to_string(instanceIndex) + "_Property_" + std::to_string(i), classType.properties[i], static_cast<Component*>(instances[instanceIndex]));
-					innerField.setParent(propField);
-				}
-			}
-		}
-		else {
-			std::cout << "Inspector: Unknown property type(" << type.name << ")" << std::endl;
-		}
-
 	}
 	else {
-		//createPropertyLine
-		EntityHandle line = createPropertyFieldLine(prop.name, prop.type, propertyValueToString(prop, component), name + "_line");
+		PropertyValueID value(prop);
+
+		EntityHandle line = createPropertyValueField(prop.name, value, component, instance, name + "_line");
 		line.setParent(propField);
 	}
 
@@ -448,7 +231,8 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	//*/
 	// Property field
 	for (std::size_t i = 0; i < type.properties.size(); i++) {
-		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component);
+		ComponentHandle componentHandle(component);
+		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, component);
 		propField.setParent(entry);
 	}
 	// End of Entry content

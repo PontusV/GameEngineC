@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(30);\
+	Mirror::Class newClass(31);\
 	newClass.name = "Core::InputField";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Selectable" });\
@@ -315,6 +315,27 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "initText") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "onSubmit") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "characterLimit") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "markColor") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "highlightColor") {\
+		throw std::invalid_argument("The property Core::InputField::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Selectable::hasProperty(propertyName))\
+		return Core::Selectable::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::InputField::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::InputField::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "initText") {\

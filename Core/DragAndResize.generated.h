@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(27);\
+	Mirror::Class newClass(28);\
 	newClass.name = "Core::DragAndResize";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -297,6 +297,27 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "top") {\
+		throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "right") {\
+		throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "bottom") {\
+		throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "left") {\
+		throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "edgeSize") {\
+		throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Behaviour::hasProperty(propertyName))\
+		return Core::Behaviour::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::DragAndResize::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::DragAndResize::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "top") {\

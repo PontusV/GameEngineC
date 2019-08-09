@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(14);\
+	Mirror::Class newClass(15);\
 	newClass.name = "Core::ContentSizeFitter";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutController" });\
@@ -112,6 +112,12 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (Core::LayoutController::hasProperty(propertyName))\
+		return Core::LayoutController::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::ContentSizeFitter::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::ContentSizeFitter::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (Core::LayoutController::hasProperty(propertyName))\

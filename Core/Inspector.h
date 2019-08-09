@@ -2,9 +2,13 @@
 #define INSPECTOR_H
 #include "Behaviour.h"
 #include <ReflectionParser/ReflectionTypes.h>
+#include "PropertyValueID.h"
+#include "ReflectedObjectHandle.h"
 #include "Inspector.generated.h"
 
 namespace Core {
+
+	class ReflectedObject;
 
 	struct PropertyInstance {
 		std::size_t lineIndex;
@@ -22,23 +26,12 @@ namespace Core {
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 
 		void inspect(EntityHandle entity);
-		void onPropertyValueSubmit(std::wstring value);
-		void onPropertyValueToggle(bool value);
-		void onBoolPropertyValueSubmit(bool value);
 
 	private:
 		void clearEntries();
 		void addComponentEntry(Component* component, std::size_t id);
-
-		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component);
-	public:
-		EntityHandle createPropertyFieldLine(std::string propName, Mirror::VariableType& propType, std::wstring propValue, std::string lineName);
-	private:
-
-		std::wstring propertyValueToString(Mirror::Property& prop, Component* component) const;
-		std::wstring propertyArrayValueToString(Mirror::Property& prop, Component* component, std::size_t index) const;
-
-		bool getSelectedProperty(PropertyInstance& ref);
+		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component, ReflectedObject* instance);
+		EntityHandle createPropertyValueField(std::string label, PropertyValueID value, Component* root, ReflectedObject* instance, std::string entityName);
 
 	private:
 		EntityHandle currentTarget;

@@ -1,0 +1,147 @@
+#include "PropertyEditor.h"
+#include "ReflectionPolymorph.generated.h"
+using namespace Core;
+
+
+template<typename T>
+void setValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle, T&& value) {
+	ReflectedObject* instance = instanceHandle.get();
+	if (valueID.isArrayElement) {
+		Mirror::polySetArrayElementValue(valueID.prop, valueID.arrayIndex, instance, value);
+	}
+	else {
+		Mirror::polySetValue(valueID.prop, instance, value);
+	}
+}
+
+template<typename T>
+T getValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle) {
+	ReflectedObject* instance = instanceHandle.get();
+	if (valueID.isArrayElement) {
+		return Mirror::polyGetArrayElementValue<T>(valueID.prop, valueID.arrayIndex, instance);
+	}
+	else {
+		return Mirror::polyGetValue<T>(valueID.prop, instance);
+	}
+}
+
+void PropertyEditor::onTextSubmit(std::wstring value) {
+	Mirror::VariableType& type = valueID.prop.type;
+
+	if (type.isNumber()) {
+		if (type.isDecimal()) {
+			setValue(valueID, instanceHandle, std::stod(value));
+		}
+		else {
+			setValue(valueID, instanceHandle, std::stoi(value));
+		}
+	}
+	else
+		if (type.isString()) {
+			std::string stringValue(value.begin(), value.end());
+			setValue(valueID, instanceHandle, stringValue);
+		}
+		else if (type.isWideString()) {
+			setValue(valueID, instanceHandle, value);
+		}
+		else if (type.isChar()) {
+			// WIP
+		}
+		else if (type.isEnum()) {
+			// WIP
+		}
+		else {
+			throw std::invalid_argument("PropertyEditor::onTextSubmit::ERROR The property is not a valid type(" + type.name + ") for this function.");
+		}
+}
+
+void PropertyEditor::onBoolSubmit(bool value) {
+	setValue(valueID, instanceHandle, value);
+}
+
+template<typename T>
+std::wstring toWString(T value);
+
+// Char
+template<>
+std::wstring toWString<char>(char value) {
+	return std::to_wstring(value);
+}
+
+// Number
+template<>
+std::wstring toWString<int>(int value) {
+	return std::to_wstring(value);
+}
+
+// Unsigned Number
+template<>
+std::wstring toWString<unsigned int>(unsigned int value) {
+	return std::to_wstring(value);
+}
+
+// Decimal Number
+template<>
+std::wstring toWString<double>(double value) {
+	std::wstring result = std::to_wstring(value);
+	// Removes trailing 0s
+	std::size_t offset = result.at(result.find_last_not_of('0')) == '.' ? 2 : 1;
+	result.erase(result.find_last_not_of('0') + offset, std::string::npos);
+	return result;
+}
+
+// Bool
+template<>
+std::wstring toWString<bool>(bool value) {
+	if (value)
+		return L"true";
+	else
+		return L"false";
+}
+
+// String
+template<>
+std::wstring toWString<std::string>(std::string value) {
+	return std::wstring(value.begin(), value.end());
+}
+
+// WString
+template<>
+std::wstring toWString<std::wstring>(std::wstring value) {
+	return value;
+}
+
+std::wstring PropertyEditor::propertyValueToString(PropertyValueID valueID, ReflectedObjectHandle instanceHandle) {
+	Mirror::Property& prop = valueID.prop;
+	if (prop.type.isChar()) {
+		return toWString(getValue<char>(valueID, instanceHandle));
+	}
+	else if (prop.type.isNumber()) {
+		if (prop.type.isDecimal()) {
+			return toWString(getValue<double>(valueID, instanceHandle));
+		}
+		else if (prop.type.isSignedNumber())
+			return toWString(getValue<int>(valueID, instanceHandle));
+		else if (prop.type.isUnsignedNumber())
+			return toWString(getValue<unsigned int>(valueID, instanceHandle));
+	}
+	else if (prop.type.isBool()) {
+		return toWString(getValue<bool>(valueID, instanceHandle));
+	}
+	else if (prop.type.isString()) {
+		return toWString(getValue<std::string>(valueID, instanceHandle));
+	}
+	else if (prop.type.isWideString()) {
+		return getValue<std::wstring>(valueID, instanceHandle);
+	}
+	else if (prop.type.isObject()) {
+		if (prop.type.name == "glm::vec2") {
+			glm::vec2 size = getValue<glm::vec2>(valueID, instanceHandle);
+			return L"x: " + std::to_wstring(size.x) + L", y: " + std::to_wstring(size.y);
+		}
+		else {
+			return L"instance of " + std::wstring(prop.type.name.begin(), prop.type.name.end());
+		}
+	}
+	return L"ERROR!";
+}

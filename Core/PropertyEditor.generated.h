@@ -13,8 +13,8 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(11);\
-	newClass.name = "Core::ChildManager";\
+	Mirror::Class newClass(32);\
+	newClass.name = "Core::PropertyEditor";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
 	return newClass;\
@@ -26,11 +26,11 @@ T getValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 std::vector<T> getArrayValue_impl(std::string propertyName) {\
@@ -38,11 +38,11 @@ std::vector<T> getArrayValue_impl(std::string propertyName) {\
 		if (Core::Component::hasProperty(propertyName))\
 			return Core::Component::getArrayValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!" << "\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!");\
+		std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " cannot be converted to the specified type!" << "\n";\
+		throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 T getArrayElementValue_impl(std::string propertyName, std::size_t index) {\
@@ -52,32 +52,32 @@ T getArrayElementValue_impl(std::string propertyName, std::size_t index) {\
 	} catch(std::exception& e) {\
 		std::cout << e.what() << std::endl;\
 		throw e;\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " cannot be converted to the specified type!");\
+		throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " cannot be converted to the specified type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (Core::Component::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename T, std::size_t N>\
 bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 	try {\
 		if (Core::Component::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
-		std::cout << "Warning: The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!\n";\
-		throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " was set to a value with an incompatible type!");\
+		std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " was set to a value with an incompatible type!\n";\
+		throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " was set to a value with an incompatible type!");\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename T>\
 bool setArrayElementValue_impl(std::string propertyName, std::size_t index, T value) {\
@@ -87,8 +87,8 @@ bool setArrayElementValue_impl(std::string propertyName, std::size_t index, T va
 		std::cout << e.what() << std::endl;\
 		throw e;\
 	}\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist!");\
 }\
 template<typename... Ts>\
 bool invoke_impl(std::string functionName, Ts... args) { return false; }\
@@ -116,20 +116,20 @@ virtual Mirror::Class getType() {\
 virtual std::size_t getArraySize(std::string propertyName) {\
 	if (Core::Component::hasProperty(propertyName))\
 		return Core::Component::getArraySize(propertyName);\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist or the property is const!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist or the property is const!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (Core::Component::hasProperty(propertyName))\
 		return Core::Component::getPointer(propertyName);\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist or the property is const!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist or the property is const!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
 	if (Core::Component::hasProperty(propertyName))\
 		return Core::Component::getArrayElementPointers(propertyName);\
-	std::cout << "Warning: The property Core::ChildManager::" + propertyName + " does not exist or the property is const!" << "\n";\
-	throw std::invalid_argument("The property Core::ChildManager::" + propertyName + " does not exist or the property is const!");\
+	std::cout << "Warning: The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::PropertyEditor::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void serialize(std::ostream& os) const {\
 	Core::Component::serialize(os);\

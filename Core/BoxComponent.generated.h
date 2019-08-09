@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(2);\
+	Mirror::Class newClass(3);\
 	newClass.name = "Core::BoxComponent";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
@@ -186,6 +186,18 @@ static Mirror::Class getClassType() {\
 public:\
 virtual Mirror::Class getType() {\
 	return getClassType();\
+}\
+virtual std::size_t getArraySize(std::string propertyName) {\
+	if (propertyName == "size") {\
+		throw std::invalid_argument("The property Core::BoxComponent::" + propertyName + " is not an array!");\
+	}\
+	if (propertyName == "bounds") {\
+		throw std::invalid_argument("The property Core::BoxComponent::" + propertyName + " is not an array!");\
+	}\
+	if (Core::Component::hasProperty(propertyName))\
+		return Core::Component::getArraySize(propertyName);\
+	std::cout << "Warning: The property Core::BoxComponent::" + propertyName + " does not exist or the property is const!" << "\n";\
+	throw std::invalid_argument("The property Core::BoxComponent::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "size") {\
