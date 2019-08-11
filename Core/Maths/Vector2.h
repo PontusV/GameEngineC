@@ -20,7 +20,7 @@ namespace Core {
 		bool operator!=(const Vector2& other) const;
 		const float& operator[](std::size_t index) const;
 		float& operator[](std::size_t index);
-		Vector2 operator*(const float& value) const;
+		Vector2 operator*(const float& scalar) const;
 	public:
 		float x;
 		float y;

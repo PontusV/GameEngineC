@@ -10,6 +10,7 @@ namespace Core {
 		~Vector4();
 
 		float length() const;
+		Vector4 floor() const;
 
 		Vector4 operator-() const;
 		Vector4 operator+(const Vector4& other) const;

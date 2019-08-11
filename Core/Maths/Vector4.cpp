@@ -1,5 +1,6 @@
 #include "Vector4.h"
 #include <stdexcept>
+#include <cmath>
 using namespace Core;
 
 Vector4::Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {
@@ -13,6 +14,10 @@ Vector4::~Vector4() {
 
 float Vector4::length() const {
 	return sqrt(x * x + y * y + z * z + w * w);
+}
+
+Vector4 Vector4::floor() const {
+	return Vector4(std::floor(x), std::floor(y), std::floor(z), std::floor(w));
 }
 
 Vector4 Vector4::operator-() const {
