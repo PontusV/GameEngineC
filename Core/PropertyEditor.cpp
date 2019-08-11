@@ -1,4 +1,5 @@
 #include "PropertyEditor.h"
+#include "Maths/Vector2.h"
 #include "ReflectionPolymorph.generated.h"
 using namespace Core;
 
@@ -135,8 +136,8 @@ std::wstring PropertyEditor::propertyValueToString(PropertyValueID valueID, Refl
 		return getValue<std::wstring>(valueID, instanceHandle);
 	}
 	else if (prop.type.isObject()) {
-		if (prop.type.name == "glm::vec2") {
-			glm::vec2 size = getValue<glm::vec2>(valueID, instanceHandle);
+		if (prop.type.name == "Vector2") {
+			Vector2 size = getValue<Vector2>(valueID, instanceHandle);
 			return L"x: " + std::to_wstring(size.x) + L", y: " + std::to_wstring(size.y);
 		}
 		else {

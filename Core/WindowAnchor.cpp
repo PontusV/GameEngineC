@@ -21,7 +21,7 @@ void WindowAnchor::awake() {
 void WindowAnchor::onWindowResize() {
 	Transform* transform = owner.getComponent<Transform>();
 	if (transform) {
-		glm::vec2 resolution = window->getResolution();
+		Vector2 resolution = window->getResolution();
 		transform->setLocalX(resolution.x * anchor.x + offset.x);
 		transform->setLocalY(resolution.y * anchor.y + offset.y);
 	}

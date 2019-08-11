@@ -13,29 +13,29 @@ LayoutElement::~LayoutElement() {
 }
 
 
-glm::vec2 LayoutElement::getMinSize() {
+Vector2 LayoutElement::getMinSize() {
 	if (minSizeEnabled)
 		return minSize;
-	return glm::vec2(0, 0);
+	return Vector2(0, 0);
 }
 
-glm::vec2 LayoutElement::getPrefSize() {
-	return glm::vec2(std::max(minSize.x, prefSize.x), std::max(minSize.y, prefSize.y));
+Vector2 LayoutElement::getPrefSize() {
+	return Vector2(std::max(minSize.x, prefSize.x), std::max(minSize.y, prefSize.y));
 }
 
-glm::vec2 LayoutElement::getFlexibleSize() {
+Vector2 LayoutElement::getFlexibleSize() {
 	if (flexibleSizeEnabled)
 		return flexibleSize;
-	return glm::vec2(1, 1);
+	return Vector2(1, 1);
 }
 
-void LayoutElement::setMinSize(glm::vec2 size) {
+void LayoutElement::setMinSize(Vector2 size) {
 	minSize = size;
 }
-void LayoutElement::setPrefSize(glm::vec2 size) {
+void LayoutElement::setPrefSize(Vector2 size) {
 	prefSize = size;
 }
-void LayoutElement::setFlexibleSize(glm::vec2 size) {
+void LayoutElement::setFlexibleSize(Vector2 size) {
 	flexibleSize = size;
 }
 

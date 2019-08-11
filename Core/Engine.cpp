@@ -11,8 +11,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Maths/Vector2.h"
+#include "Maths/MatrixTransform.h"
 
 using namespace std;
 using namespace Core;
@@ -29,7 +29,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// Viewport
 	glViewport(0, 0, width, height);
 	// Updates projection matrix of all shaders
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
+	Matrix4 projection = maths::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::getInstance().updateShaders(projection);
 	// Resize draw area
 	engine->getGraphics().getRenderer().updateSize(width, height);
@@ -68,7 +68,7 @@ void characterCallback(GLFWwindow* window, unsigned int codepoint) {
 
 void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-	engine->getInput().setMousePosition(glm::vec2(xpos, ypos));
+	engine->getInput().setMousePosition(Vector2(xpos, ypos));
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

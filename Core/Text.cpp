@@ -32,7 +32,7 @@ void Text::setText(std::string text) {
 	setText(std::wstring(text.begin(), text.end()));
 }
 
-glm::vec2 Text::getSize() {
+Vector2 Text::getSize() {
 	return ResourceManager::getInstance().getTextSize(text, font);
 }
 

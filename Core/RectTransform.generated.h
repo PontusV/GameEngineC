@@ -22,7 +22,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "size";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\
@@ -39,7 +39,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "pivot";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\
@@ -56,7 +56,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "position";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\

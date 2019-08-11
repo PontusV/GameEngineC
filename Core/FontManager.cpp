@@ -37,7 +37,7 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 		atlas_width += g->bitmap.width;
 		atlas_height = std::max(atlas_height, g->bitmap.rows);
 	}
-	textureAtlas.size = glm::ivec2(atlas_width, atlas_height);
+	textureAtlas.size = Vector2(atlas_width, atlas_height);
 
 
 	// Prepare new atlas texture
@@ -67,9 +67,9 @@ FontManager::FontManager(const char* fontFile, unsigned short textSize, FT_Libra
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, (GLuint)x, (GLuint)y, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 
-		characters[i].size = glm::ivec2(g->bitmap.width, g->bitmap.rows);
-		characters[i].bearing = glm::ivec2(g->bitmap_left, g->bitmap_top);
-		characters[i].uvPos = glm::vec2((x/*+0.5f*/)/atlas_width, 0.0f);
+		characters[i].size = Vector2(g->bitmap.width, g->bitmap.rows);
+		characters[i].bearing = Vector2(g->bitmap_left, g->bitmap_top);
+		characters[i].uvPos = Vector2((x/*+0.5f*/)/atlas_width, 0.0f);
 		characters[i].advance = g->advance.x >> 6;
 
 		x += g->bitmap.width;
@@ -106,17 +106,17 @@ TextData2D FontManager::createText(std::wstring text, unsigned short size) {
 		if (charTextures[character].texture.ID == 0) { // ID is zero if uninitialized
 
 			Texture2D tex = textureAtlas;
-			glm::vec2 offset(x + ch.bearing.x, y - ch.bearing.y);
+			Vector2 offset(x + ch.bearing.x, y - ch.bearing.y);
 
 			tex.size = ch.size;
 
 			float uvWidth = (float)ch.size.x / textureAtlas.size.x;
 			float uvHeight = (float)ch.size.y / textureAtlas.size.y;
 
-			tex.uvCoords[0] = glm::vec2(ch.uvPos.x, ch.uvPos.y);
-			tex.uvCoords[1] = glm::vec2(ch.uvPos.x, ch.uvPos.y + uvHeight);
-			tex.uvCoords[2] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y + uvHeight);
-			tex.uvCoords[3] = glm::vec2(ch.uvPos.x + uvWidth, ch.uvPos.y);
+			tex.uvCoords[0] = Vector2(ch.uvPos.x, ch.uvPos.y);
+			tex.uvCoords[1] = Vector2(ch.uvPos.x, ch.uvPos.y + uvHeight);
+			tex.uvCoords[2] = Vector2(ch.uvPos.x + uvWidth, ch.uvPos.y + uvHeight);
+			tex.uvCoords[3] = Vector2(ch.uvPos.x + uvWidth, ch.uvPos.y);
 
 			charTextures[character] = CharTexture2D(tex, offset);
 		}
@@ -136,5 +136,5 @@ TextData2D FontManager::createText(std::wstring text, unsigned short size) {
 	//int height = (int)(textHeight * scale);
 	int height = textHeight;
 
-	return { textures, glm::ivec2(width,height) };
+	return { textures, Vector2(width,height) };
 }

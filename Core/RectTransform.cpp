@@ -1,5 +1,6 @@
 #include "RectTransform.h"
 #include "UIBehaviour.h"
+#include "Maths/MatrixTransform.h"
 
 using namespace Core;
 
@@ -13,8 +14,8 @@ RectTransform::RectTransform() {
 RectTransform::~RectTransform() {
 }
 
-std::array<glm::vec2, 4> RectTransform::getVertices() const {
-	glm::mat4 localModelMatrix = getLocalModelMatrix();
+std::array<Vector2, 4> RectTransform::getVertices() const {
+	Matrix4 localModelMatrix = getLocalModelMatrix();
 	return {
 		getVertex(0, localModelMatrix),
 		getVertex(1, localModelMatrix),
@@ -23,38 +24,38 @@ std::array<glm::vec2, 4> RectTransform::getVertices() const {
 	};
 }
 
-glm::vec2 RectTransform::getVertex(std::size_t index) const {
-	glm::mat4 localModelMatrix = getLocalModelMatrix();
+Vector2 RectTransform::getVertex(std::size_t index) const {
+	Matrix4 localModelMatrix = getLocalModelMatrix();
 	return getVertex(index, localModelMatrix);
 }
 
-glm::vec2 RectTransform::getVertex(std::size_t index, glm::mat4& localModelMatrix) const {
-	glm::vec2 pos = getRectOffset();
+Vector2 RectTransform::getVertex(std::size_t index, Matrix4& localModelMatrix) const {
+	Vector2 pos = getRectOffset();
 	if (index == 0) {
 		return localToWorldMatrix * localModelMatrix * pos;
 	}
 	else if (index == 1) {
-		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x, pos.y + size.y);
+		return localToWorldMatrix * localModelMatrix * Vector2(pos.x, pos.y + size.y);
 	}
 	else if (index == 2) {
 		return localToWorldMatrix * localModelMatrix * (pos + size);
 	}
 	else if (index == 3) {
-		return localToWorldMatrix * localModelMatrix * glm::vec2(pos.x + size.x, pos.y);
+		return localToWorldMatrix * localModelMatrix * Vector2(pos.x + size.x, pos.y);
 	}
 	throw std::invalid_argument("RectTransform::getVertex::ERROR Vertex index out of bounds!");
 }
 
 Rect RectTransform::getRect() const {
-	glm::vec2 rectPos = getRectOffset();
+	Vector2 rectPos = getRectOffset();
 	return Rect(rectPos.x, rectPos.y, size.x, size.y);
 }
 
-glm::vec2 RectTransform::getRectOffset() const {
+Vector2 RectTransform::getRectOffset() const {
 	return size * -pivot;
 }
 
-const glm::vec2& RectTransform::getSize() const {
+const Vector2& RectTransform::getSize() const {
 	return size;
 }
 void RectTransform::notifyResize() {
@@ -70,7 +71,7 @@ void RectTransform::notifyResize() {
 	}
 }
 
-void RectTransform::setSize(glm::vec2 size) {
+void RectTransform::setSize(Vector2 size) {
 	this->size = size;
 	notifyResize();
 }
@@ -84,10 +85,10 @@ void RectTransform::setHeight(float height) {
 	notifyResize();
 }
 
-const glm::vec2& RectTransform::getPivot() const {
+const Vector2& RectTransform::getPivot() const {
 	return pivot;
 }
 
-void RectTransform::setPivot(glm::vec2 pivot) {
+void RectTransform::setPivot(Vector2 pivot) {
 	this->pivot = pivot;
 }

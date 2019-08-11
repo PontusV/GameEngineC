@@ -19,16 +19,16 @@ void Sprite::setColor(Color value) {
 	color = value;
 }
 
-const std::vector<std::array<glm::vec2, 4>>& Sprite::getMasks() const {
+const std::vector<std::array<Vector2, 4>>& Sprite::getMasks() const {
 	return masks;
 }
 
-std::size_t Sprite::clip(const std::array<glm::vec2, 4> & mask) {
+std::size_t Sprite::clip(const std::array<Vector2, 4> & mask) {
 	masks.push_back(mask);
 	return masks.size() - 1;
 }
 
-void Sprite::reclip(std::size_t index, const std::array<glm::vec2, 4> & newMask) {
+void Sprite::reclip(std::size_t index, const std::array<Vector2, 4> & newMask) {
 	masks[index] = newMask;
 }
 

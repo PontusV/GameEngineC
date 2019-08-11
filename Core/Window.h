@@ -2,7 +2,9 @@
 #define WINDOW_H
 
 #include <iostream>
-#include <glm/glm.hpp>
+#include "Maths/Matrix4.h"
+#include "Maths/Vector2.h"
+#include "Maths/Vector3.h"
 
 struct GLFWwindow;
 namespace Core {
@@ -21,18 +23,18 @@ namespace Core {
 
 		int getWidth();
 		int getHeight();
-		const glm::ivec2& getResolution();
+		const Vector2& getResolution();
 		bool isActive() const;
 
-		void setBackgroundColor(glm::vec3 color);
+		void setBackgroundColor(Vector3 color);
 
 		GLFWwindow* getWindow();
-		glm::mat4 getProjectionMatrix();
+		Matrix4 getProjectionMatrix();
 
 	private:
 		const char* title;
-		glm::ivec2 resolution;
-		glm::vec3 backgroundColor;
+		Vector2 resolution;
+		Vector3 backgroundColor;
 
 		bool active;
 

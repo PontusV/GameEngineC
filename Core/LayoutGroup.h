@@ -3,7 +3,7 @@
 #include "LayoutController.h"
 #include "ILayoutElement.h"
 #include "Alignment.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "LayoutGroup.generated.h"
 
 namespace Core {
@@ -29,7 +29,7 @@ namespace Core {
 
 	protected:
 		/* Returns the size of the allocated space for all immediate child LayoutElements */
-		glm::vec2 getAllocatedSpace(const std::vector<LayoutElementData>& elements);
+		Vector2 getAllocatedSpace(const std::vector<LayoutElementData>& elements);
 
 		/* Returns LayoutElementData from all children with a RectTransform. */
 		std::vector<LayoutElementData> getLayoutElementData(bool shrinkableChildWidth = true, bool shrinkableChildHeight = true);

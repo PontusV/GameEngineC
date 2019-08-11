@@ -1,6 +1,6 @@
 #include "BatchRenderer2D.h"
 #include "Texture2D.h"
-#include "TransformMaths.h"
+#include "Maths/MatrixTransform.h"
 #include "Window.h"
 
 #include "ResourceManager.h"
@@ -118,8 +118,8 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 		throw std::length_error("Can not add anymore sprites to this batch!");
 
 
-	const glm::vec2*	vertices	= renderable.vertices;
-	const glm::vec2*	uvCoords	= renderable.uvCoords;
+	const Vector2*	vertices	= renderable.vertices;
+	const Vector2*	uvCoords	= renderable.uvCoords;
 	const Color&		color		= renderable.color;
 
 	const float& textureSlot = renderable.textureID == 0 ? 0 : (float)config->getTextureSlot(renderable.textureID);
@@ -133,25 +133,25 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 
 	std::size_t& i = verticiesCount;
 
-	buffer[i].vertex = (glm::ivec2)vertices[0]; // Converts to glm::ivec2 for rounding to prevent textures in a texturemap from clipping into each other
+	buffer[i].vertex = vertices[0].floor();
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[0];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = (glm::ivec2)vertices[1];
+	buffer[i].vertex = vertices[1].floor();
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[1];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = (glm::ivec2)vertices[2];
+	buffer[i].vertex = vertices[2].floor();
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[2];
 	buffer[i].textureID = textureSlot;
 	i++;
 
-	buffer[i].vertex = (glm::ivec2)vertices[3];
+	buffer[i].vertex = vertices[3].floor();
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[3];
 	buffer[i].textureID = textureSlot;
@@ -161,7 +161,7 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 	indexCount += 6;
 }
 
-void BatchRenderer2D::submitMask(glm::vec2 vertex1, glm::vec2 vertex2, glm::vec2 vertex3, glm::vec2 vertex4) {
+void BatchRenderer2D::submitMask(Vector2 vertex1, Vector2 vertex2, Vector2 vertex3, Vector2 vertex4) {
 	if (!hasRoom())
 		throw std::length_error("Can not add anymore sprites to this batch!");
 

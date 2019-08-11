@@ -8,7 +8,12 @@ namespace Core {
 		Matrix4(); // Identity Matrix
 		Matrix4(float x);
 		Matrix4(Vector4 vec1, Vector4 vec2, Vector4 vec3, Vector4 vec4);
+		Matrix4(float data[16]);
 		~Matrix4();
+
+		const float* getDataPtr() const;
+
+		Matrix4 operator*(const Matrix4& other) const;
 		const Vector4& operator[](std::size_t index) const;
 		Vector4& operator[](std::size_t index);
 	private:

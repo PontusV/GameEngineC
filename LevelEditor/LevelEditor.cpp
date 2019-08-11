@@ -13,6 +13,9 @@
 #include "../Core/DragAndResize.h"
 #include "../Core/Inspector.h"
 
+#include "../Core/Maths/Vector2.h"
+#include "../Core/Maths/Vector3.h"
+
 using namespace Core;
 
 LevelEditor::LevelEditor() {
@@ -32,7 +35,7 @@ int LevelEditor::initiate() {
 		return result;
 	}
 	Window& window = engine.getGraphics().getWindow();
-	window.setBackgroundColor(glm::vec3(50, 50, 50));
+	window.setBackgroundColor(Vector3(50, 50, 50));
 
 	// Create Level Editor
 	LevelPtr level = engine.createLevel();
@@ -123,7 +126,7 @@ int LevelEditor::initiate() {
 	);
 	inspectorLabel.setParent(rightPanel);
 	// Inspector label background
-	glm::ivec2 inspectorLabelSize = inspectorLabel.getComponent<Text>()->getSize();
+	Vector2 inspectorLabelSize = inspectorLabel.getComponent<Text>()->getSize();
 	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
 	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
@@ -138,6 +141,7 @@ int LevelEditor::initiate() {
 		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspector.setParent(inspectorLabelRect);
+	//*/
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = level->createEntity("Test_Button",

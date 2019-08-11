@@ -1,8 +1,7 @@
 #include "Renderer2D.h"
 #include "ResourceManager.h"
 #include "BatchConfig.h"
-#include "TransformMaths.h"
-#include <glm/glm.hpp>
+#include "Maths/MatrixTransform.h"
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
@@ -20,15 +19,16 @@ unsigned char Renderer2D::createLayer() {
 	return layerAmount++;
 }
 
-void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& masks, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
 
-	std::vector<glm::vec2> clipMaskVertices;
+	std::vector<Vector2> clipMaskVertices;
 	clipMaskVertices.reserve(masks.size()*4);
-	for (const std::array<glm::vec2, 4>& vertices : masks) {
+	for (const std::array<Vector2, 4>& vertices : masks) {
 		for (std::size_t i = 0; i < 4; i++) {
 			clipMaskVertices.push_back(vertices[i]);
 		}
 	}
+
 
 	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
@@ -85,8 +85,8 @@ void Renderer2D::flush() {
 		// Stencil Buffer Clip Mask Vertices compare
 		std::size_t vertexAmount = std::min(l.clipMaskVertices.size(), r.clipMaskVertices.size());
 		for (std::size_t i = 0; i < vertexAmount; i++) {
-			glm::vec2 lVertex = l.clipMaskVertices[i];
-			glm::vec2 rVertex = r.clipMaskVertices[i];
+			Vector2 lVertex = l.clipMaskVertices[i];
+			Vector2 rVertex = r.clipMaskVertices[i];
 
 			if (lVertex.x < rVertex.x) return true;
 			if (rVertex.x < lVertex.x) return false;
@@ -129,12 +129,12 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 
 	// Calculate offset
-	glm::vec2 pivot = transform.getPivot();
+	Vector2 pivot = transform.getPivot();
 	float offsetX = textData.size.x * -pivot.x;
 	float offsetY = textData.size.y * -pivot.y + textData.size.y;
 

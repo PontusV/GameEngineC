@@ -3,12 +3,12 @@
 #include "RectSprite.h"
 #include "Sprite.h"
 #include "Color.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
+#include "Maths/MatrixTransform.h"
 
 #include "RectTransform.h"
 #include "RectButton.h"
 #include "Text.h"
-#include "TransformMaths.h"
 #include "Input.h"
 
 using namespace Core;
@@ -80,8 +80,8 @@ void DropDown::open() {
 
 	// Box
 	RectTransform* transform = owner.getComponent<RectTransform>();
-	const glm::ivec2& size = transform->getSize();
-	glm::vec2 position = transform->getLocalToWorldMatrix() * (transform->getPosition() + glm::vec2(-size.x/2, size.y/2));
+	const Vector2& size = transform->getSize();
+	Vector2 position = transform->getLocalToWorldMatrix() * (transform->getPosition() + Vector2(-size.x/2, size.y/2));
 	float z = transform->getZ()+1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
 		RectSprite(Color(20, 20, 20, 255))
@@ -109,7 +109,7 @@ void DropDown::open() {
 
 		// Button Text
 		Alignment textAlignment = Alignment::LEFT;
-		glm::vec2 textPivot = Anchor(textAlignment);
+		Vector2 textPivot = Anchor(textAlignment);
 		std::size_t textPaddingX = 5.0f;
 		std::size_t textPaddingY = 0.0f;
 		float textPosX = textPaddingX + (optionWidth  - textPaddingX * 2) * textPivot.x;

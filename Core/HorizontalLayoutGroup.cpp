@@ -18,7 +18,7 @@ void HorizontalLayoutGroup::updateLayout() {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
 		std::vector<LayoutElementData> elements = getLayoutElementData(shrinkableChildWidth, shrinkableChildHeight);
-		glm::vec2 allocatedSpace = getAllocatedSpace(elements);
+		Vector2 allocatedSpace = getAllocatedSpace(elements);
 		float totalMinWidth = getTotalMinWidth(elements);
 		float totalPrefWidth = getTotalPrefWidth(elements);
 		float totalPrefWidthDif = totalPrefWidth - totalMinWidth;
@@ -56,7 +56,7 @@ void HorizontalLayoutGroup::updateLayout() {
 			if (height < element.minSize.y)
 				height = element.minSize.y;
 
-			element.size = glm::vec2(width, height);
+			element.size = Vector2(width, height);
 			element.preStretchSize = element.size;
 		}
 
@@ -70,7 +70,7 @@ void HorizontalLayoutGroup::updateLayout() {
 			claimedWidth += element.size.x + spacing;
 		}
 
-		glm::vec2 anchor = Anchor(childAlignment);
+		Vector2 anchor = Anchor(childAlignment);
 		float x = paddingLeft + allocatedSpace.x * anchor.x - claimedWidth * anchor.x;
 		float y = paddingTop + allocatedSpace.y * anchor.y;
 
@@ -134,25 +134,25 @@ void HorizontalLayoutGroup::expandWidth(std::vector<LayoutElementData>& elements
 	}
 }
 
-glm::vec2 HorizontalLayoutGroup::getMinSize() {
+Vector2 HorizontalLayoutGroup::getMinSize() {
 	std::vector<LayoutElementData> elements = getLayoutElementData();
 	float minHeight = 0;
 	for (LayoutElementData& element : elements) {
 		minHeight = std::max(element.minSize.y, minHeight);
 	}
-	return glm::vec2(getTotalMinWidth(elements), minHeight);
+	return Vector2(getTotalMinWidth(elements), minHeight);
 }
 
-glm::vec2 HorizontalLayoutGroup::getPrefSize() {
+Vector2 HorizontalLayoutGroup::getPrefSize() {
 	std::vector<LayoutElementData> elements = getLayoutElementData();
 	float prefHeight = 0;
 	for (LayoutElementData& element : elements) {
 		prefHeight = std::max(element.preferredSize.y, prefHeight);
 	}
-	return glm::vec2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
+	return Vector2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
 }
 
-glm::vec2 HorizontalLayoutGroup::getFlexibleSize() {
+Vector2 HorizontalLayoutGroup::getFlexibleSize() {
 	float totalFlexibleWidth = 0;
 	float flexibleHeight = 0;
 	std::vector<LayoutElementData> elements = getLayoutElementData();
@@ -162,5 +162,5 @@ glm::vec2 HorizontalLayoutGroup::getFlexibleSize() {
 	}
 	if (totalFlexibleWidth > 1) totalFlexibleWidth = 1;
 	if (flexibleHeight > 1) flexibleHeight = 1;
-	return glm::vec2(totalFlexibleWidth, flexibleHeight);
+	return Vector2(totalFlexibleWidth, flexibleHeight);
 }

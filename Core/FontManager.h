@@ -4,7 +4,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -16,9 +16,9 @@
 namespace Core {
 	struct Character
 	{
-		glm::ivec2 size;		// Size of glyph
-		glm::ivec2 bearing;		// Offset from baseline to left/top of glyph
-		glm::vec2 uvPos;		// UV position in texture atlas
+		Vector2 size;		// Size of glyph
+		Vector2 bearing;	// Offset from baseline to left/top of glyph
+		Vector2 uvPos;		// UV position in texture atlas
 		unsigned int advance;	// Offset to advance to next glyph
 	};
 
@@ -38,14 +38,14 @@ namespace Core {
 	//Texture2D with an offset position
 	struct CharTexture2D {
 		CharTexture2D() {}
-		CharTexture2D(Texture2D texture, glm::vec2 offset) : texture(texture), offset(offset) {}
+		CharTexture2D(Texture2D texture, Vector2 offset) : texture(texture), offset(offset) {}
 		Texture2D texture;
-		glm::vec2 offset;
+		Vector2 offset;
 	};
 
 	struct TextData2D {
 		std::vector<CharTexture2D> textures;
-		glm::ivec2 size;
+		Vector2 size;
 	};
 
 	/* Manages a specified font. */

@@ -2,7 +2,7 @@
 #define LAYOUT_ELEMENT_H
 #include "Component.h"
 #include "ILayoutElement.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "LayoutElement.generated.h"
 
 namespace Core {
@@ -15,15 +15,15 @@ namespace Core {
 		~LayoutElement();
 
 		/* Returns the minimum valid size for this element. */
-		glm::vec2 getMinSize();
+		Vector2 getMinSize();
 		/* Returns the prefered size for this element. The returned size will always be equal to or more than the minimum size. */
-		glm::vec2 getPrefSize();
+		Vector2 getPrefSize();
 		/* Returns how much extra relative space this element may be allocated if there is additional available space. */
-		glm::vec2 getFlexibleSize();
+		Vector2 getFlexibleSize();
 
-		void setMinSize(glm::vec2 size);
-		void setPrefSize(glm::vec2 size);
-		void setFlexibleSize(glm::vec2 size);
+		void setMinSize(Vector2 size);
+		void setPrefSize(Vector2 size);
+		void setFlexibleSize(Vector2 size);
 
 		void setMinSizeEnabled(bool value);
 		bool getMinSizeEnabled();
@@ -34,11 +34,11 @@ namespace Core {
 
 	private:
 		PROPERTY()
-		glm::vec2 minSize = glm::vec2(1, 1);
+		Vector2 minSize = Vector2(1, 1);
 		PROPERTY()
-		glm::vec2 prefSize = glm::vec2(1, 1);
+		Vector2 prefSize = Vector2(1, 1);
 		PROPERTY()
-		glm::vec2 flexibleSize = glm::vec2(1, 1); // Value between 0 - 1
+		Vector2 flexibleSize = Vector2(1, 1); // Value between 0 - 1
 
 		PROPERTY()
 		bool minSizeEnabled = false;

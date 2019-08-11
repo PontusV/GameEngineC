@@ -7,7 +7,22 @@
 #include "Vector4.h"
 #include <math.h>
 namespace Core {
-	namespace Maths {
+	namespace maths {
+		inline Vector2 normalize(const Vector2& vec) {
+			float length = vec.length();
+			return Vector2(vec.x / length, vec.y / length);
+		}
+
+		inline Vector3 normalize(const Vector3& vec) {
+			float length = vec.length();
+			return Vector3(vec.x / length, vec.y / length, vec.z / length);
+		}
+
+		inline Vector4 normalize(const Vector4& vec) {
+			float length = vec.length();
+			return Vector4(vec.x / length, vec.y / length, vec.z / length, vec.w / length);
+		}
+
 		inline Matrix4 ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
 			Matrix4 result;
 			result[0][0] = 2 / (right - left);
@@ -19,17 +34,18 @@ namespace Core {
 			return result;
 		}
 
-		inline Matrix4 translate(Matrix4 mat, Vector3 vec) {
-			mat[3] = mat[0] * vec[0] + mat[1] * vec[1] + mat[2] * vec[2] + mat[3];
-			return mat;
+		inline Matrix4 translate(const Matrix4& mat, const Vector3& vec) {
+			Matrix4 result(mat);
+			result[3] = mat[0] * vec[0] + mat[1] * vec[1] + mat[2] * vec[2] + mat[3];
+			return result;
 		}
 
-		inline Matrix4 rotate(Matrix4 mat, float angle, Vector3 vec) {
+		inline Matrix4 rotate(const Matrix4& mat, float angle, const Vector3& vec) {
 			float c = cos(angle);
 			float s = sin(angle);
 
 			Vector3 axis(normalize(vec));
-			Vector3 temp((1 - c) * axis);
+			Vector3 temp((1.0f - c) * axis);
 
 			Matrix4 rotation;
 			rotation[0][0] = c + temp[0] * axis[0];
@@ -52,7 +68,7 @@ namespace Core {
 			return result;
 		}
 
-		inline Matrix4 scale(Matrix4 mat, Vector3 vec) {
+		inline Matrix4 scale(const Matrix4& mat, const Vector3& vec) {
 			Matrix4 result;
 			result[0] = mat[0] * vec[0];
 			result[1] = mat[1] * vec[1];
@@ -61,7 +77,7 @@ namespace Core {
 			return result;
 		}
 
-		namespace { // Hide from the outside
+		namespace {
 			inline bool gluInvertMatrix(const float m[16], float invOut[16]) {
 				float inv[16], det;
 				int i;
@@ -183,7 +199,7 @@ namespace Core {
 				if (det == 0)
 					return false;
 
-				det = 1.0 / det;
+				det = 1.0f / det;
 
 				for (i = 0; i < 16; i++)
 					invOut[i] = inv[i] * det;
@@ -211,48 +227,33 @@ namespace Core {
 			return mat;
 		}
 
-		inline Vector2 normalize(const Vector2& vec) {
-			float length = vec.length();
-			return Vector2(vec.x / length, vec.y / length);
-		}
-
-		inline Vector3 normalize(const Vector3& vec) {
-			float length = vec.length();
-			return Vector3(vec.x / length, vec.y / length, vec.z / length);
-		}
-
-		inline Vector4 normalize(const Vector4& vec) {
-			float length = vec.length();
-			return Vector4(vec.x / length, vec.y / length, vec.z / length, vec.w / length);
-		}
-
 		inline float radians(float degrees) {
-			return (degrees * M_PI) / 180;
+			return (degrees * (float)M_PI) / 180;
 		}
+	}
 
-		Vector2 operator*(const Matrix4& mat, const Vector2& vec) {
-			return Vector2(
-				vec.x * mat[0][0] + vec.y * mat[1][0] + mat[3][0],
-				vec.x * mat[0][1] + vec.y * mat[1][1] + mat[3][1]
-			);
-		}
+	inline Vector2 operator*(const Matrix4& mat, const Vector2& vec) {
+		return Vector2(
+			vec.x * mat[0][0] + vec.y * mat[1][0] + mat[3][0],
+			vec.x * mat[0][1] + vec.y * mat[1][1] + mat[3][1]
+		);
+	}
 
-		Vector3 operator*(const Matrix4& mat, const Vector3& vec) {
-			return Vector3(
-				vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + mat[3][0],
-				vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + mat[3][1],
-				vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + mat[3][2]
-			);
-		}
+	inline Vector3 operator*(const Matrix4& mat, const Vector3& vec) {
+		return Vector3(
+			vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + mat[3][0],
+			vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + mat[3][1],
+			vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + mat[3][2]
+		);
+	}
 
-		Vector4 operator*(const Matrix4& mat, const Vector4& vec) {
-			return Vector4(
-				vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + vec.w * mat[3][0],
-				vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + vec.w * mat[3][1],
-				vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + vec.w * mat[3][2],
-				vec.x * mat[0][3] + vec.y * mat[1][3] + vec.z * mat[2][3] + vec.w * mat[3][3]
-			);
-		}
+	inline Vector4 operator*(const Matrix4& mat, const Vector4& vec) {
+		return Vector4(
+			vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + vec.w * mat[3][0],
+			vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + vec.w * mat[3][1],
+			vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + vec.w * mat[3][2],
+			vec.x * mat[0][3] + vec.y * mat[1][3] + vec.z * mat[2][3] + vec.w * mat[3][3]
+		);
 	}
 }
 #endif

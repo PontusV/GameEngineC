@@ -1,7 +1,7 @@
 #ifndef MOUSE_DRAG_H
 #define MOUSE_DRAG_H
 #include "Behaviour.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "MouseDrag.generated.h"
 namespace Core {
 	CLASS() MouseDrag : public Behaviour {
@@ -19,7 +19,7 @@ namespace Core {
 
 	private:
 		bool dragging = false;
-		glm::vec2 offset;
+		Vector2 offset;
 	};
 }
 #endif

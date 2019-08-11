@@ -10,6 +10,7 @@
 #include "InputField.h"
 #include "HideFlags.h"
 #include "CheckBox.h"
+#include "Maths/Vector2.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -41,7 +42,7 @@ void Inspector::awake() {
 			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
-		element->setFlexibleSize(glm::vec2(1, 1));
+		element->setFlexibleSize(Vector2(1, 1));
 		element->setFlexibleSizeEnabled(true);
 		element->setMinSizeEnabled(true);
 		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
@@ -225,7 +226,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	);
 	LayoutElement* labelLayout = labelField.addComponent<LayoutElement>();
 	labelLayout->setFlexibleSizeEnabled(true);
-	labelLayout->setFlexibleSize(glm::vec2(1, 0));
+	labelLayout->setFlexibleSize(Vector2(1, 0));
 	labelField.setParent(entry);
 	EntityHandle label = createEntity(entryName + "_Label",
 		Text(type.name, "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255)),

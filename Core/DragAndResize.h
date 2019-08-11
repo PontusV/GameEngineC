@@ -1,7 +1,7 @@
 #ifndef DRAG_AND_RESIZE_H
 #define DRAG_AND_RESIZE_H
 #include "Behaviour.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "DragAndResize.generated.h"
 
 namespace Core {
@@ -29,7 +29,7 @@ namespace Core {
 		float edgeSize = 0;
 
 	private:
-		glm::vec2 mouseOffset; // Offset from top left vertex
+		Vector2 mouseOffset; // Offset from top left vertex
 		bool draggingTop = false;
 		bool draggingRight = false;
 		bool draggingBottom = false;

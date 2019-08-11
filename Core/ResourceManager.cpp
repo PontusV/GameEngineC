@@ -33,7 +33,7 @@ Shader ResourceManager::loadShader(const std::string shaderFileName) {
 	return shader;
 }
 
-Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm::ivec2 uvStartCoords) {
+Texture2D ResourceManager::loadTexture(const GLchar* file, Vector2 size, Vector2 uvStartCoords) {
 	//Copy value from storage
 	Texture2D texture;
 	auto it = textures.find(file);
@@ -52,9 +52,9 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, glm::ivec2 size, glm:
 	float uvHeight = (float)size.y / texture.size.y;
 
 	texture.uvCoords[0] = uvStartCoords;
-	texture.uvCoords[1] = glm::ivec2(uvStartCoords.x, uvStartCoords.y + uvHeight);
-	texture.uvCoords[2] = glm::ivec2(uvStartCoords.x + uvWidth, uvStartCoords.y + uvHeight);
-	texture.uvCoords[3] = glm::ivec2(uvStartCoords.x + uvWidth, uvStartCoords.y);
+	texture.uvCoords[1] = Vector2(uvStartCoords.x, uvStartCoords.y + uvHeight);
+	texture.uvCoords[2] = Vector2(uvStartCoords.x + uvWidth, uvStartCoords.y + uvHeight);
+	texture.uvCoords[3] = Vector2(uvStartCoords.x + uvWidth, uvStartCoords.y);
 
 	return texture;
 }
@@ -64,7 +64,7 @@ TextData2D ResourceManager::createText(std::wstring text, Font font) {
 	return manager.createText(text, font.getSize());
 }
 
-glm::ivec2 ResourceManager::getTextSize(std::wstring text, const Font& font) {
+Vector2 ResourceManager::getTextSize(std::wstring text, const Font& font) {
 	FontManager& manager = loadFontManager(font.getFileName(), font.getSize());
 	TextData2D data = manager.createText(text, font.getSize());
 	return data.size;
@@ -87,18 +87,18 @@ void ResourceManager::updateShader(Shader& shader) {
 	updateShader(shader, projection);
 }
 
-void ResourceManager::updateShader(Shader& shader, const glm::mat4& projection) {
+void ResourceManager::updateShader(Shader& shader, const Matrix4& projection) {
 	shader.setMatrix4("projection", projection, true);
 }
 
-void ResourceManager::updateShaders(const glm::mat4& projection) {
+void ResourceManager::updateShaders(const Matrix4& projection) {
 	this->projection = projection;
 	for (auto it = shaders.begin(); it != shaders.end(); ++it) {
 		updateShader(it->second, projection);
 	}
 }
 
-void ResourceManager::initShader(const glm::mat4& projection) {
+void ResourceManager::initShader(const Matrix4& projection) {
 	updateShaders(projection);
 }
 

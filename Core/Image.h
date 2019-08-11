@@ -5,7 +5,6 @@
 #include "Texture2D.h"
 #include "Color.h"
 #include "Shader.h"
-#include <glm/glm.hpp>
 #include <string>
 #include "Image.generated.h"
 

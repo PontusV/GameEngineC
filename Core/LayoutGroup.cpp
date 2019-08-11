@@ -11,18 +11,18 @@ LayoutGroup::LayoutGroup() {
 LayoutGroup::~LayoutGroup() {
 }
 
-glm::vec2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& elements) {
+Vector2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& elements) {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
-		glm::vec2 allocatedSpace = rectTransform->getSize(); // Allocated space for all LayoutElements
+		Vector2 allocatedSpace = rectTransform->getSize(); // Allocated space for all LayoutElements
 		if (LayoutElement* element = owner.getComponent<LayoutElement>()) {
 			if (element->getFlexibleSizeEnabled()) {
-				glm::vec2 maxSpace;
+				Vector2 maxSpace;
 				if (RectTransform* parentRect = owner.getParent().getComponent<RectTransform>()) {
 					maxSpace = element->getFlexibleSize() * parentRect->getSize();
 				}
 				else {
-					maxSpace = glm::vec2(getTotalPrefWidth(elements), getTotalPrefHeight(elements));
+					maxSpace = Vector2(getTotalPrefWidth(elements), getTotalPrefHeight(elements));
 				}
 				allocatedSpace.x = std::max(maxSpace.x, allocatedSpace.x);
 				allocatedSpace.y = std::max(maxSpace.y, allocatedSpace.y);
@@ -32,7 +32,7 @@ glm::vec2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& e
 		allocatedSpace.y -= paddingTop + paddingBottom;
 		return allocatedSpace;
 	}
-	return glm::vec2(0, 0);
+	return Vector2(0, 0);
 }
 
 std::vector<LayoutElementData> LayoutGroup::getLayoutElementData(bool shrinkableChildWidth, bool shrinkableChildHeight) {
@@ -42,9 +42,9 @@ std::vector<LayoutElementData> LayoutGroup::getLayoutElementData(bool shrinkable
 		Handle child = owner.getChild(i);
 		RectTransform* childRectTransform = child.getComponent<RectTransform>();
 		if (childRectTransform) {
-			glm::vec2 flexibleSize = LayoutController::getFlexibleSize(child);
-			glm::vec2 prefSize = LayoutController::getPrefSize(child);
-			glm::vec2 minSize;
+			Vector2 flexibleSize = LayoutController::getFlexibleSize(child);
+			Vector2 prefSize = LayoutController::getPrefSize(child);
+			Vector2 minSize;
 			if (!shrinkableChildWidth && !shrinkableChildHeight) {
 				minSize = prefSize;
 			}

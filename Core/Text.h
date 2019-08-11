@@ -1,12 +1,11 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-
 #include <string>
 #include "Font.h"
 #include "Sprite.h"
 #include "Color.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "Text.generated.h"
 
 namespace Core {
@@ -24,7 +23,7 @@ namespace Core {
 
 		void setText(std::wstring text);
 		void setText(std::string text);
-		glm::vec2 getSize();
+		Vector2 getSize();
 
 	private:
 		PROPERTY()

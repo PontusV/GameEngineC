@@ -3,8 +3,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Maths/MatrixTransform.h"
 using namespace Core;
 
 
@@ -75,7 +74,7 @@ bool Window::isActive() const {
 	return active && !glfwWindowShouldClose(window);
 }
 
-void Window::setBackgroundColor(glm::vec3 color) {
+void Window::setBackgroundColor(Vector3 color) {
 	backgroundColor = color;
 }
 
@@ -88,21 +87,24 @@ void Window::close() {
 }
 
 int Window::getWidth() {
-	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	getResolution();
 	return resolution.x;
 }
 
 int Window::getHeight() {
-	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+	getResolution();
 	return resolution.y;
 }
 
-const glm::ivec2& Window::getResolution() {
-	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+const Vector2& Window::getResolution() {
+	int width = 0;
+	int height = 0;
+	glfwGetWindowSize(window, &width, &height);
+	resolution = Vector2(width, height);
 	return resolution;
 }
 
-glm::mat4 Window::getProjectionMatrix() {
-	glfwGetWindowSize(window, &resolution.x, &resolution.y);
-	return glm::ortho(0.0f, static_cast<GLfloat>(resolution.x), static_cast<GLfloat>(resolution.y), 0.0f, -1.0f, 1.0f);
+Matrix4 Window::getProjectionMatrix() {
+	getResolution();
+	return maths::ortho(0.0f, static_cast<GLfloat>(resolution.x), static_cast<GLfloat>(resolution.y), 0.0f, -1.0f, 1.0f);
 }

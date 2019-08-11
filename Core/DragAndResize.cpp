@@ -1,5 +1,6 @@
 #include "DragAndResize.h"
 #include "Input.h"
+#include "Maths/MatrixTransform.h"
 #include "RectTransform.h"
 
 using namespace Core;
@@ -18,8 +19,8 @@ void DragAndResize::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (buttoncode == MOUSE_BUTTON_LEFT) {
 		RectTransform* transform = owner.getComponent<RectTransform>();
 		if (transform) {
-			const glm::vec2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
-			glm::vec2 mousePos = transform->getWorldToLocalMatrix() * glm::inverse(transform->getLocalModelMatrix()) * mousePosition;
+			const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
 			mouseOffset = mousePos - transform->getRectOffset();
 			// Left
 			if (mouseOffset.x <= edgeSize && left) {
@@ -43,9 +44,9 @@ void DragAndResize::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 void DragAndResize::onMouseDrag(float mouseX, float mouseY) {
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	if (transform) {
-		const glm::vec2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
-		glm::vec2 mousePos = transform->getWorldToLocalMatrix() * glm::inverse(transform->getLocalModelMatrix()) * mousePosition;
-		glm::vec2 move = mousePos - transform->getRectOffset() - mouseOffset;
+		const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+		Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
+		Vector2 move = mousePos - transform->getRectOffset() - mouseOffset;
 
 		if (draggingLeft) {
 			if (move.x > transform->getSize().x - edgeSize * 2)

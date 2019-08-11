@@ -3,15 +3,15 @@
 #include "ResourceManager.h"
 #include "Renderer2D.h"
 #include "Renderable2D.h"
-#include "TransformMaths.h"
 #include "Sprite.h"
+#include "Maths/Matrix4.h"
+#include "Maths/Vector2.h"
+#include "Maths/MatrixTransform.h"
 
 #include <algorithm>
 #include <array>
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 using namespace Core;
 Shader spriteShader;
@@ -43,7 +43,7 @@ bool Graphics::initiate() {
 	spriteShader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
 
 	// Configure shaders
-	glm::mat4 projection = window.getProjectionMatrix();
+	Matrix4 projection = window.getProjectionMatrix();
 	ResourceManager::getInstance().initShader(projection);
 	
 	// Initialize renderer
@@ -69,7 +69,7 @@ void Graphics::render(float deltaTime) {
 		const Color&			color			= rect.getColor();
 		bool					clipEnabled		= rect.isClipEnabled();
 		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
-		const std::vector<std::array<glm::vec2, 4>>& masks = rect.getMasks();
+		const std::vector<std::array<Vector2, 4>>& masks = rect.getMasks();
 
 		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
 	}
@@ -86,7 +86,7 @@ void Graphics::render(float deltaTime) {
 		const Color&			color		= image.getColor();
 		bool					clipEnabled = image.isClipEnabled();
 		unsigned char			layerIndex	= image.getOwner().getEntityLayer();
-		const std::vector<std::array<glm::vec2, 4>>& masks = image.getMasks();
+		const std::vector<std::array<Vector2, 4>>& masks = image.getMasks();
 
 		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, masks, layerIndex);
 	}
@@ -96,7 +96,7 @@ void Graphics::render(float deltaTime) {
 		const Text&						text				= renderableTexts.texts[i];
 		bool							clipEnabled			= text.isClipEnabled();
 		const unsigned char&			layerIndex			= text.getOwner().getEntityLayer();
-		const std::vector<std::array<glm::vec2, 4>>&	masks			= text.getMasks();
+		const std::vector<std::array<Vector2, 4>>&	masks	= text.getMasks();
 
 		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, masks, layerIndex);
 	}
@@ -109,16 +109,16 @@ void Graphics::render(float deltaTime) {
 		const Color&			color			= border.getColor();
 		const std::size_t&		borderThickness	= border.getBorderThickness();
 		bool					inner			= border.isInner();
-		const glm::ivec2&		size			= transform.getSize();
+		const Vector2&			size			= transform.getSize();
 		bool					clipEnabled		= border.isClipEnabled();
 		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
-		const std::vector<std::array<glm::vec2, 4>>& masks	= border.getMasks();
+		const std::vector<std::array<Vector2, 4>>& masks	= border.getMasks();
 
 
 		for (std::size_t side = 0; side < 4; side++) { // 4 lines
 			if (border.sideEnabled(side)) { // Check if this side is enabled (0 = top, 1 = right, 2 = bottom, 3 = left)
 
-				glm::ivec2 rectSize = size;
+				Vector2 rectSize = size;
 				if (!inner) {
 					rectSize.x += borderThickness * 2;
 					rectSize.y += borderThickness * 2;
@@ -139,7 +139,7 @@ void Graphics::render(float deltaTime) {
 					localPosY += borderThickness;
 				}
 
-				glm::ivec2 borderSize;
+				Vector2 borderSize;
 				if (side == 0 || side == 2) {	// Vertical line
 					borderSize.x = rectSize.x;
 					borderSize.y = borderThickness;

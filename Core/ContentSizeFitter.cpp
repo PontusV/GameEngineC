@@ -16,8 +16,8 @@ ContentSizeFitter::~ContentSizeFitter()
 void ContentSizeFitter::updateLayout() {
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	if (transform) {
-		float width;
-		float height;
+		float width = 0;
+		float height = 0;
 		if (horizontalFit == Mode::UNCONSTRAINED) {
 			width = transform->getSize().x;
 		}
@@ -36,6 +36,6 @@ void ContentSizeFitter::updateLayout() {
 		else if (verticalFit == Mode::PREFERREDSIZE) {
 			height = LayoutController::getPrefSize(owner).y;
 		}
-		transform->setSize(glm::vec2(width, height));
+		transform->setSize(Vector2(width, height));
 	}
 }

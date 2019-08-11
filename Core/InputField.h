@@ -4,9 +4,9 @@
 #include "Selectable.h"
 #include "Color.h"
 #include "ComponentFunctionHandle.h"
+#include "Maths/Vector2.h"
 #include <string>
 #include <cstddef>
-#include <glm/glm.hpp>
 #include "InputField.generated.h"
 
 namespace Core {
@@ -80,7 +80,7 @@ namespace Core {
 		void hideHighlight();
 
 		float getXPosOfTextIndex(std::size_t index, RectTransform* textRect, Text* textComponent);
-		std::size_t getTextIndexAtPosition(const glm::vec2& position, RectTransform* textRect, Text* textComponent);
+		std::size_t getTextIndexAtPosition(const Vector2& position, RectTransform* textRect, Text* textComponent);
 		std::size_t getSelectedStartIndex();
 		std::size_t getSelectedEndIndex();
 

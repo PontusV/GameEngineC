@@ -23,7 +23,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "minSize";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\
@@ -40,7 +40,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "prefSize";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\
@@ -57,7 +57,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "flexibleSize";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\

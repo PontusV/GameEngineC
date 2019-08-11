@@ -22,7 +22,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "anchor";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\
@@ -39,7 +39,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "offset";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::vec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\

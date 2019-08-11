@@ -2,7 +2,8 @@
 #define TRANSFORM_COMPONENT_H
 
 #include "Component.h"
-#include <glm/glm.hpp>
+#include "Maths/Matrix4.h"
+#include "Maths/Vector2.h"
 
 namespace Core {
 
@@ -19,29 +20,29 @@ namespace Core {
 		void moveX(float value);
 		void moveY(float value);
 
-		void updateLocalToWorldMatrix(const glm::mat4& model);
+		void updateLocalToWorldMatrix(const Matrix4& model);
 		void resetLocalToWorldMatrix();
-		const glm::mat4& getLocalToWorldMatrix() const;
-		const glm::mat4& getWorldToLocalMatrix() const;
+		const Matrix4& getLocalToWorldMatrix() const;
+		const Matrix4& getWorldToLocalMatrix() const;
 		/* Calculates and returns a new model matrix from local position, rotation and scale */
-		glm::mat4 getLocalModelMatrix() const;
+		Matrix4 getLocalModelMatrix() const;
 
 		/* Returns local rotation */
 		const float& getLocalRotation() const;
 		/* Returns position in local space. */
-		const glm::vec2& getLocalPosition() const;
+		const Vector2& getLocalPosition() const;
 		/* Returns position in world space. */
-		const glm::vec2 getPosition() const;
+		const Vector2 getPosition() const;
 		const float& getZ() const;
 		
 		/* Sets the position in local space. */
-		void setLocalPosition(glm::vec2 pos);
+		void setLocalPosition(Vector2 pos);
 		/* Sets local x coord */
 		void setLocalX(float value);
 		/* Sets local y coord */
 		void setLocalY(float value);
 		/* Sets the position in world space. */
-		void setPosition(glm::vec2 pos);
+		void setPosition(Vector2 pos);
 		/* Sets x coord in world space. */
 		void setX(float value);
 		/* Sets y coord in world space. */
@@ -51,10 +52,10 @@ namespace Core {
 		bool hasChanged();
 
 	protected:
-		glm::mat4 localToWorldMatrix;	// World Model Matrix
-		glm::mat4 worldToLocalMatrix;	// Inverse of worldModelMatrix. Multiply with a world position to get local position
+		Matrix4 localToWorldMatrix;		// World Model Matrix
+		Matrix4 worldToLocalMatrix;		// Inverse of worldModelMatrix. Multiply with a world position to get local position
 		PROPERTY()
-		glm::vec2 position;				// Local position (Position in parent)
+		Vector2 position;				// Local position (Position in parent)
 		PROPERTY()
 		float z;						// Depth for drawing order
 		PROPERTY()

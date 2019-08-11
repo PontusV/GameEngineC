@@ -22,7 +22,7 @@ static Mirror::Class createType() {\
 	newProperty.name = "size";\
 {\
 	Mirror::VariableType& newPropertyType = newProperty.type;\
-	newPropertyType.name = "glm::ivec2";\
+	newPropertyType.name = "Core::Vector2";\
 	newPropertyType.isConst = false;\
 	newPropertyType.isPointer = false;\
 	newPropertyType.isReference = false;\

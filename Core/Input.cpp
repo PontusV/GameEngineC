@@ -310,7 +310,7 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 
 // -------------- ADD/SET/GET ------------------
 
-void Input::setMousePosition(glm::vec2 position) {
+void Input::setMousePosition(Vector2 position) {
 	mouseMoved = true;
 	mousePosition = position;
 }
@@ -322,7 +322,7 @@ void Input::addInputEvent(const InputEvent& event) {
 EntityHandle Input::getHoverTarget() {
 	return hoverTarget;
 }
-const glm::vec2& Input::getMousePosition() const {
+const Vector2& Input::getMousePosition() const {
 	return mousePosition;
 }
 

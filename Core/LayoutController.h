@@ -2,21 +2,21 @@
 #define LAYOUT_CONTROLLER_H
 #include "UIBehaviour.h"
 #include "ILayoutElement.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "LayoutController.generated.h"
 namespace Core {
 
 	class LayoutElement;
 
 	struct LayoutElementData {
-		LayoutElementData(Handle child, glm::vec2 minSize, glm::vec2 preferredSize, glm::vec2 flexibleSize) : child(child), minSize(minSize), preferredSize(preferredSize), flexibleSize(flexibleSize) {}
-		glm::vec2 size;
-		glm::vec2 preStretchSize;
+		LayoutElementData(Handle child, Vector2 minSize, Vector2 preferredSize, Vector2 flexibleSize) : child(child), minSize(minSize), preferredSize(preferredSize), flexibleSize(flexibleSize) {}
+		Vector2 size;
+		Vector2 preStretchSize;
 
 		Handle child;
-		glm::vec2 minSize;
-		glm::vec2 preferredSize;
-		glm::vec2 flexibleSize;
+		Vector2 minSize;
+		Vector2 preferredSize;
+		Vector2 flexibleSize;
 	};
 
 	CLASS() LayoutController : public UIBehaviour {
@@ -39,11 +39,11 @@ namespace Core {
 
 	protected:
 		/* Returns LayoutElement minSize from the given Entity. */
-		static glm::vec2 getMinSize(Handle entity);
+		static Vector2 getMinSize(Handle entity);
 		/* Returns LayoutElement prefSize from the given Entity. */
-		static glm::vec2 getPrefSize(Handle entity);
+		static Vector2 getPrefSize(Handle entity);
 		/* Returns LayoutElement flexibleSize from the given Entity. */
-		static glm::vec2 getFlexibleSize(Handle entity);
+		static Vector2 getFlexibleSize(Handle entity);
 		/* Returns all components inheriting from the Layout Element Interface (ILayoutElement) */
 		static std::vector<ILayoutElement*> getLayoutGroups(Handle entity);
 

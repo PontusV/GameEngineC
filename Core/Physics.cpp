@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include "BoxComponent.h"
 #include "Behaviour.h"
+#include "Maths/Matrix4.h"
 using namespace Core;
 
 
@@ -23,7 +24,7 @@ void onTransformChange(Transform& transform) {
 /* Updates the Model Matrix of the target Transform and its child transforms.
  * @parameter matrixChanged specifies if the modelMatrix has changed from the previous update
 */
-void updateTransformModel(Transform& root, glm::mat4 modelMatrix, bool matrixChanged) {
+void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChanged) {
 	if (root.hasChanged())
 		matrixChanged = true;
 
@@ -58,6 +59,6 @@ void Physics::update(float dt) {
 		Transform& root = rootTransforms.transforms[i];
 
 		//glm::mat4 rootModelMatrix = glm::mat4(1.0f);
-		updateTransformModel(root, glm::mat4(1.0f), false);
+		updateTransformModel(root, Matrix4(1.0f), false);
 	}
 }

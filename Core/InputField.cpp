@@ -5,6 +5,7 @@
 #include "RectSprite.h"
 #include "ResourceManager.h"
 #include "Clipboard.h"
+#include "Maths/MatrixTransform.h"
 #include <GLFW/glfw3.h>
 
 using namespace Core;
@@ -154,7 +155,7 @@ void InputField::update(float deltaTime) {
 			showMark();
 		// Update position
 		float markXPos = getXPosOfTextIndex(selectedTextIndex, inputText.getComponent<RectTransform>(), inputText.getComponent<Text>());
-		textMark.getComponent<RectTransform>()->setLocalPosition(glm::vec2(markXPos, 0));
+		textMark.getComponent<RectTransform>()->setLocalPosition(Vector2(markXPos, 0));
 	}
 	else {
 		// Hide
@@ -246,8 +247,8 @@ void InputField::deleteText() {
 	}
 }
 
-std::size_t InputField::getTextIndexAtPosition(const glm::vec2 & position, RectTransform * textRect, Text * textComponent) {
-	glm::vec2 localPos = textRect->getWorldToLocalMatrix() * position - textRect->getLocalPosition().x + textComponent->getSize().x * textRect->getPivot().x;
+std::size_t InputField::getTextIndexAtPosition(const Vector2& position, RectTransform * textRect, Text * textComponent) {
+	Vector2 localPos = textRect->getWorldToLocalMatrix() * position - textRect->getLocalPosition().x + textComponent->getSize().x * textRect->getPivot().x;
 	TextData2D data = ResourceManager::getInstance().createText(textComponent->getText(), textComponent->getFont());
 	std::size_t index = 0;
 	for (const CharTexture2D& texture : data.textures) {
@@ -285,8 +286,8 @@ void InputField::updateTextHighlight() {
 	float endX = getXPosOfTextIndex(endIndex, textRect, textComponent);
 	// Assign new values to Highlight entity
 	RectTransform * hRect = textHighlight.getComponent<RectTransform>();
-	hRect->setLocalPosition(glm::vec2(startX, 0));
-	hRect->setSize(glm::vec2(endX - startX, textComponent->getSize().y + 4));
+	hRect->setLocalPosition(Vector2(startX, 0));
+	hRect->setSize(Vector2(endX - startX, textComponent->getSize().y + 4));
 }
 
 void InputField::traverseLeft() {
@@ -322,13 +323,13 @@ std::size_t InputField::getSelectedEndIndex() {
 
 void InputField::showMark() {
 	textMark.getComponent<RectSprite>()->setColor(markColor);
-	textMark.getComponent<RectTransform>()->setSize(glm::vec2(1, inputText.getComponent<Text>()->getSize().y + 4));
+	textMark.getComponent<RectTransform>()->setSize(Vector2(1, inputText.getComponent<Text>()->getSize().y + 4));
 	markIsHidden = false;
 }
 
 void InputField::hideMark() {
 	textMark.getComponent<RectSprite>()->setColor(Color(markColor.r, markColor.g, markColor.b, 0));
-	textMark.getComponent<RectTransform>()->setSize(glm::vec2(0, 0));
+	textMark.getComponent<RectTransform>()->setSize(Vector2(0, 0));
 	markIsHidden = true;
 }
 
@@ -338,7 +339,7 @@ void InputField::showHighlight() {
 
 void InputField::hideHighlight() {
 	textHighlight.getComponent<RectSprite>()->setColor(Color(highlightColor.r, highlightColor.g, highlightColor.b, 0));
-	textHighlight.getComponent<RectTransform>()->setSize(glm::vec2(0, 0));
+	textHighlight.getComponent<RectTransform>()->setSize(Vector2(0, 0));
 }
 
 void InputField::setText(std::wstring text) {

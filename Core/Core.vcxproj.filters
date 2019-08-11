@@ -162,9 +162,6 @@
     <ClCompile Include="Border.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TransformMaths.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -406,9 +403,6 @@
     </ClInclude>
     <ClInclude Include="Window.h">
       <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformMaths.h">
-      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="FpsCounter.h">
       <Filter>Header Files\Debug</Filter>

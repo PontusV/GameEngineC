@@ -2,7 +2,7 @@
 #define WINDOW_ANCHOR_H
 #include "UIBehaviour.h"
 #include "Anchor.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "WindowAnchor.generated.h"
 namespace Core {
 
@@ -19,9 +19,9 @@ namespace Core {
 
 	public:
 		PROPERTY()
-		glm::vec2 anchor;
+		Vector2 anchor;
 		PROPERTY()
-		glm::vec2 offset;
+		Vector2 offset;
 	};
 }
 #endif

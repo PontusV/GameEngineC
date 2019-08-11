@@ -10,11 +10,11 @@
 
 #include "EntityHandle.h"
 #include "InputEvent.h"
+#include "Maths/Vector2.h"
 
 #include <map>
 #include <string>
 #include <vector>
-#include <glm/glm.hpp>
 
 struct GLFWwindow;
 
@@ -59,9 +59,9 @@ namespace Core {
 		void addKeyBind(int keyCode, std::string buttonName);
 
 		// Helper
-		void setMousePosition(glm::vec2 position);
+		void setMousePosition(Vector2 position);
 		/* Returns mouse position in screen space. */
-		const glm::vec2& getMousePosition() const;
+		const Vector2& getMousePosition() const;
 
 		EntityHandle getHoverTarget();
 		EntityHandle getLastClicked();
@@ -102,7 +102,7 @@ namespace Core {
 		//std::map<int, std::string> keyBindsReleased;
 
 	private:
-		glm::vec2 mousePosition;		// Mouse position in screen space
+		Vector2 mousePosition;		// Mouse position in screen space
 		bool mouseMoved;
 		EntityHandle hoverTarget;
 		EntityHandle lastClickTarget;

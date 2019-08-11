@@ -1,11 +1,14 @@
 #include "Vector2.h"
+#include <cmath>
 #include <stdexcept>
 using namespace Core;
 
 
 Vector2::Vector2(float x, float y) : x(x), y(y) {
 }
-Vector2::Vector2(float value) : Vector2(value, value) {
+Vector2::Vector2(float scalar) : Vector2(scalar, scalar) {
+}
+Vector2::Vector2() : Vector2(0,0) {
 }
 
 Vector2::~Vector2() {
@@ -16,6 +19,14 @@ float Vector2::length() const {
 	return sqrt(x * x + y * y);
 }
 
+Vector2 Vector2::floor() const {
+	return Vector2(std::floor(x), std::floor(y));
+}
+
+Vector2 Vector2::operator-() const {
+	return Vector2(-x, -y);
+}
+
 Vector2 Vector2::operator+(const Vector2& other) const {
 	return Vector2(x + other.x, y + other.y);
 }
@@ -24,11 +35,15 @@ Vector2 Vector2::operator-(const Vector2& other) const {
 	return Vector2(x - other.x, y - other.y);
 }
 
+Vector2 Vector2::operator*(const Vector2& other) const {
+	return Vector2(x * other.x, y * other.y);
+}
+
 bool Vector2::operator==(const Vector2& other) const {
 	return x == other.x && y == other.y;
 }
 
-bool Vector2::operator==(const Vector2& other) const {
+bool Vector2::operator!=(const Vector2& other) const {
 	return !(*this == other);
 }
 

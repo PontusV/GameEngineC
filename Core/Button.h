@@ -5,7 +5,6 @@
 #include "Image.h"
 #include "Color.h"
 #include <iostream>
-#include <glm/glm.hpp>
 
 namespace Core {
 

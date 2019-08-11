@@ -1,8 +1,8 @@
 #ifndef BATCH_CONFIG_H
 #define BATCH_CONFIG_H
 
+#include "Maths/Vector2.h"
 #include <vector>
-#include <glm/glm.hpp>
 #include <stdexcept>
 
 #define MAX_TEXTURE_IDS 32
@@ -10,11 +10,11 @@
 namespace Core {
 	class ConstBatchConfig {
 	public:
-		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID, const std::vector<glm::vec2>& clipMaskVertices) : textureID(textureID), shaderID(shaderID), clipMaskVertices(clipMaskVertices) {}
+		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID, const std::vector<Vector2>& clipMaskVertices) : textureID(textureID), shaderID(shaderID), clipMaskVertices(clipMaskVertices) {}
 
 		const unsigned int&				textureID;
 		const unsigned int&				shaderID;
-		const std::vector<glm::vec2>&	clipMaskVertices;
+		const std::vector<Vector2>&		clipMaskVertices;
 	};
 
 	class BatchConfig {
@@ -57,7 +57,7 @@ namespace Core {
 		}
 
 		unsigned int				shaderID;
-		std::vector<glm::vec2>		clipMaskVertices;
+		std::vector<Vector2>		clipMaskVertices;
 		std::vector<unsigned int>	textureIDs;
 	};
 }

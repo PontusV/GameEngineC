@@ -3,8 +3,7 @@
 
 #include "BatchConfig.h"
 #include "Renderable2D.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Maths/Vector2.h"
 #include <vector>
 
 namespace Core {
@@ -13,9 +12,9 @@ namespace Core {
 
 	struct VertexData
 	{
-		glm::vec2		vertex;
+		Vector2			vertex;
 		unsigned int	color;
-		glm::vec2		texture;
+		Vector2			texture;
 		float			textureID;
 	};
 
@@ -60,7 +59,7 @@ namespace Core {
 		void end();
 		void flush();
 
-		void submitMask(glm::vec2 vertex1, glm::vec2 vertex2, glm::vec2 vertex3, glm::vec2 vertex4);
+		void submitMask(Vector2 vertex1, Vector2 vertex2, Vector2 vertex3, Vector2 vertex4);
 
 	private:
 		unsigned int maskShaderID;

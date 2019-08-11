@@ -2,7 +2,6 @@
 #define CHECK_BOX_H
 #include "Behaviour.h"
 #include "ComponentFunctionHandle.h"
-#include <glm/glm.hpp>
 #include "CheckBox.generated.h"
 namespace Core {
 	CLASS() CheckBox : public Behaviour {

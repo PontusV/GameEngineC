@@ -1,6 +1,7 @@
 #include "WindowScale.h"
 #include "RectTransform.h"
 #include "Window.h"
+#include "Maths/Vector2.h"
 
 using namespace Core;
 
@@ -23,7 +24,7 @@ void WindowScale::awake() {
 void WindowScale::onWindowResize() {
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	if (transform) {
-		glm::vec2 resolution = window->getResolution();
+		Vector2 resolution = window->getResolution();
 		if (stretchWidth)
 			transform->setWidth(resolution.x * widthScale);
 		if (stretchHeight)

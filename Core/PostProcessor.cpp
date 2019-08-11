@@ -52,8 +52,26 @@ void PostProcessor::setSize(unsigned int width, unsigned int height) {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "ERROR::POSTPROCESSOR: Failed to initialize FBO" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_UNDEFINED)
+			std::cout << "ERROR::POSTPROCESSOR: FBO Undefined" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete attachment" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete missing attachment" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete draw buffer" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete read buffer" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_UNSUPPORTED)
+			std::cout << "ERROR::POSTPROCESSOR: FBO unsupported" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete multisample" << std::endl;
+		if (fboStatus == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS)
+			std::cout << "ERROR::POSTPROCESSOR: FBO incomplete layer targets" << std::endl;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

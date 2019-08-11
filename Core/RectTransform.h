@@ -34,19 +34,19 @@ namespace Core {
 		~RectTransform();
 
 
-		void setSize(glm::vec2 size);
+		void setSize(Vector2 size);
 		void setWidth(float width);
 		void setHeight(float height);
-		void setPivot(glm::vec2 pivot);
+		void setPivot(Vector2 pivot);
 
-		const glm::vec2& getPivot() const;
-		const glm::vec2& getSize() const;
+		const Vector2& getPivot() const;
+		const Vector2& getSize() const;
 		/* Returns a rectangle in local space. */
 		Rect getRect() const;
-		glm::vec2 getRectOffset() const;
-		std::array<glm::vec2, 4> getVertices() const;
-		glm::vec2 getVertex(std::size_t index) const;
-		glm::vec2 getVertex(std::size_t index, glm::mat4& localModelMatrix) const;
+		Vector2 getRectOffset() const;
+		std::array<Vector2, 4> getVertices() const;
+		Vector2 getVertex(std::size_t index) const;
+		Vector2 getVertex(std::size_t index, Matrix4& localModelMatrix) const;
 
 	private:
 		/* Notifies UIBehaviours of a change in size */
@@ -54,9 +54,9 @@ namespace Core {
 
 	private:
 		PROPERTY()
-		glm::vec2 size;	// Size of the rect
+		Vector2 size;	// Size of the rect
 		PROPERTY()
-		glm::vec2 pivot;	// The position the Entity scales and rotates around
+		Vector2 pivot;	// The position the Entity scales and rotates around
 	};
 }
 #endif

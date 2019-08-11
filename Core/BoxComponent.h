@@ -3,7 +3,7 @@
 
 #include "Component.h"
 #include "Bounds.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include "BoxComponent.generated.h"
 
 namespace Core {
@@ -18,21 +18,21 @@ namespace Core {
 		/* Recalculates bounds. */
 		void updateBounds();
 		Bounds& getBounds();
-		const glm::ivec2& getSize() const;
+		const Vector2& getSize() const;
 
 		void setSize(int width, int height);
-		void setSize(glm::ivec2 size);
+		void setSize(Vector2 size);
 		void setWidth(int width);
 		void setHeight(int height);
 
 	protected:
 		BoxComponent(int width, int height);
-		BoxComponent(glm::ivec2 size);
+		BoxComponent(Vector2 size);
 		BoxComponent();
 
 	private:
 		PROPERTY()
-		glm::ivec2 size;
+		Vector2 size;
 		PROPERTY()
 		Bounds bounds;
 	};

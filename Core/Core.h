@@ -8,7 +8,6 @@
 
 #ifdef REFLECTION_PARSER
 #include <vector>
-#include "include/glm/glm.hpp"
 #endif
 
 #include "ReflectionMacros.h"
@@ -18,7 +17,6 @@
 #include "ChildManager.h"
 #include "Sprite.h"
 #include "Image.h"
-#include "Panel.h"
 #include "ParentEntity.h"
 #include "RectSprite.h"
 #include "Text.h"

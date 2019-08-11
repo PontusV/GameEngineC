@@ -1,7 +1,7 @@
 #ifndef GL_TEXTURE_H
 #define GL_TEXTURE_H
 
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 
 namespace Core {
 	typedef unsigned int GLuint;
@@ -18,9 +18,9 @@ namespace Core {
 		GLuint ID;
 		GLuint format;
 		int nrChannels;
-		glm::ivec2 size; // Size of destination draw area
-		glm::ivec2 sourceSize;
-		glm::vec2 uvCoords[4];
+		Vector2 size; // Size of destination draw area
+		Vector2 sourceSize;
+		Vector2 uvCoords[4];
 	};
 }
 #endif

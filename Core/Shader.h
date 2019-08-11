@@ -3,8 +3,10 @@
 
 #define SHADER_SAMPLE_COUNT 32
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Maths/Vector2.h"
+#include "Maths/Vector3.h"
+#include "Maths/Vector4.h"
+#include "Maths/Matrix4.h"
 
 #include <string>
 #include <iostream>
@@ -33,12 +35,12 @@ namespace Core {
 		void setInteger(const GLchar* name, GLint value, GLboolean useShader = false);
 		void setIntegerV(const GLchar* name, GLsizei count, GLint* value, GLboolean useShader = false);
 		void setVector2f(const GLchar* name, GLfloat x, GLfloat y, GLboolean useShader = false);
-		void setVector2f(const GLchar* name, const glm::vec2 &value, GLboolean useShader = false);
+		void setVector2f(const GLchar* name, const Vector2 &value, GLboolean useShader = false);
 		void setVector3f(const GLchar* name, GLfloat x, GLfloat y, GLfloat z, GLboolean useShader = false);
-		void setVector3f(const GLchar* name, const glm::vec3 &value, GLboolean useShader = false);
+		void setVector3f(const GLchar* name, const Vector3 &value, GLboolean useShader = false);
 		void setVector4f(const GLchar* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLboolean useShader = false);
-		void setVector4f(const GLchar* name, const glm::vec4 &value, GLboolean useShader = false);
-		void setMatrix4(const GLchar* name, const glm::mat4 &matrix, GLboolean useShader = false);
+		void setVector4f(const GLchar* name, const Vector4 &value, GLboolean useShader = false);
+		void setMatrix4(const GLchar* name, const Matrix4 &matrix, GLboolean useShader = false);
 
 		bool operator==(const Shader& other) {
 			return ID == other.ID;

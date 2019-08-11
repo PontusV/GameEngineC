@@ -274,7 +274,6 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="TransformMaths.cpp" />
     <ClCompile Include="UIBehaviour.cpp" />
     <ClCompile Include="UIDContainer.cpp" />
     <ClCompile Include="UISystem.cpp" />
@@ -357,7 +356,6 @@
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="BehaviourManager.h" />
     <ClInclude Include="TArray.h" />
-    <ClInclude Include="TransformMaths.h" />
     <ClInclude Include="Renderable2D.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Graphics.h" />

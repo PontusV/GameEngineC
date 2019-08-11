@@ -5,11 +5,12 @@
 #include <string>
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
+#include "Maths/Vector2.h"
+#include "Maths/Matrix4.h"
 #include "Texture2D.h"
 #include "Shader.h"
 #include "FontManager.h"
@@ -29,18 +30,18 @@ namespace Core {
 		}
 		/* @param shaderFileName the name of the shader file without any file extension. */
 		Shader loadShader(const std::string shaderFileName);
-		Texture2D loadTexture(const GLchar* file, glm::ivec2 size = glm::ivec2(0,0), glm::ivec2 uvStartCoords = glm::ivec2(0,0));
+		Texture2D loadTexture(const GLchar* file, Vector2 size = Vector2(0,0), Vector2 uvStartCoords = Vector2(0,0));
 		TextData2D createText(std::wstring text, Font font);
-		glm::ivec2 getTextSize(std::wstring text, const Font& font);
+		Vector2 getTextSize(std::wstring text, const Font& font);
 
 		// De-allocates all loaded resources
 		void clear();
 		void updateShader(Shader& shader);
-		void updateShader(Shader& shader, const glm::mat4& projection);
+		void updateShader(Shader& shader, const Matrix4& projection);
 		// Updates Projection matrix of all shaders
-		void updateShaders(const glm::mat4& projection);
+		void updateShaders(const Matrix4& projection);
 		// Initializes all shaders. Prepares them for use in rendering.
-		void initShader(const glm::mat4& projection);
+		void initShader(const Matrix4& projection);
 	private:
 		ResourceManager();
 
@@ -58,7 +59,7 @@ namespace Core {
 		std::map<std::string, Shader> shaders;
 		std::map<std::string, Texture2D> textures;
 		std::map<std::string, FontManager*> fontManagers;
-		glm::mat4 projection = glm::mat4(1.0f);
+		Matrix4 projection;
 	};
 }
 #endif

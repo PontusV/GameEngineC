@@ -4,7 +4,7 @@
 #include "BoxComponent.h"
 #include "RectTransform.h"
 #include "Color.h"
-#include <glm/glm.hpp>
+#include "Maths/Vector2.h"
 #include <cstddef>
 #include <vector>
 #include <array>
@@ -20,10 +20,10 @@ namespace Core {
 		const Color& getColor() const;
 		void setColor(Color value);
 
-		const std::vector<std::array<glm::vec2, 4>>& getMasks() const;
+		const std::vector<std::array<Vector2, 4>>& getMasks() const;
 		/* Cuts away Drawable area that is outside of the rect parameter. */
-		std::size_t clip(const std::array<glm::vec2, 4> & mask);
-		void reclip(std::size_t index, const std::array<glm::vec2, 4> & mask);
+		std::size_t clip(const std::array<Vector2, 4> & mask);
+		void reclip(std::size_t index, const std::array<Vector2, 4> & mask);
 		void removeClip(std::size_t index);
 		void resetClipping();
 		bool isClipEnabled() const;
@@ -34,7 +34,7 @@ namespace Core {
 	private:
 		PROPERTY()
 		Color color;
-		std::vector<std::array<glm::vec2, 4>> masks;
+		std::vector<std::array<Vector2, 4>> masks;
 	};
 }
 #endif

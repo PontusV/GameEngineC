@@ -8,8 +8,8 @@
 #include "RectTransform.h"
 #include "Texture2D.h"
 #include "PostProcessor.h"
+#include "Maths/Vector2.h"
 
-#include <glm/glm.hpp>
 #include <vector>
 #include <string>
 #include <array>
@@ -29,10 +29,10 @@ namespace Core {
 		unsigned char createLayer();
 
 		/* Render sprite. Submits a Renderable2D to a batchRenderer2D. */
-		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned char& layerIndex);
+		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned char& layerIndex);
 
 		/* Render text. Submits text to a batchRenderer2D. */
-		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<glm::vec2, 4>>& clipMaskVertices, const unsigned int& layerIndex);
+		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& layerIndex);
 
 		/* Draws everything submitted to this renderer since the last render() call. */
 		void render(float deltaTime);
