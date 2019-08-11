@@ -235,6 +235,7 @@
     <ClCompile Include="Inspector.cpp" />
     <ClCompile Include="LayoutController.cpp" />
     <ClCompile Include="LayoutGroup.cpp" />
+    <ClCompile Include="Maths\Matrix4.cpp" />
     <ClCompile Include="MouseDrag.cpp" />
     <ClCompile Include="PropertyEditor.cpp" />
     <ClCompile Include="RectButton.cpp" />
@@ -277,6 +278,9 @@
     <ClCompile Include="UIBehaviour.cpp" />
     <ClCompile Include="UIDContainer.cpp" />
     <ClCompile Include="UISystem.cpp" />
+    <ClCompile Include="Maths\Vector2.cpp" />
+    <ClCompile Include="Maths\Vector4.cpp" />
+    <ClCompile Include="Maths\Vector3.cpp" />
     <ClCompile Include="VerticalLayoutGroup.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowAnchor.cpp" />
@@ -318,6 +322,8 @@
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="LayoutController.h" />
     <ClInclude Include="LayoutGroup.h" />
+    <ClInclude Include="Maths\MatrixTransform.h" />
+    <ClInclude Include="Maths\Matrix4.h" />
     <ClInclude Include="MouseDrag.h" />
     <ClInclude Include="PropertyEditor.h" />
     <ClInclude Include="PropertyValueID.h" />
@@ -372,6 +378,9 @@
     <ClInclude Include="UIBehaviour.h" />
     <ClInclude Include="UIDContainer.h" />
     <ClInclude Include="UISystem.h" />
+    <ClInclude Include="Maths\Vector2.h" />
+    <ClInclude Include="Maths\Vector4.h" />
+    <ClInclude Include="Maths\Vector3.h" />
     <ClInclude Include="VerticalLayoutGroup.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowAnchor.h" />

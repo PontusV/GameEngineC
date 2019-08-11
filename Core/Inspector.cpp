@@ -9,7 +9,6 @@
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
-#include "Selectable.h"
 #include "CheckBox.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
@@ -44,8 +43,6 @@ void Inspector::awake() {
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
 		element->setFlexibleSize(glm::vec2(1, 1));
 		element->setFlexibleSizeEnabled(true);
-		element->setPrefSizeEnabled(true);
-		element->setMinSize(glm::vec2(400, 1000/*470*/));
 		element->setMinSizeEnabled(true);
 		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
 		group->childForceExpandHeight = false;
@@ -82,7 +79,6 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle propValueField = createEntity(entityName,
-		Selectable(),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
 	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, instanceHandle));
@@ -167,13 +163,12 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 
 	// Create Field
 	EntityHandle propField = createEntity(name,
-		Selectable(),
 		//Border(1, Color(255,255,255,125)),
 		//RectSprite(Color(40, 40, 40, 255)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
 	VerticalLayoutGroup* fieldLayout = propField.addComponent<VerticalLayoutGroup>();
-	fieldLayout->spacing = 3;
+	fieldLayout->spacing = 5;
 	fieldLayout->paddingTop = 5;
 	fieldLayout->paddingBottom = 5;
 	fieldLayout->paddingRight = 5;
@@ -208,33 +203,56 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 
 	// Entry
 	EntityHandle entry = createEntity(entryName,
-		RectSprite(Color(50, 50, 50)),
+		RectSprite(Color(55, 55, 55)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
 	);
 	VerticalLayoutGroup* group = entry.addComponent<VerticalLayoutGroup>();
-	group->paddingTop = 5;
-	group->paddingLeft = 5;
-	group->paddingRight = 5;
-	group->paddingBottom = 5;
-	group->spacing = 5;
+	group->paddingTop = 1;
+	group->paddingLeft = 1;
+	group->paddingRight = 1;
+	group->paddingBottom = 1;
+	group->spacing = 1;
 	group->childForceExpandHeight = false;
-	group->childForceExpandWidth = false;
+	group->childForceExpandWidth = true;
 	group->shrinkableChildHeight = false;
 	group->shrinkableChildWidth = false;
 	entry.setParent(scrollPanel);
 
 	// Entry content
-	EntityHandle label = createEntity(entryName + "_Label", Selectable());
-	Text* labelText = label.addComponent(Text(type.name, "resources/fonts/segoeui.ttf", 20, Color(255, 255, 255)));
-	label.addComponent(RectTransform(0, 0, labelText->getSize().x, labelText->getSize().y, rect->getZ() + 0.1f, Alignment::TOP_LEFT));
-	label.setParent(entry);
+	EntityHandle labelField = createEntity(entryName + "_LabelField",
+		RectSprite(Color(40, 40, 40)),
+		RectTransform(0, 0, 0, 24, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+	);
+	LayoutElement* labelLayout = labelField.addComponent<LayoutElement>();
+	labelLayout->setFlexibleSizeEnabled(true);
+	labelLayout->setFlexibleSize(glm::vec2(1, 0));
+	labelField.setParent(entry);
+	EntityHandle label = createEntity(entryName + "_Label",
+		Text(type.name, "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255)),
+		RectTransform(5, 12, 0, 24, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	label.setParent(labelField);
 	//*/
+	EntityHandle entryContent = createEntity(entryName + "_Content",
+		RectTransform(0,0,0,0,rect->getZ() + 0.1f, Alignment::TOP_LEFT)
+	);
+	VerticalLayoutGroup* contentGroup = entryContent.addComponent<VerticalLayoutGroup>();
+	contentGroup->paddingTop = 5;
+	contentGroup->paddingLeft = 5;
+	contentGroup->paddingRight = 5;
+	contentGroup->paddingBottom = 5;
+	contentGroup->spacing = 5;
+	contentGroup->childForceExpandHeight = false;
+	contentGroup->childForceExpandWidth = false;
+	contentGroup->shrinkableChildHeight = false;
+	contentGroup->shrinkableChildWidth = false;
 	// Property field
 	for (std::size_t i = 0; i < type.properties.size(); i++) {
 		ComponentHandle componentHandle(component);
 		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, component);
-		propField.setParent(entry);
+		propField.setParent(entryContent);
 	}
+	entryContent.setParent(entry);
 	// End of Entry content
 	targetComponentList.push_back(entry);
 }
