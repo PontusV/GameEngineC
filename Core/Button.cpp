@@ -53,7 +53,7 @@ void Button::changeState(ButtonState state) {
 	if (image) {
 		images[state].reload();
 		// Change image
-		image->setTexture(images[state].getFileName(), images[state].getTexture());
+		image->set(images[state].getFileName());
 		// Change color
 		image->setColor(colors[state]);
 	}

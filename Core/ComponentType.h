@@ -14,14 +14,6 @@ namespace Core {
 		ComponentType() {}
 		~ComponentType() {}
 
-		bool operator==(const ComponentTypeID& other) const {
-			for (const ComponentTypeID& id : idList) {
-				if (id == other)
-					return true;
-			}
-			return false;
-		}
-
 		ComponentTypeID getTypeID() const {
 			return idList[0];
 		}
@@ -34,6 +26,9 @@ namespace Core {
 		std::vector<ComponentTypeID> idList;
 	};
 }
+
+bool operator==(const Core::ComponentType& left, const Core::ComponentTypeID& right);
+bool operator==(const Core::ComponentTypeID& left, const Core::ComponentType& right);
 bool operator==(const Core::ComponentType& left, const Core::ComponentType& right);
 bool operator!=(const Core::ComponentType& left, const Core::ComponentType& right);
 #endif

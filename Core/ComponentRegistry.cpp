@@ -14,36 +14,31 @@ typename std::enable_if_t<!std::is_abstract<T>::value && std::is_default_constru
 template<typename T> typename std::enable_if_t<std::is_abstract<T>::value || !std::is_default_constructible<T>::value> registerToLoader() {}
 
 //--------------------------------------------Get Matching Component Types----------------------------------------------------------------
-template<ComponentTypeID I, typename T>
-std::vector<ComponentTypeID> getMatchingComponentTypeList(Mirror::TypeList<>) {
-	return std::vector<ComponentTypeID>(); // Empty vector
-} // Ends match search
-template<ComponentTypeID I, typename T, typename T2, typename... Ts>
-std::vector<ComponentTypeID> getMatchingComponentTypeList(Mirror::TypeList<T2, Ts...>) {
-	std::vector<ComponentTypeID> derivedTypeIDList = getMatchingComponentTypeList<I + 1, T>(Mirror::TypeList<Ts...>{});
-	if (std::is_base_of<T, T2>::value) {
-		// Append value to derivedTypeIDList
-		derivedTypeIDList.push_back(I);
-	}
-	return derivedTypeIDList;
+template<typename T>
+std::vector<ComponentTypeID> getMatchingComponentTypeList() {
+	ComponentTypeID typeID = T::getTypeID();
+	std::vector<ComponentTypeID> derivedTypeIDs = Mirror::polyGetDerivedTypeIDs(typeID);
+	derivedTypeIDs.insert(derivedTypeIDs.begin(), typeID);
+	return derivedTypeIDs;
 }
 
 //-------------------------------------------Register Component Types Implementation-----------------------------------------------------------------
-template<ComponentTypeID I=1, typename... Ts>
+template<typename... Ts>
 void registerComponentTypes_impl(Mirror::TypeList<Ts...>) {} // End of registry
-template<ComponentTypeID I=1, typename T, typename... Ts>
+
+template<typename T, typename... Ts>
 void registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
 	// Check if base for any types in componentTypeList
-	std::vector<ComponentTypeID> matchList = getMatchingComponentTypeList<1, T>(Mirror::ReflectedTypes{});
+	std::vector<ComponentTypeID> matchList = getMatchingComponentTypeList<T>();
 
 	// Set Component Type Info values
-	ComponentTypeInfo<T>::setTypeID(I);
+	ComponentTypeInfo<T>::setTypeID(T::getTypeID());
 	ComponentTypeInfo<T>::setMatchingTypeIDs(matchList);
 	registerToLoader<T>();
-	//ComponentTypeInfo<T>::print(); // Debug information
+	ComponentTypeInfo<T>::print(); // Debug information
 
 	// Continue registry
-	registerComponentTypes_impl<I+1>(Mirror::TypeList<Ts...>{});
+	registerComponentTypes_impl(Mirror::TypeList<Ts...>{});
 }
 
 //------------------------------------------------------------------------------------------------------------

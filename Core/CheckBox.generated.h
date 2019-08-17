@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(10);\
+	Mirror::Class newClass(11);\
 	newClass.name = "Core::CheckBox";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -197,6 +197,12 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
+static constexpr std::size_t getTypeID() {\
+	return 11;\
+}\
+static std::vector<std::size_t> getBaseTypeIDs() {\
+	return std::vector<std::size_t>{Behaviour::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\
+}\
 static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\

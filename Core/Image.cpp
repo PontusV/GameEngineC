@@ -6,45 +6,29 @@
 
 using namespace Core;
 
-Image::Image(const char* fileName, Color color) : Sprite(color), fileName(fileName) {
-	// Default shader
-	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
+Image::Image(const char* fileName, Color color) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color), fileName(fileName) {
 } // Constructor
 
-Image::Image(const char* fileName, Shader shader, Color color) : Sprite(color), fileName(fileName), shader(shader) {
+Image::Image(const char* fileName, Shader shader, Color color) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), shader, color), fileName(fileName) {
 } // Constructor
 
-Image::Image() {
-	// Default shader
-	shader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
+Image::Image() : TexturedSprite(Texture2D(), ResourceManager::getInstance().loadShader("resources/shaders/sprite")) {
 }
 
 Image::~Image() {
 } // Destructor
 
 void Image::reload(bool force) {
-	if (texture.ID == 0 || force) {
-		texture = ResourceManager::getInstance().loadTexture(fileName.c_str());
+	if (getTexture().ID == 0 || force) {
+		setTexture(ResourceManager::getInstance().loadTexture(fileName.c_str()));
 	}
 }
 
-Texture2D& Image::getTexture() {
-	return texture;
-}
-
-void Image::setTexture(const char* fileName, Texture2D& texture) {
+void Image::set(const char* fileName) {
 	this->fileName = fileName;
-	this->texture = texture;
+	reload(true);
 }
 
 const char* Image::getFileName() const {
 	return fileName.c_str();
-}
-
-const Shader& Image::getShader() const {
-	return shader;
-}
-
-void Image::setShader(Shader shader) {
-	this->shader = shader;
 }

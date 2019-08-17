@@ -4,6 +4,7 @@ LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/x64/*
 LevelEditor/resources/*
+Core/*.generated.h
 Debug/*
 Release/*
 *.db

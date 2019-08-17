@@ -273,6 +273,7 @@
     <ClCompile Include="Serializable.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Text.cpp" />
+    <ClCompile Include="TexturedSprite.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIBehaviour.cpp" />
     <ClCompile Include="UIDContainer.cpp" />
@@ -306,7 +307,6 @@
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="ComponentTypeInfo.h" />
     <ClInclude Include="ContentSizeFitter.h" />
-    <ClInclude Include="Core.h" />
     <ClInclude Include="DragAndResize.h" />
     <ClInclude Include="FunctionCaller.h" />
     <ClInclude Include="DropDown.h" />
@@ -372,6 +372,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Text.h" />
+    <ClInclude Include="TexturedSprite.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UIBehaviour.h" />
     <ClInclude Include="UIDContainer.h" />

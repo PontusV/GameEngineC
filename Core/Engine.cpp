@@ -5,6 +5,7 @@
 #include "ResourceManager.h"
 #include "Renderer2D.h"
 #include "WindowAnchor.h"
+#include "Text.h"
 
 #include <iostream>
 #include <fstream>

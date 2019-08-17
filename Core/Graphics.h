@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Image.h"
 #include "Text.h"
+#include "TexturedSprite.h"
 #include "RectTransform.h"
 #include "Texture2D.h"
 #include "RectSprite.h"
@@ -28,10 +29,14 @@ namespace Core {
 		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
 		ComponentArray<Image>&			images		= getComponentArray<Image>();
 	};
-
 	struct RenderableTexts : public ComponentGroup<RectTransform, Text> {
+		ComponentArray<RectTransform>& transforms = getComponentArray<RectTransform>();
+		ComponentArray<Text>& texts = getComponentArray<Text>();
+	};
+
+	struct RenderableTexturedSprites : public ComponentGroup<RectTransform, TexturedSprite> {
 		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<Text>&			texts		= getComponentArray<Text>();
+		ComponentArray<TexturedSprite>&	sprites		= getComponentArray<TexturedSprite>();
 	};
 
 	struct RenderableBorders : public ComponentGroup<RectTransform, Border> {
@@ -66,6 +71,7 @@ namespace Core {
 		RenderableRects renderableRects;
 		RenderableImages renderableImages;
 		RenderableTexts renderableTexts;
+		RenderableTexturedSprites renderableTexturedSprites;
 		RenderableBorders renderableBorders;
 	};
 }

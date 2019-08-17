@@ -55,10 +55,11 @@ bool Graphics::initiate() {
 
 /* Loops through Renderable vector and draws them.*/
 void Graphics::render(float deltaTime) {
-	std::size_t sizeRectangles	= renderableRects.rects.size();
-	std::size_t sizeImages		= renderableImages.images.size();
-	std::size_t sizeTexts		= renderableTexts.texts.size();
-	std::size_t sizeBorders		= renderableBorders.borders.size();
+	std::size_t sizeRectangles		= renderableRects.rects.size();
+	std::size_t sizeImages			= renderableImages.images.size();
+	std::size_t sizeTexts			= renderableTexts.texts.size();
+	std::size_t sizeTexturedSprites	= renderableTexturedSprites.sprites.size();
+	std::size_t sizeBorders			= renderableBorders.borders.size();
 
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
 	// Rectangles
@@ -74,31 +75,32 @@ void Graphics::render(float deltaTime) {
 		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
 	}
 
-	// Images
+	// Images (Reload)
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
-
-		//renderableImages.transforms[i].rotate(60 * deltaTime); // Tesst
-
-		Image&					image		= renderableImages.images[i];
-		const RectTransform&	transform	= renderableImages.transforms[i];
-		const Texture2D&		texture		= image.getTexture();
-		const Color&			color		= image.getColor();
-		bool					clipEnabled = image.isClipEnabled();
-		unsigned char			layerIndex	= image.getOwner().getEntityLayer();
-		const std::vector<std::array<Vector2, 4>>& masks = image.getMasks();
-
-		renderer->submit( texture, transform, image.getShader().ID, color, clipEnabled, masks, layerIndex);
 	}
-
+	
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const Text&						text				= renderableTexts.texts[i];
-		bool							clipEnabled			= text.isClipEnabled();
-		const unsigned char&			layerIndex			= text.getOwner().getEntityLayer();
-		const std::vector<std::array<Vector2, 4>>&	masks	= text.getMasks();
+		const Text& text = renderableTexts.texts[i];
+		bool							clipEnabled = text.isClipEnabled();
+		const unsigned char& layerIndex = text.getOwner().getEntityLayer();
+		const std::vector<std::array<Vector2, 4>> & masks = text.getMasks();
 
 		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, masks, layerIndex);
+	}
+
+	// Textured Sprites
+	for (std::size_t i = 0; i < sizeTexturedSprites; i++) {
+		const TexturedSprite&	sprite				= renderableTexturedSprites.sprites[i];
+		const RectTransform&	transform			= renderableTexturedSprites.transforms[i];
+		const Texture2D&		texture				= sprite.getTexture();
+		const Color&			color				= sprite.getColor();
+		bool					clipEnabled			= sprite.isClipEnabled();
+		unsigned char			layerIndex			= sprite.getOwner().getEntityLayer();
+		const std::vector<std::array<Vector2, 4>> & masks = sprite.getMasks();
+
+		renderer->submit(texture, transform, sprite.getShader().ID, color, clipEnabled, masks, layerIndex);
 	}
 
 	// Borders

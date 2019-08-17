@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(25);\
+	Mirror::Class newClass(23);\
 	newClass.name = "Core::HorizontalLayoutGroup";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::LayoutGroup" });\
@@ -355,6 +355,12 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
+static constexpr std::size_t getTypeID() {\
+	return 23;\
+}\
+static std::vector<std::size_t> getBaseTypeIDs() {\
+	return std::vector<std::size_t>{LayoutGroup::getTypeID(),LayoutController::getTypeID(),UIBehaviour::getTypeID(),Behaviour::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\
+}\
 static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\

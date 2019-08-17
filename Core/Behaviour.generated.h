@@ -105,6 +105,12 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
+static constexpr std::size_t getTypeID() {\
+	return 5;\
+}\
+static std::vector<std::size_t> getBaseTypeIDs() {\
+	return std::vector<std::size_t>{Component::getTypeID(),ReflectedObject::getTypeID()};\
+}\
 static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\

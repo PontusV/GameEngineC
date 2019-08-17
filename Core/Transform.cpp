@@ -40,6 +40,7 @@ void Transform::moveY(float value) {
 
 void Transform::setLocalPosition(Vector2 pos) {
 	position = pos;
+	changed = true;
 }
 
 void Transform::setPosition(Vector2 pos) {

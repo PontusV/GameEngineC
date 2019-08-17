@@ -13,10 +13,10 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(8);\
+	Mirror::Class newClass(9);\
 	newClass.name = "Core::Image";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
-	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
+	newClass.baseClasses.push_back(Mirror::Type{ "Core::TexturedSprite" });\
 \
 	Mirror::Property newProperty;\
 	newProperty.name = "fileName";\
@@ -94,14 +94,8 @@ T getValue_impl(std::string propertyName) {\
 		if (propertyName == "fileName") {\
 			return Mirror::convertType<T>(fileName);\
 		}\
-		if (propertyName == "texture") {\
-			return Mirror::convertType<T>(texture);\
-		}\
-		if (propertyName == "shader") {\
-			return Mirror::convertType<T>(shader);\
-		}\
-		if (Core::Sprite::hasProperty(propertyName))\
-			return Core::Sprite::getValue_impl<T>(propertyName);\
+		if (Core::TexturedSprite::hasProperty(propertyName))\
+			return Core::TexturedSprite::getValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Image::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " cannot be converted to the specified type!");\
@@ -115,14 +109,8 @@ std::vector<T> getArrayValue_impl(std::string propertyName) {\
 		if (propertyName == "fileName") {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
-		if (propertyName == "texture") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "shader") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (Core::Sprite::hasProperty(propertyName))\
-			return Core::Sprite::getArrayValue_impl<T>(propertyName);\
+		if (Core::TexturedSprite::hasProperty(propertyName))\
+			return Core::TexturedSprite::getArrayValue_impl<T>(propertyName);\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Image::" + propertyName + " cannot be converted to the specified type!" << "\n";\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " cannot be converted to the specified type!");\
@@ -136,14 +124,8 @@ T getArrayElementValue_impl(std::string propertyName, std::size_t index) {\
 		if (propertyName == "fileName") {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
-		if (propertyName == "texture") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "shader") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (Core::Sprite::hasProperty(propertyName))\
-			return Core::Sprite::getArrayElementValue_impl<T>(propertyName, index);\
+		if (Core::TexturedSprite::hasProperty(propertyName))\
+			return Core::TexturedSprite::getArrayElementValue_impl<T>(propertyName, index);\
 	} catch(std::exception& e) {\
 		std::cout << e.what() << std::endl;\
 		throw e;\
@@ -160,15 +142,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 			reload(true);\
 			return true;\
 		}\
-		if (propertyName == "texture") {\
-			Mirror::setVariableValue(texture, value);\
-			return true;\
-		}\
-		if (propertyName == "shader") {\
-			Mirror::setVariableValue(shader, value);\
-			return true;\
-		}\
-		if (Core::Sprite::setValue_impl<T>(propertyName, value)) return true;\
+		if (Core::TexturedSprite::setValue_impl<T>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Image::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " was set to a value with an incompatible type!");\
@@ -182,13 +156,7 @@ bool setArrayValue_impl(std::string propertyName, T (&value)[N]) {\
 		if (propertyName == "fileName") {\
 			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 		}\
-		if (propertyName == "texture") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (propertyName == "shader") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-		}\
-		if (Core::Sprite::setArrayValue_impl<T, N>(propertyName, value)) return true;\
+		if (Core::TexturedSprite::setArrayValue_impl<T, N>(propertyName, value)) return true;\
 	} catch(std::exception&) {\
 		std::cout << "Warning: The property Core::Image::" + propertyName + " was set to a value with an incompatible type!\n";\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " was set to a value with an incompatible type!");\
@@ -204,15 +172,7 @@ bool setArrayElementValue_impl(std::string propertyName, std::size_t index, T va
 			reload(true);\
 			return true;\
 		}\
-		if (propertyName == "texture") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-			return true;\
-		}\
-		if (propertyName == "shader") {\
-			throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-			return true;\
-		}\
-		if (Core::Sprite::setArrayElementValue_impl<T>(propertyName, index, value)) return true;\
+		if (Core::TexturedSprite::setArrayElementValue_impl<T>(propertyName, index, value)) return true;\
 	} catch(std::exception& e) {\
 		std::cout << e.what() << std::endl;\
 		throw e;\
@@ -235,6 +195,12 @@ static bool hasProperty(std::string propertyName) {\
 	return false;\
 }\
 public:\
+static constexpr std::size_t getTypeID() {\
+	return 9;\
+}\
+static std::vector<std::size_t> getBaseTypeIDs() {\
+	return std::vector<std::size_t>{TexturedSprite::getTypeID(),Sprite::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\
+}\
 static Mirror::Class getClassType() {\
 	static Mirror::Class type = getTypeImpl();\
 	return type;\
@@ -247,14 +213,8 @@ virtual std::size_t getArraySize(std::string propertyName) {\
 	if (propertyName == "fileName") {\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 	}\
-	if (propertyName == "texture") {\
-		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-	}\
-	if (propertyName == "shader") {\
-		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-	}\
-	if (Core::Sprite::hasProperty(propertyName))\
-		return Core::Sprite::getArraySize(propertyName);\
+	if (Core::TexturedSprite::hasProperty(propertyName))\
+		return Core::TexturedSprite::getArraySize(propertyName);\
 	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
 	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
 }\
@@ -262,14 +222,8 @@ virtual void* getPointer(std::string propertyName) {\
 	if (propertyName == "fileName") {\
 		return &fileName;\
 	}\
-	if (propertyName == "texture") {\
-		return &texture;\
-	}\
-	if (propertyName == "shader") {\
-		return &shader;\
-	}\
-	if (Core::Sprite::hasProperty(propertyName))\
-		return Core::Sprite::getPointer(propertyName);\
+	if (Core::TexturedSprite::hasProperty(propertyName))\
+		return Core::TexturedSprite::getPointer(propertyName);\
 	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
 	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
 }\
@@ -277,27 +231,17 @@ virtual std::vector<void*> getArrayElementPointers(std::string propertyName) {\
 	if (propertyName == "fileName") {\
 		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
 	}\
-	if (propertyName == "texture") {\
-		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-	}\
-	if (propertyName == "shader") {\
-		throw std::invalid_argument("The property Core::Image::" + propertyName + " is not an array!");\
-	}\
-	if (Core::Sprite::hasProperty(propertyName))\
-		return Core::Sprite::getArrayElementPointers(propertyName);\
+	if (Core::TexturedSprite::hasProperty(propertyName))\
+		return Core::TexturedSprite::getArrayElementPointers(propertyName);\
 	std::cout << "Warning: The property Core::Image::" + propertyName + " does not exist or the property is const!" << "\n";\
 	throw std::invalid_argument("The property Core::Image::" + propertyName + " does not exist or the property is const!");\
 }\
 virtual void serialize(std::ostream& os) const {\
 		Mirror::serialize(fileName, os);\
-		Mirror::serialize(texture, os);\
-		Mirror::serialize(shader, os);\
-	Core::Sprite::serialize(os);\
+	Core::TexturedSprite::serialize(os);\
 }\
 virtual void deserialize(std::istream& is) {\
 		Mirror::deserialize(fileName, is);\
-		Mirror::deserialize(texture, is);\
-		Mirror::deserialize(shader, is);\
-	Core::Sprite::deserialize(is);\
+	Core::TexturedSprite::deserialize(is);\
 }
 #endif

@@ -1,7 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "Sprite.h"
+#include "TexturedSprite.h"
 #include "Texture2D.h"
 #include "Color.h"
 #include "Shader.h"
@@ -9,9 +9,7 @@
 #include "Image.generated.h"
 
 namespace Core {
-	class Texture;
-
-	CLASS() Image : public Sprite {
+	CLASS() Image : public TexturedSprite {
 		GENERATED_BODY()
 	public:
 		Image(const char* fileName, Color color = {255,255,255,255});
@@ -21,20 +19,12 @@ namespace Core {
 
 		// Loads image if it is not loaded
 		void reload(bool force = false);
-		Texture2D& getTexture();
-		void setTexture(const char* fileName, Texture2D& texture);
+		void set(const char* fileName);
 		const char* getFileName() const;
-
-		const Shader& getShader() const;
-		void setShader(Shader shader);
 
 	private:
 		PROPERTY(Category=ImagePath, Update=reload(true))
 		std::string fileName;
-		PROPERTY()
-		Texture2D texture;
-		PROPERTY()
-		Shader shader;
 	};
 }
 #endif

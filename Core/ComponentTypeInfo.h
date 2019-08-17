@@ -60,7 +60,7 @@ namespace Core {
 
 		/* ATM makes use of RTTI. Swap typeid.name() with name */
 		static void print() {
-			std::cout << "ComponentTypeInfo: " << typeid(T).name() << "(" << id << ")\n";
+			std::cout << "ComponentTypeInfo: " << T::getClassType().name << "(" << id << ")\n";
 			std::cout << "Derived: ";
 			auto derivedList = type.getDerivedList();
 			for (std::size_t i = 0; i < derivedList.size(); i++) {

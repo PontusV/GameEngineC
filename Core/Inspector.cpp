@@ -100,8 +100,9 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	std::wstring propValue = PropertyEditor::propertyValueToString(value, instanceHandle);
 	// Label
 	EntityHandle propLabel = createEntity(entityName + "_Label");
+	RectTransform* propTextRect = propLabel.addComponent(RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::LEFT));
 	Text* propText = propLabel.addComponent(Text(label + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-	propLabel.addComponent(RectTransform(0, 0, propText->getSize().x, propText->getSize().y, rect->getZ() + 0.1f, Alignment::LEFT));
+	propTextRect->setSize(propText->getSize());
 	propLabel.setParent(propValueField);
 	// Value Display & Input
 	if (propType.isNumber()) {
@@ -151,8 +152,9 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	}
 	else {
 		EntityHandle propValueDisplay = createEntity(entityName + "_Value");
+		RectTransform* propValueTextRect = propValueDisplay.addComponent(RectTransform(0, 0, 0, 0, rect->getZ() + 0.3f, Alignment::LEFT));
 		Text* propValueText = propValueDisplay.addComponent(Text(propValue, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propValueDisplay.addComponent(RectTransform(0, 0, propValueText->getSize().x, propValueText->getSize().y, rect->getZ() + 0.3f, Alignment::LEFT));
+		propValueTextRect->setSize(propValueText->getSize());
 		propValueDisplay.setParent(propValueField);
 	}
 	// -------------- End of Content --------------

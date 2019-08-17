@@ -43,11 +43,15 @@ namespace Core {
 	public:
 		ComponentArray(std::initializer_list<ComponentType> dependencies, std::initializer_list<ComponentType> filter) : IComponentArray(typeof(T)), dependencyTypes(dependencies), filterTypes(filter) {
 			for (const ComponentType& fType : filter) {
-				if (type == fType)
+				if (type == fType) {
+					std::cout << "You can not make a ComponentArray<T> filter the ComponentTypeID from T. " << type.getTypeID() << " : " << fType.getTypeID() << std::endl;
 					throw std::invalid_argument("You can not make a ComponentArray<T> filter the ComponentTypeID from T.");
+				}
 				for (const ComponentType& dType : dependencies) {
-					if (dType == fType)
+					if (dType == fType) {
+						std::cout << "You can not both filter and be dependent on a ComponentType in ComponentArray<T>. " << dType.getTypeID() << " : " << fType.getTypeID() << std::endl;
 						throw std::invalid_argument("You can not both filter and be dependent on a ComponentType in ComponentArray<T>.");
+					}
 				}
 			}
 		}
@@ -75,8 +79,8 @@ namespace Core {
 				}
 
 			}
-			std::cout << "Index out of range: " << index << ", size is: " << size() << "\n";
-			throw std::out_of_range("Index out of range.");
+			std::cout << "ComponentArray::get::ERROR Index out of range. size: " << size() << ", typeID: " << T::getTypeID() << std::endl;
+			throw std::out_of_range("ComponentArray::get::ERROR Index out of range.");
 		}
 
 		Entity& getEntity(std::size_t index) {
@@ -88,7 +92,7 @@ namespace Core {
 					index -= chunkSize;
 
 			}
-			throw std::out_of_range("Index out of range.");
+			throw std::out_of_range("ComponentArray::getEntity::ERROR Index out of range.");
 		}
 
 		T& operator[](std::size_t index) {
@@ -144,9 +148,9 @@ namespace Core {
 				}
 			}
 			// Check DependencyTypes
-			for (ComponentType& dependencyTypeID : dependencyTypes) {
+			for (ComponentType& dependencyType : dependencyTypes) {
 				for (std::size_t i = 0; i < typeIDs.size(); i++) {
-					if (dependencyTypeID == typeIDs[i]) { // Match
+					if (dependencyType == typeIDs[i]) { // Match
 						break;
 					}
 					else if (i == typeIDs.size() - 1) { // Miss
