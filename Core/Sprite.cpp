@@ -1,5 +1,6 @@
 #include "Sprite.h"
 #include "ResourceManager.h"
+#include <stdexcept>
 
 using namespace Core;
 
@@ -23,17 +24,36 @@ const std::vector<std::array<Vector2, 4>>& Sprite::getMasks() const {
 	return masks;
 }
 
-std::size_t Sprite::clip(const std::array<Vector2, 4> & mask) {
-	masks.push_back(mask);
-	return masks.size() - 1;
+std::size_t Sprite::getMaskSenderIndex(ComponentID sender) {
+	for (std::size_t i = 0; i < maskSenders.size(); i++) {
+		if (maskSenders[i] == sender)
+			return i;
+	}
+	std::cout << "Sprite::getMaskSenderIndex::ERROR the sender has not sent anything to this sprite" << std::endl;
+	throw std::invalid_argument("Sprite::getMaskSenderIndex::ERROR the sender has not sent anything to this sprite");
 }
 
-void Sprite::reclip(std::size_t index, const std::array<Vector2, 4> & newMask) {
+void Sprite::clip(ComponentID sender, const std::array<Vector2, 4> & mask) {
+	// Check for existing mask
+	for (const ComponentID& maskSender : maskSenders) {
+		if (maskSender == sender) {
+			std::cout << "Sprite::clip::ERROR the sender(" << maskSender << ") has already sent a mask to this sprite(" << owner.getEntityName() << ")" << std::endl;
+			throw std::invalid_argument("Sprite::clip::ERROR the sender has already sent a mask to this sprite");
+		}
+	}
+	masks.push_back(mask);
+	maskSenders.push_back(sender);
+}
+
+void Sprite::reclip(ComponentID sender, const std::array<Vector2, 4> & newMask) {
+	std::size_t index = getMaskSenderIndex(sender);
 	masks[index] = newMask;
 }
 
-void Sprite::removeClip(std::size_t index) {
+void Sprite::removeClip(ComponentID sender) {
+	std::size_t index = getMaskSenderIndex(sender);
 	masks.erase(masks.begin() + index);
+	maskSenders.erase(maskSenders.begin() + index);
 }
 
 void Sprite::resetClipping() {

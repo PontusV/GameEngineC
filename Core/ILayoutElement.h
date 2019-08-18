@@ -9,7 +9,6 @@ namespace Core {
 	protected:
 		ILayoutElement() {}
 	public:
-		static constexpr std::size_t getTypeID() { return 2342834; }
 		virtual ~ILayoutElement() {};
 
 		/* Returns the minimum valid size for this element. */

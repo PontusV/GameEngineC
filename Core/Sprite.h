@@ -11,6 +11,7 @@
 #include "Sprite.generated.h"
 
 namespace Core {
+
 	/* 2D Graphic. */
 	CLASS() Sprite : public Component {
 		GENERATED_BODY()
@@ -22,9 +23,9 @@ namespace Core {
 
 		const std::vector<std::array<Vector2, 4>>& getMasks() const;
 		/* Cuts away Drawable area that is outside of the rect parameter. */
-		std::size_t clip(const std::array<Vector2, 4> & mask);
-		void reclip(std::size_t index, const std::array<Vector2, 4> & mask);
-		void removeClip(std::size_t index);
+		void clip(ComponentID sender, const std::array<Vector2, 4> & mask);
+		void reclip(ComponentID sender, const std::array<Vector2, 4> & mask);
+		void removeClip(ComponentID sender);
 		void resetClipping();
 		bool isClipEnabled() const;
 
@@ -32,9 +33,13 @@ namespace Core {
 		Sprite(Color color = {255, 255, 255, 255});
 
 	private:
+		std::size_t getMaskSenderIndex(ComponentID sender);
+
+	private:
 		PROPERTY()
 		Color color;
 		std::vector<std::array<Vector2, 4>> masks;
+		std::vector<ComponentID> maskSenders;
 	};
 }
 #endif

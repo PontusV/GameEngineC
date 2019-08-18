@@ -172,6 +172,10 @@ std::string EntityManager::getEntityName(Entity entity) {
 		if (it->second == entity) return it->first;
 		it++;
 	}
+	auto it2 = entityMap.find(entity);
+	if (it2 != entityMap.end()) {
+		return std::string("Queued_For_Destruction");
+	}
 	std::cout << "EntityManager::getEntityName::ERROR There is no such entity stored in this Level!" << std::endl;
 	throw std::invalid_argument("EntityManager::getEntityName::ERROR There is no such entity stored in this Level!");
 }
@@ -426,7 +430,7 @@ void EntityManager::processQueue() {
 }
 
 void EntityManager::destroyEntityQueued(Entity entity) {
-	removeEntityName(entity);
+	removeEntityName(entity); // Unreserves name immediately
 	functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
 }
 

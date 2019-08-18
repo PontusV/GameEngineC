@@ -18,10 +18,6 @@ EntityHandle::EntityHandle() {
 EntityHandle::~EntityHandle() {
 }
 
-void EntityHandle::destroy() {
-	manager->destroyEntityQueued(entity);
-}
-
 void EntityHandle::setParent(const Entity& entity) {
 	EntityHandle parent = manager->getEntityHandle(entity);
 	setParent(parent);

@@ -28,8 +28,6 @@ namespace Core {
 		/* Removes the component of type T at the end of the frame. */
 		template<typename T>
 		void removeComponent();
-		/* Removes the Entity at the end of the frame. */
-		void destroy();
 
 		std::string getEntityName();
 		HideFlags getEntityHideFlags();

@@ -20,9 +20,7 @@ void RectMask::onChildAdded(Handle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
-			std::size_t maskIndex = sprite->clip(vertices);
-			std::size_t componentID = sprite->getComponentID();
-			maskMap[componentID] = maskIndex;
+			sprite->clip(getComponentID(), vertices);
 		}
 	}
 }
@@ -31,7 +29,8 @@ void RectMask::onChildRemoved(Handle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
 			std::size_t componentID = sprite->getComponentID();
-			sprite->removeClip(maskMap[componentID]);
+			std::size_t clipIndex = maskMap[componentID];
+			sprite->removeClip(getComponentID());
 		}
 	}
 }
@@ -44,9 +43,7 @@ void RectMask::onChildChanged(Handle entity) {
 			std::size_t componentID = sprite->getComponentID();
 			auto it = maskMap.find(componentID);
 			if (it == maskMap.end()) {
-				std::size_t maskIndex = sprite->clip(vertices);
-				std::size_t componentID = sprite->getComponentID();
-				maskMap[componentID] = maskIndex;
+				sprite->reclip(getComponentID(), vertices);
 			}
 		}
 	}
@@ -56,9 +53,7 @@ void RectMask::updateMask() {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : owner.getComponentsInChildren<Sprite>()) {
-			std::size_t componentID = sprite->getComponentID();
-			std::size_t maskIndex = maskMap[componentID];
-			sprite->reclip(maskIndex, vertices);
+			sprite->reclip(getComponentID(), vertices);
 		}
 	}
 }

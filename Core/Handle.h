@@ -28,6 +28,9 @@ namespace Core {
 		/* Returns true if Handle is valid. If not, the handle is updated and returns true if the update was successful. */
 		bool refresh();
 
+		/* Removes the Entity at the end of the frame. */
+		void destroy();
+
 		/* Updates the Handle so it points towards the target Entity. */
 		void update();
 		void updateLocation(EntityLocation location);

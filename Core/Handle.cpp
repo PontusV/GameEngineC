@@ -55,6 +55,15 @@ const EntityLocation& Handle::getLocation() const {
 	return locationData;
 }
 
+void Handle::destroy() {
+	if (refresh()) {
+		manager->destroyEntityQueued(entity);
+	}
+	else {
+		std::cout << "Handle::destroy Cannot destroy an Entity that does not exist!" << std::endl;
+	}
+}
+
 bool Handle::hasComponent(ComponentType type) {
 	return getComponent(type) != nullptr; // Faster than EntityManager::hasComponent
 }
