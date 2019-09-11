@@ -1,3 +1,4 @@
+#include "Component.h"
 #include "ComponentRegistry.h"
 #include "ComponentLoader.h"
 #include "ComponentType.h"
@@ -24,10 +25,11 @@ std::vector<ComponentTypeID> getMatchingComponentTypeList() {
 
 //-------------------------------------------Register Component Types Implementation-----------------------------------------------------------------
 template<typename... Ts>
-void registerComponentTypes_impl(Mirror::TypeList<Ts...>) {} // End of registry
+void registerComponentTypes_impl(Mirror::TypeList<Ts...>) { std::cout << "LOL" << std::endl; } // End of registry
 
 template<typename T, typename... Ts>
-void registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
+typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
+	std::cout << "true" << std::endl;
 	// Check if base for any types in componentTypeList
 	std::vector<ComponentTypeID> matchList = getMatchingComponentTypeList<T>();
 
@@ -37,6 +39,13 @@ void registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
 	registerToLoader<T>();
 	ComponentTypeInfo<T>::print(); // Debug information
 
+	// Continue registry
+	registerComponentTypes_impl(Mirror::TypeList<Ts...>{});
+}
+
+template<typename T, typename... Ts>
+typename std::enable_if_t<!std::is_base_of<Component, T>::value && !std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
+	std::cout << "false" << sizeof...(Ts) << std::endl;
 	// Continue registry
 	registerComponentTypes_impl(Mirror::TypeList<Ts...>{});
 }

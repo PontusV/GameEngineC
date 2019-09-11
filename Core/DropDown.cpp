@@ -110,8 +110,8 @@ void DropDown::open() {
 		// Button Text
 		Alignment textAlignment = Alignment::LEFT;
 		Vector2 textPivot = Anchor(textAlignment);
-		std::size_t textPaddingX = 5.0f;
-		std::size_t textPaddingY = 0.0f;
+		float textPaddingX = 5.0f;
+		float textPaddingY = 0.0f;
 		float textPosX = textPaddingX + (optionWidth  - textPaddingX * 2) * textPivot.x;
 		float textPosY = textPaddingY + (optionHeight - textPaddingY * 2) * textPivot.y;
 		EntityHandle menuOptionText = createEntity(owner.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),

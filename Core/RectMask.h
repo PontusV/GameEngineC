@@ -23,9 +23,6 @@ namespace Core {
 
 	private:
 		void updateMask();
-
-	private:
-		std::map<ComponentID, std::size_t> maskMap;
 	};
 }
 #endif

@@ -6,7 +6,7 @@
 #include <string>
 
 namespace Core {
-	/* A handle with additional functionality appropriate for an Entity. */
+	/* An Entity handle with additional functionality. */
 	class EntityHandle : public Handle {
 	public:
 		EntityHandle(Entity entity, EntityManager* manager);
@@ -16,8 +16,6 @@ namespace Core {
 
 		void setParent(const Entity& entity);
 		void setParent(EntityHandle entity);
-		/* Returns true if the given Entity is a child of the Entity this instance points to. */
-		bool isChild(Entity entity);
 
 		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
 		template<typename T, class... Args>
@@ -36,6 +34,9 @@ namespace Core {
 
 		template<typename... Ts>
 		EntityHandle createEntity(std::string name, Ts&... components);
+
+		bool operator==(const EntityHandle& other);
+		bool operator!=(const EntityHandle& other);
 	};
 
 	// --------------------------- Template Function Definitions --------------------------------

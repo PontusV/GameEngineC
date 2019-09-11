@@ -1,13 +1,12 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 #include "Component.h"
+#include "Behaviour.generated.h"
 
 namespace Core {
 
 	class Input;
 	class Window;
-
-	#include "Behaviour.generated.h"
 
 	CLASS() Behaviour : public Component {
 		GENERATED_BODY()

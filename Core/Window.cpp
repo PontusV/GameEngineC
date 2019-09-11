@@ -29,7 +29,7 @@ bool Window::init() {
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	//glfwWindowHint(GLFW_SAMPLES, 16); // Anti-alias (Makes Sprites blurry)
 
-	window = glfwCreateWindow(resolution.x, resolution.y, title, NULL, NULL);
+	window = glfwCreateWindow((int)resolution.x, (int)resolution.y, title, NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		std::cout << "Failed to create GLFW window!" << std::endl;
@@ -47,7 +47,7 @@ bool Window::init() {
 	}
 
 	// OpenGL configuration
-	glViewport(0, 0, resolution.x, resolution.y);
+	glViewport(0, 0, (int)resolution.x, (int)resolution.y);
 	// Enable transparently
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -88,12 +88,12 @@ void Window::close() {
 
 int Window::getWidth() {
 	getResolution();
-	return resolution.x;
+	return (int)resolution.x;
 }
 
 int Window::getHeight() {
 	getResolution();
-	return resolution.y;
+	return (int)resolution.y;
 }
 
 const Vector2& Window::getResolution() {

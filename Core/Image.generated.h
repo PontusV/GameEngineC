@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(9);\
+	Mirror::Class newClass(10);\
 	newClass.name = "Core::Image";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::TexturedSprite" });\
@@ -196,7 +196,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 9;\
+	return 10;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{TexturedSprite::getTypeID(),Sprite::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\

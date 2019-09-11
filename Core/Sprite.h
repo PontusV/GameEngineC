@@ -29,6 +29,8 @@ namespace Core {
 		void resetClipping();
 		bool isClipEnabled() const;
 
+		bool hasMaskFromSender(ComponentID sender);
+
 	protected:
 		Sprite(Color color = {255, 255, 255, 255});
 

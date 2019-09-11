@@ -166,6 +166,7 @@ int Engine::initiate() {
 	glfwSetCharCallback(window.getWindow(), characterCallback);
 	glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
 	glfwSetMouseButtonCallback(window.getWindow(), mouseButtonCallback);
+	glfwSetScrollCallback(window.getWindow(), scrollCallback);
 	// End of system initialization
 
 	return 0;

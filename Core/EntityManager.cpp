@@ -105,10 +105,10 @@ void EntityManager::onEntityDestroyed(Entity entity) {
 	// Check for parent & call onChildDestroyed
 	Handle parent = handle.getParent();
 	if (parent.refresh()) {
-		parent.getComponent<ChildManager>()->onChildRemoved(handle);
 		for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
 			behaviour->onChildRemoved(handle);
 		}
+		parent.getComponent<ChildManager>()->onChildRemoved(handle);
 	}
 }
 

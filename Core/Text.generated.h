@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(18);\
+	Mirror::Class newClass(19);\
 	newClass.name = "Core::Text";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Sprite" });\
@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 }\
 	newProperty.isStatic = false;\
 	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
-	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
+	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}, Mirror::Annotation{"Update", {"refresh()"}}};\
 	newClass.properties.push_back(newProperty);\
 \
 	newProperty = {};\
@@ -131,6 +131,7 @@ bool setValue_impl(std::string propertyName, T value) {\
 	try {\
 		if (propertyName == "text") {\
 			Mirror::setVariableValue(text, value);\
+			refresh();\
 			return true;\
 		}\
 		if (propertyName == "font") {\
@@ -167,6 +168,7 @@ bool setArrayElementValue_impl(std::string propertyName, std::size_t index, T va
 	try {\
 		if (propertyName == "text") {\
 			throw std::invalid_argument("The property Core::Text::" + propertyName + " is not an array!");\
+			refresh();\
 			return true;\
 		}\
 		if (propertyName == "font") {\
@@ -197,7 +199,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 18;\
+	return 19;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{Sprite::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\

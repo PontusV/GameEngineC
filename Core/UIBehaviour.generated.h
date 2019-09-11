@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(14);\
+	Mirror::Class newClass(15);\
 	newClass.name = "Core::UIBehaviour";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Behaviour" });\
@@ -106,7 +106,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 14;\
+	return 15;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{Behaviour::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\

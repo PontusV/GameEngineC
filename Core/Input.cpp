@@ -34,7 +34,7 @@ void Input::update(float dt) {
 
 	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);
 	// Mouse Hover
-	if (target.getEntity() != hoverTarget.getEntity()) {
+	if (target != hoverTarget) {
 		std::vector<Behaviour*> scripts;
 		// Hover out
 		if (!hoverTarget.isChild(target.getEntity())) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called

@@ -19,7 +19,7 @@ unsigned char Renderer2D::createLayer() {
 	return layerAmount++;
 }
 
-void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
 
 	std::vector<Vector2> clipMaskVertices;
 	clipMaskVertices.reserve(masks.size()*4);
@@ -129,7 +129,7 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const bool& clipEnabled, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 
@@ -143,7 +143,7 @@ void Renderer2D::submitText(const std::wstring& text, const RectTransform& trans
 		RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
 		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
-		submit(c.texture, spriteTransform, textShaderID, color, clipEnabled, clipMaskVertices, layerIndex);
+		submit(c.texture, spriteTransform, textShaderID, color, clipMaskVertices, layerIndex);
 	}
 }
 

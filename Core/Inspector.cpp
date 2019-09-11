@@ -6,6 +6,7 @@
 #include "RectTransform.h"
 #include "RectSprite.h"
 #include "RectMask.h"
+#include "ScrollRect.h"
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
@@ -39,6 +40,7 @@ void Inspector::awake() {
 		scrollPanel = createEntity("Inspector_Scroll_Panel",
 			RectSprite(Color(150, 0, 0)),
 			RectMask(),
+			ScrollRect(),
 			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
 		);
 		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();

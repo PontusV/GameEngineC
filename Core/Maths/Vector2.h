@@ -4,7 +4,8 @@
 namespace Core {
 	class Vector2 {
 	public:
-		Vector2(float x, float y);
+		template<typename T, typename T2>
+		Vector2(T x, T2 y) : x(float(x)), y(float(y)){}
 		Vector2(float scalar);
 		Vector2();
 		~Vector2();

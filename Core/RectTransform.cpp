@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-RectTransform::RectTransform(float x, float y, int width, int height, float z, Anchor pivot, float rotation, float scale) : Transform(x, y, z, rotation, scale), size(width, height), pivot(pivot) {
+RectTransform::RectTransform(float x, float y, float width, float height, float z, Anchor pivot, float rotation, float scale) : Transform(x, y, z, rotation, scale), size(width, height), pivot(pivot) {
 }
 
 RectTransform::RectTransform() {
@@ -12,6 +12,33 @@ RectTransform::RectTransform() {
 
 
 RectTransform::~RectTransform() {
+}
+
+
+std::array<Vector2, 4> RectTransform::getLocalVertices() const {
+	return {
+		getLocalVertex(0),
+		getLocalVertex(1),
+		getLocalVertex(2),
+		getLocalVertex(3)
+	};
+}
+
+Vector2 RectTransform::getLocalVertex(std::size_t index) const {
+	Vector2 pos = getRectOffset();
+	if (index == 0) {
+		return position + pos;
+	}
+	else if (index == 1) {
+		return position + Vector2(pos.x, pos.y + size.y);
+	}
+	else if (index == 2) {
+		return position + pos + size;
+	}
+	else if (index == 3) {
+		return position + Vector2(pos.x + size.x, pos.y);
+	}
+	throw std::invalid_argument("RectTransform::getVertex::ERROR Vertex index out of bounds!");
 }
 
 std::array<Vector2, 4> RectTransform::getVertices() const {

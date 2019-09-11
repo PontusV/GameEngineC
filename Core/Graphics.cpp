@@ -68,26 +68,29 @@ void Graphics::render(float deltaTime) {
 		const RectTransform&	transform		= renderableRects.transforms[i];
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= rect.getColor();
-		bool					clipEnabled		= rect.isClipEnabled();
 		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
 		const std::vector<std::array<Vector2, 4>>& masks = rect.getMasks();
 
-		renderer->submit(texture, transform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
+		renderer->submit(texture, transform, spriteShader.ID, color, masks, layerIndex);
 	}
 
 	// Images (Reload)
 	for (std::size_t i = 0; i < sizeImages; i++) {
 		renderableImages.images[i].reload(); //Make sure image is loaded
 	}
-	
+
+	static Shader textShader = ResourceManager::getInstance().loadShader("resources/shaders/text");
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const Text& text = renderableTexts.texts[i];
-		bool							clipEnabled = text.isClipEnabled();
+		const Text& text				= renderableTexts.texts[i];
 		const unsigned char& layerIndex = text.getOwner().getEntityLayer();
 		const std::vector<std::array<Vector2, 4>> & masks = text.getMasks();
 
-		renderer->submitText(text.getText(), renderableTexts.transforms[i], text.getFont(), text.getColor(), clipEnabled, masks, layerIndex);
+		const std::vector<RectTransform>& textTransforms = text.getTextTransforms();
+		const std::vector<Texture2D>& textSprites = text.getTextSprites();
+		for (std::size_t i2 = 0; i2 < textSprites.size(); i2++) {
+			renderer->submit(textSprites[i2], textTransforms[i2], textShader.ID, text.getColor(), masks, layerIndex);
+		}
 	}
 
 	// Textured Sprites
@@ -96,11 +99,10 @@ void Graphics::render(float deltaTime) {
 		const RectTransform&	transform			= renderableTexturedSprites.transforms[i];
 		const Texture2D&		texture				= sprite.getTexture();
 		const Color&			color				= sprite.getColor();
-		bool					clipEnabled			= sprite.isClipEnabled();
 		unsigned char			layerIndex			= sprite.getOwner().getEntityLayer();
 		const std::vector<std::array<Vector2, 4>> & masks = sprite.getMasks();
 
-		renderer->submit(texture, transform, sprite.getShader().ID, color, clipEnabled, masks, layerIndex);
+		renderer->submit(texture, transform, sprite.getShader().ID, color, masks, layerIndex);
 	}
 
 	// Borders
@@ -112,7 +114,6 @@ void Graphics::render(float deltaTime) {
 		const std::size_t&		borderThickness	= border.getBorderThickness();
 		bool					inner			= border.isInner();
 		const Vector2&			size			= transform.getSize();
-		bool					clipEnabled		= border.isClipEnabled();
 		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
 		const std::vector<std::array<Vector2, 4>>& masks	= border.getMasks();
 
@@ -153,7 +154,7 @@ void Graphics::render(float deltaTime) {
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
 
-				renderer->submit(texture, lineTransform, spriteShader.ID, color, clipEnabled, masks, layerIndex);
+				renderer->submit(texture, lineTransform, spriteShader.ID, color, masks, layerIndex);
 			}
 		}
 	}

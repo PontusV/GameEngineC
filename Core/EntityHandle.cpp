@@ -27,15 +27,6 @@ void EntityHandle::setParent(EntityHandle entity) {
 	manager->setParentQueued(*this, entity);
 }
 
-bool EntityHandle::isChild(Entity entity) {
-	std::size_t childCount = getChildCount();
-	for (std::size_t i = 0; i < childCount; i++) {
-		EntityHandle child = getChild(i);
-		if (child.getEntity() == entity || child.isChild(entity))
-			return true;
-	}
-	return false;
-}
 std::string EntityHandle::getEntityName() {
 	if (refresh()) {
 		return manager->getEntityName(entity);
@@ -43,6 +34,7 @@ std::string EntityHandle::getEntityName() {
 	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!";
 	return "Invalid";
 }
+
 HideFlags EntityHandle::getEntityHideFlags() {
 	HideFlags result = manager->getEntityHideFlags(entity);
 	EntityHandle parent = getParent();
@@ -53,11 +45,18 @@ HideFlags EntityHandle::getEntityHideFlags() {
 	}
 	return result;
 }
+
 unsigned char EntityHandle::getEntityLayer() const {
 	return 0; // TEMP
 }
 
-
 void EntityHandle::setEntityHideFlags(HideFlags hideFlags) {
 	return manager->setEntityHideFlags(entity, hideFlags);
+}
+
+bool EntityHandle::operator==(const EntityHandle& other) {
+	return entity.getID() == other.entity.getID();
+}
+bool EntityHandle::operator!=(const EntityHandle& other) {
+	return !(*this == other);
 }

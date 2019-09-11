@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(27);\
+	Mirror::Class newClass(28);\
 	newClass.name = "Core::LayoutElement";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
@@ -32,7 +32,7 @@ static Mirror::Class createType() {\
 	newPropertyType.arraySize = 0;\
 }\
 	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
@@ -49,7 +49,7 @@ static Mirror::Class createType() {\
 	newPropertyType.arraySize = 0;\
 }\
 	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
@@ -66,7 +66,7 @@ static Mirror::Class createType() {\
 	newPropertyType.arraySize = 0;\
 }\
 	newProperty.isStatic = false;\
-	newProperty.accessSpecifier = Mirror::AccessSpecifier::PRIVATE;\
+	newProperty.accessSpecifier = Mirror::AccessSpecifier::PUBLIC;\
 	newProperty.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.properties.push_back(newProperty);\
 \
@@ -329,7 +329,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 27;\
+	return 28;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{Component::getTypeID(),ReflectedObject::getTypeID()};\

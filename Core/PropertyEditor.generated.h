@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(29);\
+	Mirror::Class newClass(30);\
 	newClass.name = "Core::PropertyEditor";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Component" });\
@@ -106,7 +106,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 29;\
+	return 30;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{Component::getTypeID(),ReflectedObject::getTypeID()};\

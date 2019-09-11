@@ -32,14 +32,20 @@ std::size_t Sprite::getMaskSenderIndex(ComponentID sender) {
 	std::cout << "Sprite::getMaskSenderIndex::ERROR the sender has not sent anything to this sprite" << std::endl;
 	throw std::invalid_argument("Sprite::getMaskSenderIndex::ERROR the sender has not sent anything to this sprite");
 }
+bool Sprite::hasMaskFromSender(ComponentID sender) {
+	for (const ComponentID& maskSender : maskSenders) {
+		if (maskSender == sender) {
+			return true;
+		}
+	}
+	return false;
+}
 
 void Sprite::clip(ComponentID sender, const std::array<Vector2, 4> & mask) {
 	// Check for existing mask
-	for (const ComponentID& maskSender : maskSenders) {
-		if (maskSender == sender) {
-			std::cout << "Sprite::clip::ERROR the sender(" << maskSender << ") has already sent a mask to this sprite(" << owner.getEntityName() << ")" << std::endl;
-			throw std::invalid_argument("Sprite::clip::ERROR the sender has already sent a mask to this sprite");
-		}
+	if (hasMaskFromSender(sender)) {
+		std::cout << "Sprite::clip::ERROR the sender(" << sender << ") has already sent a mask to this sprite(" << owner.getEntityName() << ")" << std::endl;
+		throw std::invalid_argument("Sprite::clip::ERROR the sender has already sent a mask to this sprite");
 	}
 	masks.push_back(mask);
 	maskSenders.push_back(sender);

@@ -13,7 +13,7 @@
 #define GENERATED_BODY(...)\
 private:\
 static Mirror::Class createType() {\
-	Mirror::Class newClass(25);\
+	Mirror::Class newClass(26);\
 	newClass.name = "Core::InputField";\
 	newClass.annotatedAttributes = {Mirror::Annotation{"Reflect", {}}};\
 	newClass.baseClasses.push_back(Mirror::Type{ "Core::Selectable" });\
@@ -309,7 +309,7 @@ static bool hasProperty(std::string propertyName) {\
 }\
 public:\
 static constexpr std::size_t getTypeID() {\
-	return 25;\
+	return 26;\
 }\
 static std::vector<std::size_t> getBaseTypeIDs() {\
 	return std::vector<std::size_t>{Selectable::getTypeID(),Behaviour::getTypeID(),Component::getTypeID(),ReflectedObject::getTypeID()};\

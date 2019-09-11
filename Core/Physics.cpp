@@ -1,6 +1,9 @@
 #include "Physics.h"
 #include "BoxComponent.h"
 #include "Behaviour.h"
+#include "Text.h"
+#include "ScrollRect.h"
+#include "Maths/MatrixTransform.h"
 #include "Maths/Matrix4.h"
 using namespace Core;
 
@@ -14,10 +17,14 @@ Physics::~Physics() {
 }
 
 void onTransformChange(Transform& transform) {
+	EntityHandle owner = transform.getOwner();
 	// Updates bounds
-	std::vector<BoxComponent*> boxComponents = transform.getOwner().getComponents<BoxComponent>();
-	for (BoxComponent* box : boxComponents) {
+	for (BoxComponent* box : owner.getComponents<BoxComponent>()) {
 		box->updateBounds();
+	}
+	// Updates text position
+	for (Text* text : owner.getComponents<Text>()) {
+		text->updateTransforms();
 	}
 }
 
@@ -34,19 +41,28 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 	}
 
 	// Iterate through all children (immediate children iterate through their immediate children)
-	std::size_t childCount = root.getOwner().getImmediateChildCount();
-	if (childCount > 0)
+	EntityHandle owner = root.getOwner();
+	std::size_t childCount = owner.getImmediateChildCount();
+	if (childCount > 0) {
 		modelMatrix = root.getLocalToWorldMatrix() * root.getLocalModelMatrix();
+		// Check for scrollrect
+		if (ScrollRect* scrollRect = owner.getComponent<ScrollRect>()) {
+			if (scrollRect->hasChanged() || matrixChanged) {
+				modelMatrix = maths::translate(modelMatrix, Vector3(scrollRect->offset.x, scrollRect->offset.y, 0.0f));
+				matrixChanged = true;
+			}
+		}
+	}
 
 	for (std::size_t childIndex = 0; childIndex < childCount; childIndex++) {
-		Transform* childTransform = root.getOwner().getChild(childIndex).getComponent<Transform>();
+		Transform* childTransform = owner.getChild(childIndex).getComponent<Transform>();
 		if (childTransform) {
 			updateTransformModel(*childTransform, modelMatrix, matrixChanged);
 		}
 	}
 	// Notify behaviours of change in transform
 	if (matrixChanged) {
-		for (Behaviour* behaviour : root.getOwner().getComponents<Behaviour>()) {
+		for (Behaviour* behaviour : owner.getComponents<Behaviour>()) {
 			behaviour->onTransformChanged();
 		}
 	}

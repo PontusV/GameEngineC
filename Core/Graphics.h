@@ -30,8 +30,8 @@ namespace Core {
 		ComponentArray<Image>&			images		= getComponentArray<Image>();
 	};
 	struct RenderableTexts : public ComponentGroup<RectTransform, Text> {
-		ComponentArray<RectTransform>& transforms = getComponentArray<RectTransform>();
-		ComponentArray<Text>& texts = getComponentArray<Text>();
+		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
+		ComponentArray<Text>&			texts		= getComponentArray<Text>();
 	};
 
 	struct RenderableTexturedSprites : public ComponentGroup<RectTransform, TexturedSprite> {

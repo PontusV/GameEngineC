@@ -4,8 +4,6 @@
 using namespace Core;
 
 
-Vector2::Vector2(float x, float y) : x(x), y(y) {
-}
 Vector2::Vector2(float scalar) : Vector2(scalar, scalar) {
 }
 Vector2::Vector2() : Vector2(0,0) {

@@ -22,6 +22,10 @@ bool Handle::operator==(const Handle& other) {
 	return entity == other.entity && manager == other.manager;
 }
 
+bool Handle::operator!=(const Handle& other) {
+	return !(*this == other);
+}
+
 const Entity& Handle::getEntity() const {
 	return entity;
 }
@@ -64,6 +68,26 @@ void Handle::destroy() {
 	}
 }
 
+bool Handle::isChild(Entity entity) {
+	std::size_t childCount = getChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = getChild(i);
+		if (child.getEntity() == entity)
+			return true;
+	}
+	return false;
+}
+
+bool Handle::isImmediateChild(Entity entity) {
+	std::size_t childCount = getImmediateChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = getChild(i);
+		if (child.getEntity() == entity)
+			return true;
+	}
+	return false;
+}
+
 bool Handle::hasComponent(ComponentType type) {
 	return getComponent(type) != nullptr; // Faster than EntityManager::hasComponent
 }
@@ -98,6 +122,17 @@ std::vector<Component*> Handle::getComponents() {
 			return chunk->getComponents(locationData.index);
 	}
 	return std::vector<Component*>(); // Empty
+}
+
+std::vector<Component*> Handle::getComponentsInImmediateChildren() {
+	std::vector<Component*> components;
+	std::size_t childCount = getImmediateChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = getChild(i);
+		std::vector<Component*> childComponents = child.getComponents();
+		components.insert(components.end(), childComponents.begin(), childComponents.end());
+	}
+	return components;
 }
 
 std::vector<Component*> Handle::getComponentsInChildren() {

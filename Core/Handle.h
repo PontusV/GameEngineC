@@ -13,13 +13,18 @@ namespace Core {
 	class EntityManager; // Forward declare
 	class Component;
 
-	/* A handle for Entities and Components */
+	/* A handle for Entities */
 	class Handle {
 	public:
 		Handle(Entity entity, EntityManager* manager);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
 		bool operator==(const Handle& other);
+		bool operator!=(const Handle& other);
+		/* Returns true if the given Entity is a child of the Entity this instance points to. */
+		bool isChild(Entity entity);
+		/* Returns true if the given Entity is an immediate child of the Entity this instance points to. */
+		bool isImmediateChild(Entity entity);
 
 		const Entity& getEntity() const;
 
@@ -27,7 +32,6 @@ namespace Core {
 		bool isValid();
 		/* Returns true if Handle is valid. If not, the handle is updated and returns true if the update was successful. */
 		bool refresh();
-
 		/* Removes the Entity at the end of the frame. */
 		void destroy();
 
@@ -56,6 +60,12 @@ namespace Core {
 		std::vector<T*> getComponentsInChildren();
 
 		template<typename T>
+		T* getComponentInImmediateChildren();
+		std::vector<Component*> getComponentsInImmediateChildren();
+		template<typename T>
+		std::vector<T*> getComponentsInImmediateChildren();
+
+		template<typename T>
 		T* getComponentInParents();
 		std::vector<Component*> getComponentsInParents();
 		template<typename T>
@@ -77,6 +87,7 @@ namespace Core {
 		Handle getChild(std::size_t index);
 		std::size_t getImmediateChildCount();
 		std::size_t getChildCount();
+
 	protected:
 		// Data required to update itself
 		EntityManager* manager = nullptr;
@@ -105,6 +116,27 @@ namespace Core {
 			castedPtrs.push_back((T*)ptr);
 		}
 		return castedPtrs;
+	}
+
+	template<typename T>
+	T* Handle::getComponentInImmediateChildren() {
+		std::size_t childCount = getImmediateChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			Handle child = getChild(i);
+			if (T * ptr = child.getComponent<T>()) // Check if child has the component
+				return ptr;
+		}
+	}
+	template<typename T>
+	std::vector<T*> Handle::getComponentsInImmediateChildren() {
+		std::vector<T*> components;
+		std::size_t childCount = getImmediateChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			Handle child = getChild(i);
+			std::vector<T*> childComponents = child.getComponents<T>();
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
+		}
+		return components;
 	}
 
 	template<typename T>
