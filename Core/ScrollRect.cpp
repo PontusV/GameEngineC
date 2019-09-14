@@ -22,8 +22,8 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 		if (scrollableY) {
 			if (offset.y > contentBounds.pos.y)
 				offset.y = 0;
-			if (offset.y < contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - 10)
-				offset.y = contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - 10;
+			if (offset.y < contentBounds.pos.y - contentBounds.size.y + rect->getSize().y)
+				offset.y = contentBounds.pos.y - contentBounds.size.y + rect->getSize().y;
 		}
 	}
 }
@@ -65,4 +65,12 @@ bool ScrollRect::hasChanged() {
 		return true;
 	}
 	return false;
+}
+
+void ScrollRect::onChildAdded(Handle entity) {
+	refreshContentBounds();
+}
+
+void ScrollRect::onChildRemoved(Handle entity) {
+	refreshContentBounds();
 }

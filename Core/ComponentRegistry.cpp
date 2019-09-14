@@ -25,11 +25,14 @@ std::vector<ComponentTypeID> getMatchingComponentTypeList() {
 
 //-------------------------------------------Register Component Types Implementation-----------------------------------------------------------------
 template<typename... Ts>
-void registerComponentTypes_impl(Mirror::TypeList<Ts...>) { std::cout << "LOL" << std::endl; } // End of registry
+void registerComponentTypes_impl(Mirror::TypeList<Ts...>) {} // End of registry
+template<typename T, typename... Ts>
+typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>);
+template<typename T, typename... Ts>
+typename std::enable_if_t<!std::is_base_of<Component, T>::value && !std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>);
 
 template<typename T, typename... Ts>
 typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
-	std::cout << "true" << std::endl;
 	// Check if base for any types in componentTypeList
 	std::vector<ComponentTypeID> matchList = getMatchingComponentTypeList<T>();
 
@@ -37,7 +40,7 @@ typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<C
 	ComponentTypeInfo<T>::setTypeID(T::getTypeID());
 	ComponentTypeInfo<T>::setMatchingTypeIDs(matchList);
 	registerToLoader<T>();
-	ComponentTypeInfo<T>::print(); // Debug information
+	//ComponentTypeInfo<T>::print(); // Debug information
 
 	// Continue registry
 	registerComponentTypes_impl(Mirror::TypeList<Ts...>{});
@@ -45,7 +48,6 @@ typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<C
 
 template<typename T, typename... Ts>
 typename std::enable_if_t<!std::is_base_of<Component, T>::value && !std::is_same<Component, T>::value, void> registerComponentTypes_impl(Mirror::TypeList<T, Ts...>) {
-	std::cout << "false" << sizeof...(Ts) << std::endl;
 	// Continue registry
 	registerComponentTypes_impl(Mirror::TypeList<Ts...>{});
 }

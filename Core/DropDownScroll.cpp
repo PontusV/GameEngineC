@@ -6,6 +6,10 @@
 #include "Maths/MatrixTransform.h"
 using namespace Core;
 
+DropDownScroll::DropDownScroll() {}
+DropDownScroll::DropDownScroll(Text text) : DropDown(text) {}
+DropDownScroll::~DropDownScroll() {}
+
 void DropDownScroll::open() {
 	if (isOpen) return; // Already open
 	isOpen = true;
@@ -13,13 +17,15 @@ void DropDownScroll::open() {
 	// Box
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	const Vector2& size = transform->getSize();
-	Vector2 position = transform->getLocalToWorldMatrix() * (transform->getPosition() + Vector2(-size.x / 2, size.y / 2));
+	Vector2 position = transform->getPosition() + Vector2(-size.x / 2, size.y / 2);
 	float z = transform->getZ() + 1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
 		RectSprite(Color(20, 20, 20, 255)),
 		RectMask(),
-		ScrollRect()
+		ScrollRect(),
+		RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
 	);
+	std::cout << "x: " << position.x << ", y: " << position.y << std::endl;
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 
 	// Menu Option settings
@@ -27,7 +33,6 @@ void DropDownScroll::open() {
 	float yOffset = 0;
 
 	for (std::size_t i = 0; i < options.size(); i++) {
-		std::string label = options[i].text;
 		// Button
 		RectButton button = RectButton();
 		button.colors[RectButton::DEFAULT] = { 20,20,20,255 };
@@ -49,14 +54,13 @@ void DropDownScroll::open() {
 		float textPosX = textPaddingX + (optionWidth - textPaddingX * 2) * textPivot.x;
 		float textPosY = textPaddingY + (optionHeight - textPaddingY * 2) * textPivot.y;
 		EntityHandle menuOptionText = createEntity(owner.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),
-			Text(label, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
+			Text(options[i].text, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
 			RectTransform(textPosX, textPosY, 0, 0, z + 0.1f, textAlignment)
 		);
 		menuOptionText.setParent(menuOption.getEntity());
 
 		yOffset += optionHeight;
 	}
-	menuBox.addComponent(RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT));
 
 	// Box Border
 	if (border) {

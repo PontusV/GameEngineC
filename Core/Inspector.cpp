@@ -27,6 +27,24 @@ Inspector::~Inspector()
 {
 }
 
+template<typename... Ts>
+void addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<Ts...>) {} // End
+template<typename T, typename... Ts>
+typename std::enable_if_t<std::is_base_of<Component, T>::value&& std::is_default_constructible<T>::value && !std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>);
+template<typename T, typename... Ts>
+typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>);
+
+template<typename T, typename... Ts>
+typename std::enable_if_t<std::is_base_of<Component, T>::value && std::is_default_constructible<T>::value && !std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>) {
+	dropDown->addOption(T::getClassType().name, Core::bind(inspector, &Inspector::addComponentToTarget<T>));
+	addComponentDropDownOption(dropDown, inspector, Mirror::TypeList<Ts...>{}); // Continue
+}
+
+template<typename T, typename... Ts>
+typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>) {
+	addComponentDropDownOption(dropDown, inspector, Mirror::TypeList<Ts...>{}); // Continue
+}
+
 
 void Inspector::awake() {
 	// create scroll panel for targetComponentList
@@ -58,14 +76,6 @@ void Inspector::awake() {
 		group->paddingLeft = 10;
 		group->paddingRight = 10;
 		scrollPanel.setParent(owner);
-
-		// Add add component button
-		EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
-			DropDownScroll(),
-			Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
-			RectTransform(0, 0, 200, 50)
-		);
-		addComponentButton.setParent(scrollPanel);
 	}
 }
 
@@ -283,6 +293,22 @@ void Inspector::inspect(EntityHandle entity) {
 		for (Component* component : entity.getComponents()) {
 			addComponentEntry(component, i++);
 		}
+		// Add an 'Add Component' button
+		EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
+			Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
+			RectTransform(0, 0, 200, 50, owner.getComponent<RectTransform>()->getZ() + 0.1f)
+		);
+		DropDownScroll* dropDown = addComponentButton.addComponent(DropDownScroll(Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))));
+		dropDown->boxWidth = 200;
+		dropDown->boxHeight = 100;
+		dropDown->optionFont = Font("resources/fonts/segoeui.ttf", 14);
+		dropDown->optionTextColor = Color(255, 255, 255, 255);
+		dropDown->border = true;
+		dropDown->borderColor = Color(255, 255, 255, 255);
+		dropDown->borderSize = 10;
+		addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
+		addComponentButton.setParent(scrollPanel);
+		targetComponentList.push_back(addComponentButton);
 	}
 }
 

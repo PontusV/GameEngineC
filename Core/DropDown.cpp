@@ -81,7 +81,7 @@ void DropDown::open() {
 	// Box
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	const Vector2& size = transform->getSize();
-	Vector2 position = transform->getLocalToWorldMatrix() * (transform->getPosition() + Vector2(-size.x/2, size.y/2));
+	Vector2 position = transform->getPosition() + Vector2(-size.x/2, size.y/2);
 	float z = transform->getZ()+1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
 		RectSprite(Color(20, 20, 20, 255))

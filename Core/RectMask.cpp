@@ -37,8 +37,9 @@ void RectMask::onChildChanged(Handle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
-			if (!sprite->hasMaskFromSender(getComponentID()))
+			if (!sprite->hasMaskFromSender(getComponentID())) {
 				sprite->clip(getComponentID(), vertices);
+			}
 		}
 	}
 }

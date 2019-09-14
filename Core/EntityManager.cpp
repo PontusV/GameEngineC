@@ -58,7 +58,7 @@ void EntityManager::setParent(Handle entityHandle, Handle parentHandle) {
 	// Notify previous parent of removal
 	Handle currentParent = getParent(entity);
 	if (currentParent.refresh()) {
-		for (Behaviour* behaviour : currentParent.getComponents<Behaviour>()) {
+		for (Behaviour* behaviour : currentParent.getComponentsUpwards<Behaviour>()) {
 			behaviour->onChildRemoved(entityHandle);
 		}
 
@@ -100,15 +100,20 @@ void EntityManager::onEntityCreated(Handle entity) {
 
 	// Should not have to handle any ParentEntiy component here
 }
-void EntityManager::onEntityDestroyed(Entity entity) {
+void EntityManager::onEntityDestroyed(Entity entity, bool destroyingParent) {
 	Handle handle = getEntityHandle(entity);
 	// Check for parent & call onChildDestroyed
 	Handle parent = handle.getParent();
 	if (parent.refresh()) {
-		for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
-			behaviour->onChildRemoved(handle);
+		if (!destroyingParent) {
+			for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
+				behaviour->onChildRemoved(handle);
+			}
 		}
-		parent.getComponent<ChildManager>()->onChildRemoved(handle);
+		ChildManager* childManager = parent.getComponent<ChildManager>();
+		childManager->onChildRemoved(handle);
+		if (!destroyingParent && childManager->getChildCount() == 0)
+			removeComponent<ChildManager>(parent.getEntity());
 	}
 }
 
@@ -211,6 +216,10 @@ void EntityManager::setEntityHideFlags(Entity entity, HideFlags hideFlags) {
 }
 
 void EntityManager::destroyEntity(Entity entity) {
+	destroyEntity(entity, false);
+}
+
+void EntityManager::destroyEntity(Entity entity, bool chained) {
 	// Exception check
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) {
@@ -218,7 +227,7 @@ void EntityManager::destroyEntity(Entity entity) {
 		throw std::invalid_argument("EntityManager::destroyEntity::ERROR The entity does not exist in this manager!");
 	}
 	Archetype* archetype = it->second;
-	onEntityDestroyed(entity);
+	onEntityDestroyed(entity, chained);
 
 	// Call onDestroy
 	std::vector<Behaviour*> scripts = getComponents<Behaviour>(entity);
@@ -232,7 +241,7 @@ void EntityManager::destroyEntity(Entity entity) {
 	if (childManager) {
 		bool updateIt = childManager->getChildCount() > 0;
 		while (childManager->getChildCount() > 0) {
-			destroyEntity(getChild(entity, 0).getEntity()); // TODO: Tell it to not remove the ChildManager component to prevent unnecessary work.
+			destroyEntity(getChild(entity, 0).getEntity(), true); // TODO: Tell it to not remove the ChildManager component to prevent unnecessary work.
 		}
 		// Update the iterator if children were removed.
 		if (updateIt) {

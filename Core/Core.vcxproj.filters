@@ -300,6 +300,9 @@
     <ClCompile Include="ScrollRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DropDownScroll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource2.h">
@@ -594,6 +597,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScrollRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DropDownScroll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -27,6 +27,9 @@ namespace Core {
 
 		void inspect(EntityHandle entity);
 
+		template<typename T>
+		void addComponentToTarget();
+
 	private:
 		void clearEntries();
 		void addComponentEntry(Component* component, std::size_t id);
@@ -38,5 +41,10 @@ namespace Core {
 		EntityHandle scrollPanel;
 		std::vector<EntityHandle> targetComponentList;
 	};
+
+	template<typename T>
+	void Inspector::addComponentToTarget() {
+		currentTarget.addComponent<T>();
+	}
 }
 #endif

@@ -31,6 +31,7 @@ namespace Core {
 		template <typename... Ts>
 		Handle createEntity(std::string name, Ts&... components);
 		void destroyEntity(Entity entity);
+		void destroyEntity(Entity entity, bool chained);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		template <typename T>
@@ -111,7 +112,7 @@ namespace Core {
 
 		void onEntityCreated(Entity entity); // Used by queue
 		void onEntityCreated(Handle entity);
-		void onEntityDestroyed(Entity entity);
+		void onEntityDestroyed(Entity entity, bool destroyingParent = false);
 		void onEntityChanged(Handle entity);
 
 	private:

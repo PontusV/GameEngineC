@@ -15,6 +15,9 @@ namespace Core {
 		void lateUpdate(float deltaTime) override;
 		bool hasChanged();
 
+		void onChildAdded(Handle entity) override;
+		void onChildRemoved(Handle entity) override;
+
 	private:
 		void refreshContentBounds();
 
