@@ -11,6 +11,7 @@
 #include "InputField.h"
 #include "HideFlags.h"
 #include "CheckBox.h"
+#include "DropDownScroll.h"
 #include "Maths/Vector2.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
@@ -57,6 +58,14 @@ void Inspector::awake() {
 		group->paddingLeft = 10;
 		group->paddingRight = 10;
 		scrollPanel.setParent(owner);
+
+		// Add add component button
+		EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
+			DropDownScroll(),
+			Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
+			RectTransform(0, 0, 200, 50)
+		);
+		addComponentButton.setParent(scrollPanel);
 	}
 }
 

@@ -23,7 +23,7 @@ namespace Core {
 		DropDown();
 		~DropDown();
 
-		void open();
+		virtual void open();
 		void close();
 		void addOption(std::string label, ComponentFunctionHandle<void> function, std::vector<DropDownOption> nest = {});
 
@@ -57,7 +57,7 @@ namespace Core {
 		PROPERTY()
 		Color borderColor = Color(100, 100, 100, 255);
 
-	private:
+	protected:
 		PROPERTY()
 		Text text;
 		//PROPERTY()
