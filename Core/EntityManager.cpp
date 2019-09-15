@@ -237,11 +237,11 @@ void EntityManager::destroyEntity(Entity entity, bool chained) {
 
 	// Destroy children first. The children will destroy their own children.
 	// Destroy Children
-	ChildManager* childManager = getComponent<ChildManager>(entity);
-	if (childManager) {
-		bool updateIt = childManager->getChildCount() > 0;
-		while (childManager->getChildCount() > 0) {
-			destroyEntity(getChild(entity, 0).getEntity(), true); // TODO: Tell it to not remove the ChildManager component to prevent unnecessary work.
+	Handle entityHandle = getEntityHandle(entity);
+	if (entityHandle.hasComponent<ChildManager>()) {
+		bool updateIt = entityHandle.getComponent<ChildManager>()->getChildCount() > 0;
+		while (entityHandle.getComponent<ChildManager>()->getChildCount() > 0) {
+			destroyEntity(getChild(entity, 0).getEntity(), true);
 		}
 		// Update the iterator if children were removed.
 		if (updateIt) {
@@ -266,6 +266,8 @@ void EntityManager::destroyEntity(Entity entity, bool chained) {
 	if (archetype->isEmpty()) {
 		removeArchetype(archetype);
 	}
+	if (entityMap.find(Entity(51)) != entityMap.end())
+		std::cout << "(End) Child count of 51: " << getImmediateChildCount(Entity(51)) << std::endl;
 }
 
 /* Removes specified entity and its components from the Archetype that stores it. */
@@ -440,6 +442,12 @@ void EntityManager::processQueue() {
 
 void EntityManager::destroyEntityQueued(Entity entity) {
 	removeEntityName(entity); // Unreserves name immediately
+	EntityHandle handle = getEntityHandle(entity);
+	// Unreserves names of children
+	std::size_t childCount = handle.getChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		removeEntityName(handle.getChild(i).getEntity());
+	}
 	functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::destroyEntity, *this, entity));
 }
 

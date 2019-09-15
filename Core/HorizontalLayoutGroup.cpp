@@ -65,9 +65,9 @@ void HorizontalLayoutGroup::updateLayout() {
 		}
 
 		// Position and resize all elements
-		float claimedWidth = 0; // Total width claimed by all the layout elements
+		float claimedWidth = elements.size() > 0 ? spacing * (elements.size() - 1) : 0; // Total width claimed by all the layout elements
 		for (LayoutElementData& element : elements) {
-			claimedWidth += element.size.x + spacing;
+			claimedWidth += element.size.x;
 		}
 
 		Vector2 anchor = Anchor(childAlignment);

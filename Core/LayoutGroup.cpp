@@ -60,33 +60,33 @@ std::vector<LayoutElementData> LayoutGroup::getLayoutElementData(bool shrinkable
 }
 
 float LayoutGroup::getTotalMinWidth(const std::vector<LayoutElementData>& elements) {
-	float totalMinWidth = 0;
+	float totalMinWidth = elements.size() > 0 ? spacing * (elements.size() - 1) : 0;
 	for (const LayoutElementData& element : elements) {
-		totalMinWidth += element.minSize.x + spacing;
+		totalMinWidth += element.minSize.x;
 	}
 	return totalMinWidth;
 }
 
 float LayoutGroup::getTotalPrefWidth(const std::vector<LayoutElementData>& elements) {
-	float totalPrefWidth = 0;
+	float totalPrefWidth = elements.size() > 0 ? spacing * (elements.size() - 1) : 0;
 	for (const LayoutElementData& element : elements) {
-		totalPrefWidth += element.preferredSize.x + spacing;
+		totalPrefWidth += element.preferredSize.x;
 	}
 	return totalPrefWidth;
 }
 
 float LayoutGroup::getTotalMinHeight(const std::vector<LayoutElementData>& elements) {
-	float totalMinHeight = 0;
+	float totalMinHeight = elements.size() > 0 ? spacing * (elements.size() - 1) : 0;
 	for (const LayoutElementData& element : elements) {
-		totalMinHeight += element.minSize.y + spacing;
+		totalMinHeight += element.minSize.y;
 	}
 	return totalMinHeight;
 }
 
 float LayoutGroup::getTotalPrefHeight(const std::vector<LayoutElementData>& elements) {
-	float totalPrefHeight = 0;
+	float totalPrefHeight = elements.size() > 0 ? spacing * (elements.size() - 1) : 0;
 	for (const LayoutElementData& element : elements) {
-		totalPrefHeight += element.preferredSize.y + spacing;
+		totalPrefHeight += element.preferredSize.y;
 	}
 	return totalPrefHeight;
 }

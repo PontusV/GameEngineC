@@ -18,6 +18,8 @@ namespace Core {
 		void onChildAdded(Handle entity) override;
 		void onChildRemoved(Handle entity) override;
 
+		const Bounds& getContentBounds() const;
+
 	private:
 		void refreshContentBounds();
 
@@ -27,6 +29,17 @@ namespace Core {
 		float speed = 30.0f;
 		PROPERTY()
 		bool scrollableY = true;
+		PROPERTY()
+		bool scrollableX = false;
+		PROPERTY()
+		float paddingTop = 0;
+		PROPERTY()
+		float paddingRight = 0;
+		PROPERTY()
+		float paddingBottom = 0;
+		PROPERTY()
+		float paddingLeft = 0;
+
 
 	private:
 		bool changed = false;

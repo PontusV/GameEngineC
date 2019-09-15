@@ -23,9 +23,13 @@ namespace Core {
 		~Inspector();
 
 		void awake() override;
+		void lateUpdate(float deltaTime) override;
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 
 		void inspect(EntityHandle entity);
+		/* Recreates target component list if target exists. */
+		void refresh();
+		void createEntries();
 
 		template<typename T>
 		void addComponentToTarget();
@@ -39,7 +43,9 @@ namespace Core {
 	private:
 		EntityHandle currentTarget;
 		EntityHandle scrollPanel;
+		EntityHandle scrollBar;
 		std::vector<EntityHandle> targetComponentList;
+		std::vector<ComponentTypeID> targetComponents;
 	};
 
 	template<typename T>

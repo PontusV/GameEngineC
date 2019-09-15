@@ -22,10 +22,11 @@ void DropDownScroll::open() {
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
 		RectSprite(Color(20, 20, 20, 255)),
 		RectMask(),
-		ScrollRect(),
 		RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
 	);
-	std::cout << "x: " << position.x << ", y: " << position.y << std::endl;
+	ScrollRect* scrollRect = menuBox.addComponent<ScrollRect>();
+	scrollRect->paddingTop = boxPaddingY;
+	scrollRect->paddingBottom = boxPaddingY;
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 
 	// Menu Option settings

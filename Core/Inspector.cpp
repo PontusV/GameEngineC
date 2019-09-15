@@ -7,6 +7,7 @@
 #include "RectSprite.h"
 #include "RectMask.h"
 #include "ScrollRect.h"
+#include "ScrollBar.h"
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
@@ -48,42 +49,63 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 
 void Inspector::awake() {
 	// create scroll panel for targetComponentList
-	if (!scrollPanel.isValid()) {
-		VerticalLayoutGroup* parentGroup = owner.addComponent<VerticalLayoutGroup>();
-		parentGroup->childForceExpandHeight = true;
-		parentGroup->childForceExpandWidth = true;
-		parentGroup->shrinkableChildHeight = true;
-		parentGroup->shrinkableChildWidth = true;
-		RectTransform* rect = owner.getComponent<RectTransform>();
+	RectTransform* rect = owner.getComponent<RectTransform>();
+	if (rect) {
+		if (!scrollPanel.isValid()) {
+			HorizontalLayoutGroup* parentGroup = owner.addComponent<HorizontalLayoutGroup>();
+			parentGroup->childForceExpandHeight = true;
+			parentGroup->childForceExpandWidth = true;
+			parentGroup->shrinkableChildHeight = true;
+			parentGroup->shrinkableChildWidth = true;
+			parentGroup->spacing = 5;
 
-		scrollPanel = createEntity("Inspector_Scroll_Panel",
-			RectSprite(Color(150, 0, 0)),
-			RectMask(),
-			ScrollRect(),
-			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
-		);
-		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
-		element->setFlexibleSize(Vector2(1, 1));
-		element->setFlexibleSizeEnabled(true);
-		element->setMinSizeEnabled(true);
-		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
-		group->childForceExpandHeight = false;
-		group->childForceExpandWidth = true;
-		group->shrinkableChildHeight = false;
-		group->shrinkableChildWidth = false;
-		group->spacing = 5;
-		group->paddingTop = 10;
-		group->paddingLeft = 10;
-		group->paddingRight = 10;
-		scrollPanel.setParent(owner);
+			scrollPanel = createEntity("Inspector_Scroll_Panel",
+				RectMask(),
+				RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
+			);
+			ScrollRect* scrollRect = scrollPanel.addComponent<ScrollRect>();
+			scrollRect->paddingBottom = 10;
+			LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
+			element->setFlexibleSize(Vector2(1, 1));
+			element->setFlexibleSizeEnabled(true);
+			element->setMinSizeEnabled(true);
+			VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
+			group->childForceExpandHeight = false;
+			group->childForceExpandWidth = true;
+			group->shrinkableChildHeight = false;
+			group->shrinkableChildWidth = false;
+			group->spacing = 5;
+			group->paddingTop = 10;
+			group->paddingLeft = 10;
+			group->paddingRight = 10;
+			scrollPanel.setParent(owner);
+		}
+		if (!scrollBar.isValid()) {
+			scrollBar = createEntity("Inspector_Scroll_Bar",
+				ScrollBar(scrollPanel),
+				RectTransform(0, 0, 20, 500, rect->getZ() + 10.0f)
+			);
+			LayoutElement* element = scrollBar.addComponent<LayoutElement>();
+			element->setMinSize(Vector2(20, 0));
+			element->setMinSizeEnabled(true);
+			element->setFlexibleSize(Vector2(0, 1));
+			element->setFlexibleSizeEnabled(true);
+			scrollBar.setParent(owner);
+		}
 	}
 }
 
 void Inspector::clearEntries() {
 	for (EntityHandle& handle : targetComponentList) {
+		std::cout << "Clearing entries: " << handle.getEntity().getID() << "(" << handle.getEntityName() << ")" << std::endl;
+		for (std::size_t i = 0; i < handle.getChildCount(); i++) {
+			EntityHandle child = handle.getChild(i);
+			std::cout << "Clearing entries child: " << child.getEntity().getID() << "(" << child.getEntityName() << ")" << std::endl;
+		}
 		handle.destroy();
 	}
 	targetComponentList.clear();
+	targetComponents.clear();
 }
 
 ReflectedObject* getInstanceOfValue(ReflectedObject* instance, PropertyValueID value) {
@@ -279,6 +301,37 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	entryContent.setParent(entry);
 	// End of Entry content
 	targetComponentList.push_back(entry);
+	targetComponents.push_back(component->getTypeID());
+}
+
+void Inspector::createEntries() {
+	// Get components and their reflection data
+	std::size_t i = 0;
+	for (Component* component : currentTarget.getComponents()) {
+		addComponentEntry(component, i++);
+	}
+	// Add an 'Add Component' button
+	EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
+		Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
+		RectTransform(0, 0, 200, 50, owner.getComponent<RectTransform>()->getZ() + 0.1f)
+	);
+	DropDownScroll* dropDown = addComponentButton.addComponent(DropDownScroll(Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))));
+	dropDown->boxWidth = 200;
+	dropDown->boxHeight = 100;
+	dropDown->optionFont = Font("resources/fonts/segoeui.ttf", 14);
+	dropDown->optionTextColor = Color(255, 255, 255, 255);
+	dropDown->border = true;
+	dropDown->borderColor = Color(255, 255, 255, 255);
+	dropDown->borderSize = 10;
+	dropDown->boxPaddingY = 5;
+	addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
+	addComponentButton.setParent(scrollPanel);
+	targetComponentList.push_back(addComponentButton);
+}
+
+void Inspector::refresh() {
+	clearEntries();
+	createEntries();
 }
 
 void Inspector::inspect(EntityHandle entity) {
@@ -286,29 +339,7 @@ void Inspector::inspect(EntityHandle entity) {
 		HideFlags hideFlags = entity.getEntityHideFlags();
 		if (hideFlags == HideFlags::HideInInspector) return;
 		currentTarget = entity;
-		// Clear old target component list
-		clearEntries();
-		// Get components and their reflection data
-		std::size_t i = 0;
-		for (Component* component : entity.getComponents()) {
-			addComponentEntry(component, i++);
-		}
-		// Add an 'Add Component' button
-		EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
-			Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
-			RectTransform(0, 0, 200, 50, owner.getComponent<RectTransform>()->getZ() + 0.1f)
-		);
-		DropDownScroll* dropDown = addComponentButton.addComponent(DropDownScroll(Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))));
-		dropDown->boxWidth = 200;
-		dropDown->boxHeight = 100;
-		dropDown->optionFont = Font("resources/fonts/segoeui.ttf", 14);
-		dropDown->optionTextColor = Color(255, 255, 255, 255);
-		dropDown->border = true;
-		dropDown->borderColor = Color(255, 255, 255, 255);
-		dropDown->borderSize = 10;
-		addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
-		addComponentButton.setParent(scrollPanel);
-		targetComponentList.push_back(addComponentButton);
+		refresh();
 	}
 }
 
@@ -316,5 +347,22 @@ void Inspector::onMouseButtonPressed(int buttoncode, int mods) {
 	EntityHandle target = input->getLastClicked();
 	if (target.getEntity() != currentTarget.getEntity()) {
 		inspect(target);
+	}
+}
+
+void Inspector::lateUpdate(float deltaTime) {
+	if (currentTarget.getEntity().getID() == Entity::INVALID_ID) return;
+	// Check if refresh is necessary
+	std::vector<Component*> components = currentTarget.getComponents();
+	if (components.size() != targetComponents.size()) {
+		refresh();
+	}
+	else {
+		for (std::size_t i = 0; i < components.size(); i++) {
+			if (components[i]->getTypeID() != targetComponents[i]) {
+				refresh();
+				break;
+			}
+		}
 	}
 }

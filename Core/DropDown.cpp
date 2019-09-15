@@ -158,6 +158,10 @@ void DropDown::addOption(std::string label, ComponentFunctionHandle<void> functi
 	options.push_back({label, function, nest});
 }
 
+void DropDown::onDestroy() {
+	close();
+}
+
 void DropDown::test() {
 	std::cout << "Option clicked\n";
 }

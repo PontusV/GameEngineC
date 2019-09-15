@@ -243,6 +243,7 @@
     <ClCompile Include="RectTransform.cpp" />
     <ClCompile Include="ReflectedObject.cpp" />
     <ClCompile Include="ReflectedObjectHandle.cpp" />
+    <ClCompile Include="ScrollBar.cpp" />
     <ClCompile Include="ScrollRect.cpp" />
     <ClCompile Include="Selectable.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -334,6 +335,7 @@
     <ClInclude Include="ReflectedObject.h" />
     <ClInclude Include="ReflectedObjectHandle.h" />
     <ClInclude Include="ReflectionMacros.h" />
+    <ClInclude Include="ScrollBar.h" />
     <ClInclude Include="ScrollRect.h" />
     <ClInclude Include="Selectable.h" />
     <ClInclude Include="Sprite.h" />

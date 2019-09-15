@@ -20,10 +20,11 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		if (scrollableY) {
-			if (offset.y > contentBounds.pos.y)
-				offset.y = 0;
-			if (offset.y < contentBounds.pos.y - contentBounds.size.y + rect->getSize().y)
-				offset.y = contentBounds.pos.y - contentBounds.size.y + rect->getSize().y;
+			if (offset.y < -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom) {
+				offset.y = -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom;
+			}
+			if (offset.y > contentBounds.pos.y + paddingTop)
+				offset.y = contentBounds.pos.y + paddingTop;
 		}
 	}
 }
@@ -73,4 +74,8 @@ void ScrollRect::onChildAdded(Handle entity) {
 
 void ScrollRect::onChildRemoved(Handle entity) {
 	refreshContentBounds();
+}
+
+const Bounds& ScrollRect::getContentBounds() const {
+	return contentBounds;
 }

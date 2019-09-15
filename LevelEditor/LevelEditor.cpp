@@ -138,6 +138,7 @@ int LevelEditor::initiate() {
 	// Inspector background
 	EntityHandle inspector = level->createEntity("Inspector_background",
 		Inspector(),
+		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspector.setParent(inspectorLabelRect);
