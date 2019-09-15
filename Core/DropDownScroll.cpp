@@ -2,6 +2,7 @@
 #include "RectSprite.h"
 #include "RectButton.h"
 #include "ScrollRect.h"
+#include "ScrollBar.h"
 #include "RectMask.h"
 #include "Maths/MatrixTransform.h"
 using namespace Core;
@@ -20,14 +21,18 @@ void DropDownScroll::open() {
 	Vector2 position = transform->getPosition() + Vector2(-size.x / 2, size.y / 2);
 	float z = transform->getZ() + 1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
-		RectSprite(Color(20, 20, 20, 255)),
-		RectMask(),
 		RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
 	);
-	ScrollRect* scrollRect = menuBox.addComponent<ScrollRect>();
+	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
+	EntityHandle menuBoxContent = createEntity(owner.getEntityName() + "_DropDownBox_Content",
+		RectSprite(Color(20, 20, 20, 255)),
+		RectMask(),
+		RectTransform(0, 0, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
+	);
+	ScrollRect* scrollRect = menuBoxContent.addComponent<ScrollRect>();
 	scrollRect->paddingTop = boxPaddingY;
 	scrollRect->paddingBottom = boxPaddingY;
-	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
+	menuBoxContent.setParent(menuBox);
 
 	// Menu Option settings
 	int optionWidth = boxWidth - (int)(boxPaddingX * 2);
@@ -45,7 +50,7 @@ void DropDownScroll::open() {
 			button,
 			RectSprite({ 20,20,20,255 })
 		);
-		menuOption.setParent(menuBox.getEntity());
+		menuOption.setParent(menuBoxContent.getEntity());
 
 		// Button Text
 		Alignment textAlignment = Alignment::LEFT;
@@ -70,15 +75,22 @@ void DropDownScroll::open() {
 			RectSprite(borderColor),
 			RectTransform((float)-borderSize, 0.0f, boxWidth + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorder.setParent(menuBox.getEntity());
+		menuBoxBorder.setParent(menuBoxContent.getEntity());
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(owner.getEntityName() + "_DropDownBox_BorderTop",
 			RectSprite(borderColor),
 			RectTransform((float)size.x, (float)-borderSize, boxWidth - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorderTop.setParent(menuBox.getEntity());
+		menuBoxBorderTop.setParent(menuBoxContent.getEntity());
 	}
+
+	// Scroll Bar
+	EntityHandle scrollBar = createEntity(owner.getEntityName() + "_DropDownBox_Scroll_Bar",
+		ScrollBar(menuBoxContent),
+		RectTransform(boxWidth, 0, 20, boxHeight, z + 0.2f, Alignment::TOP_LEFT)
+	);
+	scrollBar.setParent(menuBox);
 
 	// Set to Open color
 	owner.getComponent<RectSprite>()->setColor(Color(20, 20, 20, 255));

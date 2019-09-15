@@ -154,8 +154,8 @@ void DropDown::close() {
 	// Set to Default color
 	owner.getComponent<RectSprite>()->setColor(Color(80, 80, 80, 255));
 }
-void DropDown::addOption(std::string label, ComponentFunctionHandle<void> function, std::vector<DropDownOption> nest) {
-	options.push_back({label, function, nest});
+void DropDown::addOption(std::string label, ComponentFunctionHandle<void> function) {
+	options.push_back({label, function});
 }
 
 void DropDown::onDestroy() {

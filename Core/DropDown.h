@@ -12,7 +12,6 @@ namespace Core {
 	struct DropDownOption {
 		std::string text;
 		ComponentFunctionHandle<void> function;
-		std::vector<DropDownOption> options; // Nested
 	};
 
 	/* Adds a Text and Rect component on start() */
@@ -25,7 +24,7 @@ namespace Core {
 
 		virtual void open();
 		void close();
-		void addOption(std::string label, ComponentFunctionHandle<void> function, std::vector<DropDownOption> nest = {});
+		void addOption(std::string label, ComponentFunctionHandle<void> function);
 
 		void awake() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
