@@ -19,7 +19,7 @@ Vector2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& ele
 			if (element->getFlexibleSizeEnabled()) {
 				Vector2 maxSpace;
 				if (RectTransform* parentRect = owner.getParent().getComponent<RectTransform>()) {
-					maxSpace = element->getFlexibleSize() * parentRect->getSize();
+					maxSpace = element->getFlexibleSize() * parentRect->getSize(); // This is probably the issue....
 				}
 				else {
 					maxSpace = Vector2(getTotalPrefWidth(elements), getTotalPrefHeight(elements));

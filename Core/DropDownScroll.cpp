@@ -18,10 +18,10 @@ void DropDownScroll::open() {
 	// Box
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	const Vector2& size = transform->getSize();
-	Vector2 position = transform->getPosition() + Vector2(-size.x / 2, size.y / 2);
+	Vector2 position = transform->getPosition() + transform->getRectOffset() + Vector2(0, size.y);
 	float z = transform->getZ() + 1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
-		RectTransform(position.x, position.y, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
+		RectTransform(position.x, position.y, boxWidth + 20, boxHeight, z, Alignment::TOP_LEFT)
 	);
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	EntityHandle menuBoxContent = createEntity(owner.getEntityName() + "_DropDownBox_Content",
@@ -73,16 +73,16 @@ void DropDownScroll::open() {
 		// left, bottom, right
 		EntityHandle menuBoxBorder = createEntity(owner.getEntityName() + "_DropDownBox_Border",
 			RectSprite(borderColor),
-			RectTransform((float)-borderSize, 0.0f, boxWidth + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
+			RectTransform((float)-borderSize, 0.0f, boxWidth + 20 + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorder.setParent(menuBoxContent.getEntity());
+		menuBoxBorder.setParent(menuBox.getEntity());
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(owner.getEntityName() + "_DropDownBox_BorderTop",
 			RectSprite(borderColor),
-			RectTransform((float)size.x, (float)-borderSize, boxWidth - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
+			RectTransform(size.x, (float)-borderSize, boxWidth + 20 - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorderTop.setParent(menuBoxContent.getEntity());
+		menuBoxBorderTop.setParent(menuBox.getEntity());
 	}
 
 	// Scroll Bar

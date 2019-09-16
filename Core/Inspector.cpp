@@ -68,6 +68,7 @@ void Inspector::awake() {
 			LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
 			element->setFlexibleSize(Vector2(1, 1));
 			element->setFlexibleSizeEnabled(true);
+			element->setMinSize(Vector2(0, 0));
 			element->setMinSizeEnabled(true);
 			VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
 			group->childForceExpandHeight = false;
@@ -322,8 +323,11 @@ void Inspector::createEntries() {
 	dropDown->optionTextColor = Color(255, 255, 255, 255);
 	dropDown->border = true;
 	dropDown->borderColor = Color(255, 255, 255, 255);
-	dropDown->borderSize = 10;
+	dropDown->borderSize = 1;
 	dropDown->boxPaddingY = 5;
+	LayoutElement* layoutElement = addComponentButton.addComponent<LayoutElement>();
+	layoutElement->setMinSize(Vector2(200, 50));
+	layoutElement->setMinSizeEnabled(true);
 	addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
 	addComponentButton.setParent(scrollPanel);
 	targetComponentList.push_back(addComponentButton);

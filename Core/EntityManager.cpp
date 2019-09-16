@@ -266,8 +266,6 @@ void EntityManager::destroyEntity(Entity entity, bool chained) {
 	if (archetype->isEmpty()) {
 		removeArchetype(archetype);
 	}
-	if (entityMap.find(Entity(51)) != entityMap.end())
-		std::cout << "(End) Child count of 51: " << getImmediateChildCount(Entity(51)) << std::endl;
 }
 
 /* Removes specified entity and its components from the Archetype that stores it. */
