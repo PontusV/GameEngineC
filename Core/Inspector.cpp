@@ -328,6 +328,8 @@ void Inspector::createEntries() {
 	LayoutElement* layoutElement = addComponentButton.addComponent<LayoutElement>();
 	layoutElement->setMinSize(Vector2(200, 50));
 	layoutElement->setMinSizeEnabled(true);
+	layoutElement->setFlexibleSize(Vector2(1, 0));
+	layoutElement->setFlexibleSizeEnabled(true);
 	addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
 	addComponentButton.setParent(scrollPanel);
 	targetComponentList.push_back(addComponentButton);

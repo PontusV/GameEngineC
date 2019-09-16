@@ -15,7 +15,7 @@ Vector2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& ele
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
 		Vector2 allocatedSpace = rectTransform->getSize(); // Allocated space for all LayoutElements
-		if (LayoutElement* element = owner.getComponent<LayoutElement>()) {
+		/*if (LayoutElement* element = owner.getComponent<LayoutElement>()) {
 			if (element->getFlexibleSizeEnabled()) {
 				Vector2 maxSpace;
 				if (RectTransform* parentRect = owner.getParent().getComponent<RectTransform>()) {
@@ -27,7 +27,7 @@ Vector2 LayoutGroup::getAllocatedSpace(const std::vector<LayoutElementData>& ele
 				allocatedSpace.x = std::max(maxSpace.x, allocatedSpace.x);
 				allocatedSpace.y = std::max(maxSpace.y, allocatedSpace.y);
 			}
-		}
+		}*/
 		allocatedSpace.x -= paddingLeft + paddingRight;
 		allocatedSpace.y -= paddingTop + paddingBottom;
 		return allocatedSpace;

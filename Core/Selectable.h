@@ -8,7 +8,6 @@ namespace Core {
 	CLASS() Selectable : public Behaviour {
 		GENERATED_BODY()
 	public:
-		Selectable();
 		virtual ~Selectable();
 
 		void select();
@@ -16,6 +15,9 @@ namespace Core {
 		virtual void onSelect() {}
 		virtual void onDeselect() {}
 		bool isSelected();
+
+	protected:
+		Selectable();
 
 	private:
 		bool selected = false;
