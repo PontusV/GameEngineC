@@ -9,6 +9,7 @@
 #include "../Core/MouseDrag.h"
 #include "../Core/LayoutElement.h"
 #include "../Core/HorizontalLayoutGroup.h"
+#include "../Core/VerticalLayoutGroup.h"
 #include "../Core/WindowScale.h"
 #include "../Core/DragAndResize.h"
 #include "../Core/Inspector.h"
@@ -114,26 +115,35 @@ int LevelEditor::initiate() {
 	EntityHandle rightPanel = level->createEntity("Right_Panel",
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
-		RectTransform(0, 0, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
+		VerticalLayoutGroup(),
+		RectTransform(1000, 50, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
 	);
+	VerticalLayoutGroup* rplayoutGroup = rightPanel.getComponent<VerticalLayoutGroup>();
+	rplayoutGroup->paddingTop = 5;
+	rplayoutGroup->paddingLeft = 3;
 	rightPanel.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	int textPadding = 5;
 	int backgroundPadding = 3;
-	// Inspector label
-	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
-		Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
-		RectTransform(textPadding+backgroundPadding-inspectorWidth, textPadding+backgroundPadding, 0, 0, 1.1f, Alignment::TOP_LEFT)
-	);
-	inspectorLabel.setParent(rightPanel);
-	// Inspector label background
-	Vector2 inspectorLabelSize = inspectorLabel.getComponent<Text>()->getSize();
+	Text inspectorLabelText = Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
+	Vector2 inspectorLabelSize = inspectorLabelText.getSize();
 	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
+	// Inspector label background
 	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
-		RectSprite(Color(100,100,100,255)),
-		RectTransform((float)-textPadding, (float)-textPadding, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
+		RectSprite(Color(100, 100, 100, 255)),
+		LayoutElement(),
+		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspectorLabelRect.setParent(inspectorLabel);
+	LayoutElement* labelRectLE = inspectorLabelRect.getComponent<LayoutElement>();
+	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
+	labelRectLE->setFlexibleSizeEnabled(true);
+	inspectorLabelRect.setParent(rightPanel);
+	// Inspector label
+	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
+		inspectorLabelText,
+		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
+	);
+	inspectorLabel.setParent(inspectorLabelRect);
 
 	// Inspector background
 	EntityHandle inspector = level->createEntity("Inspector_background",
@@ -141,7 +151,7 @@ int LevelEditor::initiate() {
 		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspector.setParent(inspectorLabelRect);
+	inspector.setParent(rightPanel);
 	//*/
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button

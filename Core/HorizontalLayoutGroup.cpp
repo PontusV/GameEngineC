@@ -82,8 +82,8 @@ void HorizontalLayoutGroup::updateLayout() {
 			transform->setSize(element.size);
 
 			// Set position
-			transform->setLocalX(x - transform->getRectOffset().x - rectTransform->getRectOffset().x);
-			transform->setLocalY(y - transform->getRectOffset().y - rectTransform->getRectOffset().y - element.size.y * anchor.y);
+			transform->setLocalX(x - transform->getRectOffset().x + rectTransform->getRectOffset().x);
+			transform->setLocalY(y - transform->getRectOffset().y + rectTransform->getRectOffset().y - element.size.y * anchor.y);
 
 			// Calculate position for next element
 			x += element.size.x + spacing;

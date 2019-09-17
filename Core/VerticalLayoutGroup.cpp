@@ -81,8 +81,8 @@ void VerticalLayoutGroup::updateLayout() {
 			transform->setSize(element.size);
 
 			// Set position
-			transform->setLocalX(x - transform->getRectOffset().x - rectTransform->getRectOffset().x - element.size.x * anchor.x);
-			transform->setLocalY(y - transform->getRectOffset().y - rectTransform->getRectOffset().y);
+			transform->setLocalX(x - transform->getRectOffset().x + rectTransform->getRectOffset().x - element.size.x * anchor.x);
+			transform->setLocalY(y - transform->getRectOffset().y + rectTransform->getRectOffset().y);
 
 			// Calculate position for next element
 			y += element.size.y + spacing;
