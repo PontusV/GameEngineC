@@ -75,6 +75,8 @@ Vector2 LayoutController::getPrefSize(Handle entity) {
 	if (LayoutElement* element = entity.getComponent<LayoutElement>())
 		if (element->getPrefSizeEnabled())
 			return element->getPrefSize();
+		else if (element->getMinSizeEnabled())
+			return element->getMinSize();
 
 	std::vector<ILayoutElement*> layoutElements = getLayoutGroups(entity);
 	Vector2 prefSize(0,0);

@@ -77,12 +77,13 @@ namespace Core {
 		bool isInsideWindow(int cameraX, int cameraY, int windowWidth, int windowHeight, const RectTransform& rect) {
 			// TODO: Check every corner or if a rect line crosses the window
 			// Currently only checks if pivot point is inside window
-			Vector2 rectPosition = rect.getPosition(); // Pivot point in world space, TODO: Convert to screen space
+			/*Vector2 rectPosition = rect.getPosition(); // Pivot point in world space, TODO: Convert to screen space
 
 			int relativeX = (int)(rectPosition.x - cameraX); // Offset
 			int relativeY = (int)(rectPosition.y - cameraY); // Offset
 			return (relativeX > 0 && relativeX < windowWidth &&
-					relativeY > 0 && relativeY < windowHeight);
+					relativeY > 0 && relativeY < windowHeight);*/
+			return true;
 		}
 	}
 }

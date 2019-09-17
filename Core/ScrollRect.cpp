@@ -12,13 +12,8 @@ ScrollRect::~ScrollRect() {
 
 }
 
-void ScrollRect::onScroll(float xOffset, float yOffset) {
-	// getContentBounds
-	offset.x += xOffset * speed;
-	offset.y += yOffset * speed;
-	changed = true;
-
-	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
+void ScrollRect::checkScrollArea() {
+	if (RectTransform * rect = owner.getComponent<RectTransform>()) {
 		if (scrollableY) {
 			if (offset.y < -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom) {
 				offset.y = -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom;
@@ -29,10 +24,20 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 	}
 }
 
+void ScrollRect::onScroll(float xOffset, float yOffset) {
+	// getContentBounds
+	offset.x += xOffset * speed;
+	offset.y += yOffset * speed;
+	changed = true;
+
+	checkScrollArea();
+}
+
 void ScrollRect::lateUpdate(float deltaTime) {
 	for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
 		if (rect->hasChanged()) {
 			refreshContentBounds();
+			checkScrollArea();
 		}
 	}
 }
@@ -70,10 +75,12 @@ bool ScrollRect::hasChanged() {
 
 void ScrollRect::onChildAdded(Handle entity) {
 	refreshContentBounds();
+	checkScrollArea();
 }
 
 void ScrollRect::onChildRemoved(Handle entity) {
 	refreshContentBounds();
+	checkScrollArea();
 }
 
 const Bounds& ScrollRect::getContentBounds() const {

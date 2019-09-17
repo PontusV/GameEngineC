@@ -116,11 +116,19 @@ int LevelEditor::initiate() {
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		VerticalLayoutGroup(),
+		DragAndResize(),
 		RectTransform(1000, 50, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
 	);
+	DragAndResize* rpdar = rightPanel.getComponent<DragAndResize>();
+	rpdar->top = false;
+	rpdar->right = false;
+	rpdar->left = true;
+	rpdar->bottom = true;
+	rpdar->edgeSize = 10;
 	VerticalLayoutGroup* rplayoutGroup = rightPanel.getComponent<VerticalLayoutGroup>();
 	rplayoutGroup->paddingTop = 5;
-	rplayoutGroup->paddingLeft = 3;
+	rplayoutGroup->paddingLeft = 10;
+	rplayoutGroup->paddingBottom = 10;
 	rightPanel.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	int textPadding = 5;
 	int backgroundPadding = 3;

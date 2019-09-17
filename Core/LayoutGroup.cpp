@@ -51,7 +51,7 @@ std::vector<LayoutElementData> LayoutGroup::getLayoutElementData(bool shrinkable
 			else {
 				minSize = LayoutController::getMinSize(child);
 				if (!shrinkableChildWidth) minSize.x = prefSize.x;
-				if (!shrinkableChildWidth) minSize.y = prefSize.y;
+				if (!shrinkableChildHeight) minSize.y = prefSize.y;
 			}
 			elements.push_back(LayoutElementData(child, minSize, prefSize, flexibleSize));
 		}

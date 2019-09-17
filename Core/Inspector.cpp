@@ -98,10 +98,8 @@ void Inspector::awake() {
 
 void Inspector::clearEntries() {
 	for (EntityHandle& handle : targetComponentList) {
-		std::cout << "Clearing entries: " << handle.getEntity().getID() << "(" << handle.getEntityName() << ")" << std::endl;
 		for (std::size_t i = 0; i < handle.getChildCount(); i++) {
 			EntityHandle child = handle.getChild(i);
-			std::cout << "Clearing entries child: " << child.getEntity().getID() << "(" << child.getEntityName() << ")" << std::endl;
 		}
 		handle.destroy();
 	}
@@ -191,7 +189,6 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		for (std::size_t i = 0; i < classType.properties.size(); i++) {
 			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, propInstance);
 			propField.setParent(propValueField);
-			std::cout << classType.properties[i].name << std::endl;
 		}
 	}
 	else {

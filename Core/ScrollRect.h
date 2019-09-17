@@ -22,6 +22,7 @@ namespace Core {
 
 	private:
 		void refreshContentBounds();
+		void checkScrollArea();
 
 	public:
 		Vector2 offset;
