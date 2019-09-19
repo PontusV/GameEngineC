@@ -17,9 +17,12 @@ void ScrollRect::checkScrollArea() {
 		if (scrollableY) {
 			if (offset.y < -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom) {
 				offset.y = -contentBounds.pos.y - contentBounds.size.y + rect->getSize().y - paddingBottom;
+				changed = true;
 			}
-			if (offset.y > contentBounds.pos.y + paddingTop)
+			if (offset.y > contentBounds.pos.y + paddingTop) {
 				offset.y = contentBounds.pos.y + paddingTop;
+				changed = true;
+			}
 		}
 	}
 }
@@ -36,6 +39,7 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 void ScrollRect::lateUpdate(float deltaTime) {
 	refreshContentBounds();
 	checkScrollArea();
+	changed = true;
 	/*for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
 		if (rect->hasChanged()) {
 			refreshContentBounds();
