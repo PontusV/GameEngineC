@@ -126,6 +126,10 @@ int LevelEditor::initiate() {
 	rpdar->bottom = true;
 	rpdar->edgeSize = 10;
 	VerticalLayoutGroup* rplayoutGroup = rightPanel.getComponent<VerticalLayoutGroup>();
+	rplayoutGroup->childForceExpandWidth = true;
+	rplayoutGroup->childForceExpandHeight = true;
+	rplayoutGroup->shrinkableChildWidth = true;
+	rplayoutGroup->shrinkableChildHeight = true;
 	rplayoutGroup->paddingTop = 5;
 	rplayoutGroup->paddingLeft = 10;
 	rplayoutGroup->paddingBottom = 10;

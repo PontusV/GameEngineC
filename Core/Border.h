@@ -2,7 +2,6 @@
 #define BORDER_COMPONENT_H
 
 #include "Sprite.h"
-#include "Color.h"
 #include <cstddef>
 #include "Border.generated.h"
 
@@ -33,8 +32,6 @@ namespace Core {
 		bool inner = false;
 		PROPERTY()
 		std::size_t borderThickness = 1;
-		PROPERTY()
-		Color color;
 		// padding!
 	};
 }

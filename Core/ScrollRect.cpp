@@ -34,12 +34,14 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 }
 
 void ScrollRect::lateUpdate(float deltaTime) {
-	//for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
-	//	if (rect->hasChanged()) {
+	refreshContentBounds();
+	checkScrollArea();
+	/*for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
+		if (rect->hasChanged()) {
 			refreshContentBounds();
 			checkScrollArea();
-	//	}
-	//}
+		}
+	}*/
 }
 
 void ScrollRect::refreshContentBounds() {

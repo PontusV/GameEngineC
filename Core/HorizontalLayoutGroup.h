@@ -13,14 +13,14 @@ namespace Core {
 		~HorizontalLayoutGroup();
 
 		PROPERTY()
-		bool shrinkableChildWidth = true; // Determines if the childrens width can be shrunk below their original width
+		bool shrinkableChildWidth = false; // Determines if the childrens width can be shrunk below their original width
 		PROPERTY()
-		bool shrinkableChildHeight = true; // Determines if the childrens height can be shrunk below their original height
+		bool shrinkableChildHeight = false; // Determines if the childrens height can be shrunk below their original height
 
 		PROPERTY()
-		bool childForceExpandWidth = true;
+		bool childForceExpandWidth = false;
 		PROPERTY()
-		bool childForceExpandHeight = true;
+		bool childForceExpandHeight = false;
 
 	private:
 		/* Attemps to stretch the width of all elements in the given vector so it fills all of the allocated width available to the elements. */
