@@ -90,3 +90,15 @@ float LayoutGroup::getTotalPrefHeight(const std::vector<LayoutElementData>& elem
 	}
 	return totalPrefHeight;
 }
+
+Vector2 LayoutGroup::getMinSize() {
+	return minSize;
+}
+
+Vector2 LayoutGroup::getPrefSize() {
+	return prefSize;
+}
+
+Vector2 LayoutGroup::getFlexibleSize() {
+	return flexibleSize;
+}

@@ -4,11 +4,13 @@
 #include "LayoutGroup.h"
 #include "ContentSizeFitter.h"
 #include "UIBehaviour.h"
+#include "ParentEntity.h"
 namespace Core {
 	struct ContentSizeFitterGroup : public ComponentGroup<ContentSizeFitter> {
 		ComponentArray<ContentSizeFitter>& contentSizeFitters = getComponentArray<ContentSizeFitter>();
 	};
 	struct LayoutGroupComponentGroup : public ComponentGroup<LayoutGroup> {
+		LayoutGroupComponentGroup() : ComponentGroup<LayoutGroup>({ typeof(ParentEntity) }) {}
 		ComponentArray<LayoutGroup>& layoutGroups = getComponentArray<LayoutGroup>();
 	};
 	struct UIBehaviourGroup : public ComponentGroup<UIBehaviour> {

@@ -10,7 +10,6 @@ UISystem::UISystem() {
 UISystem::~UISystem() {
 }
 
-
 void UISystem::update() {
 	// Update Content Size Fitters
 	std::size_t contentSizeFitterGroupSize = contentSizeFitterGroup.contentSizeFitters.size();
@@ -24,6 +23,12 @@ void UISystem::update() {
 	std::size_t layoutGroupSize = layoutGroupComponentGroup.layoutGroups.size();
 	for (std::size_t i = 0; i < layoutGroupSize; i++) {
 		LayoutController& controller = layoutGroupComponentGroup.layoutGroups[i];
+		// Update child layout groups first
+		for (LayoutController* child : controller.getOwner().getComponentsInChildren<LayoutController>()) {
+			if (child->isDirty())
+				child->refresh();
+		}
+		// Update self
 		if (controller.isDirty())
 			controller.refresh();
 	}

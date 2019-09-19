@@ -38,6 +38,19 @@ namespace Core {
 		float getTotalPrefWidth(const std::vector<LayoutElementData>& elements);
 		float getTotalMinHeight(const std::vector<LayoutElementData>& elements);
 		float getTotalPrefHeight(const std::vector<LayoutElementData>& elements);
+
+		/* Returns the minimum valid size for this element. */
+		Vector2 getMinSize();
+		/* Returns the prefered size for this element. The returned size will always be equal to or more than the minimum size. */
+		Vector2 getPrefSize();
+		/* Returns how much extra relative space this element may be allocated if there is additional available space. */
+		Vector2 getFlexibleSize();
+
+	protected:
+		virtual void updateLayoutSizes() = 0;
+		Vector2 minSize;
+		Vector2 prefSize;
+		Vector2 flexibleSize;
 	};
 }
 #endif

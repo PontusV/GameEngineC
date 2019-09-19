@@ -17,10 +17,11 @@ HorizontalLayoutGroup::~HorizontalLayoutGroup() {
 void HorizontalLayoutGroup::updateLayout() {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
+		updateLayoutSizes();
 		std::vector<LayoutElementData> elements = getLayoutElementData(shrinkableChildWidth, shrinkableChildHeight);
 		Vector2 allocatedSpace = getAllocatedSpace(elements);
-		float totalMinWidth = getTotalMinWidth(elements);
-		float totalPrefWidth = getTotalPrefWidth(elements);
+		float totalMinWidth = minSize.x;
+		float totalPrefWidth = prefSize.x;
 		float totalPrefWidthDif = totalPrefWidth - totalMinWidth;
 
 		// Calculate width scales
@@ -134,33 +135,28 @@ void HorizontalLayoutGroup::expandWidth(std::vector<LayoutElementData>& elements
 	}
 }
 
-Vector2 HorizontalLayoutGroup::getMinSize() {
+void HorizontalLayoutGroup::updateLayoutSizes() {
+	// Min size
 	std::vector<LayoutElementData> elements = getLayoutElementData();
 	float minHeight = 0;
 	for (LayoutElementData& element : elements) {
 		minHeight = std::max(element.minSize.y, minHeight);
 	}
-	return Vector2(getTotalMinWidth(elements), minHeight);
-}
-
-Vector2 HorizontalLayoutGroup::getPrefSize() {
-	std::vector<LayoutElementData> elements = getLayoutElementData();
+	minSize = Vector2(getTotalMinWidth(elements), minHeight);
+	// Pref size
 	float prefHeight = 0;
 	for (LayoutElementData& element : elements) {
 		prefHeight = std::max(element.preferredSize.y, prefHeight);
 	}
-	return Vector2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
-}
-
-Vector2 HorizontalLayoutGroup::getFlexibleSize() {
+	prefSize = Vector2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
+	// Flexible size
 	float totalFlexibleWidth = 0;
 	float flexibleHeight = 0;
-	std::vector<LayoutElementData> elements = getLayoutElementData();
 	for (LayoutElementData& element : elements) {
 		totalFlexibleWidth += element.flexibleSize.x;
 		flexibleHeight = std::max(element.flexibleSize.y, flexibleHeight);
 	}
 	if (totalFlexibleWidth > 1) totalFlexibleWidth = 1;
 	if (flexibleHeight > 1) flexibleHeight = 1;
-	return Vector2(totalFlexibleWidth, flexibleHeight);
+	flexibleSize = Vector2(totalFlexibleWidth, flexibleHeight);
 }
