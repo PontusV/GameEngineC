@@ -36,10 +36,9 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 	checkScrollArea();
 }
 
-void ScrollRect::lateUpdate(float deltaTime) {
+void ScrollRect::onPostLayoutUpdate() {
 	refreshContentBounds();
 	checkScrollArea();
-	changed = true;
 	/*for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
 		if (rect->hasChanged()) {
 			refreshContentBounds();

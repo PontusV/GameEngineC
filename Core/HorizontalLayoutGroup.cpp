@@ -17,11 +17,10 @@ HorizontalLayoutGroup::~HorizontalLayoutGroup() {
 void HorizontalLayoutGroup::updateLayout() {
 	RectTransform* rectTransform = owner.getComponent<RectTransform>();
 	if (rectTransform) {
-		updateLayoutSizes();
 		std::vector<LayoutElementData> elements = getLayoutElementData(shrinkableChildWidth, shrinkableChildHeight);
 		Vector2 allocatedSpace = getAllocatedSpace(elements);
-		float totalMinWidth = minSize.x;
-		float totalPrefWidth = prefSize.x;
+		float totalMinWidth = minSize.x - paddingLeft - paddingRight;
+		float totalPrefWidth = prefSize.x - paddingLeft - paddingRight;
 		float totalPrefWidthDif = totalPrefWidth - totalMinWidth;
 
 		// Calculate width scales
@@ -80,7 +79,8 @@ void HorizontalLayoutGroup::updateLayout() {
 			RectTransform* transform = element.child.getComponent<RectTransform>();
 
 			// Set size
-			transform->setSize(element.size);
+			if (transform->getSize() != element.size)
+				transform->setSize(element.size);
 
 			// Set position
 			transform->setLocalX(x - transform->getRectOffset().x + rectTransform->getRectOffset().x);
@@ -136,19 +136,20 @@ void HorizontalLayoutGroup::expandWidth(std::vector<LayoutElementData>& elements
 }
 
 void HorizontalLayoutGroup::updateLayoutSizes() {
-	// Min size
+	dirtySize = false;
 	std::vector<LayoutElementData> elements = getLayoutElementData();
-	float minHeight = 0;
+	// Min size
+	float minHeight = paddingTop + paddingBottom;
 	for (LayoutElementData& element : elements) {
 		minHeight = std::max(element.minSize.y, minHeight);
 	}
 	minSize = Vector2(getTotalMinWidth(elements), minHeight);
 	// Pref size
-	float prefHeight = 0;
+	float prefHeight = paddingTop + paddingBottom;
 	for (LayoutElementData& element : elements) {
 		prefHeight = std::max(element.preferredSize.y, prefHeight);
 	}
-	prefSize = Vector2(paddingLeft + paddingRight + getTotalPrefWidth(elements), paddingTop + paddingBottom + prefHeight);
+	prefSize = Vector2(getTotalPrefWidth(elements), prefHeight);
 	// Flexible size
 	float totalFlexibleWidth = 0;
 	float flexibleHeight = 0;

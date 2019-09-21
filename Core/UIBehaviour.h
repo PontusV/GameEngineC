@@ -15,6 +15,8 @@ namespace Core {
 		virtual void onChildRectTransformResized() {}
 		/* Called when the window changes resolution. */
 		virtual void onWindowResize() {}
+		/* Called after layout update. */
+		virtual void onPostLayoutUpdate() {}
 
 	protected:
 		UIBehaviour();

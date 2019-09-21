@@ -1,11 +1,11 @@
 #ifndef SCROLL_BAR_H
 #define SCROLL_BAR_H
-#include "Behaviour.h"
+#include "UIBehaviour.h"
 #include "Color.h"
 #include "Maths/Vector2.h"
 #include "ScrollBar.generated.h"
 namespace Core {
-	CLASS() ScrollBar : public Behaviour {
+	CLASS() ScrollBar : public UIBehaviour {
 		GENERATED_BODY()
 	public:
 		ScrollBar(EntityHandle target);
@@ -13,7 +13,7 @@ namespace Core {
 		~ScrollBar();
 
 		void awake() override;
-		void lateUpdate(float deltaTime) override;
+		void onPostLayoutUpdate() override;
 		void onMouseDrag(float mouseX, float mouseY);
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;

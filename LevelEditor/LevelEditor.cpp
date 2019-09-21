@@ -147,6 +147,8 @@ int LevelEditor::initiate() {
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
 	LayoutElement* labelRectLE = inspectorLabelRect.getComponent<LayoutElement>();
+	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
+	labelRectLE->setMinSizeEnabled(true);
 	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
 	labelRectLE->setFlexibleSizeEnabled(true);
 	inspectorLabelRect.setParent(rightPanel);
@@ -161,7 +163,7 @@ int LevelEditor::initiate() {
 	EntityHandle inspector = level->createEntity("Inspector_background",
 		Inspector(),
 		RectSprite(Color(175, 0, 0, 255)),
-		RectTransform(0, labelRectHeight, inspectorWidth - backgroundPadding * 2, inspectorHeight - backgroundPadding * 2 - labelRectHeight, 1.05f, Alignment::TOP_LEFT)
+		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspector.setParent(rightPanel);
 	//*/

@@ -10,7 +10,7 @@ namespace Core {
 		ComponentArray<ContentSizeFitter>& contentSizeFitters = getComponentArray<ContentSizeFitter>();
 	};
 	struct LayoutGroupComponentGroup : public ComponentGroup<LayoutGroup> {
-		LayoutGroupComponentGroup() : ComponentGroup<LayoutGroup>({ typeof(ParentEntity) }) {}
+		//LayoutGroupComponentGroup() : ComponentGroup<LayoutGroup>({ typeof(ParentEntity) }) {}
 		ComponentArray<LayoutGroup>& layoutGroups = getComponentArray<LayoutGroup>();
 	};
 	struct UIBehaviourGroup : public ComponentGroup<UIBehaviour> {

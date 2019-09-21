@@ -19,7 +19,7 @@ namespace Core {
 		Vector2 flexibleSize;
 	};
 
-	CLASS() LayoutController : public UIBehaviour {
+	CLASS() LayoutController : public UIBehaviour, public ILayoutElement {
 		GENERATED_BODY()
 	protected:
 		LayoutController();
@@ -31,11 +31,13 @@ namespace Core {
 		void onChildRectTransformResized() override;
 		void onChildAdded(Handle entity) override;
 		void onChildRemoved(Handle entity) override;
+		void onChildChanged(Handle entity) override;
 
 		/* Updates layout and sets dirty to false. */
 		void refresh();
 		void setDirty();
 		bool isDirty();
+		bool isDirtySize();
 
 	protected:
 		/* Returns LayoutElement minSize from the given Entity. */
@@ -46,6 +48,22 @@ namespace Core {
 		static Vector2 getFlexibleSize(Handle entity);
 		/* Returns all components inheriting from the Layout Element Interface (ILayoutElement) */
 		static std::vector<ILayoutElement*> getLayoutGroups(Handle entity);
+
+		/* Returns the minimum valid size for this element. */
+		Vector2 getMinSize();
+		/* Returns the prefered size for this element. The returned size will always be equal to or more than the minimum size. */
+		Vector2 getPrefSize();
+		/* Returns how much extra relative space this element may be allocated if there is additional available space. */
+		Vector2 getFlexibleSize();
+
+	public:
+		virtual void updateLayoutSizes() = 0;
+
+	protected:
+		Vector2 minSize;
+		Vector2 prefSize;
+		Vector2 flexibleSize;
+		bool dirtySize; // Determines if the layout size preferences need to be updated
 
 	private:
 		virtual void updateLayout() = 0;

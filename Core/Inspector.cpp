@@ -57,7 +57,7 @@ void Inspector::awake() {
 			parentGroup->childForceExpandWidth = true;
 			parentGroup->shrinkableChildHeight = true;
 			parentGroup->shrinkableChildWidth = true;
-			parentGroup->spacing = 5;
+			parentGroup->spacing = 10;
 
 			scrollPanel = createEntity("Inspector_Scroll_Panel",
 				RectMask(),
@@ -74,11 +74,11 @@ void Inspector::awake() {
 			group->childForceExpandHeight = false;
 			group->childForceExpandWidth = true;
 			group->shrinkableChildHeight = false;
-			group->shrinkableChildWidth = false;
+			group->shrinkableChildWidth = true;
 			group->spacing = 5;
 			group->paddingTop = 10;
 			group->paddingLeft = 10;
-			group->paddingRight = 10;
+			group->paddingRight = 0;
 			scrollPanel.setParent(owner);
 		}
 		if (!scrollBar.isValid()) {
@@ -268,6 +268,8 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		RectTransform(0, 0, 0, 24, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
 	LayoutElement* labelLayout = labelField.addComponent<LayoutElement>();
+	labelLayout->setMinSizeEnabled(true);
+	labelLayout->setMinSize(Vector2(0, 24));
 	labelLayout->setFlexibleSizeEnabled(true);
 	labelLayout->setFlexibleSize(Vector2(1, 0));
 	labelField.setParent(entry);

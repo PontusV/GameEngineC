@@ -31,17 +31,29 @@ void LayoutController::onChildRemoved(Handle entity) {
 	setDirty();
 }
 
+void LayoutController::onChildChanged(Handle entity) {
+	setDirty();
+}
+
 void LayoutController::refresh() {
 	updateLayout();
 	dirty = false;
 }
 
 void LayoutController::setDirty() {
+	for (LayoutController* controller : owner.getParent().getComponents<LayoutController>()) {
+		controller->setDirty();
+	}
 	dirty = true;
+	dirtySize = true;
 }
 
 bool LayoutController::isDirty() {
 	return dirty;
+}
+
+bool LayoutController::isDirtySize() {
+	return dirtySize;
 }
 
 Vector2 LayoutController::getMinSize(Handle entity) {
@@ -61,11 +73,6 @@ Vector2 LayoutController::getMinSize(Handle entity) {
 			minSize.x = std::max(minSize.x, currentMinSize.x);
 			minSize.y = std::max(minSize.y, currentMinSize.y);
 		}
-	}
-	else {
-		// Default value for children without any ILayoutElement components
-		if (RectTransform* childRectTransform = entity.getComponent<RectTransform>())
-			minSize = childRectTransform->getSize();
 	}
 	return minSize;
 }
@@ -127,4 +134,16 @@ std::vector<ILayoutElement*> LayoutController::getLayoutGroups(Handle entity) {
 		layoutElements.push_back(static_cast<ILayoutElement*>(group));
 	}
 	return layoutElements;
+}
+
+Vector2 LayoutController::getMinSize() {
+	return minSize;
+}
+
+Vector2 LayoutController::getPrefSize() {
+	return prefSize;
+}
+
+Vector2 LayoutController::getFlexibleSize() {
+	return flexibleSize;
 }

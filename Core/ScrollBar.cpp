@@ -37,13 +37,14 @@ void ScrollBar::awake() {
 	}
 }
 
-void ScrollBar::lateUpdate(float deltaTime) {
+void ScrollBar::onPostLayoutUpdate() {
 	if (!target.refresh()) {
 		RectTransform* handleRect = handle.getComponent<RectTransform>();
 		if (handleRect->getSize().y != 0.0f || handleRect->getSize().x != 0.0f)
 			handleRect->setSize(Vector2(0.0f, 0.0f));
 		return;
 	}
+	// Handle color
 	if (input->getHoverTarget() == handle) {
 		hovering = true;
 		if (!handleDrag)
