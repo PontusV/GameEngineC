@@ -172,14 +172,14 @@ namespace Mirror {
 
 	struct AnnotatedType {
 		std::vector<Annotation> annotatedAttributes;
-		bool hasAnnotation(std::string annotation) {
+		bool hasAnnotation(std::string annotation) const {
 			for (const Annotation& entry : annotatedAttributes) {
 				if (entry.name == annotation)
 					return true;
 			}
 			return false;
 		}
-		Annotation getAnnotation(std::string name) {
+		Annotation getAnnotation(std::string name) const {
 			for (const Annotation& annotation : annotatedAttributes) {
 				if (name == annotation.name) {
 					return annotation;
@@ -240,6 +240,10 @@ namespace Mirror {
 		template<typename ClassType>
 		std::size_t getArraySize(ClassType* instance) {
 			return instance->getArraySize(name);
+		}
+		template<typename ClassType>
+		void onUpdate(ClassType* instance) {
+			instance->onUpdate(name);
 		}
 	};
 

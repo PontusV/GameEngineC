@@ -52,15 +52,20 @@ namespace Core {
 		bool hasChanged();
 
 	protected:
+		void setToChanged() {
+			changed = true;
+		}
+
+	protected:
 		Matrix4 localToWorldMatrix;		// World Model Matrix
 		Matrix4 worldToLocalMatrix;		// Inverse of worldModelMatrix. Multiply with a world position to get local position
-		PROPERTY()
+		PROPERTY(Update=setToChanged())
 		Vector2 position;				// Local position (Position in parent)
 		PROPERTY()
 		float z;						// Depth for drawing order
-		PROPERTY()
+		PROPERTY(Update=setToChanged())
 		float rotation;					// Local rotation in radians
-		PROPERTY()
+		PROPERTY(Update=setToChanged())
 		float scale;					// Local scale (both width and height atm)
 
 		bool changed = true;			// Defines if the transform has moved

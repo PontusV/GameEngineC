@@ -107,25 +107,26 @@ void Inspector::clearEntries() {
 	targetComponents.clear();
 }
 
-ReflectedObject* getInstanceOfValue(ReflectedObject* instance, PropertyValueID value) {
+void* getInstanceOfValue(void* instance, std::size_t typeID, PropertyValueID value) {
 	if (value.isArrayElement) {
-		return static_cast<ReflectedObject*>(instance->getArrayElementPointers(value.prop.name)[value.arrayIndex]);
+		return Mirror::getArrayElementPointers(value.prop, instance, typeID)[value.arrayIndex]; // WIP instance->getArrayElementPointers(value.prop.name)[value.arrayIndex];
 	}
 	else {
-		return static_cast<ReflectedObject*>(instance->getPointer(value.prop.name));
+		return Mirror::getPointer(value.prop, instance, typeID); // WIP instance->getPointer(value.prop.name);
 	}
 }
 
-EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValueID value, Component* root, ReflectedObject* instance, std::string entityName) {
+EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValueID value, Component* root, Mirror::Property& rootProp, void* instance, std::size_t typeID, std::string entityName) {
 	std::size_t offset = reinterpret_cast<unsigned char*>(instance) - reinterpret_cast<unsigned char*>(root);
-	ReflectedObjectHandle instanceHandle(ComponentHandle(root), offset);
+	ReflectedObjectHandle instanceHandle(ComponentHandle(root), offset, typeID);
 
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle propValueField = createEntity(entityName,
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
-	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, instanceHandle));
-	if (Mirror::isReflected(value.prop.type.name)) {
+	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, rootProp, instanceHandle));
+	std::size_t propTypeID = Mirror::getTypeID(value.prop.type.name);
+	if (propTypeID) {
 		VerticalLayoutGroup* fieldLayout = propValueField.addComponent<VerticalLayoutGroup>();
 		fieldLayout->spacing = 3;
 		fieldLayout->shrinkableChildHeight = false;
@@ -183,11 +184,11 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		checkBox->onToggle = Core::bind(editor, &PropertyEditor::onBoolSubmit);
 		propValueDisplay.setParent(propValueField);
 	}
-	else if (Mirror::isReflected(propType.name)) {
-		ReflectedObject* propInstance = getInstanceOfValue(instance, value); // instance->getPointer(value.prop.name)
-		Mirror::Class classType = propInstance->getType();
+	else if (propTypeID) {
+		void* propInstance = getInstanceOfValue(instance, typeID, value);
+		Mirror::Class classType = Mirror::getType(propType.name); // WIP propInstance->getType();
 		for (std::size_t i = 0; i < classType.properties.size(); i++) {
-			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, propInstance);
+			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, value.prop, propInstance, propTypeID);
 			propField.setParent(propValueField);
 		}
 	}
@@ -202,7 +203,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	return propValueField;
 }
 
-EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& prop, Component* component, ReflectedObject* instance) {
+EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& prop, Component* component, Mirror::Property& rootProp, void* instance, std::size_t typeID) {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 
 	// Create Field
@@ -220,18 +221,18 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 
 	// Create Field Body
 	if (Mirror::isArrayType(prop.type)) {
-		std::size_t arraySize = prop.getArraySize(instance);
+		std::size_t arraySize = Mirror::getArraySize(prop, instance, typeID); // WIP Change implementation of Property::getArraySize to use Mirror::polyGetArraySize(instance)
 		for (std::size_t i = 0; i < arraySize; i++) {
 			PropertyValueID value(prop, i);
 
-			EntityHandle line = createPropertyValueField(prop.name + "[" + std::to_string(i) + "]", value, component, instance, name + "_line_" + std::to_string(i));
+			EntityHandle line = createPropertyValueField(prop.name + "[" + std::to_string(i) + "]", value, component, rootProp, instance, typeID, name + "_line_" + std::to_string(i));
 			line.setParent(propField);
 		}
 	}
 	else {
 		PropertyValueID value(prop);
 
-		EntityHandle line = createPropertyValueField(prop.name, value, component, instance, name + "_line");
+		EntityHandle line = createPropertyValueField(prop.name, value, component, rootProp, instance, typeID, name + "_line");
 		line.setParent(propField);
 	}
 
@@ -295,7 +296,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	// Property field
 	for (std::size_t i = 0; i < type.properties.size(); i++) {
 		ComponentHandle componentHandle(component);
-		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, component);
+		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, type.properties[i], component, component->getType().typeID);
 		propField.setParent(entryContent);
 	}
 	entryContent.setParent(entry);

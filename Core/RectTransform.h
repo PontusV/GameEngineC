@@ -59,9 +59,9 @@ namespace Core {
 		void notifyResize();
 
 	private:
-		PROPERTY()
+		PROPERTY(Update=setToChanged())
 		Vector2 size;	// Size of the rect
-		PROPERTY()
+		PROPERTY(Update=setToChanged())
 		Vector2 pivot;	// The position the Entity scales and rotates around
 	};
 }

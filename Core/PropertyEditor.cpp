@@ -5,24 +5,27 @@ using namespace Core;
 
 
 template<typename T>
-void setValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle, T&& value) {
-	ReflectedObject* instance = instanceHandle.get();
+void setValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle, Mirror::Property& rootProp, T&& value) {
+	void* instance = instanceHandle.get();
+	std::size_t typeID = instanceHandle.getTypeID();
 	if (valueID.isArrayElement) {
-		Mirror::polySetArrayElementValue(valueID.prop, valueID.arrayIndex, instance, value);
+		Mirror::polySetArrayElementValue(valueID.prop, valueID.arrayIndex, instance, typeID, value);
 	}
 	else {
-		Mirror::polySetValue(valueID.prop, instance, value);
+		Mirror::polySetValue(valueID.prop, instance, typeID, value);
 	}
+	Mirror::onUpdate(instanceHandle.getRoot(), instanceHandle.getRootPropTypeID(), rootProp);
 }
 
 template<typename T>
 T getValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle) {
-	ReflectedObject* instance = instanceHandle.get();
+	void* instance = instanceHandle.get();
+	std::size_t typeID = instanceHandle.getTypeID();
 	if (valueID.isArrayElement) {
-		return Mirror::polyGetArrayElementValue<T>(valueID.prop, valueID.arrayIndex, instance);
+		return Mirror::polyGetArrayElementValue<T>(valueID.prop, valueID.arrayIndex, instance, typeID);
 	}
 	else {
-		return Mirror::polyGetValue<T>(valueID.prop, instance);
+		return Mirror::polyGetValue<T>(valueID.prop, instance, typeID);
 	}
 }
 
@@ -31,19 +34,19 @@ void PropertyEditor::onTextSubmit(std::wstring value) {
 
 	if (type.isNumber()) {
 		if (type.isDecimal()) {
-			setValue(valueID, instanceHandle, std::stod(value));
+			setValue(valueID, instanceHandle, rootProp, std::stod(value));
 		}
 		else {
-			setValue(valueID, instanceHandle, std::stoi(value));
+			setValue(valueID, instanceHandle, rootProp, std::stoi(value));
 		}
 	}
 	else
 		if (type.isString()) {
 			std::string stringValue(value.begin(), value.end());
-			setValue(valueID, instanceHandle, stringValue);
+			setValue(valueID, instanceHandle, rootProp, stringValue);
 		}
 		else if (type.isWideString()) {
-			setValue(valueID, instanceHandle, value);
+			setValue(valueID, instanceHandle, rootProp, value);
 		}
 		else if (type.isChar()) {
 			// WIP
@@ -57,7 +60,7 @@ void PropertyEditor::onTextSubmit(std::wstring value) {
 }
 
 void PropertyEditor::onBoolSubmit(bool value) {
-	setValue(valueID, instanceHandle, value);
+	setValue(valueID, instanceHandle, rootProp, value);
 }
 
 template<typename T>

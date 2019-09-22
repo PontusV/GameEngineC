@@ -3,19 +3,23 @@
 #include "ComponentHandle.h"
 #include <cstddef>
 namespace Core {
-	class ReflectedObject;
 
 	class ReflectedObjectHandle {
 	public:
-		ReflectedObjectHandle(ComponentHandle handle, std::size_t offset) : handle(handle), offset(offset) {}
+		ReflectedObjectHandle(ComponentHandle handle, std::size_t offset, std::size_t typeID) : handle(handle), offset(offset), typeID(typeID) {}
 		~ReflectedObjectHandle() {}
 
 		bool isValid();
-		ReflectedObject* get();
+		void* get();
+		std::size_t getTypeID() const;
+
+		Component* getRoot();
+		std::size_t getRootPropTypeID();
 
 	private:
 		ComponentHandle handle;
 		std::size_t offset;
+		std::size_t typeID;
 	};
 }
 #endif

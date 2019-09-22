@@ -37,8 +37,8 @@ namespace Core {
 	private:
 		void clearEntries();
 		void addComponentEntry(Component* component, std::size_t id);
-		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component, ReflectedObject* instance);
-		EntityHandle createPropertyValueField(std::string label, PropertyValueID value, Component* root, ReflectedObject* instance, std::string entityName);
+		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component, Mirror::Property& rootProp, void* instance, std::size_t typeID);
+		EntityHandle createPropertyValueField(std::string label, PropertyValueID value, Component* root, Mirror::Property& rootProp, void* instance, std::size_t typeID, std::string entityName);
 
 	private:
 		EntityHandle currentTarget;

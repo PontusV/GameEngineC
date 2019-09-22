@@ -2,11 +2,11 @@
 #define COLOR_H
 #include "Serializable.h"
 #include <iostream>
-#include "ReflectedObject.h"
+#include <ReflectionParser/ReflectionMacros.h>
 #include "Color.generated.h"
 namespace Core {
 	/* Holds color values between 0-255 */
-	CLASS() Color : public ReflectedObject {
+	CLASS() Color {
 		GENERATED_BODY()
 	public:
 		Color() {}

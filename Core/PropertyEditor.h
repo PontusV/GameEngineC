@@ -9,7 +9,7 @@ namespace Core {
 	CLASS() PropertyEditor : public Component {
 		GENERATED_BODY()
 	public:
-		PropertyEditor(PropertyValueID value, ReflectedObjectHandle instance) : valueID(value), instanceHandle(instance) {}
+		PropertyEditor(PropertyValueID value, Mirror::Property& rootProp, ReflectedObjectHandle instance) : valueID(value), rootProp(rootProp), instanceHandle(instance) {}
 		~PropertyEditor() {}
 
 		void onTextSubmit(std::wstring value);
@@ -19,6 +19,7 @@ namespace Core {
 	private:
 		PropertyValueID valueID;
 		ReflectedObjectHandle instanceHandle;
+		Mirror::Property rootProp;
 	};
 }
 #endif

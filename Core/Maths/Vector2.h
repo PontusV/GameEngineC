@@ -1,8 +1,11 @@
 #ifndef VECTOR_2_H
 #define VECTOR_2_H
 #include <cstddef>
+#include <ReflectionParser/ReflectionMacros.h>
+#include "../Vector2.generated.h"
 namespace Core {
-	class Vector2 {
+	CLASS() Vector2 {
+		GENERATED_BODY()
 	public:
 		template<typename T, typename T2>
 		Vector2(T x, T2 y) : x(float(x)), y(float(y)){}
@@ -23,7 +26,9 @@ namespace Core {
 		float& operator[](std::size_t index);
 		Vector2 operator*(const float& scalar) const;
 	public:
+		PROPERTY()
 		float x;
+		PROPERTY()
 		float y;
 	};
 
