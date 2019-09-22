@@ -19,7 +19,7 @@ namespace Core {
 	private:
 		PropertyValueID valueID;
 		ReflectedObjectHandle instanceHandle;
-		Mirror::Property rootProp;
+		Mirror::Property rootProp; // The property to call onUpdate for when value is set
 	};
 }
 #endif

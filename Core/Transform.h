@@ -52,7 +52,7 @@ namespace Core {
 		bool hasChanged();
 
 	protected:
-		void setToChanged() {
+		void setToChanged() { // Used as Update function
 			changed = true;
 		}
 
