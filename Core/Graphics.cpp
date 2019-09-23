@@ -10,13 +10,14 @@
 
 #include <algorithm>
 #include <array>
+#include <GLFW/glfw3.h>
 
 #include <glad/glad.h>
 
 using namespace Core;
 Shader spriteShader;
 
-Graphics::Graphics() {}
+Graphics::Graphics() : camera(&window) {}
 
 
 Graphics::~Graphics() {
@@ -60,6 +61,8 @@ void Graphics::render(float deltaTime) {
 	std::size_t sizeTexts			= renderableTexts.texts.size();
 	std::size_t sizeTexturedSprites	= renderableTexturedSprites.sprites.size();
 	std::size_t sizeBorders			= renderableBorders.borders.size();
+
+	ResourceManager::getInstance().updateCameraViewMatrix(camera.getViewMatrix());
 
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
 	// Rectangles

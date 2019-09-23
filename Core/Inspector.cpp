@@ -14,6 +14,8 @@
 #include "CheckBox.h"
 #include "DropDownScroll.h"
 #include "Maths/Vector2.h"
+#include "ChildManager.h"
+#include "ParentEntity.h"
 #include "ReflectionPolymorph.generated.h"
 #include <limits>
 
@@ -28,22 +30,42 @@ Inspector::~Inspector()
 {
 }
 
+/* Utility */
+template<typename T>
+bool contains(const std::vector<T>& vec, const T& value) {
+	for (const T& v : vec) {
+		if (v == value) return true;
+	}
+	return false;
+}
+
+bool filterComponentType(const std::vector<ComponentTypeID>& filter, const ComponentTypeID& typeID) {
+	for (const ComponentTypeID& filterID : filter) {
+		if (typeID == filterID || contains(Mirror::polyGetDerivedTypeIDs(typeID), filterID)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 template<typename... Ts>
-void addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<Ts...>) {} // End
+void addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, std::vector<ComponentTypeID> filter, Mirror::TypeList<Ts...>) {} // End
 template<typename T, typename... Ts>
-typename std::enable_if_t<std::is_base_of<Component, T>::value&& std::is_default_constructible<T>::value && !std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>);
+typename std::enable_if_t<std::is_base_of<Component, T>::value&& std::is_default_constructible<T>::value && !std::is_abstract<T>::value && !std::is_same<T, ChildManager>::value && !std::is_same<T, ParentEntity>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, std::vector<ComponentTypeID> filter, Mirror::TypeList<T, Ts...>);
 template<typename T, typename... Ts>
-typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>);
+typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value || std::is_same<T, ChildManager>::value || std::is_same<T, ParentEntity>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, std::vector<ComponentTypeID> filter, Mirror::TypeList<T, Ts...>);
 
 template<typename T, typename... Ts>
-typename std::enable_if_t<std::is_base_of<Component, T>::value && std::is_default_constructible<T>::value && !std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>) {
-	dropDown->addOption(T::getClassType().name, Core::bind(inspector, &Inspector::addComponentToTarget<T>));
-	addComponentDropDownOption(dropDown, inspector, Mirror::TypeList<Ts...>{}); // Continue
+typename std::enable_if_t<std::is_base_of<Component, T>::value && std::is_default_constructible<T>::value && !std::is_abstract<T>::value && !std::is_same<T, ChildManager>::value && !std::is_same<T, ParentEntity>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, std::vector<ComponentTypeID> filter, Mirror::TypeList<T, Ts...>) {
+	Mirror::Class type = T::getClassType();
+	if (!filterComponentType(filter, type.typeID))
+		dropDown->addOption(type.name, Core::bind(inspector, &Inspector::addComponentToTarget<T>));
+	addComponentDropDownOption(dropDown, inspector, filter, Mirror::TypeList<Ts...>{}); // Continue
 }
 
 template<typename T, typename... Ts>
-typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, Mirror::TypeList<T, Ts...>) {
-	addComponentDropDownOption(dropDown, inspector, Mirror::TypeList<Ts...>{}); // Continue
+typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_default_constructible<T>::value || std::is_abstract<T>::value || std::is_same<T, ChildManager>::value || std::is_same<T, ParentEntity>::value, void> addComponentDropDownOption(DropDown* dropDown, Inspector* inspector, std::vector<ComponentTypeID> filter, Mirror::TypeList<T, Ts...>) {
+	addComponentDropDownOption(dropDown, inspector, filter, Mirror::TypeList<Ts...>{}); // Continue
 }
 
 
@@ -109,10 +131,10 @@ void Inspector::clearEntries() {
 
 void* getInstanceOfValue(void* instance, std::size_t typeID, PropertyValueID value) {
 	if (value.isArrayElement) {
-		return Mirror::getArrayElementPointers(value.prop, instance, typeID)[value.arrayIndex]; // WIP instance->getArrayElementPointers(value.prop.name)[value.arrayIndex];
+		return Mirror::getArrayElementPointers(value.prop, instance, typeID)[value.arrayIndex];
 	}
 	else {
-		return Mirror::getPointer(value.prop, instance, typeID); // WIP instance->getPointer(value.prop.name);
+		return Mirror::getPointer(value.prop, instance, typeID);
 	}
 }
 
@@ -186,7 +208,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	}
 	else if (propTypeID) {
 		void* propInstance = getInstanceOfValue(instance, typeID, value);
-		Mirror::Class classType = Mirror::getType(propType.name); // WIP propInstance->getType();
+		Mirror::Class classType = Mirror::getType(propType.name);
 		for (std::size_t i = 0; i < classType.properties.size(); i++) {
 			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, value.prop, propInstance, propTypeID);
 			propField.setParent(propValueField);
@@ -221,7 +243,7 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 
 	// Create Field Body
 	if (Mirror::isArrayType(prop.type)) {
-		std::size_t arraySize = Mirror::getArraySize(prop, instance, typeID); // WIP Change implementation of Property::getArraySize to use Mirror::polyGetArraySize(instance)
+		std::size_t arraySize = Mirror::getArraySize(prop, instance, typeID);
 		for (std::size_t i = 0; i < arraySize; i++) {
 			PropertyValueID value(prop, i);
 
@@ -330,7 +352,11 @@ void Inspector::createEntries() {
 	layoutElement->setMinSizeEnabled(true);
 	layoutElement->setFlexibleSize(Vector2(1, 0));
 	layoutElement->setFlexibleSizeEnabled(true);
-	addComponentDropDownOption(dropDown, this, Mirror::ReflectedTypes{});
+	std::vector<ComponentTypeID> filter;
+	for (Component* component : currentTarget.getComponents()) {
+		filter.push_back(component->getType().typeID);
+	}
+	addComponentDropDownOption(dropDown, this, filter, Mirror::ReflectedTypes{});
 	addComponentButton.setParent(scrollPanel);
 	targetComponentList.push_back(addComponentButton);
 }

@@ -15,6 +15,7 @@
 #include "UISystem.h"
 
 #include "Window.h"
+#include "Camera.h"
 #include <vector>
 
 namespace Core {
@@ -65,6 +66,7 @@ namespace Core {
 		UISystem userInterfaceSystem;
 
 		Window window;
+		Camera camera;
 		Renderer2D* renderer;
 
 	private:

@@ -40,6 +40,8 @@ namespace Core {
 		void updateShader(Shader& shader, const Matrix4& projection);
 		// Updates Projection matrix of all shaders
 		void updateShaders(const Matrix4& projection);
+		// Updates View matrix of all loaded shaders
+		void updateCameraViewMatrix(const Matrix4& viewMatrix);
 		// Initializes all shaders. Prepares them for use in rendering.
 		void initShader(const Matrix4& projection);
 	private:

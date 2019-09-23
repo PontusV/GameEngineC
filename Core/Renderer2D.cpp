@@ -20,7 +20,6 @@ unsigned char Renderer2D::createLayer() {
 }
 
 void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
-
 	std::vector<Vector2> clipMaskVertices;
 	clipMaskVertices.reserve(masks.size()*4);
 	for (const std::array<Vector2, 4>& vertices : masks) {
@@ -28,7 +27,6 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 			clipMaskVertices.push_back(vertices[i]);
 		}
 	}
-
 
 	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
