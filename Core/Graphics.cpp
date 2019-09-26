@@ -62,6 +62,7 @@ void Graphics::render(float deltaTime) {
 	std::size_t sizeTexturedSprites	= renderableTexturedSprites.sprites.size();
 	std::size_t sizeBorders			= renderableBorders.borders.size();
 
+	// Updates Camera View Matrix
 	ResourceManager::getInstance().updateCameraViewMatrix(camera.getViewMatrix());
 
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view

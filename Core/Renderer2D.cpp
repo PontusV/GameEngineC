@@ -20,6 +20,11 @@ unsigned char Renderer2D::createLayer() {
 }
 
 void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
+	if (renderablesSize >= MAX_RENDERABLES) {
+		// TODO: Add warning to increase MAX_RENDERABLES
+		return;
+	}
+
 	std::vector<Vector2> clipMaskVertices;
 	clipMaskVertices.reserve(masks.size()*4);
 	for (const std::array<Vector2, 4>& vertices : masks) {
