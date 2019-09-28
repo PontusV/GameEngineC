@@ -37,14 +37,21 @@ void Camera::setRotation(float value) {
 	rotation = value;
 }
 
-Matrix4 Camera::getViewMatrix() {
-	Matrix4 view;
+const Matrix4& Camera::getWorldToScreenMatrix() const {
+	return worldToScreenMatrix;
+}
+
+const Matrix4& Camera::getViewMatrix() const {
+	return viewMatrix;
+}
+void Camera::updateViewMatrix() {
+	Matrix4 viewMatrix = Matrix4(1.0f);
 	Vector2 resolution = window->getResolution();
-	Vector2 center = Vector2(resolution.x/2, resolution.y/2);
+	Vector2 center = Vector2(resolution.x / 2, resolution.y / 2);
 
-	view = maths::translate(view, Vector3(center.x, center.y, 0.0f));
-	view = maths::rotate(view, -rotation, Vector3(0.0f, 0.0f, 1.0f));
-	view = maths::translate(view, Vector3(-center.x - position.x, -center.y - position.y, 0.0f));
+	viewMatrix = maths::translate(viewMatrix, Vector3(center.x, center.y, 0.0f));
+	viewMatrix = maths::rotate(viewMatrix, -rotation, Vector3(0.0f, 0.0f, 1.0f));
+	viewMatrix = maths::translate(viewMatrix, Vector3(-center.x - position.x, -center.y - position.y, 0.0f));
 
-	return view;
+	worldToScreenMatrix = maths::inverse(viewMatrix);
 }

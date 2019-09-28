@@ -14,7 +14,7 @@ namespace Core {
 		float			z;
 		unsigned char	shaderID;
 		Color			color;
-		unsigned char	layerIndex;
+		unsigned char	sortingLayer;
 
 		// Clipping with Stencil Buffer
 		std::vector<Vector2> clipMaskVertices;

@@ -48,7 +48,7 @@ bool Graphics::initiate() {
 	ResourceManager::getInstance().initShader(projection);
 	
 	// Initialize renderer
-	renderer = new Renderer2D(&window);
+	renderer = new Renderer2D(&camera, &window);
 
 	// Succesfull initialization
 	return true;
@@ -63,6 +63,7 @@ void Graphics::render(float deltaTime) {
 	std::size_t sizeBorders			= renderableBorders.borders.size();
 
 	// Updates Camera View Matrix
+	camera.updateViewMatrix();
 	ResourceManager::getInstance().updateCameraViewMatrix(camera.getViewMatrix());
 
 	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
@@ -72,10 +73,10 @@ void Graphics::render(float deltaTime) {
 		const RectTransform&	transform		= renderableRects.transforms[i];
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= rect.getColor();
-		unsigned char			layerIndex		= rect.getOwner().getEntityLayer();
+		unsigned char			sortingLayer	= rect.getSortingLayer();
 		const std::vector<std::array<Vector2, 4>>& masks = rect.getMasks();
 
-		renderer->submit(texture, transform, spriteShader.ID, color, masks, layerIndex);
+		renderer->submit(texture, transform, spriteShader.ID, color, masks, sortingLayer);
 	}
 
 	// Images (Reload)
@@ -86,14 +87,14 @@ void Graphics::render(float deltaTime) {
 	static Shader textShader = ResourceManager::getInstance().loadShader("resources/shaders/text");
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const Text& text				= renderableTexts.texts[i];
-		const unsigned char& layerIndex = text.getOwner().getEntityLayer();
+		const Text& text					= renderableTexts.texts[i];
+		const unsigned char& sortingLayer	= text.getSortingLayer();
 		const std::vector<std::array<Vector2, 4>> & masks = text.getMasks();
 
 		const std::vector<RectTransform>& textTransforms = text.getTextTransforms();
 		const std::vector<Texture2D>& textSprites = text.getTextSprites();
 		for (std::size_t i2 = 0; i2 < textSprites.size(); i2++) {
-			renderer->submit(textSprites[i2], textTransforms[i2], textShader.ID, text.getColor(), masks, layerIndex);
+			renderer->submit(textSprites[i2], textTransforms[i2], textShader.ID, text.getColor(), masks, sortingLayer);
 		}
 	}
 
@@ -103,10 +104,10 @@ void Graphics::render(float deltaTime) {
 		const RectTransform&	transform			= renderableTexturedSprites.transforms[i];
 		const Texture2D&		texture				= sprite.getTexture();
 		const Color&			color				= sprite.getColor();
-		unsigned char			layerIndex			= sprite.getOwner().getEntityLayer();
+		unsigned char			sortingLayer		= sprite.getSortingLayer();
 		const std::vector<std::array<Vector2, 4>> & masks = sprite.getMasks();
 
-		renderer->submit(texture, transform, sprite.getShader().ID, color, masks, layerIndex);
+		renderer->submit(texture, transform, sprite.getShader().ID, color, masks, sortingLayer);
 	}
 
 	// Borders
@@ -118,7 +119,7 @@ void Graphics::render(float deltaTime) {
 		const std::size_t&		borderThickness	= border.getBorderThickness();
 		bool					inner			= border.isInner();
 		const Vector2&			size			= transform.getSize();
-		const unsigned char&	layerIndex		= border.getOwner().getEntityLayer();
+		const unsigned char&	sortingLayer	= border.getSortingLayer();
 		const std::vector<std::array<Vector2, 4>>& masks	= border.getMasks();
 
 
@@ -158,7 +159,7 @@ void Graphics::render(float deltaTime) {
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
 
-				renderer->submit(texture, lineTransform, spriteShader.ID, color, masks, layerIndex);
+				renderer->submit(texture, lineTransform, spriteShader.ID, color, masks, sortingLayer);
 			}
 		}
 	}
@@ -174,12 +175,12 @@ void Graphics::update(float dt) {
 	userInterfaceSystem.update();
 }
 
-unsigned char Graphics::createLayer() {
-	return renderer->createLayer();
-}
-
 Window& Graphics::getWindow() {
 	return window;
+}
+
+Camera& Graphics::getCamera() {
+	return camera;
 }
 
 Renderer2D& Graphics::getRenderer() {

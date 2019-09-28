@@ -11,7 +11,8 @@ namespace Core {
 		~Camera();
 
 		const Vector2& getPosition();
-		Matrix4 getViewMatrix();
+		const Matrix4& getViewMatrix() const;
+		void updateViewMatrix();
 
 		void setPosition(Vector2 vec);
 		void moveX(float value);
@@ -19,10 +20,13 @@ namespace Core {
 		void setRotation(float value);
 		void rotate(float value);
 
+		const Matrix4& getWorldToScreenMatrix() const;
+
 	private:
 		Vector2 position = Vector2(0.0f, 0.0f);
 		float rotation = 0.0f;
-		Matrix4 matrix;
+		Matrix4 viewMatrix;
+		Matrix4 worldToScreenMatrix;
 
 		Window* window;
 	};

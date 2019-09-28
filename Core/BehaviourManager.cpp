@@ -7,6 +7,7 @@ using namespace Core;
 BehaviourManager::BehaviourManager(Engine* engine) {
 	Behaviour::input = &engine->getInput();
 	Behaviour::window = &engine->getGraphics().getWindow();
+	Behaviour::camera = &engine->getGraphics().getCamera();
 }
 
 

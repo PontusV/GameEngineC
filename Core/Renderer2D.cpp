@@ -7,7 +7,7 @@
 #include <algorithm>
 using namespace Core;
 
-Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
+Renderer2D::Renderer2D(Camera* camera, Window* window) : camera(camera), batch(window), postProcessor(window) {
 	batch.init();
 	textShaderID = ResourceManager::getInstance().loadShader("resources/shaders/text").ID;
 }
@@ -15,11 +15,7 @@ Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
 Renderer2D::~Renderer2D() {
 }
 
-unsigned char Renderer2D::createLayer() {
-	return layerAmount++;
-}
-
-void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& layerIndex) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& sortingLayer) {
 	if (renderablesSize >= MAX_RENDERABLES) {
 		// TODO: Add warning to increase MAX_RENDERABLES
 		return;
@@ -46,7 +42,7 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 	renderable.z = transform.getZ();
 	renderable.shaderID = shaderID;
 	renderable.color = color;
-	renderable.layerIndex = layerIndex;
+	renderable.sortingLayer = sortingLayer;
 
 	renderable.clipMaskVertices = clipMaskVertices;
 
@@ -67,8 +63,8 @@ void Renderer2D::flush() {
 	// Sort list of renderable copies
 	std::sort(std::begin(renderableBuffer), &renderableBuffer[renderablesSize], [](Renderable2D& l, Renderable2D& r) {
 
-		if (l.layerIndex > r.layerIndex) return true;
-		if (r.layerIndex > l.layerIndex) return false;
+		if (l.sortingLayer > r.sortingLayer) return true;
+		if (r.sortingLayer > l.sortingLayer) return false;
 
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
@@ -132,7 +128,7 @@ void Renderer2D::flush() {
 	renderablesSize = 0;
 }
 
-void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& layerIndex) {
+void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& sortingLayer) {
 	TextData2D textData = ResourceManager::getInstance().createText(text, font);
 	std::vector<CharTexture2D>& textTextures = textData.textures;
 
@@ -146,7 +142,7 @@ void Renderer2D::submitText(const std::wstring& text, const RectTransform& trans
 		RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 		// Set world model matrix of new text sprite
 		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
-		submit(c.texture, spriteTransform, textShaderID, color, clipMaskVertices, layerIndex);
+		submit(c.texture, spriteTransform, textShaderID, color, clipMaskVertices, sortingLayer);
 	}
 }
 

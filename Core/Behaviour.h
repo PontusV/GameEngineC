@@ -7,6 +7,7 @@ namespace Core {
 
 	class Input;
 	class Window;
+	class Camera;
 
 	CLASS() Behaviour : public Component {
 		GENERATED_BODY()
@@ -68,6 +69,7 @@ namespace Core {
 
 		static Input* input;
 		static Window* window;
+		static Camera* camera;
 	protected:
 		Behaviour();
 

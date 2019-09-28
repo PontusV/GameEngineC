@@ -40,7 +40,7 @@ int LevelEditor::initiate() {
 
 	// Create Level Editor
 	LevelPtr level = engine.createLevel();
-	unsigned char editorLayer = engine.getGraphics().createLayer();
+	unsigned char editorSortingLayer = 0;
 	engine.setCurrentLevel(level);
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = level->createEntity("Menu_Bar",
@@ -173,7 +173,7 @@ int LevelEditor::initiate() {
 		Image("resources/images/invaders.png"),
 		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
-		Border(1, Color(255,255,255,255), false),
+		Border(1, Color(255,255,255,255), editorSortingLayer),
 		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
 	MouseDrag* mouseDrag = button.addComponent<MouseDrag>();

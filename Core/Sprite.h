@@ -20,6 +20,8 @@ namespace Core {
 
 		const Color& getColor() const;
 		void setColor(Color value);
+		void setSortingLayer(std::size_t sortingLayer);
+		const std::size_t& getSortingLayer() const;
 
 		const std::vector<std::array<Vector2, 4>>& getMasks() const;
 		/* Cuts away Drawable area that is outside of the rect parameter. */
@@ -32,7 +34,7 @@ namespace Core {
 		bool hasMaskFromSender(ComponentID sender);
 
 	protected:
-		Sprite(Color color = {255, 255, 255, 255});
+		Sprite(Color color = {255, 255, 255, 255}, std::size_t sortingLayer = 0);
 
 	private:
 		std::size_t getMaskSenderIndex(ComponentID sender);
@@ -40,6 +42,9 @@ namespace Core {
 	private:
 		PROPERTY()
 		Color color;
+		PROPERTY()
+		std::size_t sortingLayer = 0;
+
 		std::vector<std::array<Vector2, 4>> masks;
 		std::vector<ComponentID> maskSenders;
 	};

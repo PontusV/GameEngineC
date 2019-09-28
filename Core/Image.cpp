@@ -6,10 +6,10 @@
 
 using namespace Core;
 
-Image::Image(const char* fileName, Color color) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color), fileName(fileName) {
+Image::Image(const char* fileName, Color color, std::size_t sortingLayer) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color, sortingLayer), fileName(fileName) {
 } // Constructor
 
-Image::Image(const char* fileName, Shader shader, Color color) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), shader, color), fileName(fileName) {
+Image::Image(const char* fileName, Shader shader, Color color, std::size_t sortingLayer) : TexturedSprite(ResourceManager::getInstance().loadTexture(fileName), shader, color, sortingLayer), fileName(fileName) {
 } // Constructor
 
 Image::Image() : TexturedSprite(Texture2D(), ResourceManager::getInstance().loadShader("resources/shaders/sprite")) {

@@ -2,10 +2,10 @@
 #include "ResourceManager.h"
 using namespace Core;
 
-TexturedSprite::TexturedSprite(Texture2D texture, Shader shader, Color color) : Sprite(color), shader(shader), texture(texture) {
+TexturedSprite::TexturedSprite(Texture2D texture, Shader shader, Color color, std::size_t sortingLayer) : Sprite(color, sortingLayer), shader(shader), texture(texture) {
 }
 
-TexturedSprite::TexturedSprite(Texture2D texture, Color color) : Sprite(color), texture(texture), shader(ResourceManager::getInstance().loadShader("resources/shaders/sprite")) {
+TexturedSprite::TexturedSprite(Texture2D texture, Color color, std::size_t sortingLayer) : Sprite(color, sortingLayer), texture(texture), shader(ResourceManager::getInstance().loadShader("resources/shaders/sprite")) {
 }
 
 TexturedSprite::TexturedSprite() : shader(ResourceManager::getInstance().loadShader("resources/shaders/sprite")) {

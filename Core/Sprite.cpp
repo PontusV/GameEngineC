@@ -5,7 +5,7 @@
 using namespace Core;
 
 
-Sprite::Sprite(Color color) : color(color) {
+Sprite::Sprite(Color color, std::size_t sortingLayer) : color(color), sortingLayer(sortingLayer) {
 } // Constructor
 
 Sprite::~Sprite() {
@@ -18,6 +18,14 @@ const Color& Sprite::getColor() const {
 
 void Sprite::setColor(Color value) {
 	color = value;
+}
+
+void Sprite::setSortingLayer(std::size_t sortingLayer) {
+	this->sortingLayer = sortingLayer;
+}
+
+const std::size_t& Sprite::getSortingLayer() const {
+	return sortingLayer;
 }
 
 const std::vector<std::array<Vector2, 4>>& Sprite::getMasks() const {

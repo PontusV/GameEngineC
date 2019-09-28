@@ -9,8 +9,8 @@ namespace Core {
 		GENERATED_BODY()
 	public:
 		TexturedSprite();
-		TexturedSprite(Texture2D texture, Color color = { 255,255,255,255 });
-		TexturedSprite(Texture2D texture, Shader shader, Color color = { 255,255,255,255 });
+		TexturedSprite(Texture2D texture, Color color = { 255,255,255,255 }, std::size_t sortingLayer = 0);
+		TexturedSprite(Texture2D texture, Shader shader, Color color = { 255,255,255,255 }, std::size_t sortingLayer = 0);
 		virtual ~TexturedSprite();
 
 		void setTexture(Texture2D texture);

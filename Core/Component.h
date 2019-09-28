@@ -6,7 +6,7 @@
 #include "ReflectedObject.h"
 #include "Component.generated.h"
 
-typedef std::size_t ComponentTypeID; // Should not be needed here. Remove
+typedef std::size_t ComponentTypeID; // Should not be needed here. Remove?
 typedef std::size_t ComponentID;
 
 namespace Core {

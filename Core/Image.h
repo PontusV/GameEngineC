@@ -12,8 +12,8 @@ namespace Core {
 	CLASS() Image : public TexturedSprite {
 		GENERATED_BODY()
 	public:
-		Image(const char* fileName, Color color = {255,255,255,255});
-		Image(const char* fileName, Shader shader, Color color = {255,255,255,255});
+		Image(const char* fileName, Color color = {255,255,255,255}, std::size_t sortingLayer = 0);
+		Image(const char* fileName, Shader shader, Color color = {255,255,255,255}, std::size_t sortingLayer = 0);
 		Image();
 		~Image();
 

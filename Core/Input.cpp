@@ -289,6 +289,7 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		// Add rectangles in view of window
 		int cameraX = 0;
 		int cameraY = 0;
+		Camera& camera = engine->getGraphics().getCamera();
 		Window& window = engine->getGraphics().getWindow();
 		if (maths::isInsideWindow(cameraX, cameraY, window.getWidth(), window.getHeight(), transform)) {
 			allRects.push_back({ transform, Texture2D(), i+1, sprite.getMasks() });

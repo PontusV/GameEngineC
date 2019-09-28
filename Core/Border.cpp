@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-Border::Border(std::size_t thickness, Color color, bool inner, bool top, bool right, bool bottom, bool left) : Sprite(color), borderThickness(thickness), inner(inner), top(top), right(right), bottom(bottom), left(left) {
+Border::Border(std::size_t thickness, Color color, std::size_t sortingLayer, bool inner, bool top, bool right, bool bottom, bool left) : Sprite(color, sortingLayer), borderThickness(thickness), inner(inner), top(top), right(right), bottom(bottom), left(left) {
 } // Constructor
 
 Border::Border() {

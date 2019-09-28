@@ -27,9 +27,9 @@ namespace Core {
 	};
 
 	struct RenderableImages : public ComponentGroup<RectTransform, Image> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
 		ComponentArray<Image>&			images		= getComponentArray<Image>();
 	};
+
 	struct RenderableTexts : public ComponentGroup<RectTransform, Text> {
 		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
 		ComponentArray<Text>&			texts		= getComponentArray<Text>();
@@ -56,9 +56,8 @@ namespace Core {
 		void update(float dt);
 		void render(float deltaTime);
 
-		unsigned char createLayer();
-
 		Window& getWindow();
+		Camera& getCamera();
 		Renderer2D& getRenderer();
 		UISystem& getUISystem();
 
