@@ -235,6 +235,7 @@
     <ClCompile Include="HorizontalLayoutGroup.cpp" />
     <ClCompile Include="InputField.cpp" />
     <ClCompile Include="Inspector.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="LayoutController.cpp" />
     <ClCompile Include="LayoutGroup.cpp" />
     <ClCompile Include="Maths\Matrix4.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />
     <ClInclude Include="InputField.h" />
     <ClInclude Include="Inspector.h" />
+    <ClInclude Include="Layer.h" />
     <ClInclude Include="LayoutController.h" />
     <ClInclude Include="LayoutGroup.h" />
     <ClInclude Include="Maths\MatrixTransform.h" />
