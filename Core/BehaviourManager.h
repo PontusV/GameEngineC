@@ -9,10 +9,6 @@ namespace Core {
 
 	class Engine;
 
-	struct BehaviourGroup : public ComponentGroup<Behaviour> {
-		ComponentArray<Behaviour>& behaviours = getComponentArray<Behaviour>();
-	};
-
 	class BehaviourManager {
 	public:
 		BehaviourManager(Engine* engine);
@@ -28,7 +24,7 @@ namespace Core {
 		ComponentArray<Behaviour>& getAllScripts();
 
 	private:
-		BehaviourGroup behaviourGroup;
+		ComponentGroup<Behaviour> behaviourGroup;
 	};
 }
 #endif

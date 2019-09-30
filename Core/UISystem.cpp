@@ -38,33 +38,33 @@ void updateLayoutSizes(LayoutGroup* group) {
 
 void UISystem::update() {
 	// Update Content Size Fitters
-	std::size_t contentSizeFitterGroupSize = contentSizeFitterGroup.contentSizeFitters.size();
+	std::size_t contentSizeFitterGroupSize = contentSizeFitterGroup.size();
 	for (std::size_t i = 0; i < contentSizeFitterGroupSize; i++) {
-		ContentSizeFitter& controller = contentSizeFitterGroup.contentSizeFitters[i];
+		ContentSizeFitter& controller = contentSizeFitterGroup.get<ContentSizeFitter>(i);
 		if (controller.isDirty())
 			controller.refresh();
 	}
 
 	// Update Layout Groups
-	std::size_t layoutGroupSize = layoutGroupComponentGroup.layoutGroups.size();
+	std::size_t layoutGroupSize = layoutGroupComponentGroup.size();
 	for (std::size_t i = 0; i < layoutGroupSize; i++) {
-		LayoutGroup& group = layoutGroupComponentGroup.layoutGroups[i];
+		LayoutGroup& group = layoutGroupComponentGroup.get<LayoutGroup>(i);
 		updateLayoutSizes(&group);
 		updateLayout(&group);
 	}
 
 	// Notify UIBehaviour of PostLayoutUpdate
-	std::size_t behavioursSize = behavioursGroup.behaviours.size();
+	std::size_t behavioursSize = behavioursGroup.size();
 	for (std::size_t i = 0; i < behavioursSize; i++) {
-		UIBehaviour& behaviour = behavioursGroup.behaviours[i];
+		UIBehaviour& behaviour = behavioursGroup.get<UIBehaviour>(i);
 		behaviour.onPostLayoutUpdate();
 	}
 }
 
 void UISystem::onWindowResize() {
-	std::size_t behavioursSize = behavioursGroup.behaviours.size();
+	std::size_t behavioursSize = behavioursGroup.size();
 	for (std::size_t i = 0; i < behavioursSize; i++) {
-		UIBehaviour& behaviour = behavioursGroup.behaviours[i];
+		UIBehaviour& behaviour = behavioursGroup.get<UIBehaviour>(i);
 		behaviour.onWindowResize();
 	}
 }

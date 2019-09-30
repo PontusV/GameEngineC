@@ -281,10 +281,11 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::vector<maths::RectTransformEntry> allRects;
+	std::size_t spriteGroupSize = spriteGroup.size();
 
-	for (std::size_t i = 0; i < spriteGroup.transforms.size(); i++) {
-		Sprite&			sprite		= spriteGroup.sprites[i];
-		RectTransform&	transform	= spriteGroup.transforms[i];
+	for (std::size_t i = 0; i < spriteGroupSize; i++) {
+		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
+		RectTransform&	transform	= spriteGroup.get<RectTransform>(i);
 
 		// Add rectangles in view of window
 		int cameraX = 0;
@@ -302,8 +303,8 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 	index -= 1;
 	LevelPtr level = engine->getCurrentLevel();
 	Entity entity;
-	if (index < spriteGroup.transforms.size()) {
-		entity = spriteGroup.sprites.getEntity(index);
+	if (index < spriteGroupSize) {
+		entity = spriteGroup.getEntity(index);
 	}
 
 	return level->getEntityHandle(entity);

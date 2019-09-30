@@ -6,17 +6,6 @@
 #include "UIBehaviour.h"
 #include "ParentEntity.h"
 namespace Core {
-	struct ContentSizeFitterGroup : public ComponentGroup<ContentSizeFitter> {
-		ComponentArray<ContentSizeFitter>& contentSizeFitters = getComponentArray<ContentSizeFitter>();
-	};
-	struct LayoutGroupComponentGroup : public ComponentGroup<LayoutGroup> {
-		//LayoutGroupComponentGroup() : ComponentGroup<LayoutGroup>({ typeof(ParentEntity) }) {}
-		ComponentArray<LayoutGroup>& layoutGroups = getComponentArray<LayoutGroup>();
-	};
-	struct UIBehaviourGroup : public ComponentGroup<UIBehaviour> {
-		ComponentArray<UIBehaviour>& behaviours = getComponentArray<UIBehaviour>();
-	};
-
 	class UISystem {
 	public:
 		UISystem();
@@ -27,9 +16,9 @@ namespace Core {
 		void onWindowResize();
 
 	private:
-		ContentSizeFitterGroup contentSizeFitterGroup;
-		LayoutGroupComponentGroup layoutGroupComponentGroup;
-		UIBehaviourGroup behavioursGroup;
+		ComponentGroup<ContentSizeFitter> contentSizeFitterGroup;
+		ComponentGroup<LayoutGroup> layoutGroupComponentGroup;
+		ComponentGroup<UIBehaviour> behavioursGroup;
 	};
 }
 #endif

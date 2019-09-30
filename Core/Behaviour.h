@@ -52,10 +52,10 @@ namespace Core {
 		virtual void onTransformChanged() {}
 
 		// Hierarchy
-		virtual void onChildAdded(Handle entity) {}
-		virtual void onChildRemoved(Handle entity) {}
+		virtual void onChildAdded(EntityHandle entity) {}
+		virtual void onChildRemoved(EntityHandle entity) {}
 		/* Called when a child has been changed; either by having a component removed or added. */
-		virtual void onChildChanged(Handle entity) {}
+		virtual void onChildChanged(EntityHandle entity) {}
 		/* WIP. Called when another parent has been set or if the parent was lost. */
 		virtual void onParentChanged() {}
 

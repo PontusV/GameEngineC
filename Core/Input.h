@@ -23,12 +23,6 @@ namespace Core {
 	class KeyListener;
 	class Selectable;
 
-	// Component Group for getEntityAtPos(x,y)
-	struct SpriteGroup : public ComponentGroup<Sprite, RectTransform> {
-		ComponentArray<Sprite>&			sprites		= getComponentArray<Sprite>();
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-	};
-
 	class Input {
 	public:
 		Input(Engine* engine);
@@ -94,7 +88,7 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		SpriteGroup	spriteGroup;
+		ComponentGroup<Sprite, RectTransform> spriteGroup;
 
 		//TODO: List of contexts, A context contains a list of keybinds.
 		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges

@@ -15,8 +15,8 @@ namespace Core {
 		void onPostLayoutUpdate() override;
 		bool hasChanged();
 
-		void onChildAdded(Handle entity) override;
-		void onChildRemoved(Handle entity) override;
+		void onChildAdded(EntityHandle entity) override;
+		void onChildRemoved(EntityHandle entity) override;
 
 		const Bounds& getContentBounds() const;
 

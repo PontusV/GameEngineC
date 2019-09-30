@@ -16,7 +16,7 @@ void RectMask::onTransformChanged() {
 	updateMask();
 }
 
-void RectMask::onChildAdded(Handle entity) {
+void RectMask::onChildAdded(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
@@ -25,7 +25,7 @@ void RectMask::onChildAdded(Handle entity) {
 	}
 }
 
-void RectMask::onChildRemoved(Handle entity) {
+void RectMask::onChildRemoved(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
 			sprite->removeClip(getComponentID());
@@ -33,7 +33,7 @@ void RectMask::onChildRemoved(Handle entity) {
 	}
 }
 
-void RectMask::onChildChanged(Handle entity) {
+void RectMask::onChildChanged(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {

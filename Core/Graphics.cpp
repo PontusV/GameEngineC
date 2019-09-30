@@ -56,21 +56,21 @@ bool Graphics::initiate() {
 
 /* Loops through Renderable vector and draws them.*/
 void Graphics::render(float deltaTime) {
-	std::size_t sizeRectangles		= renderableRects.rects.size();
-	std::size_t sizeImages			= renderableImages.images.size();
-	std::size_t sizeTexts			= renderableTexts.texts.size();
-	std::size_t sizeTexturedSprites	= renderableTexturedSprites.sprites.size();
-	std::size_t sizeBorders			= renderableBorders.borders.size();
+	std::size_t sizeRectangles		= renderableRects.size();
+	std::size_t sizeImages			= renderableImages.size();
+	std::size_t sizeTexts			= renderableTexts.size();
+	std::size_t sizeTexturedSprites	= renderableTexturedSprites.size();
+	std::size_t sizeBorders			= renderableBorders.size();
 
 	// Updates Camera View Matrix
 	camera.updateViewMatrix();
 	ResourceManager::getInstance().updateCameraViewMatrix(camera.getViewMatrix());
 
-	// TODO: Add Renderables to vector IF they are inside the window. No need to sort Renderables if they cant be drawn in camera view
+	// TODO: submit Renderables IF they are inside the window.
 	// Rectangles
 	for (std::size_t i = 0; i < sizeRectangles; i++) {
-		const RectSprite&		rect			= renderableRects.rects[i];
-		const RectTransform&	transform		= renderableRects.transforms[i];
+		const RectSprite&		rect			= renderableRects.get<RectSprite>(i);
+		const RectTransform&	transform		= renderableRects.get<RectTransform>(i);
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= rect.getColor();
 		unsigned char			sortingLayer	= rect.getSortingLayer();
@@ -81,13 +81,13 @@ void Graphics::render(float deltaTime) {
 
 	// Images (Reload)
 	for (std::size_t i = 0; i < sizeImages; i++) {
-		renderableImages.images[i].reload(); //Make sure image is loaded
+		renderableImages.get<Image>(i).reload(); // TODO: Optimize. Make sure image is loaded
 	}
 
 	static Shader textShader = ResourceManager::getInstance().loadShader("resources/shaders/text");
 	// Texts
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const Text& text					= renderableTexts.texts[i];
+		const Text& text					= renderableTexts.get<Text>(i);
 		const unsigned char& sortingLayer	= text.getSortingLayer();
 		const std::vector<std::array<Vector2, 4>> & masks = text.getMasks();
 
@@ -100,8 +100,8 @@ void Graphics::render(float deltaTime) {
 
 	// Textured Sprites
 	for (std::size_t i = 0; i < sizeTexturedSprites; i++) {
-		const TexturedSprite&	sprite				= renderableTexturedSprites.sprites[i];
-		const RectTransform&	transform			= renderableTexturedSprites.transforms[i];
+		const TexturedSprite&	sprite				= renderableTexturedSprites.get<TexturedSprite>(i);
+		const RectTransform&	transform			= renderableTexturedSprites.get<RectTransform>(i);
 		const Texture2D&		texture				= sprite.getTexture();
 		const Color&			color				= sprite.getColor();
 		unsigned char			sortingLayer		= sprite.getSortingLayer();
@@ -112,8 +112,8 @@ void Graphics::render(float deltaTime) {
 
 	// Borders
 	for (std::size_t i = 0; i < sizeBorders; i++) {
-		const Border&			border			= renderableBorders.borders[i];
-		const RectTransform&	transform		= renderableBorders.transforms[i];
+		const Border&			border			= renderableBorders.get<Border>(i);
+		const RectTransform&	transform		= renderableBorders.get<RectTransform>(i);
 		const Texture2D			texture			= Texture2D(); // No texture
 		const Color&			color			= border.getColor();
 		const std::size_t&		borderThickness	= border.getBorderThickness();

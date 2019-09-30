@@ -21,30 +21,6 @@
 namespace Core {
 	class Renderer2D;
 
-	struct RenderableRects : public ComponentGroup<RectTransform, RectSprite> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<RectSprite>&		rects		= getComponentArray<RectSprite>();
-	};
-
-	struct RenderableImages : public ComponentGroup<RectTransform, Image> {
-		ComponentArray<Image>&			images		= getComponentArray<Image>();
-	};
-
-	struct RenderableTexts : public ComponentGroup<RectTransform, Text> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<Text>&			texts		= getComponentArray<Text>();
-	};
-
-	struct RenderableTexturedSprites : public ComponentGroup<RectTransform, TexturedSprite> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<TexturedSprite>&	sprites		= getComponentArray<TexturedSprite>();
-	};
-
-	struct RenderableBorders : public ComponentGroup<RectTransform, Border> {
-		ComponentArray<RectTransform>&	transforms	= getComponentArray<RectTransform>();
-		ComponentArray<Border>&			borders		= getComponentArray<Border>();
-	};
-
 	/* Manages the window, renderer and UISystem */
 	class Graphics {
 	public:
@@ -69,11 +45,11 @@ namespace Core {
 		Renderer2D* renderer;
 
 	private:
-		RenderableRects renderableRects;
-		RenderableImages renderableImages;
-		RenderableTexts renderableTexts;
-		RenderableTexturedSprites renderableTexturedSprites;
-		RenderableBorders renderableBorders;
+		ComponentGroup<RectTransform, RectSprite> renderableRects;
+		ComponentGroup<RectTransform, Image> renderableImages;
+		ComponentGroup<RectTransform, Text> renderableTexts;
+		ComponentGroup<RectTransform, TexturedSprite> renderableTexturedSprites;
+		ComponentGroup<RectTransform, Border> renderableBorders;
 	};
 }
 #endif

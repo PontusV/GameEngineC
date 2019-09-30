@@ -10,20 +10,42 @@
 
 namespace Core {
 	/* Has access to all chunks compatible with its template. */
-	template <typename... Ts>
+	template <typename T, typename... Ts>
 	class ComponentGroup {
 	public:
-		ComponentGroup() : componentArrays{ ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<Ts>::getType()... }, {})... } {}
-		ComponentGroup(std::initializer_list<ComponentType> filterTypes) : componentArrays({ ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<Ts>::getType()... }, filterTypes)... }) {}
+		ComponentGroup()
+			: componentArrays{
+				ComponentArrayManager::getInstance().createComponentArray<T>({ ComponentTypeInfo<T>::getType(), ComponentTypeInfo<Ts>::getType()... }, {}),
+				ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<T>::getType(), ComponentTypeInfo<Ts>::getType()... }, {})...
+			} {
+		}
+		ComponentGroup(std::initializer_list<ComponentType> filterTypes)
+			: componentArrays{
+				ComponentArrayManager::getInstance().createComponentArray<T>({ ComponentTypeInfo<T>::getType(), ComponentTypeInfo<Ts>::getType()... }, filterTypes),
+				ComponentArrayManager::getInstance().createComponentArray<Ts>({ ComponentTypeInfo<T>::getType(), ComponentTypeInfo<Ts>::getType()... }, filterTypes)...
+			} {
+		}
 		virtual ~ComponentGroup() {}
 
-		template <typename T>
-		ComponentArray<T>& getComponentArray() {
-			return *std::get<ComponentArray<T>*>(componentArrays);
+		template <typename Type>
+		Type& get(std::size_t index) {
+			return std::get<ComponentArray<Type>*>(componentArrays)->get(index);
+		}
+
+		template <typename Type>
+		ComponentArray<Type>& getArray() {
+			return *std::get<ComponentArray<Type>*>(componentArrays);
+		}
+
+		Entity& getEntity(std::size_t index) {
+			return std::get<0>(componentArrays)->getEntity(index);
+		}
+
+		std::size_t size() {
+			return std::get<0>(componentArrays)->size();
 		}
 	private:
-		std::size_t length;
-		std::tuple<ComponentArray<Ts>*...> componentArrays;
+		std::tuple<ComponentArray<T>*, ComponentArray<Ts>*...> componentArrays;
 	};
 }
 #endif

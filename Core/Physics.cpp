@@ -69,10 +69,10 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 }
 
 void Physics::update(float dt) {
-	std::size_t sizeTransform = rootTransforms.transforms.size();
+	std::size_t sizeTransform = rootTransforms.size();
 
 	for (std::size_t i = 0; i < sizeTransform; i++) {
-		Transform& root = rootTransforms.transforms[i];
+		Transform& root = rootTransforms.get<Transform>(i);
 
 		//glm::mat4 rootModelMatrix = glm::mat4(1.0f);
 		updateTransformModel(root, Matrix4(1.0f), false);

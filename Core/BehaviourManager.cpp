@@ -16,48 +16,52 @@ BehaviourManager::~BehaviourManager() {
 
 
 void BehaviourManager::update(float deltaTime) {
-	std::size_t scriptAmount = behaviourGroup.behaviours.size();
+	std::size_t scriptAmount = behaviourGroup.size();
 
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
-		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
+		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
+		if (behaviour.enabled) { // Check if enabled
 			// Start
-			if (!behaviourGroup.behaviours[i].started) {
-				behaviourGroup.behaviours[i].started = true;
-				behaviourGroup.behaviours[i].start();
+			if (!behaviour.started) {
+				behaviour.started = true;
+				behaviour.start();
 			}
 			// Update
-			behaviourGroup.behaviours[i].update(deltaTime);
+			behaviour.update(deltaTime);
 		}
 	}
 	// LateUpdate
 	for (std::size_t i = 0; i < scriptAmount; i++) {
-		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
-			behaviourGroup.behaviours[i].lateUpdate(deltaTime);
+		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
+		if (behaviour.enabled) { // Check if enabled
+			behaviour.lateUpdate(deltaTime);
 		}
 	}
 }
 
 void BehaviourManager::onPreRender() {
-	std::size_t scriptAmount = behaviourGroup.behaviours.size();
+	std::size_t scriptAmount = behaviourGroup.size();
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
-		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
-			behaviourGroup.behaviours[i].onPreRender();
+		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
+		if (behaviour.enabled) { // Check if enabled
+			behaviour.onPreRender();
 		}
 	}
 }
 
 void BehaviourManager::onPostRender() {
-	std::size_t scriptAmount = behaviourGroup.behaviours.size();
+	std::size_t scriptAmount = behaviourGroup.size();
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
-		if (behaviourGroup.behaviours[i].enabled) { // Check if enabled
-			behaviourGroup.behaviours[i].onPostRender();
+		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
+		if (behaviour.enabled) { // Check if enabled
+			behaviour.onPostRender();
 		}
 	}
 }
 
 ComponentArray<Behaviour>& BehaviourManager::getAllScripts() {
-	return behaviourGroup.behaviours;
+	return behaviourGroup.getArray<Behaviour>();
 }

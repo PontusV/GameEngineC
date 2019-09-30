@@ -9,11 +9,6 @@
 
 namespace Core {
 
-	struct RootTransforms : public ComponentGroup<Transform> {
-		RootTransforms() : ComponentGroup<Transform>({typeof(ParentEntity)}) {}
-		ComponentArray<Transform>&	transforms = getComponentArray<Transform>();
-	};
-
 	class Physics
 	{
 	public:
@@ -23,7 +18,7 @@ namespace Core {
 		void update(float dt);
 
 	private:
-		RootTransforms rootTransforms;
+		ComponentGroup<Transform> rootTransforms = ComponentGroup<Transform>({typeof(ParentEntity)});
 	};
 }
 #endif

@@ -23,15 +23,15 @@ void LayoutController::onChildRectTransformResized() {
 	setDirty();
 }
 
-void LayoutController::onChildAdded(Handle entity) {
+void LayoutController::onChildAdded(EntityHandle entity) {
 	setDirty();
 }
 
-void LayoutController::onChildRemoved(Handle entity) {
+void LayoutController::onChildRemoved(EntityHandle entity) {
 	setDirty();
 }
 
-void LayoutController::onChildChanged(Handle entity) {
+void LayoutController::onChildChanged(EntityHandle entity) {
 	setDirty();
 }
 

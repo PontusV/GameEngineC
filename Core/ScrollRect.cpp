@@ -78,12 +78,12 @@ bool ScrollRect::hasChanged() {
 	return false;
 }
 
-void ScrollRect::onChildAdded(Handle entity) {
+void ScrollRect::onChildAdded(EntityHandle entity) {
 	refreshContentBounds();
 	checkScrollArea();
 }
 
-void ScrollRect::onChildRemoved(Handle entity) {
+void ScrollRect::onChildRemoved(EntityHandle entity) {
 	refreshContentBounds();
 	checkScrollArea();
 }
