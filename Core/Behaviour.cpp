@@ -21,3 +21,12 @@ void Behaviour::disable() {
 	started = false;
 	enabled = false;
 }
+
+void Behaviour::destroyEntity(const EntityHandle& handle) {
+	destroyEntity(handle.getEntity());
+}
+
+void Behaviour::destroyEntity(Entity entity) {
+	Scene* scene = owner.getComponent<ObjectData>()->getScene();
+	scene->destroyEntityQueued(entity);
+}

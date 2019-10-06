@@ -16,10 +16,11 @@ CheckBox::~CheckBox() {
 
 void CheckBox::showTick() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
+	EntityHandle ownerHandle = owner;
 	if (rect) {
 		Shader shader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
 		hideTick(); // Make sure tick is destroyed
-		tick = createEntity(owner.getEntityName() + "_Tick",
+		tick = createEntity(ownerHandle.getEntityName() + "_Tick",
 			Image("resources/images/ui/CheckBox-tick.png", shader, Color(0, 0, 0, 255)),
 			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ() + 0.0002f, Alignment::TOP_LEFT)
 		);
@@ -30,23 +31,24 @@ void CheckBox::showTick() {
 
 void CheckBox::hideTick() {
 	if (tick.refresh()) {
-		tick.destroy();
+		destroyEntity(tick);
 	}
 }
 
 void CheckBox::awake() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
+	EntityHandle ownerHandle = owner;
 	if (rect) {
 		if (toggle) showTick();
 		Shader shader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
 		// Create graphics
-		EntityHandle background = createEntity(owner.getEntityName() + "_Background",
+		EntityHandle background = createEntity(ownerHandle.getEntityName() + "_Background",
 			Image("resources/images/ui/CheckBox-background.png", shader, Color(255, 255, 255, 255)),
 			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ(), Alignment::TOP_LEFT)
 		);
 		background.setParent(owner);
 		background.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
-		EntityHandle border = createEntity(owner.getEntityName() + "_Border",
+		EntityHandle border = createEntity(ownerHandle.getEntityName() + "_Border",
 			Image("resources/images/ui/CheckBox-border.png", shader, Color(0, 0, 0, 255)),
 			RectTransform(0, 0, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001f, Alignment::TOP_LEFT)
 		);

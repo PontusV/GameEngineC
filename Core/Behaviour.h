@@ -1,6 +1,9 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 #include "Component.h"
+#include "ObjectData.h"
+#include "Scene.h"
+#include "EntityHandle.h"
 #include "Behaviour.generated.h"
 
 namespace Core {
@@ -73,14 +76,18 @@ namespace Core {
 	protected:
 		Behaviour();
 
-		/* Creates an Entity at the end of the frame. */
+		/* Creates an Entity in the same Scene at the end of the frame. */
 		template<typename... Ts>
 		EntityHandle createEntity(std::string name, Ts... components);
+
+		void destroyEntity(const EntityHandle& handle);
+		void destroyEntity(Entity entity);
 	};
 
 	template<typename... Ts>
 	EntityHandle Behaviour::createEntity(std::string name, Ts... components) {
-		return owner.createEntity(name, components...);
+		Scene* scene = owner.getComponent<ObjectData>()->getScene();
+		return scene->createEntityQueued(name, components...);
 	}
 }
 #endif

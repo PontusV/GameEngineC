@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "Level.h"
+#include "Scene.h"
 #include "Window.h"
 #include "FpsCounter.h"
 #include "ResourceManager.h"
@@ -98,50 +98,37 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 // -------------------------------End of Callbacks----------------------------------
 
 
-/* Saves current level. */
-void Engine::saveLevel(const char* fileName) { //To be added: file location of level map (currently hard coded to the map Levels)
-	if (!currentLevel) {
-		std::cout << "Engine::saveLevel::ERROR There is not any currently active level to save!\n";
-		throw std::invalid_argument("Engine::saveLevel::ERROR There is not any currently active level to save!");
-	}
+void Engine::saveScene(ScenePtr scene, const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
 	ofstream file;
-	std::string levelDir("Levels/");
-	levelDir.append(fileName);
-	file.open(levelDir, ios::out | ios::binary | ios::trunc);
-	currentLevel->serialize(file);
+	std::string sceneDir("Scenes/");
+	sceneDir.append(fileName);
+	file.open(sceneDir, ios::out | ios::binary | ios::trunc);
+	scene->serialize(file);
 	file.close();
 
-	std::cout << "Saved level to: " << levelDir << "\n";
+	std::cout << "Saved scene to: " << sceneDir << "\n";
 }
 
-/* Loads level from file. */
-LevelPtr Engine::loadLevel(const char* fileName) { //To be added: file location of level map (currently hard coded to the map Levels)
+ScenePtr Engine::loadScene(const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
 	ifstream file;
-	std::string levelDir("Levels/");
-	levelDir.append(fileName);
-	std::cout << "Loading level: " << levelDir << "\n";
-	file.open(levelDir, ios::in | ios::binary);
+	std::string sceneDir("sceneDir/");
+	sceneDir.append(fileName);
+	std::cout << "Loading Scene: " << sceneDir << "\n";
+	file.open(sceneDir, ios::in | ios::binary);
 	//
-	LevelPtr level = std::make_shared<Level>();
-	level->deserialize(file);
+	ScenePtr scene = std::make_shared<Scene>(&entityManager, ObjectType::World); // TODO: Save & Load type
+	scene->deserialize(file);
 	//
 	file.close();
-	level->awake();
+	scene->awake();
 
-	return level;
+	return scene;
 }
 
-LevelPtr Engine::createLevel() {
-	LevelPtr level = std::make_shared<Level>();
-	return level;
-}
-
-void Engine::setCurrentLevel(LevelPtr level) {
-	std::cout << "Changing level...\n";
-	if (currentLevel)
-		currentLevel->clear();
-
-	currentLevel = level;
+ScenePtr Engine::createScene(std::string name, ObjectType type) { // TODO: Link name to Scene
+	ScenePtr scene = std::make_shared<Scene>(&entityManager, type);
+	scenes.push_back(scene);
+	return scene;
 }
 
 /* Stops the gameloop. */
@@ -151,8 +138,8 @@ void Engine::terminate() {
 
 /* Starts the gameloop. */
 int Engine::initiate() {
-	// Create Empty Debug level
-	debugLevel = createLevel();
+	// Create Empty Debug Scene
+	debugScene = createScene("Debug", ObjectType::UI);
 
 	// Initialize systems
 	// Graphics
@@ -179,12 +166,12 @@ int Engine::start() {
 
 	FpsCounter fpsCounter;
 	//unsigned char debugLayer = graphics.createLayer();
-	EntityHandle fpsDisplay = debugLevel->createEntity("FPS_Display",
+	EntityHandle fpsDisplay = debugScene->createEntity("FPS_Display",
 		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255)),
 		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
 		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT)
 	);
-	debugLevel->awake();
+	debugScene->awake();
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
@@ -208,8 +195,9 @@ int Engine::start() {
 		// Update systems
 		input.update(deltaTime);
 		behaviourManager.update(deltaTime);
-		currentLevel->getEntityManager().lock()->processQueue(); // Process Queue
-		debugLevel->getEntityManager().lock()->processQueue(); // Temporary for testing (ugly solution for updating all levels)
+		for (ScenePtr& scene : scenes) {
+			scene->processQueue();
+		}
 		graphics.update(deltaTime);
 		physics.update(deltaTime);
 
@@ -230,11 +218,14 @@ int Engine::start() {
 Engine::Engine() : graphics(), input(this), physics(), behaviourManager(this) {
 }
 Engine::~Engine() {
-	//Unload all entities and components
-	if (currentLevel)
-		currentLevel->clear();
-	if (debugLevel)
-		debugLevel->clear();
+	// Unload all entities and components
+	for (ScenePtr& scene : scenes) {
+		scene->clear();
+	}
+}
+
+EntityManager& Engine::getEntityManager() {
+	return entityManager;
 }
 
 Input& Engine::getInput() {
@@ -251,11 +242,4 @@ Physics& Engine::getPhysics() {
 
 BehaviourManager& Engine::getBehaviourManager() {
 	return behaviourManager;
-}
-
-LevelPtr Engine::getCurrentLevel() {
-	return currentLevel;
-}
-LevelPtr Engine::getDebugLevel() {
-	return debugLevel;
 }

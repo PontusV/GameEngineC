@@ -1,5 +1,5 @@
 #include "Handle.h"
-#include "EntityManager.h"
+#include "Scene.h"
 #include "Chunk.h"
 #include "Component.h"
 
@@ -8,7 +8,7 @@
 
 using namespace Core;
 
-Handle::Handle(Entity entity, EntityManager* manager) : entity(entity), manager(manager) {
+Handle::Handle(Entity entity, Scene* scene) : entity(entity), scene(scene) {
 }
 
 Handle::Handle() : entity(0) {
@@ -19,7 +19,7 @@ Handle::~Handle() {
 }
 
 bool Handle::operator==(const Handle& other) {
-	return entity == other.entity && manager == other.manager;
+	return entity == other.entity;
 }
 
 bool Handle::operator!=(const Handle& other) {
@@ -38,16 +38,14 @@ bool Handle::isValid() {
 }
 
 bool Handle::refresh() {
-	if (!isValid()) {
-		update();
-		return isValid();
-	}
-	return true;
+	if (isValid()) return true;
+	update();
+	return isValid();
 }
 
 void Handle::update() {
-	if (manager) {
-		locationData = manager->getLocation(entity);
+	if (scene) {
+		locationData = scene->getEntityManager()->getLocation(entity);
 	}
 }
 
@@ -57,15 +55,6 @@ void Handle::updateLocation(EntityLocation location) {
 
 const EntityLocation& Handle::getLocation() const {
 	return locationData;
-}
-
-void Handle::destroy() {
-	if (refresh()) {
-		manager->destroyEntityQueued(entity);
-	}
-	else {
-		std::cout << "Handle::destroy Cannot destroy an Entity that does not exist!" << std::endl;
-	}
 }
 
 bool Handle::isChild(Entity entity) {

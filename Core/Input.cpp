@@ -4,7 +4,6 @@
 #include "Algorithm.h"
 
 #include "EntityManager.h"
-#include "Level.h"
 #include "Component.h"
 #include "Behaviour.h"
 #include "Selectable.h"
@@ -301,13 +300,13 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::size_t index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects);
 	if (index == 0) return EntityHandle();
 	index -= 1;
-	LevelPtr level = engine->getCurrentLevel();
-	Entity entity;
 	if (index < spriteGroupSize) {
-		entity = spriteGroup.getEntity(index);
+		Entity entity = spriteGroup.getEntity(index);
+		Scene* scene = spriteGroup.get<ObjectData>(index).getScene();
+		return EntityHandle(entity, scene);
 	}
 
-	return level->getEntityHandle(entity);
+	return EntityHandle();
 }
 
 // -------------- ADD/SET/GET ------------------

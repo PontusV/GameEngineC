@@ -3,12 +3,13 @@
 
 #include "Handle.h"
 #include "Component.h"
+#include "Scene.h"
 
 namespace Core {
 	/* A handle for a component with a specific ComponentTypeID. Does not look for components with a type deriving from the type with the specified ComponentTypeID. */
 	class ComponentHandle {
 	public:
-		ComponentHandle(ComponentID id, Entity entity, EntityManager* manager);
+		ComponentHandle(ComponentID id, Entity entity, Scene* scene);
 		ComponentHandle(ComponentID id, Handle owner);
 		ComponentHandle(Component* instance);
 		ComponentHandle();

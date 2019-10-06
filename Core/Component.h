@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "Serializable.h"
-#include "EntityHandle.h"
+#include "Handle.h"
 #include "UIDContainer.h"
 #include "ReflectedObject.h"
 #include "Component.generated.h"
@@ -19,7 +19,7 @@ namespace Core {
 		Component& operator=(const Component& other);
 		virtual ~Component() = 0; // Abstract
 
-		EntityHandle getOwner() const;
+		Handle getOwner() const;
 		void setOwner(Handle owner);
 		/* Marks the Component for destruction. */
 		void destroy();
@@ -29,7 +29,7 @@ namespace Core {
 		ComponentID getComponentID() const;
 
 	protected:
-		EntityHandle owner;
+		Handle owner;
 
 	private:
 		bool destruct = false;

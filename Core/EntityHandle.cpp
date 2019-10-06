@@ -5,7 +5,7 @@
 using namespace Core;
 
 
-EntityHandle::EntityHandle(Entity entity, EntityManager* manager) : Handle(entity, manager) {
+EntityHandle::EntityHandle(Entity entity, Scene* scene) : Handle(entity, scene) {
 }
 
 EntityHandle::EntityHandle(const Handle& handle) : Handle(handle) {
@@ -19,24 +19,24 @@ EntityHandle::~EntityHandle() {
 }
 
 void EntityHandle::setParent(const Entity& entity) {
-	EntityHandle parent = manager->getEntityHandle(entity);
+	EntityHandle parent = scene->getEntityHandle(entity);
 	setParent(parent);
 }
 
 void EntityHandle::setParent(EntityHandle entity) {
-	manager->setParentQueued(*this, entity);
+	scene->setParentQueued(*this, entity);
 }
 
 std::string EntityHandle::getEntityName() {
 	if (refresh()) {
-		return manager->getEntityName(entity);
+		return scene->getEntityManager()->getEntityName(entity);
 	}
 	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!";
 	return "Invalid";
 }
 
 HideFlags EntityHandle::getEntityHideFlags() {
-	HideFlags result = manager->getEntityHideFlags(entity);
+	HideFlags result = scene->getEntityManager()->getEntityHideFlags(entity);
 	EntityHandle parent = getParent();
 	while (parent.refresh()) {
 		HideFlags hideFlags = parent.getEntityHideFlags();
@@ -47,7 +47,7 @@ HideFlags EntityHandle::getEntityHideFlags() {
 }
 
 void EntityHandle::setEntityHideFlags(HideFlags hideFlags) {
-	return manager->setEntityHideFlags(entity, hideFlags);
+	return scene->getEntityManager()->setEntityHideFlags(entity, hideFlags);
 }
 
 bool EntityHandle::operator==(const EntityHandle& other) {

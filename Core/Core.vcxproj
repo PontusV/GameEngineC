@@ -211,7 +211,6 @@
     <ClCompile Include="Archetype.cpp" />
     <ClCompile Include="Border.cpp" />
     <ClCompile Include="Bounds.cpp" />
-    <ClCompile Include="BoxComponent.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CheckBox.cpp" />
@@ -231,15 +230,16 @@
     <ClCompile Include="FunctionCaller.cpp" />
     <ClCompile Include="DropDown.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
+    <ClCompile Include="GameObjectData.cpp" />
     <ClCompile Include="GridLayoutGroup.cpp" />
     <ClCompile Include="HorizontalLayoutGroup.cpp" />
     <ClCompile Include="InputField.cpp" />
     <ClCompile Include="Inspector.cpp" />
-    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="LayoutController.cpp" />
     <ClCompile Include="LayoutGroup.cpp" />
     <ClCompile Include="Maths\Matrix4.cpp" />
     <ClCompile Include="MouseDrag.cpp" />
+    <ClCompile Include="ObjectData.cpp" />
     <ClCompile Include="PropertyEditor.cpp" />
     <ClCompile Include="RectButton.cpp" />
     <ClCompile Include="RectTransform.cpp" />
@@ -272,7 +272,7 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KeyListener.cpp" />
-    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Serializable.cpp" />
@@ -282,6 +282,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIBehaviour.cpp" />
     <ClCompile Include="UIDContainer.cpp" />
+    <ClCompile Include="UIObjectData.cpp" />
     <ClCompile Include="UISystem.cpp" />
     <ClCompile Include="Maths\Vector2.cpp" />
     <ClCompile Include="Maths\Vector4.cpp" />
@@ -299,7 +300,6 @@
     <ClInclude Include="BatchConfig.h" />
     <ClInclude Include="Border.h" />
     <ClInclude Include="Bounds.h" />
-    <ClInclude Include="BoxComponent.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CheckBox.h" />
@@ -319,6 +319,7 @@
     <ClInclude Include="DropDown.h" />
     <ClInclude Include="EntityLocation.h" />
     <ClInclude Include="FpsCounter.h" />
+    <ClInclude Include="GameObjectData.h" />
     <ClInclude Include="GridLayoutGroup.h" />
     <ClInclude Include="HideFlags.h" />
     <ClInclude Include="HorizontalLayoutGroup.h" />
@@ -326,12 +327,12 @@
     <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />
     <ClInclude Include="InputField.h" />
     <ClInclude Include="Inspector.h" />
-    <ClInclude Include="Layer.h" />
     <ClInclude Include="LayoutController.h" />
     <ClInclude Include="LayoutGroup.h" />
     <ClInclude Include="Maths\MatrixTransform.h" />
     <ClInclude Include="Maths\Matrix4.h" />
     <ClInclude Include="MouseDrag.h" />
+    <ClInclude Include="ObjectData.h" />
     <ClInclude Include="PropertyEditor.h" />
     <ClInclude Include="PropertyValueID.h" />
     <ClInclude Include="RectButton.h" />
@@ -372,7 +373,7 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="KeyListener.h" />
-    <ClInclude Include="Level.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
@@ -386,6 +387,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UIBehaviour.h" />
     <ClInclude Include="UIDContainer.h" />
+    <ClInclude Include="UIObjectData.h" />
     <ClInclude Include="UISystem.h" />
     <ClInclude Include="Maths\Vector2.h" />
     <ClInclude Include="Maths\Vector4.h" />

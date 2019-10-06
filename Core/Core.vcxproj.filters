@@ -111,9 +111,6 @@
     <ClCompile Include="KeyListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -134,9 +131,6 @@
     </ClCompile>
     <ClCompile Include="Window.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BoxComponent.cpp">
-      <Filter>Source Files\Component</Filter>
     </ClCompile>
     <ClCompile Include="Button.cpp">
       <Filter>Source Files\Component</Filter>
@@ -309,7 +303,16 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Layer.cpp">
+    <ClCompile Include="ObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -353,9 +356,6 @@
     <ClInclude Include="ComponentArray.h">
       <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="BoxComponent.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
     <ClInclude Include="ChildManager.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
     </ClInclude>
@@ -385,9 +385,6 @@
     </ClInclude>
     <ClInclude Include="KeyListener.h">
       <Filter>Header Files\Systems\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
     <ClInclude Include="ParentEntity.h">
       <Filter>Header Files\Systems\Entity\Component</Filter>
@@ -617,8 +614,17 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Layer.h">
+    <ClInclude Include="ObjectData.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIObjectData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Systems\Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

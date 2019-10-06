@@ -5,16 +5,12 @@
 #include "Entity.h"
 #include "ComponentTypeInfo.h"
 #include "EntityLocation.h"
-#include "Handle.h"
-#include "FunctionCaller.h"
 #include "HideFlags.h"
 
 #include <map>
 #include <vector>
-#include <queue>
 #include <stdexcept>
 #include <iostream>
-#include <functional>
 
 
 namespace Core {
@@ -23,13 +19,15 @@ namespace Core {
 
 	class EntityManager {
 	public:
-		EntityManager() : entityIDCounter(1), isAwake(false) {}
+		EntityManager() : entityIDCounter(1) {}
 		~EntityManager() {
 			clear();
 		}
 
 		template <typename... Ts>
-		Handle createEntity(std::string name, Ts&... components);
+		Entity createEntity(std::string name, Ts&... components);
+		template <typename... Ts>
+		EntityLocation addEntity(Entity entity, Ts& ... components);
 		void destroyEntity(Entity entity);
 		void destroyEntity(Entity entity, bool chained);
 
@@ -40,10 +38,11 @@ namespace Core {
 		Component* getComponent(Entity entity, ComponentType type);
 		/* Attaches the component to the Entity. */
 		template <typename T>
-		void addComponent(Entity entity, T& component);
+		EntityLocation addComponent(Entity entity, T& component);
 		/* If the Entity has a component of type T it is removed/destroyed. It does not removed components deriving from T. The destructor of the component is called and it is removed from the Entity. */
 		template <typename T>
-		void removeComponent(Entity entity);
+		EntityLocation removeComponent(Entity entity);
+		EntityLocation removeComponent(Entity entity, ComponentTypeID type);
 		template <typename T>
 		bool hasComponent(Entity entity);
 		bool hasComponent(Entity entity, ComponentType type);
@@ -53,42 +52,21 @@ namespace Core {
 		std::vector<T*> getComponents(Entity entity);
 		std::vector<IComponentTypeInfo> getComponentTypes(Entity entity);
 
-		void setParent(Handle entity, Handle parent);
-		Handle getParent(Entity entity);
-		Handle getChild(Entity entity, int index);
-		std::size_t getImmediateChildCount(Entity entity);
-
-		Handle getEntityHandle(Entity entity);
-		Handle getEntityHandle(std::string entityName);
+		Entity getEntity(std::string entityName);
 		std::string getEntityName(Entity entity);
 		HideFlags getEntityHideFlags(Entity entity);
 		void setEntityHideFlags(Entity entity, HideFlags hideFlags);
 		EntityLocation getLocation(Entity entity);
 
 		void clear();
-		/* Calls awake on all scripts managed by this instance. */
-		void awake();
-		void processQueue();
 
-		template<typename... Ts>
-		Entity createEntityQueued(std::string name, Ts&... components);
-		void destroyEntityQueued(Entity entity);
-		/* Returns temporary pointer to the added component. This pointer will be invalid next frame. */
-		template<typename T>
-		T* addComponentQueued(Entity entity, T& component);
-		template<typename T>
-		void removeComponentQueued(Entity entity);
-		void setParentQueued(Handle entity, Handle parent);
-
-	private:
-		template <typename... Ts>
-		Handle addEntity(Entity entity, Ts&... components);
 		Entity generateEntity(std::string name);
-		void removeEntity(Entity entity);
-		void removeEntity(Entity entity, Archetype* archetype);
-		void removeComponent(Entity entity, ComponentTypeID type);
 		/* @return Returns true if the Entity had a name to remove. */
 		bool removeEntityName(Entity entity);
+
+	private:
+		void removeEntity(Entity entity);
+		void removeEntity(Entity entity, Archetype* archetype);
 
 		void removeArchetype(Archetype* archetype);
 		Archetype* createArchetype(std::vector<IComponentTypeInfo> types);
@@ -96,24 +74,8 @@ namespace Core {
 		Archetype* getArchetype();
 		Archetype* getArchetype(std::vector<IComponentTypeInfo> types);
 
-		/* Inits components and notifies parent Entities. */
-		void prepEntity(Entity entity, Handle owner, Archetype* target);
-
 		/* Helper function for RemoveComponent and AddComponent */
-		inline Handle moveEntity(Entity entity, Archetype* src, Archetype* dest);
-
-		/* Awakes all scripts attached to the Entity. */
-		void awakeEntity(Entity entity);
-		/* Awakes all scripts attached to the Entity. */
-		void awakeEntity(Handle entity);
-
-		/* Awakes the component if it is a type of Script. */
-		void awakeComponent(Entity entity, ComponentType type);
-
-		void onEntityCreated(Entity entity); // Used by queue
-		void onEntityCreated(Handle entity);
-		void onEntityDestroyed(Entity entity, bool destroyingParent = false);
-		void onEntityChanged(Handle entity);
+		EntityLocation moveEntity(Entity entity, Archetype* src, Archetype* dest);
 
 	private:
 		std::map<Entity, Archetype*> entityMap;
@@ -121,44 +83,34 @@ namespace Core {
 		std::map<Entity, HideFlags> entityHideFlags;
 		std::vector<Archetype*> archetypes;
 		std::size_t entityIDCounter;
-
-		std::queue<IFunctionCaller*> functionQueue;
-		bool isAwake;
 	};
 
 
 	// --------------------------- Template Function Definitions --------------------------------
 
 
-	/* Creates an entity and adds it and its components to a matching Archetype. Returns a handle to the Entity. */
+	/* Creates an entity and adds it and its components to a matching Archetype. Returns the Entity. */
 	template <typename... Ts>
-	Handle EntityManager::createEntity(std::string name, Ts&... components) {
+	Entity EntityManager::createEntity(std::string name, Ts&... components) {
 		Entity entity = generateEntity(name);
-		Handle handle = addEntity(entity, components...);
-
-		onEntityCreated(handle);
-
-		return handle;
+		addEntity(entity, components...);
+		return entity;
 	}
 
 	/* Adds entity and its components to matching Archetype. */
 	template <typename... Ts>
-	Handle EntityManager::addEntity(Entity entity, Ts&... components) {
-		Handle owner;
+	EntityLocation EntityManager::addEntity(Entity entity, Ts&... components) {
 		// Call implementation
 		try {
 			Archetype* archetype = getArchetype<Ts...>();
 			entityMap.insert(std::make_pair(entity, archetype));
-			owner = Handle(entity, this);
-			EntityLocation location = archetype->addEntity(entity, components...);
-			owner.updateLocation(location);
-			prepEntity(entity, owner, archetype);
+			return archetype->addEntity(entity, components...);
 		}
 		catch (const std::exception& e) {
 			std::cout << "Failed to add Entity.\n";
 			std::cout << "Exception: " << e.what() << "\n";
+			throw e;
 		}
-		return owner;
 	}
 
 	template <typename T>
@@ -194,26 +146,22 @@ namespace Core {
 
 	/* Adds given components to the given Entity. */
 	template <typename T>
-	void EntityManager::addComponent(Entity entity, T& component) {
+	EntityLocation EntityManager::addComponent(Entity entity, T& component) {
 		Archetype* src = entityMap.at(entity);
 		std::vector<IComponentTypeInfo> destTypes = src->getTypes();
 		destTypes.push_back(IComponentTypeInfo(typeof(T), nameof(T), sizeof(T)));
 
 		Archetype* dest = getArchetype(destTypes);
-		Handle owner = moveEntity(entity, src, dest);
+		EntityLocation location = moveEntity(entity, src, dest);
 
 		dest->setComponent(entity, component);
-		prepEntity(entity, owner, dest);
-
-		// Awake the component
-		awakeComponent(entity, typeof(T));
-		onEntityChanged(owner);
+		return location;
 	}
 
 	/* Removes components with types (specified in template) from the given Entity. */
 	template <typename T>
-	void EntityManager::removeComponent(Entity entity) {
-		removeComponent(entity, typeIDof(T));
+	EntityLocation EntityManager::removeComponent(Entity entity) {
+		return removeComponent(entity, typeIDof(T));
 	}
 
 	/* Returns reference to ArchetypeEntry containing Archetype with specified types. Creates a new Archetype (and entry) if no match was found. */
@@ -222,30 +170,6 @@ namespace Core {
 		// Look for archetype with matching template
 		std::vector<IComponentTypeInfo> types = { IComponentTypeInfo(Core::ComponentTypeInfo<Ts>::getType(), Core::ComponentTypeInfo<Ts>::getName(), sizeof(Ts))... }; // Initialize list with TypeIDs from template
 		return getArchetype(types);
-	}
-
-	template<typename... Ts>
-	Entity EntityManager::createEntityQueued(std::string name, Ts&... components) {
-		Entity entity = generateEntity(name);
-		std::vector<Component*> componentVec = { static_cast<Component*>(&components)... };
-		for (Component* component : componentVec) {
-			component->setOwner(Handle(entity, this));
-		}
-
-		functionQueue.push(new FunctionCaller<Handle, EntityManager, Entity, Ts&...>(&EntityManager::addEntity<Ts...>, *this, entity, components...));
-		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::onEntityCreated, *this, entity));
-		return entity;
-	}
-	template<typename T>
-	T* EntityManager::addComponentQueued(Entity entity, T& component) {
-		component.setOwner(Handle(entity, this));
-		auto function = new FunctionCaller<void, EntityManager, Entity, T&>(&EntityManager::addComponent<T>, *this, entity, component);
-		functionQueue.push(function);
-		return function->getArgument<T>();
-	}
-	template<typename T>
-	void EntityManager::removeComponentQueued(Entity entity) {
-		functionQueue.push(new FunctionCaller<void, EntityManager, Entity>(&EntityManager::removeComponent<T>, *this, entity));
 	}
 } // End of namespace
 #endif

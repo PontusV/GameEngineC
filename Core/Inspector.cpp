@@ -74,7 +74,7 @@ void Inspector::awake() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
 		if (!scrollPanel.isValid()) {
-			HorizontalLayoutGroup* parentGroup = owner.addComponent<HorizontalLayoutGroup>();
+			HorizontalLayoutGroup* parentGroup = ((EntityHandle)owner).addComponent<HorizontalLayoutGroup>();
 			parentGroup->childForceExpandHeight = true;
 			parentGroup->childForceExpandWidth = true;
 			parentGroup->shrinkableChildHeight = true;
@@ -123,7 +123,7 @@ void Inspector::clearEntries() {
 		for (std::size_t i = 0; i < handle.getChildCount(); i++) {
 			EntityHandle child = handle.getChild(i);
 		}
-		handle.destroy();
+		destroyEntity(handle);
 	}
 	targetComponentList.clear();
 	targetComponents.clear();
@@ -317,7 +317,6 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	contentGroup->shrinkableChildWidth = false;
 	// Property field
 	for (std::size_t i = 0; i < type.properties.size(); i++) {
-		ComponentHandle componentHandle(component);
 		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, type.properties[i], component, component->getType().typeID);
 		propField.setParent(entryContent);
 	}

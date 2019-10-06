@@ -10,13 +10,13 @@ typedef std::size_t ComponentTypeID;
 
 namespace Core {
 
-	class EntityManager; // Forward declare
+	class Scene;
 	class Component;
 
 	/* A handle for Entities */
 	class Handle {
 	public:
-		Handle(Entity entity, EntityManager* manager);
+		Handle(Entity entity, Scene* scene);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
 		bool operator==(const Handle& other);
@@ -32,8 +32,6 @@ namespace Core {
 		bool isValid();
 		/* Returns true if Handle is valid. If not, the handle is updated and returns true if the update was successful. */
 		bool refresh();
-		/* Removes the Entity at the end of the frame. */
-		void destroy();
 
 		/* Updates the Handle so it points towards the target Entity. */
 		void update();
@@ -90,7 +88,7 @@ namespace Core {
 
 	protected:
 		// Data required to update itself
-		EntityManager* manager = nullptr;
+		Scene* scene = nullptr;
 		Entity entity = Entity(0);
 
 	private:
@@ -98,7 +96,6 @@ namespace Core {
 	};
 	template<typename T>
 	bool Handle::hasComponent() {
-		//return manager->hasComponent<T>(entity);
 		return hasComponent(typeof(T));
 	}
 

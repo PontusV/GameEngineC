@@ -1,5 +1,6 @@
 #include "Sprite.h"
 #include "ResourceManager.h"
+#include "EntityHandle.h"
 #include <stdexcept>
 
 using namespace Core;
@@ -52,7 +53,8 @@ bool Sprite::hasMaskFromSender(ComponentID sender) {
 void Sprite::clip(ComponentID sender, const std::array<Vector2, 4> & mask) {
 	// Check for existing mask
 	if (hasMaskFromSender(sender)) {
-		std::cout << "Sprite::clip::ERROR the sender(" << sender << ") has already sent a mask to this sprite(" << owner.getEntityName() << ")" << std::endl;
+		EntityHandle ownerHandle = owner;
+		std::cout << "Sprite::clip::ERROR the sender(" << sender << ") has already sent a mask to this sprite(" << ownerHandle.getEntityName() << ")" << std::endl;
 		throw std::invalid_argument("Sprite::clip::ERROR the sender has already sent a mask to this sprite");
 	}
 	masks.push_back(mask);

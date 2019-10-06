@@ -16,9 +16,10 @@ ScrollBar::~ScrollBar() {
 void ScrollBar::awake() {
 	// Create all parts
 	RectTransform* rect = owner.getComponent<RectTransform>();
+	EntityHandle ownerHandle = owner;
 	if (rect) {
 		// Background
-		owner.addComponent(RectSprite(backgroundColor));
+		ownerHandle.addComponent(RectSprite(backgroundColor));
 
 		// Handle
 		float handleWidth = 0;
@@ -29,7 +30,7 @@ void ScrollBar::awake() {
 		else {
 			handleHeight = rect->getSize().y - handlePadding * 2;
 		}
-		handle = createEntity(owner.getEntityName() + "_Handle",
+		handle = createEntity(ownerHandle.getEntityName() + "_Handle",
 			RectSprite(handleColorDefault),
 			RectTransform(0, 0, handleWidth, handleHeight, rect->getZ() + 0.01f, Alignment::TOP_LEFT)
 		);

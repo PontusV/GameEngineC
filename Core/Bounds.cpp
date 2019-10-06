@@ -1,5 +1,4 @@
 #include "Bounds.h"
-#include "BoxComponent.h"
 #include "Maths/MatrixTransform.h"
 
 using namespace Core;
@@ -41,7 +40,7 @@ Bounds Bounds::create(const Matrix4& localToWorldMatrix, const Vector2& localPos
 }
 
 Bounds Bounds::getBounds(EntityHandle entity) {
-	std::vector<BoxComponent*> boxComponents = entity.getComponents<BoxComponent>();
+	/*std::vector<BoxComponent*> boxComponents = entity.getComponents<BoxComponent>();
 
 	if (boxComponents.size() > 0) {
 		Bounds elementBounds = boxComponents[0]->getBounds();
@@ -60,6 +59,6 @@ Bounds Bounds::getBounds(EntityHandle entity) {
 				elementBounds.size.y = bounds.size.y;
 		}
 		return elementBounds;
-	}
+	}*/
 	return Bounds(Vector2(0, 0), Vector2(0, 0));
 }

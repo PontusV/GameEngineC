@@ -5,6 +5,8 @@
 
 #include "Sprite.h"
 #include "RectTransform.h"
+#include "GameObjectData.h"
+#include "UIObjectData.h"
 #include "ComponentGroup.h"
 #include "ComponentArray.h"
 
@@ -88,7 +90,7 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		ComponentGroup<Sprite, RectTransform> spriteGroup;
+		ComponentGroup<Sprite, RectTransform, ObjectData> spriteGroup;
 
 		//TODO: List of contexts, A context contains a list of keybinds.
 		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges

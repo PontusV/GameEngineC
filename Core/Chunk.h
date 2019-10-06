@@ -140,7 +140,7 @@ namespace Core {
 	}
 
 	template<typename T>
-	std::vector<T*>	getComponents(Entity entity) {
+	std::vector<Component*>	Chunk::getComponents(Entity entity) {
 		return getComponents(entity, typeof(T));
 	}
 

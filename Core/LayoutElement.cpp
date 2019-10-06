@@ -1,5 +1,4 @@
 #include "LayoutElement.h"
-#include "BoxComponent.h"
 #include <algorithm>
 
 using namespace Core;

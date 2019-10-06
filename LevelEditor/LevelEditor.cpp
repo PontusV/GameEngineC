@@ -1,7 +1,7 @@
 #include "LevelEditor.h"
 #include <GLFW/glfw3.h>
 
-#include "../Core/Level.h"
+#include "../Core/Scene.h"
 #include "../Core/RectTransform.h"
 #include "../Core/DropDown.h"
 #include "../Core/Button.h"
@@ -39,11 +39,11 @@ int LevelEditor::initiate() {
 	window.setBackgroundColor(Vector3(50, 50, 50));
 
 	// Create Level Editor
-	LevelPtr level = engine.createLevel();
+	ScenePtr sceneUI = engine.createScene("Level_Editor");
+	ScenePtr sceneWorld = engine.createScene("World");
 	unsigned char editorSortingLayer = 0;
-	engine.setCurrentLevel(level);
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
-	EntityHandle menuBar = level->createEntity("Menu_Bar",
+	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }),
 		WindowScale(true, 1.0f, false, 0),
 		RectTransform(0, 0, 500, 25, 10.0f, Alignment::TOP_LEFT)
@@ -57,7 +57,7 @@ int LevelEditor::initiate() {
 	layoutGroup->childForceExpandHeight = true;
 	layoutGroup->childAlignment = Alignment::TOP_LEFT;
 	// Drop menu
-	EntityHandle menuFile = level->createEntity("Menu_Item_File",
+	EntityHandle menuFile = sceneUI->createEntity("Menu_Item_File",
 		DropDown(Text("File", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
@@ -72,7 +72,7 @@ int LevelEditor::initiate() {
 	file->addOption("Save", Core::bind(file, &DropDown::test));
 	file->addOption("Build", Core::bind(file, &DropDown::test));
 	// Drop menu
-	EntityHandle menuEdit = level->createEntity("Menu_Item_Edit",
+	EntityHandle menuEdit = sceneUI->createEntity("Menu_Item_Edit",
 		DropDown(Text("Edit", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
@@ -85,7 +85,7 @@ int LevelEditor::initiate() {
 	file->addOption("Undo", Core::bind(file, &DropDown::test));
 	file->addOption("Redo", Core::bind(file, &DropDown::test));
 	// Drop menu
-	EntityHandle menuView = level->createEntity("Menu_Item_View",
+	EntityHandle menuView = sceneUI->createEntity("Menu_Item_View",
 		DropDown(Text("View", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
@@ -97,7 +97,7 @@ int LevelEditor::initiate() {
 	file->boxWidth = 300;
 	file->addOption("Test", Core::bind(file, &DropDown::test));
 	// Drop menu
-	EntityHandle menuObject = level->createEntity("Menu_Item_Object",
+	EntityHandle menuObject = sceneUI->createEntity("Menu_Item_Object",
 		DropDown(Text("Object", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255))),
 		RectTransform(0, 0, 50, 20, 10.1f, Alignment::CENTER)
 	);
@@ -112,7 +112,7 @@ int LevelEditor::initiate() {
 	// Right Panel.
 	int inspectorWidth = 400;
 	int inspectorHeight = 1000;
-	EntityHandle rightPanel = level->createEntity("Right_Panel",
+	EntityHandle rightPanel = sceneUI->createEntity("Right_Panel",
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		VerticalLayoutGroup(),
@@ -141,7 +141,7 @@ int LevelEditor::initiate() {
 	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
 	// Inspector label background
-	EntityHandle inspectorLabelRect = level->createEntity("Inspector_label_background",
+	EntityHandle inspectorLabelRect = sceneUI->createEntity("Inspector_label_background",
 		RectSprite(Color(100, 100, 100, 255)),
 		LayoutElement(),
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
@@ -153,14 +153,14 @@ int LevelEditor::initiate() {
 	labelRectLE->setFlexibleSizeEnabled(true);
 	inspectorLabelRect.setParent(rightPanel);
 	// Inspector label
-	EntityHandle inspectorLabel = level->createEntity("Inspector_label",
+	EntityHandle inspectorLabel = sceneUI->createEntity("Inspector_label",
 		inspectorLabelText,
 		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
 	);
 	inspectorLabel.setParent(inspectorLabelRect);
 
 	// Inspector background
-	EntityHandle inspector = level->createEntity("Inspector_background",
+	EntityHandle inspector = sceneUI->createEntity("Inspector_background",
 		Inspector(),
 		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
@@ -169,7 +169,7 @@ int LevelEditor::initiate() {
 	//*/
 	//------------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
-	EntityHandle button = level->createEntity("Test_Button",
+	EntityHandle button = sceneWorld->createEntity("Test_Button",
 		Image("resources/images/invaders.png"),
 		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
@@ -186,7 +186,8 @@ int LevelEditor::initiate() {
 	behaviour->bottom = true;
 
 	// Level created, calling awake
-	level->awake();
+	sceneUI->awake();
+	sceneWorld->awake();
 
 	// Keybinds
 	engine.getInput().addKeyBind(GLFW_KEY_ESCAPE, "Terminate");
@@ -202,11 +203,10 @@ int LevelEditor::initiate() {
 
 void LevelEditor::keyPressed(std::string buttonName) {
 	if (buttonName == "Save") {
-		engine.saveLevel("level.dat");
+		//engine.saveScene("level.dat");
 	}
 	if (buttonName == "Load") {
-		LevelPtr loadedLevel = engine.loadLevel("level.dat");
-		engine.setCurrentLevel(loadedLevel);
+		//ScenePtr loadedLevel = engine.loadScene("level.dat");
 	}
 }
 void LevelEditor::keyReleased(std::string buttonName) {

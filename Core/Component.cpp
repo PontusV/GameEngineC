@@ -18,7 +18,7 @@ void Component::setOwner(Handle owner) {
 	this->owner = owner;
 }
 
-EntityHandle Component::getOwner() const {
+Handle Component::getOwner() const {
 	return owner;
 }
 

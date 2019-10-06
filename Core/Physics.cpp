@@ -1,5 +1,4 @@
 #include "Physics.h"
-#include "BoxComponent.h"
 #include "Behaviour.h"
 #include "Text.h"
 #include "ScrollRect.h"
@@ -18,10 +17,6 @@ Physics::~Physics() {
 
 void onTransformChange(Transform& transform) {
 	EntityHandle owner = transform.getOwner();
-	// Updates bounds
-	for (BoxComponent* box : owner.getComponents<BoxComponent>()) {
-		box->updateBounds();
-	}
 	// Updates text position
 	for (Text* text : owner.getComponents<Text>()) {
 		text->updateTransforms();

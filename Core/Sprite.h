@@ -1,7 +1,6 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "BoxComponent.h"
 #include "RectTransform.h"
 #include "Color.h"
 #include "Maths/Vector2.h"

@@ -1,7 +1,6 @@
 #ifndef RECT_TRANSFORM_H
 #define RECT_TRANSFORM_H
 #include "Transform.h"
-#include "BoxComponent.h"
 #include "Alignment.h"
 #include "Anchor.h"
 namespace Core {

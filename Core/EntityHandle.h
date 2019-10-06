@@ -2,14 +2,14 @@
 #define ENTITY_HANDLE_H
 
 #include "Handle.h"
-#include "EntityManager.h"
+#include "Scene.h"
 #include <string>
 
 namespace Core {
 	/* An Entity handle with additional functionality. */
 	class EntityHandle : public Handle {
 	public:
-		EntityHandle(Entity entity, EntityManager* manager);
+		EntityHandle(Entity entity, Scene* scene);
 		EntityHandle(const Handle& handle);
 		EntityHandle();
 		~EntityHandle();
@@ -31,9 +31,6 @@ namespace Core {
 		HideFlags getEntityHideFlags();
 		void setEntityHideFlags(HideFlags hideFlags);
 
-		template<typename... Ts>
-		EntityHandle createEntity(std::string name, Ts&... components);
-
 		bool operator==(const EntityHandle& other);
 		bool operator!=(const EntityHandle& other);
 	};
@@ -42,25 +39,19 @@ namespace Core {
 	template<typename T, class... Args>
 	T* EntityHandle::addComponent(Args&&... args) {
 		T component(args...);
-		T* temp = manager->addComponentQueued(entity, component);
+		T* temp = scene->addComponentQueued(entity, component);
 		return temp;
 	}
 
 	template<typename T>
 	T* EntityHandle::addComponent(T component) {
-		T* temp = manager->addComponentQueued(entity, component);
+		T* temp = scene->addComponentQueued(entity, component);
 		return temp;
 	}
 
 	template<typename T>
 	void EntityHandle::removeComponent() {
-		manager->removeComponentQueued<T>(entity);
-	}
-
-	template<typename... Ts>
-	EntityHandle EntityHandle::createEntity(std::string name, Ts&... components) {
-		Entity entity = manager->createEntityQueued(name, components...);
-		return EntityHandle(entity, manager);
+		scene->removeComponentQueued<T>(entity);
 	}
 }
 #endif
