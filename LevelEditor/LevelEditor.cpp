@@ -39,8 +39,8 @@ int LevelEditor::initiate() {
 	window.setBackgroundColor(Vector3(50, 50, 50));
 
 	// Create Level Editor
-	ScenePtr sceneUI = engine.createScene("Level_Editor");
-	ScenePtr sceneWorld = engine.createScene("World");
+	ScenePtr sceneUI = engine.getSceneManager().createScene("Level_Editor", ObjectType::UI);
+	ScenePtr sceneWorld = engine.getSceneManager().createScene("World", ObjectType::World);
 	unsigned char editorSortingLayer = 0;
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",

@@ -97,40 +97,6 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 
 // -------------------------------End of Callbacks----------------------------------
 
-
-void Engine::saveScene(ScenePtr scene, const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
-	ofstream file;
-	std::string sceneDir("Scenes/");
-	sceneDir.append(fileName);
-	file.open(sceneDir, ios::out | ios::binary | ios::trunc);
-	scene->serialize(file);
-	file.close();
-
-	std::cout << "Saved scene to: " << sceneDir << "\n";
-}
-
-ScenePtr Engine::loadScene(const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
-	ifstream file;
-	std::string sceneDir("sceneDir/");
-	sceneDir.append(fileName);
-	std::cout << "Loading Scene: " << sceneDir << "\n";
-	file.open(sceneDir, ios::in | ios::binary);
-	//
-	ScenePtr scene = std::make_shared<Scene>(&entityManager, ObjectType::World); // TODO: Save & Load type
-	scene->deserialize(file);
-	//
-	file.close();
-	scene->awake();
-
-	return scene;
-}
-
-ScenePtr Engine::createScene(std::string name, ObjectType type) { // TODO: Link name to Scene
-	ScenePtr scene = std::make_shared<Scene>(&entityManager, type);
-	scenes.push_back(scene);
-	return scene;
-}
-
 /* Stops the gameloop. */
 void Engine::terminate() {
 	running = false;
@@ -139,7 +105,7 @@ void Engine::terminate() {
 /* Starts the gameloop. */
 int Engine::initiate() {
 	// Create Empty Debug Scene
-	debugScene = createScene("Debug", ObjectType::UI);
+	debugScene = sceneManager.createScene("Debug", ObjectType::UI);
 
 	// Initialize systems
 	// Graphics
@@ -195,9 +161,7 @@ int Engine::start() {
 		// Update systems
 		input.update(deltaTime);
 		behaviourManager.update(deltaTime);
-		for (ScenePtr& scene : scenes) {
-			scene->processQueue();
-		}
+		sceneManager.update();
 		graphics.update(deltaTime);
 		physics.update(deltaTime);
 
@@ -215,17 +179,17 @@ int Engine::start() {
 	return 0;
 }
 
-Engine::Engine() : graphics(), input(this), physics(), behaviourManager(this) {
+Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physics(), behaviourManager(this) {
 }
 Engine::~Engine() {
-	// Unload all entities and components
-	for (ScenePtr& scene : scenes) {
-		scene->clear();
-	}
 }
 
 EntityManager& Engine::getEntityManager() {
 	return entityManager;
+}
+
+SceneManager& Engine::getSceneManager() {
+	return sceneManager;
 }
 
 Input& Engine::getInput() {
