@@ -255,11 +255,12 @@ EntityManager* Scene::getEntityManager() {
 	return manager;
 }
 
+ObjectType Scene::getType() {
+	return type;
+}
+
 /* Save to outstream */
 void Scene::serialize(std::ostream& os) const {
-	// Scene type
-	std::size_t sceneType = static_cast<std::size_t>(type);
-	os.write((char*)& sceneType, sizeof(sceneType));
 	// Entities
 	std::size_t entityAmount = entities.size();
 	os.write((char*)&entityAmount, sizeof(std::size_t));			// Entity amount
@@ -333,10 +334,6 @@ void Scene::serialize(std::ostream& os) const {
 
 /* Load from instream */
 void Scene::deserialize(std::istream& is) {
-	// Scene type
-	std::size_t sceneType;
-	is.read((char*)&sceneType, sizeof(sceneType));
-	type = static_cast<ObjectType>(sceneType);
 	// Entities
 	std::size_t entityAmount;
 	is.read((char*)&entityAmount, sizeof(std::size_t));					// Entity amount

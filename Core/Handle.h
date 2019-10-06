@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "EntityLocation.h"
 #include "ComponentTypeInfo.h"
+#include "ObjectType.h"
 #include <vector>
 
 typedef std::size_t ComponentTypeID;
@@ -80,6 +81,8 @@ namespace Core {
 		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
 		template<typename T>
 		std::vector<T*> getComponentsDownwards();
+
+		ObjectType getObjectType();
 
 		Handle getParent();
 		Handle getChild(std::size_t index);

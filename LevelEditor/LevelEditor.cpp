@@ -36,7 +36,7 @@ int LevelEditor::initiate() {
 		return result;
 	}
 	Window& window = engine.getGraphics().getWindow();
-	window.setBackgroundColor(Vector3(50, 50, 50));
+	window.setBackgroundColor(Vector3(0.1f, 0.1f, 0.1f));
 
 	// Create Level Editor
 	ScenePtr sceneUI = engine.getSceneManager().createScene("Level_Editor", ObjectType::UI);
@@ -194,6 +194,11 @@ int LevelEditor::initiate() {
 	engine.getInput().addKeyBind(GLFW_KEY_F5, "Save");
 	engine.getInput().addKeyBind(GLFW_KEY_F9, "Load");
 
+	engine.getInput().addKeyBind(GLFW_KEY_LEFT, "Camera_move_left");
+	engine.getInput().addKeyBind(GLFW_KEY_UP, "Camera_move_up");
+	engine.getInput().addKeyBind(GLFW_KEY_RIGHT, "Camera_move_right");
+	engine.getInput().addKeyBind(GLFW_KEY_DOWN, "Camera_move_down");
+
 	// Window hints
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
 
@@ -205,8 +210,20 @@ void LevelEditor::keyPressed(std::string buttonName) {
 	if (buttonName == "Save") {
 		//engine.saveScene("level.dat");
 	}
-	if (buttonName == "Load") {
+	else if (buttonName == "Load") {
 		//ScenePtr loadedLevel = engine.loadScene("level.dat");
+	}
+	else if (buttonName == "Camera_move_left") {
+		engine.getGraphics().getCamera().moveX(-10);
+	}
+	else if (buttonName == "Camera_move_up") {
+		engine.getGraphics().getCamera().moveY(-10);
+	}
+	else if (buttonName == "Camera_move_right") {
+		engine.getGraphics().getCamera().moveX(10);
+	}
+	else if (buttonName == "Camera_move_down") {
+		engine.getGraphics().getCamera().moveY(10);
 	}
 }
 void LevelEditor::keyReleased(std::string buttonName) {

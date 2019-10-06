@@ -240,6 +240,7 @@
     <ClCompile Include="Maths\Matrix4.cpp" />
     <ClCompile Include="MouseDrag.cpp" />
     <ClCompile Include="ObjectData.cpp" />
+    <ClCompile Include="ObjectType.cpp" />
     <ClCompile Include="PropertyEditor.cpp" />
     <ClCompile Include="RectButton.cpp" />
     <ClCompile Include="RectTransform.cpp" />
@@ -334,6 +335,7 @@
     <ClInclude Include="Maths\Matrix4.h" />
     <ClInclude Include="MouseDrag.h" />
     <ClInclude Include="ObjectData.h" />
+    <ClInclude Include="ObjectType.h" />
     <ClInclude Include="PropertyEditor.h" />
     <ClInclude Include="PropertyValueID.h" />
     <ClInclude Include="RectButton.h" />

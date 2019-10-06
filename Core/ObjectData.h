@@ -1,13 +1,9 @@
 #ifndef OBJECT_DATA_H
 #define OBJECT_DATA_H
 #include "Component.h"
+#include "ObjectType.h"
 #include "ObjectData.generated.h"
 namespace Core {
-	enum class ObjectType {
-		World=0,
-		UI
-	};
-
 	class Scene;
 
 	/* A componented owned by every World and UI object. */

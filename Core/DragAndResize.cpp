@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Maths/MatrixTransform.h"
 #include "RectTransform.h"
+#include "Camera.h"
 
 using namespace Core;
 
@@ -19,22 +20,24 @@ void DragAndResize::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (buttoncode == MOUSE_BUTTON_LEFT) {
 		RectTransform* transform = owner.getComponent<RectTransform>();
 		if (transform) {
-			const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			const Vector2& mousePosition = input->getMousePosition();
 			Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
+			// Convert to World Space if owner is a World Object
+			if (owner.getObjectType() == ObjectType::World) mousePos = camera->getWorldToScreenMatrix() * mousePos;
 			mouseOffset = mousePos - transform->getRectOffset();
 			// Left
-			if (mouseOffset.x <= edgeSize && left) {
+			if (left && mouseOffset.x <= edgeSize) {
 				draggingLeft = true;
 			} // Right
-			else if (mouseOffset.x >= transform->getSize().x - edgeSize && right) {
+			else if (right && mouseOffset.x >= transform->getSize().x - edgeSize) {
 				draggingRight = true;
 			}
 			// Top
-			if (mouseOffset.y <= edgeSize && top) {
+			if (top && mouseOffset.y <= edgeSize) {
 				draggingTop = true;
 			}
 			// Bottom
-			else if (mouseOffset.y >= transform->getSize().y - edgeSize && bottom) {
+			else if (bottom && mouseOffset.y >= transform->getSize().y - edgeSize) {
 				draggingBottom = true;
 			}
 		}
@@ -44,8 +47,10 @@ void DragAndResize::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 void DragAndResize::onMouseDrag(float mouseX, float mouseY) {
 	RectTransform* transform = owner.getComponent<RectTransform>();
 	if (transform) {
-		const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+		const Vector2& mousePosition = input->getMousePosition();
 		Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
+		// Convert to World Space if owner is a World Object
+		if (owner.getObjectType() == ObjectType::World) mousePos = camera->getWorldToScreenMatrix() * mousePos;
 		Vector2 move = mousePos - transform->getRectOffset() - mouseOffset;
 
 		if (draggingLeft) {

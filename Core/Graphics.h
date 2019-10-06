@@ -9,6 +9,8 @@
 #include "Texture2D.h"
 #include "RectSprite.h"
 #include "Border.h"
+#include "UIObjectData.h"
+#include "GameObjectData.h"
 
 #include "ComponentArrayManager.h"
 #include "ComponentGroup.h"
@@ -35,6 +37,7 @@ namespace Core {
 		Window& getWindow();
 		Camera& getCamera();
 		Renderer2D& getRenderer();
+		Renderer2D& getRendererUI();
 		UISystem& getUISystem();
 
 	private:
@@ -43,13 +46,19 @@ namespace Core {
 		Window window;
 		Camera camera;
 		Renderer2D* renderer;
+		Renderer2D* rendererUI;
 
 	private:
-		ComponentGroup<RectTransform, RectSprite> renderableRects;
 		ComponentGroup<RectTransform, Image> renderableImages;
-		ComponentGroup<RectTransform, Text> renderableTexts;
-		ComponentGroup<RectTransform, TexturedSprite> renderableTexturedSprites;
-		ComponentGroup<RectTransform, Border> renderableBorders;
+		ComponentGroup<RectTransform, Text, GameObjectData> renderableTexts;
+		ComponentGroup<RectTransform, RectSprite, GameObjectData> renderableRects;
+		ComponentGroup<RectTransform, TexturedSprite, GameObjectData> renderableTexturedSprites;
+		ComponentGroup<RectTransform, Border, GameObjectData> renderableBorders;
+
+		ComponentGroup<RectTransform, Text, UIObjectData> renderableTextsUI;
+		ComponentGroup<RectTransform, RectSprite, UIObjectData> renderableRectsUI;
+		ComponentGroup<RectTransform, TexturedSprite, UIObjectData> renderableTexturedSpritesUI;
+		ComponentGroup<RectTransform, Border, UIObjectData> renderableBordersUI;
 	};
 }
 #endif

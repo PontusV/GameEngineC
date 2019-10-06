@@ -281,31 +281,53 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::vector<maths::RectTransformEntry> allRects;
 	std::size_t spriteGroupSize = spriteGroup.size();
-
-	for (std::size_t i = 0; i < spriteGroupSize; i++) {
-		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
-		RectTransform&	transform	= spriteGroup.get<RectTransform>(i);
+	std::size_t spriteGroupUISize = spriteGroupUI.size();
+	
+	// --------------------------------- UI -------------------------------------
+	for (std::size_t i = 0; i < spriteGroupUISize; i++) {
+		Sprite&			sprite		= spriteGroupUI.get<Sprite>(i);
+		RectTransform&	transform	= spriteGroupUI.get<RectTransform>(i);
 
 		// Add rectangles in view of window
-		int cameraX = 0;
-		int cameraY = 0;
-		Camera& camera = engine->getGraphics().getCamera();
 		Window& window = engine->getGraphics().getWindow();
-		if (maths::isInsideWindow(cameraX, cameraY, window.getWidth(), window.getHeight(), transform)) {
+		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), transform)) {
+			allRects.push_back({ transform, Texture2D(), i + 1, sprite.getMasks() });
+		}
+	}
+
+	// Filter out interactables that are not on mousePosition
+	std::size_t index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects) - 1;
+	if (index < spriteGroupUISize) {
+		Entity entity = spriteGroupUI.getEntity(index);
+		Scene* scene = spriteGroupUI.get<UIObjectData>(index).getScene();
+		return EntityHandle(entity, scene);
+	}
+	allRects.clear();
+
+	// --------------------------------- World -------------------------------------
+	for (std::size_t i = 0; i < spriteGroupSize; i++) {
+		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
+		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
+
+		// Add rectangles in view of window
+		Window& window = engine->getGraphics().getWindow();
+		Camera& camera = engine->getGraphics().getCamera();
+		transform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * camera.getViewMatrix());
+
+		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), transform)) {
 			allRects.push_back({ transform, Texture2D(), i+1, sprite.getMasks() });
 		}
 	}
 
 	// Filter out interactables that are not on mousePosition
-	std::size_t index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects);
-	if (index == 0) return EntityHandle();
-	index -= 1;
+	index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects) - 1;
 	if (index < spriteGroupSize) {
 		Entity entity = spriteGroup.getEntity(index);
-		Scene* scene = spriteGroup.get<ObjectData>(index).getScene();
+		Scene* scene = spriteGroup.get<GameObjectData>(index).getScene();
 		return EntityHandle(entity, scene);
 	}
 
+	// Miss
 	return EntityHandle();
 }
 

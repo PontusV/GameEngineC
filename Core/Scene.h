@@ -55,6 +55,7 @@ namespace Core {
 		Handle getEntityHandle(std::string name);
 
 		EntityManager* getEntityManager();
+		ObjectType getType();
 		/* Calls all the functions in queue and clears it. */
 		void processQueue();
 		/* Calls awake on all Entities contained by this Scene. Future Entities and Components will be awaken once added. Does nothing if the Scene has already been awaken. */
@@ -79,7 +80,7 @@ namespace Core {
 		std::queue<IFunctionCaller*> functionQueue;
 
 	private:
-		ObjectType type;
+		const ObjectType type;
 		std::vector<Handle> entities;		// A list of entities contained by this scene
 		EntityManager* manager;				// Manages the Entities in this Scene
 		bool isAwake;

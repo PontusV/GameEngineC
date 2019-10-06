@@ -50,10 +50,10 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 }
 
 void Renderer2D::render(float deltaTime) {
-	postProcessor.begin();
+	//postProcessor.begin();
 	flush();
-	postProcessor.end();
-	postProcessor.render(deltaTime);
+	//postProcessor.end();
+	//postProcessor.render(deltaTime);
 }
 
 void Renderer2D::flush() {

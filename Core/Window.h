@@ -34,7 +34,7 @@ namespace Core {
 	private:
 		const char* title;
 		Vector2 resolution;
-		Vector3 backgroundColor;
+		Vector3 backgroundColor = Vector3(0,0,0);
 
 		bool active;
 

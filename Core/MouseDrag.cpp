@@ -2,6 +2,7 @@
 #include "RectTransform.h"
 #include "Input.h"
 #include "Maths/MatrixTransform.h"
+#include "Camera.h"
 
 using namespace Core;
 
@@ -17,7 +18,8 @@ void MouseDrag::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (buttoncode == MOUSE_BUTTON_LEFT) {
 		RectTransform* transform = owner.getComponent<RectTransform>();
 		if (transform) {
-			const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			Vector2 mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			if (owner.getObjectType() == ObjectType::World) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
 			// Offset from top left vertex of the RectTransform
 			Vector2 mouseOffset = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition - transform->getRectOffset();
 			if (mouseOffset.x > padding && mouseOffset.x < transform->getSize().x - padding &&
@@ -37,7 +39,8 @@ void MouseDrag::onMouseDrag(float mouseX, float mouseY) {
 	if (dragging) {
 		RectTransform* transform = owner.getComponent<RectTransform>();
 		if (transform) {
-			const Vector2& mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			Vector2 mousePosition = input->getMousePosition(); // Screen space, TODO: convert to World Space
+			if (owner.getObjectType() == ObjectType::World) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
 			transform->setPosition(mousePosition + offset);
 		}
 	}

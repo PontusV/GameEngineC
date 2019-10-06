@@ -104,7 +104,7 @@ void PostProcessor::init() {
 
 void PostProcessor::begin() {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Background color
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 

@@ -90,7 +90,8 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		ComponentGroup<Sprite, RectTransform, ObjectData> spriteGroup;
+		ComponentGroup<Sprite, RectTransform, GameObjectData> spriteGroup;
+		ComponentGroup<Sprite, RectTransform, UIObjectData> spriteGroupUI;
 
 		//TODO: List of contexts, A context contains a list of keybinds.
 		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges

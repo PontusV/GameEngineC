@@ -44,8 +44,9 @@ const Matrix4& Camera::getWorldToScreenMatrix() const {
 const Matrix4& Camera::getViewMatrix() const {
 	return viewMatrix;
 }
+
 void Camera::updateViewMatrix() {
-	Matrix4 viewMatrix = Matrix4(1.0f);
+	viewMatrix = Matrix4(1.0f);
 	Vector2 resolution = window->getResolution();
 	Vector2 center = Vector2(resolution.x / 2, resolution.y / 2);
 
