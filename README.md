@@ -9,6 +9,5 @@ Externals:
 OpenGL		- Graphics  
 Glad		- OpenGL Loading Library  
 GLFW		- Window and input  
-OpenGL Mathematics(GLM)  
-stbh_image		- For loading images  
-Freetype		- For loading ttf text font files  
+stbh_image	- For loading images  
+Freetype	- For loading ttf text font files  
