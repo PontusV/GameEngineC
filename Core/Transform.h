@@ -24,8 +24,10 @@ namespace Core {
 		void resetLocalToWorldMatrix();
 		const Matrix4& getLocalToWorldMatrix() const;
 		const Matrix4& getWorldToLocalMatrix() const;
+
+		void updateLocalModelMatrix();
 		/* Calculates and returns a new model matrix from local position, rotation and scale */
-		Matrix4 getLocalModelMatrix() const;
+		const Matrix4& getLocalModelMatrix() const;
 
 		/* Returns local rotation */
 		const float& getLocalRotation() const;
@@ -59,6 +61,7 @@ namespace Core {
 	protected:
 		Matrix4 localToWorldMatrix;		// World Model Matrix
 		Matrix4 worldToLocalMatrix;		// Inverse of worldModelMatrix. Multiply with a world position to get local position
+		Matrix4 localModelMatrix;		// Local Model Matrix
 		PROPERTY(Update=setToChanged())
 		Vector2 position;				// Local position (Position in parent)
 		PROPERTY()

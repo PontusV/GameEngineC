@@ -19,7 +19,7 @@ namespace Core {
 		Component& operator=(const Component& other);
 		virtual ~Component() = 0; // Abstract
 
-		Handle getOwner() const;
+		Handle getOwner();
 		void setOwner(Handle owner);
 		/* Marks the Component for destruction. */
 		void destroy();

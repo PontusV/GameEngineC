@@ -81,13 +81,16 @@ const Matrix4& Transform::getWorldToLocalMatrix() const {
 	return worldToLocalMatrix;
 }
 
+void Transform::updateLocalModelMatrix() {
+	localModelMatrix = Matrix4(1.0f);
+	localModelMatrix = maths::translate(localModelMatrix, Vector3(position.x, position.y, 0.0f));
+	localModelMatrix = maths::rotate(localModelMatrix, rotation, Vector3(0, 0, 1));
+	localModelMatrix = maths::scale(localModelMatrix, Vector3(scale, scale, 1));
+}
+
 /* Calculates Local Model Matrix from local properties (position, rotation, scale). */
-Matrix4 Transform::getLocalModelMatrix() const {
-	Matrix4 matrix(1.0f);
-	matrix = maths::translate(matrix, Vector3(position.x, position.y, 0.0f));
-	matrix = maths::rotate(matrix, rotation, Vector3(0, 0, 1));
-	matrix = maths::scale(matrix, Vector3(scale, scale, 1));
-	return matrix;
+const Matrix4& Transform::getLocalModelMatrix() const {
+	return localModelMatrix;
 }
 
 const Matrix4& Transform::getLocalToWorldMatrix() const {

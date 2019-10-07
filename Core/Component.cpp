@@ -18,7 +18,8 @@ void Component::setOwner(Handle owner) {
 	this->owner = owner;
 }
 
-Handle Component::getOwner() const {
+Handle Component::getOwner() {
+	owner.refresh();
 	return owner;
 }
 

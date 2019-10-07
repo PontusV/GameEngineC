@@ -67,6 +67,7 @@ void Text::createText() {
 			RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform->getZ() + 0.00001f, Alignment::TOP_LEFT, 0.0f, 1.0f);
 			// Set world model matrix of new text sprite
 			spriteTransform.updateLocalToWorldMatrix(localToWorldMatrix);
+			spriteTransform.updateLocalModelMatrix();
 
 			textSprites.push_back(c.texture);
 			textTransforms.push_back(spriteTransform);

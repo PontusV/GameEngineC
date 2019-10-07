@@ -27,8 +27,10 @@ void onTransformChange(Transform& transform) {
  * @parameter matrixChanged specifies if the modelMatrix has changed from the previous update
 */
 void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChanged) {
-	if (root.hasChanged())
+	if (root.hasChanged()) {
 		matrixChanged = true;
+		root.updateLocalModelMatrix();
+	}
 
 	if (matrixChanged) {
 		root.updateLocalToWorldMatrix(modelMatrix);

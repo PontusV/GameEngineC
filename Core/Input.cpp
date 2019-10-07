@@ -279,9 +279,9 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y) {
-	std::vector<maths::RectTransformEntry> allRects;
 	std::size_t spriteGroupSize = spriteGroup.size();
 	std::size_t spriteGroupUISize = spriteGroupUI.size();
+	std::vector<maths::RectTransformEntry> allRects;
 	
 	// --------------------------------- UI -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupUISize; i++) {

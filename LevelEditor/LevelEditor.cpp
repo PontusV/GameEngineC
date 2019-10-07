@@ -214,16 +214,16 @@ void LevelEditor::keyPressed(std::string buttonName) {
 		//ScenePtr loadedLevel = engine.loadScene("level.dat");
 	}
 	else if (buttonName == "Camera_move_left") {
-		engine.getGraphics().getCamera().moveX(-10);
+		engine.getGraphics().getCamera().moveX(-100);
 	}
 	else if (buttonName == "Camera_move_up") {
-		engine.getGraphics().getCamera().moveY(-10);
+		engine.getGraphics().getCamera().moveY(-100);
 	}
 	else if (buttonName == "Camera_move_right") {
-		engine.getGraphics().getCamera().moveX(10);
+		engine.getGraphics().getCamera().moveX(100);
 	}
 	else if (buttonName == "Camera_move_down") {
-		engine.getGraphics().getCamera().moveY(10);
+		engine.getGraphics().getCamera().moveY(100);
 	}
 }
 void LevelEditor::keyReleased(std::string buttonName) {

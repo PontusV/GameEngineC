@@ -158,6 +158,7 @@ void Graphics::render(float deltaTime) {
 
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
+				lineTransform.updateLocalModelMatrix();
 
 				renderer->submit(texture, lineTransform, spriteShader.ID, color, masks, sortingLayer);
 			}
@@ -264,6 +265,7 @@ void Graphics::render(float deltaTime) {
 
 				RectTransform lineTransform = RectTransform(localPosX, localPosY, borderSize.x, borderSize.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
 				lineTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
+				lineTransform.updateLocalModelMatrix();
 
 				renderer->submit(texture, lineTransform, spriteShader.ID, color, masks, sortingLayer);
 			}
