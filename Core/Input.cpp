@@ -35,8 +35,9 @@ void Input::update(float dt) {
 	// Mouse Hover
 	if (target != hoverTarget) {
 		std::vector<Behaviour*> scripts;
+		bool childOfPrev = hoverTarget.isChild(target.getEntity());
 		// Hover out
-		if (!hoverTarget.isChild(target.getEntity())) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
+		if (!childOfPrev) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
 			scripts = hoverTarget.getComponents<Behaviour>();
 			for (Behaviour* script : scripts) {
 				script->onHoverout();
@@ -59,7 +60,7 @@ void Input::update(float dt) {
 		hoverTarget = target;
 
 		// Hover over
-		if (!target.isChild(prevTarget.getEntity())) { // Is the previous hoverTarget a child of the new one? If true, no onHoverOver is called
+		if (!childOfPrev) { // Is the previous hoverTarget a child of the new one? If true, no onHoverOver is called
 			scripts = target.getComponents<Behaviour>();
 			for (Behaviour* script : scripts) {
 				script->onHoverover();
@@ -287,14 +288,14 @@ struct HitDetectData {
 EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::size_t spriteGroupSize = spriteGroup.size();
 	std::size_t spriteGroupUISize = spriteGroupUI.size();
-	HitDetectData hitDetected;
+	HitDetectData currentHit;
 	
 	// --------------------------------- UI -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupUISize; i++) {
 		Sprite&			sprite		= spriteGroupUI.get<Sprite>(i);
 		RectTransform&	transform	= spriteGroupUI.get<RectTransform>(i);
 
-		if (transform.getZ() < hitDetected.sortingOrder) continue;
+		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window
 		Window& window = engine->getGraphics().getWindow();
@@ -303,14 +304,14 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
 			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
-				hitDetected.index = i;
-				hitDetected.sortingOrder = transform.getZ();
+				currentHit.index = i;
+				currentHit.sortingOrder = transform.getZ();
 			}
 		}
 	}
-	if (hitDetected.index < spriteGroupUISize) {
-		Entity entity = spriteGroupUI.getEntity(hitDetected.index);
-		Scene* scene = spriteGroupUI.get<UIObjectData>(hitDetected.index).getScene();
+	if (currentHit.index < spriteGroupUISize) {
+		Entity entity = spriteGroupUI.getEntity(currentHit.index);
+		Scene* scene = spriteGroupUI.get<UIObjectData>(currentHit.index).getScene();
 		return EntityHandle(entity, scene);
 	}
 
@@ -319,7 +320,7 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
 		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
 
-		if (transform.getZ() < hitDetected.sortingOrder) continue;
+		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window
 		Window& window = engine->getGraphics().getWindow();
@@ -329,15 +330,15 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
 			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
-				hitDetected.index = i;
-				hitDetected.sortingOrder = transform.getZ();
+				currentHit.index = i;
+				currentHit.sortingOrder = transform.getZ();
 			}
 		}
 	}
 
-	if (hitDetected.index < spriteGroupSize) {
-		Entity entity = spriteGroup.getEntity(hitDetected.index);
-		Scene* scene = spriteGroup.get<GameObjectData>(hitDetected.index).getScene();
+	if (currentHit.index < spriteGroupSize) {
+		Entity entity = spriteGroup.getEntity(currentHit.index);
+		Scene* scene = spriteGroup.get<GameObjectData>(currentHit.index).getScene();
 		return EntityHandle(entity, scene);
 	}
 
