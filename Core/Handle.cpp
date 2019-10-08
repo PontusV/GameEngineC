@@ -74,6 +74,15 @@ bool Handle::isChild(Entity entity) {
 	return false;
 }
 
+bool Handle::isParent(Entity entity) {
+	Handle parent = getParent();
+	while (parent.refresh()) {
+		if (parent.getEntity() == entity) return true;
+		parent = parent.getParent();
+	}
+	return false;
+}
+
 bool Handle::isImmediateChild(Entity entity) {
 	std::size_t childCount = getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {

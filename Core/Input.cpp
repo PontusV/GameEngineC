@@ -35,41 +35,26 @@ void Input::update(float dt) {
 	// Mouse Hover
 	if (target != hoverTarget) {
 		std::vector<Behaviour*> scripts;
-		bool childOfPrev = hoverTarget.isChild(target.getEntity());
 		// Hover out
-		if (!childOfPrev) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
-			scripts = hoverTarget.getComponents<Behaviour>();
-			for (Behaviour* script : scripts) {
+		if (!hoverTarget.isParent(target.getEntity())) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
+			for (Behaviour* script : hoverTarget.getComponentsUpwards<Behaviour>()) {
 				script->onHoverout();
 			}
-			// Hover out - parents
-			Handle parent = hoverTarget.getParent();
-			while (parent.refresh()) {
-				hoverTarget = parent;
-				if (hoverTarget.getEntity() == target.getEntity()) break;
-				scripts = hoverTarget.getComponents<Behaviour>();
-				for (Behaviour* script : scripts) {
-					script->onHoverout();
-				}
-				parent = hoverTarget.getParent();
+			// Hover over
+			for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
+				script->onHoverover();
 			}
 		}
-
-		// Switch current hover ptr
-		EntityHandle prevTarget = hoverTarget;
-		hoverTarget = target;
-
-		// Hover over
-		if (!childOfPrev) { // Is the previous hoverTarget a child of the new one? If true, no onHoverOver is called
+		if (!target.isParent(hoverTarget.getEntity())) {
+			// Hover over
 			scripts = target.getComponents<Behaviour>();
 			for (Behaviour* script : scripts) {
 				script->onHoverover();
 			}
 			// Hover over - parents
 			Handle parent = target.getParent();
-			while (parent.refresh()) {
+			while (parent != hoverTarget && parent.refresh()) {
 				target = parent;
-				if (target.getEntity() == prevTarget.getEntity()) break;
 				scripts = target.getComponents<Behaviour>();
 				for (Behaviour* script : scripts) {
 					script->onHoverover();
@@ -77,6 +62,9 @@ void Input::update(float dt) {
 				parent = target.getParent();
 			}
 		}
+
+		// Switch current hover ptr
+		hoverTarget = target;
 	}
 
 	// Clear old key pressed/released

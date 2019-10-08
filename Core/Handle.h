@@ -24,6 +24,8 @@ namespace Core {
 		bool operator!=(const Handle& other);
 		/* Returns true if the given Entity is a child of the Entity this instance points to. */
 		bool isChild(Entity entity);
+		/* Returns true if the given Entity is a parent of the Entity this instance points to. */
+		bool isParent(Entity entity);
 		/* Returns true if the given Entity is an immediate child of the Entity this instance points to. */
 		bool isImmediateChild(Entity entity);
 
