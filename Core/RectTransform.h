@@ -49,9 +49,11 @@ namespace Core {
 		Vector2 getLocalVertex(std::size_t index) const;
 		/* Returns the vertices in world space. */
 		std::array<Vector2, 4> getVertices() const;
+		/* Returns the vertices in world space. */
+		std::array<Vector2, 4> getVertices(const Matrix4& matrix) const;
 		/* Returns the vertex in world space. */
 		Vector2 getVertex(std::size_t index) const;
-		Vector2 getVertex(std::size_t index, Matrix4& localModelMatrix) const;
+		Vector2 getVertex(std::size_t index, Matrix4& matrix) const;
 
 	private:
 		/* Notifies UIBehaviours of a change in size */

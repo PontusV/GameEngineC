@@ -74,7 +74,7 @@ namespace Core {
 			return interactables[0].id;
 		}
 
-		bool isInsideWindow(int windowWidth, int windowHeight, const RectTransform& rect) {
+		bool isInsideWindow(int windowWidth, int windowHeight, const std::array<Vector2, 4> & vertices) {
 			// TODO: Check every corner or if a rect line crosses the window
 			// Currently only checks if pivot point is inside window
 			/*Vector2 rectPosition = rect.getPosition(); // Pivot point in world space, TODO: Convert to screen space

@@ -277,53 +277,67 @@ void Input::addKeyBind(int keyCode, std::string buttonName) {
 	keyBinds[keyCode] = buttonName;
 }
 
+struct HitDetectData {
+	HitDetectData() : index(-1), sortingOrder(0) {}
+	std::size_t index;
+	float sortingOrder;
+};
+
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y) {
 	std::size_t spriteGroupSize = spriteGroup.size();
 	std::size_t spriteGroupUISize = spriteGroupUI.size();
-	std::vector<maths::RectTransformEntry> allRects;
+	HitDetectData hitDetected;
 	
 	// --------------------------------- UI -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupUISize; i++) {
 		Sprite&			sprite		= spriteGroupUI.get<Sprite>(i);
 		RectTransform&	transform	= spriteGroupUI.get<RectTransform>(i);
 
+		if (transform.getZ() < hitDetected.sortingOrder) continue;
+
 		// Add rectangles in view of window
 		Window& window = engine->getGraphics().getWindow();
-		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), transform)) {
-			allRects.push_back({ transform, Texture2D(), i + 1, sprite.getMasks() });
+		std::array<Vector2, 4> vertices = transform.getVertices();
+
+		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
+			// Simple hit detection
+			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
+				hitDetected.index = i;
+				hitDetected.sortingOrder = transform.getZ();
+			}
 		}
 	}
-
-	// Filter out interactables that are not on mousePosition
-	std::size_t index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects) - 1;
-	if (index < spriteGroupUISize) {
-		Entity entity = spriteGroupUI.getEntity(index);
-		Scene* scene = spriteGroupUI.get<UIObjectData>(index).getScene();
+	if (hitDetected.index < spriteGroupUISize) {
+		Entity entity = spriteGroupUI.getEntity(hitDetected.index);
+		Scene* scene = spriteGroupUI.get<UIObjectData>(hitDetected.index).getScene();
 		return EntityHandle(entity, scene);
 	}
-	allRects.clear();
 
 	// --------------------------------- World -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupSize; i++) {
 		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
 		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
 
+		if (transform.getZ() < hitDetected.sortingOrder) continue;
+
 		// Add rectangles in view of window
 		Window& window = engine->getGraphics().getWindow();
 		Camera& camera = engine->getGraphics().getCamera();
-		transform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * camera.getViewMatrix());
+		std::array<Vector2, 4> vertices = transform.getVertices(camera.getViewMatrix());
 
-		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), transform)) {
-			allRects.push_back({ transform, Texture2D(), i+1, sprite.getMasks() });
+		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
+			// Simple hit detection
+			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
+				hitDetected.index = i;
+				hitDetected.sortingOrder = transform.getZ();
+			}
 		}
 	}
 
-	// Filter out interactables that are not on mousePosition
-	index = maths::hitDetect(mousePosition.x, mousePosition.y, allRects) - 1;
-	if (index < spriteGroupSize) {
-		Entity entity = spriteGroup.getEntity(index);
-		Scene* scene = spriteGroup.get<GameObjectData>(index).getScene();
+	if (hitDetected.index < spriteGroupSize) {
+		Entity entity = spriteGroup.getEntity(hitDetected.index);
+		Scene* scene = spriteGroup.get<GameObjectData>(hitDetected.index).getScene();
 		return EntityHandle(entity, scene);
 	}
 

@@ -42,33 +42,43 @@ Vector2 RectTransform::getLocalVertex(std::size_t index) const {
 }
 
 std::array<Vector2, 4> RectTransform::getVertices() const {
-	Matrix4 localModelMatrix = getLocalModelMatrix();
+	Matrix4 matrix = localToWorldMatrix * localModelMatrix;
 	return {
-		getVertex(0, localModelMatrix),
-		getVertex(1, localModelMatrix),
-		getVertex(2, localModelMatrix),
-		getVertex(3, localModelMatrix)
+		getVertex(0, matrix),
+		getVertex(1, matrix),
+		getVertex(2, matrix),
+		getVertex(3, matrix)
+	};
+}
+
+std::array<Vector2, 4> RectTransform::getVertices(const Matrix4& multMatrix) const {
+	Matrix4 matrix = localToWorldMatrix * localModelMatrix * multMatrix;
+	return {
+		getVertex(0, matrix),
+		getVertex(1, matrix),
+		getVertex(2, matrix),
+		getVertex(3, matrix)
 	};
 }
 
 Vector2 RectTransform::getVertex(std::size_t index) const {
-	Matrix4 localModelMatrix = getLocalModelMatrix();
-	return getVertex(index, localModelMatrix);
+	Matrix4 matrix = localToWorldMatrix * localModelMatrix;
+	return getVertex(index, matrix);
 }
 
-Vector2 RectTransform::getVertex(std::size_t index, Matrix4& localModelMatrix) const {
+Vector2 RectTransform::getVertex(std::size_t index, Matrix4& matrix) const {
 	Vector2 pos = getRectOffset();
 	if (index == 0) {
-		return localToWorldMatrix * localModelMatrix * pos;
+		return matrix * pos;
 	}
 	else if (index == 1) {
-		return localToWorldMatrix * localModelMatrix * Vector2(pos.x, pos.y + size.y);
+		return matrix * Vector2(pos.x, pos.y + size.y);
 	}
 	else if (index == 2) {
-		return localToWorldMatrix * localModelMatrix * (pos + size);
+		return matrix * (pos + size);
 	}
 	else if (index == 3) {
-		return localToWorldMatrix * localModelMatrix * Vector2(pos.x + size.x, pos.y);
+		return matrix * Vector2(pos.x + size.x, pos.y);
 	}
 	throw std::invalid_argument("RectTransform::getVertex::ERROR Vertex index out of bounds!");
 }
