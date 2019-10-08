@@ -23,43 +23,47 @@ Input::~Input() {
 
 void Input::update(float dt) {
 	// Mouse Drag
-	if (mouseMoved && leftMouseButtonPressed && lastClickTarget.refresh()) {
-		std::vector<Behaviour*> scripts = lastClickTarget.getComponentsUpwards<Behaviour>();
-		for (Behaviour* script : scripts) {
-			script->onMouseDrag(mousePosition.x, mousePosition.y);
-		}
+	if (mouseMoved) {
 		mouseMoved = false;
+		if (leftMouseButtonPressed && lastClickTarget.refresh()) {
+			std::vector<Behaviour*> scripts = lastClickTarget.getComponentsUpwards<Behaviour>();
+			for (Behaviour* script : scripts) {
+				script->onMouseDrag(mousePosition.x, mousePosition.y);
+			}
+		}
 	}
 
 	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);
 	// Mouse Hover
 	if (target != hoverTarget) {
-		std::vector<Behaviour*> scripts;
 		// Hover out
-		if (!hoverTarget.isParent(target.getEntity())) { // Is the new hoverTarget a child of the previous one? If true, no onHoverOut is called
-			for (Behaviour* script : hoverTarget.getComponentsUpwards<Behaviour>()) {
+		if (!target.isParent(hoverTarget.getEntity())) {
+			for (Behaviour* script : hoverTarget.getComponents<Behaviour>()) {
 				script->onHoverout();
 			}
-			// Hover over
-			for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-				script->onHoverover();
+			// Hover over - parents
+			Handle parent = hoverTarget.getParent();
+			while (parent.refresh()) {
+				if (parent == target) break;
+				for (Behaviour* script : parent.getComponents<Behaviour>()) {
+					script->onHoverout();
+				}
+				parent = parent.getParent();
 			}
 		}
-		if (!target.isParent(hoverTarget.getEntity())) {
-			// Hover over
-			scripts = target.getComponents<Behaviour>();
-			for (Behaviour* script : scripts) {
+		// Hover over
+		if (!hoverTarget.isParent(target.getEntity())) {
+			for (Behaviour* script : target.getComponents<Behaviour>()) {
 				script->onHoverover();
 			}
 			// Hover over - parents
 			Handle parent = target.getParent();
-			while (parent != hoverTarget && parent.refresh()) {
-				target = parent;
-				scripts = target.getComponents<Behaviour>();
-				for (Behaviour* script : scripts) {
+			while (parent.refresh()) {
+				if (parent == hoverTarget) break;
+				for (Behaviour* script : parent.getComponents<Behaviour>()) {
 					script->onHoverover();
 				}
-				parent = target.getParent();
+				parent = parent.getParent();
 			}
 		}
 
@@ -70,7 +74,7 @@ void Input::update(float dt) {
 	// Clear old key pressed/released
 	keysPressed.clear();
 	keysReleased.clear();
-	typedText = std::wstring();
+	typedText.clear();
 	// Process input events
 	for (InputEvent& event : events) {
 		processInputEvent(event, hoverTarget);
