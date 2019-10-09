@@ -33,6 +33,7 @@ namespace Core {
 		/* Removes the component from the Entity. */
 		template<typename T>
 		void removeComponent(Entity entity);
+		void removeComponent(Entity entity, ComponentTypeID componentTypeID);
 
 		template<typename... Ts>
 		Handle createEntityQueued(std::string name, Ts& ... components);
@@ -42,6 +43,7 @@ namespace Core {
 		T* addComponentQueued(Entity entity, T& component);
 		template<typename T>
 		void removeComponentQueued(Entity entity);
+		void removeComponentQueued(Entity entity, ComponentTypeID componentTypeID);
 		void setParentQueued(Handle entity, Handle parent);
 
 		void setParent(Handle entity, Handle parent);
@@ -126,11 +128,7 @@ namespace Core {
 
 	template<typename T>
 	void Scene::removeComponent(Entity entity) {
-		EntityLocation location = manager->removeComponent(entity, typeIDof(T));
-		Handle handle = getEntityHandle(entity);
-		handle.updateLocation(location);
-		prepEntity(handle);
-		onEntityChanged(handle);
+		removeComponent(entity, typeIDof(T));
 	}
 
 	template<typename... Ts>

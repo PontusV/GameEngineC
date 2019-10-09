@@ -26,6 +26,7 @@ namespace Core {
 		/* Removes the component of type T at the end of the frame. */
 		template<typename T>
 		void removeComponent();
+		void removeComponent(ComponentTypeID componentTypeID);
 
 		std::string getEntityName();
 		HideFlags getEntityHideFlags();

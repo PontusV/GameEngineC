@@ -7,7 +7,7 @@
 
 namespace Core {
 
-	CLASS() ParentEntity : public Component {
+	CLASS(hideInInspector) ParentEntity : public Component {
 		GENERATED_BODY()
 	public:
 		ParentEntity(Handle parent);

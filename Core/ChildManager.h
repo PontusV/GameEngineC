@@ -10,7 +10,7 @@
 
 namespace Core {
 
-	CLASS() ChildManager : public Component {
+	CLASS(hideInInspector) ChildManager : public Component {
 		GENERATED_BODY()
 	public:
 		ChildManager() {}

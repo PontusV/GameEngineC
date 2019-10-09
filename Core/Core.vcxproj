@@ -218,6 +218,7 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Clipboard.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="ComponentEntry.cpp" />
     <ClCompile Include="ComponentFunctionHandle.cpp" />
     <ClCompile Include="ComponentHandle.cpp" />
     <ClCompile Include="ComponentLoader.cpp" />
@@ -308,6 +309,7 @@
     <ClInclude Include="ChildManager.h" />
     <ClInclude Include="Clipboard.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="ComponentEntry.h" />
     <ClInclude Include="ComponentFunctionHandle.h" />
     <ClInclude Include="ComponentHandle.h" />
     <ClInclude Include="ComponentLoader.h" />

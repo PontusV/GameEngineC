@@ -4,6 +4,7 @@
 #include "HorizontalLayoutGroup.h"
 #include "VerticalLayoutGroup.h"
 #include "RectTransform.h"
+#include "RectButton.h"
 #include "RectSprite.h"
 #include "RectMask.h"
 #include "ScrollRect.h"
@@ -13,6 +14,7 @@
 #include "HideFlags.h"
 #include "CheckBox.h"
 #include "DropDownScroll.h"
+#include "ComponentEntry.h"
 #include "Maths/Vector2.h"
 #include "ChildManager.h"
 #include "ParentEntity.h"
@@ -28,6 +30,15 @@ Inspector::Inspector()
 
 Inspector::~Inspector()
 {
+}
+
+std::vector<Component*> getInspectableComponents(EntityHandle target) {
+	std::vector<Component*> components;
+	for (Component* component : target.getComponents()) {
+		if (!component->getType().hasAnnotation("hideInInspector"))
+			components.push_back(component);
+	}
+	return components;
 }
 
 /* Utility */
@@ -290,17 +301,41 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		RectSprite(Color(40, 40, 40)),
 		RectTransform(0, 0, 0, 24, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
-	LayoutElement* labelLayout = labelField.addComponent<LayoutElement>();
-	labelLayout->setMinSizeEnabled(true);
-	labelLayout->setMinSize(Vector2(0, 24));
-	labelLayout->setFlexibleSizeEnabled(true);
-	labelLayout->setFlexibleSize(Vector2(1, 0));
+	LayoutElement* labelFieldLayout = labelField.addComponent<LayoutElement>();
+	labelFieldLayout->setMinSizeEnabled(true);
+	labelFieldLayout->setMinSize(Vector2(0, 24));
+	labelFieldLayout->setFlexibleSizeEnabled(true);
+	labelFieldLayout->setFlexibleSize(Vector2(1, 0));
+	HorizontalLayoutGroup* labelLayoutGroup = labelField.addComponent<HorizontalLayoutGroup>();
+	labelLayoutGroup->childForceExpandWidth = true;
+	labelLayoutGroup->paddingLeft = 5;
+	labelLayoutGroup->paddingRight = 2;
+	labelLayoutGroup->childAlignment = Alignment::LEFT;
 	labelField.setParent(entry);
 	EntityHandle label = createEntity(entryName + "_Label",
 		Text(type.name, "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255)),
-		RectTransform(5, 12, 0, 24, rect->getZ() + 0.1f, Alignment::LEFT)
+		RectTransform(0, 12, 0, 24, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
+	LayoutElement* labelLayout = label.addComponent<LayoutElement>();
+	labelLayout->setFlexibleSizeEnabled(true);
+	labelLayout->setFlexibleSize(Vector2(1.0f, 0));
 	label.setParent(labelField);
+	EntityHandle removeButtonEntity = createEntity(entryName + "_RemoveButton",
+		RectSprite(Color(255, 40, 40)),
+		RectTransform(0, 0, 20, 20, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
+	);
+	ComponentEntry* entryComponent = removeButtonEntity.addComponent(ComponentEntry(currentTarget, component->getType().typeID));
+	RectButton* removeButton = removeButtonEntity.addComponent<RectButton>();
+	removeButton->colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
+	removeButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);
+	removeButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(200, 0, 0);
+	removeButton->clickFunction = Core::bind(entryComponent, &ComponentEntry::removeComponent);
+	LayoutElement* removeButtonLayout = removeButtonEntity.addComponent<LayoutElement>();
+	removeButtonLayout->setFlexibleSizeEnabled(true);
+	removeButtonLayout->setFlexibleSize(Vector2(0, 0));
+	removeButtonLayout->setMinSizeEnabled(true);
+	removeButtonLayout->setMinSize(Vector2(20, 20));
+	removeButtonEntity.setParent(labelField);
 	//*/
 	EntityHandle entryContent = createEntity(entryName + "_Content",
 		RectTransform(0,0,0,0,rect->getZ() + 0.1f, Alignment::TOP_LEFT)
@@ -329,7 +364,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 void Inspector::createEntries() {
 	// Get components and their reflection data
 	std::size_t i = 0;
-	for (Component* component : currentTarget.getComponents()) {
+	for (Component* component : getInspectableComponents(currentTarget)) {
 		addComponentEntry(component, i++);
 	}
 	// Add an 'Add Component' button
@@ -384,7 +419,7 @@ void Inspector::onMouseButtonPressed(int buttoncode, int mods) {
 void Inspector::lateUpdate(float deltaTime) {
 	if (currentTarget.getEntity().getID() == Entity::INVALID_ID) return;
 	// Check if refresh is necessary
-	std::vector<Component*> components = currentTarget.getComponents();
+	std::vector<Component*> components = getInspectableComponents(currentTarget);
 	if (components.size() != targetComponents.size()) {
 		refresh();
 	}

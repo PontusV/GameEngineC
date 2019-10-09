@@ -69,6 +69,18 @@ Handle Scene::getEntityHandle(std::string name) {
 	return Handle(manager->getEntity(name), this);
 }
 
+void Scene::removeComponent(Entity entity, ComponentTypeID componentTypeID) {
+	EntityLocation location = manager->removeComponent(entity, componentTypeID);
+	Handle handle = getEntityHandle(entity);
+	handle.updateLocation(location);
+	prepEntity(handle);
+	onEntityChanged(handle);
+}
+
+void Scene::removeComponentQueued(Entity entity, ComponentTypeID componentTypeID) {
+	functionQueue.push(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
+}
+
 void Scene::awake() {
 	isAwake = true;
 	// Loop through all entities
