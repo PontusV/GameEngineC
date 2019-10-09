@@ -21,6 +21,7 @@ void RectMask::onChildAdded(EntityHandle entity) {
 		auto vertices = rect->getVertices();
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
 			sprite->clip(getComponentID(), vertices);
+			childSprites.push_back(ComponentHandle(sprite));
 		}
 	}
 }
@@ -29,6 +30,18 @@ void RectMask::onChildRemoved(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
 			sprite->removeClip(getComponentID());
+			bool removed = false;
+			for (auto it = childSprites.begin(); it != childSprites.end(); it++) {
+				if (it->getComponent()->getComponentID() == sprite->getComponentID()) {
+					childSprites.erase(it);
+					removed = true;
+					break;
+				}
+			}
+			if (!removed) {
+				std::cout << "RectMask::onChildRemoved::ERROR Failed to find sprite in childSprites collection" << std::endl;
+				throw std::invalid_argument("RectMask::onChildRemoved::ERROR Failed to find sprite in childSprites collection");
+			}
 		}
 	}
 }
@@ -39,6 +52,7 @@ void RectMask::onChildChanged(EntityHandle entity) {
 		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
 			if (!sprite->hasMaskFromSender(getComponentID())) {
 				sprite->clip(getComponentID(), vertices);
+				childSprites.push_back(ComponentHandle(sprite));
 			}
 		}
 	}
@@ -47,8 +61,8 @@ void RectMask::onChildChanged(EntityHandle entity) {
 void RectMask::updateMask() {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
-		for (Sprite* sprite : owner.getComponentsInChildren<Sprite>()) {
-			sprite->reclip(getComponentID(), vertices);
+		for (ComponentHandle& sprite : childSprites) {
+			sprite.getComponent<Sprite>()->reclip(getComponentID(), vertices);
 		}
 	}
 }

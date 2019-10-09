@@ -41,7 +41,7 @@ void Input::update(float dt) {
 			for (Behaviour* script : hoverTarget.getComponents<Behaviour>()) {
 				script->onHoverout();
 			}
-			// Hover over - parents
+			// Hover out - parents
 			Handle parent = hoverTarget.getParent();
 			while (parent.refresh()) {
 				if (parent == target) break;

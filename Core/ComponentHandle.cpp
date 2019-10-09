@@ -1,4 +1,5 @@
 #include "ComponentHandle.h"
+#include "Scene.h"
 #include <iostream>
 
 using namespace Core;

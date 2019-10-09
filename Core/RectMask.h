@@ -1,6 +1,7 @@
 #ifndef RECT_MASK_H
 #define RECT_MASK_H
 #include "Behaviour.h"
+#include "ComponentHandle.h"
 #include <cstddef>
 #include <map>
 #include <array>
@@ -23,6 +24,7 @@ namespace Core {
 
 	private:
 		void updateMask();
+		std::vector<ComponentHandle> childSprites;
 	};
 }
 #endif

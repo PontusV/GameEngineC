@@ -27,6 +27,7 @@ void onTransformChange(Transform& transform) {
  * @parameter matrixChanged specifies if the modelMatrix has changed from the previous update
 */
 void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChanged) {
+	bool blockNotify = false;
 	if (root.hasChanged()) {
 		matrixChanged = true;
 		root.updateLocalModelMatrix();
@@ -46,6 +47,7 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 		if (ScrollRect* scrollRect = owner.getComponent<ScrollRect>()) {
 			if (scrollRect->hasChanged() || matrixChanged) {
 				modelMatrix = maths::translate(modelMatrix, Vector3(scrollRect->offset.x, scrollRect->offset.y, 0.0f));
+				if (!matrixChanged) blockNotify = true;
 				matrixChanged = true;
 			}
 		}
@@ -58,7 +60,7 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 		}
 	}
 	// Notify behaviours of change in transform
-	if (matrixChanged) {
+	if (!blockNotify && matrixChanged) {
 		for (Behaviour* behaviour : owner.getComponents<Behaviour>()) {
 			behaviour->onTransformChanged();
 		}
