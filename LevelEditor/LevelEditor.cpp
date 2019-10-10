@@ -138,10 +138,18 @@ int LevelEditor::initiate() {
 	int textPadding = 5;
 	int backgroundPadding = 3;
 	Text inspectorLabelText = Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
+	Text hierarchyLabelText = Text("Hierarchy", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
 	Vector2 inspectorLabelSize = inspectorLabelText.getSize();
 	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
-	// Inspector label background
+	// Tabs
+	EntityHandle tabContainer = sceneUI->createEntity("Tab_Container",
+		RectTransform(0, 0, 0, 0, 1.04f, Alignment::TOP_LEFT)
+	);
+	HorizontalLayoutGroup* tabsLayoutGroup = tabContainer.addComponent<HorizontalLayoutGroup>();
+	tabsLayoutGroup->spacing = 5;
+	tabContainer.setParent(rightPanel);
+	// Inspector Tab
 	EntityHandle inspectorLabelRect = sceneUI->createEntity("Inspector_label_background",
 		RectSprite(Color(100, 100, 100, 255)),
 		LayoutElement(),
@@ -152,13 +160,34 @@ int LevelEditor::initiate() {
 	labelRectLE->setMinSizeEnabled(true);
 	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
 	labelRectLE->setFlexibleSizeEnabled(true);
-	inspectorLabelRect.setParent(rightPanel);
+	inspectorLabelRect.setParent(tabContainer);
 	// Inspector label
 	EntityHandle inspectorLabel = sceneUI->createEntity("Inspector_label",
 		inspectorLabelText,
 		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
 	);
 	inspectorLabel.setParent(inspectorLabelRect);
+	// Hierarchy Tab
+	Vector2 hierarchyLabelSize = hierarchyLabelText.getSize();
+	labelRectWidth = hierarchyLabelSize.x + textPadding * 2;
+	labelRectHeight = hierarchyLabelSize.y + textPadding * 2;
+	EntityHandle hierarchyLabelRect = sceneUI->createEntity("Hierarchy_label_background",
+		RectSprite(Color(100, 100, 100, 255)),
+		LayoutElement(),
+		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
+	);
+	labelRectLE = hierarchyLabelRect.getComponent<LayoutElement>();
+	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
+	labelRectLE->setMinSizeEnabled(true);
+	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
+	labelRectLE->setFlexibleSizeEnabled(true);
+	hierarchyLabelRect.setParent(tabContainer);
+	// Hierarchy label
+	EntityHandle hierarchyLabel = sceneUI->createEntity("Hierarchy_label",
+		hierarchyLabelText,
+		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
+	);
+	hierarchyLabel.setParent(hierarchyLabelRect);
 
 	// Inspector background
 	EntityHandle inspector = sceneUI->createEntity("Inspector_background",
