@@ -33,6 +33,7 @@ namespace Core {
 
 		template<typename T>
 		void addComponentToTarget();
+		void removeComponentFromTarget(ComponentTypeID typeID);
 
 	private:
 		void clearEntries();

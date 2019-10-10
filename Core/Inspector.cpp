@@ -14,7 +14,6 @@
 #include "HideFlags.h"
 #include "CheckBox.h"
 #include "DropDownScroll.h"
-#include "ComponentEntry.h"
 #include "Maths/Vector2.h"
 #include "ChildManager.h"
 #include "ParentEntity.h"
@@ -324,12 +323,11 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		RectSprite(Color(255, 40, 40)),
 		RectTransform(0, 0, 20, 20, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
-	ComponentEntry* entryComponent = removeButtonEntity.addComponent(ComponentEntry(currentTarget, component->getType().typeID));
 	RectButton* removeButton = removeButtonEntity.addComponent<RectButton>();
 	removeButton->colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
 	removeButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);
 	removeButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(200, 0, 0);
-	removeButton->clickFunction = Core::bind(entryComponent, &ComponentEntry::removeComponent);
+	removeButton->clickFunction = Core::bind(this, &Inspector::removeComponentFromTarget, (ComponentTypeID)component->getType().typeID);
 	LayoutElement* removeButtonLayout = removeButtonEntity.addComponent<LayoutElement>();
 	removeButtonLayout->setFlexibleSizeEnabled(true);
 	removeButtonLayout->setFlexibleSize(Vector2(0, 0));
@@ -431,4 +429,8 @@ void Inspector::lateUpdate(float deltaTime) {
 			}
 		}
 	}
+}
+
+void Inspector::removeComponentFromTarget(ComponentTypeID typeID) {
+	currentTarget.removeComponent(typeID);
 }

@@ -3,9 +3,12 @@
 #include "ComponentHandle.h"
 #include <functional>
 #include <memory>
+#include <tuple>
 namespace Core {
 	template<typename... Args>
 	class IComponentFunctionHandleImpl {
+	protected:
+		IComponentFunctionHandleImpl() {}
 	public:
 		virtual ~IComponentFunctionHandleImpl() {}
 		virtual void call(Args... args) = 0;
@@ -14,7 +17,7 @@ namespace Core {
 	template<typename T, typename R, typename... Args>
 	class ComponentFunctionHandleImpl : public IComponentFunctionHandleImpl<Args...> {
 	private:
-		typedef R(T::*FunctionPtr)(Args...);
+		typedef R(T::* FunctionPtr)(Args...);
 	public:
 		ComponentFunctionHandleImpl(ComponentHandle component, FunctionPtr ptr) : component(component), functionPtr(ptr) {}
 		void call(Args... args) {
@@ -28,26 +31,46 @@ namespace Core {
 	};
 
 	template<typename T, typename R, typename... Args>
-	ComponentFunctionHandleImpl<T, R, Args...> bind(T* component, R(T::*ptr)(Args...)) {
-		return ComponentFunctionHandleImpl(ComponentHandle(component->getComponentID(), component->getOwner()), ptr);
+	class ComponentFunctionHandleWrapper : public IComponentFunctionHandleImpl<> {
+	private:
+		typedef R(T::* FunctionPtr)(Args...);
+	public:
+		ComponentFunctionHandleWrapper(ComponentHandle component, FunctionPtr ptr, Args... args) : component(component), functionPtr(ptr), args(std::make_tuple(args...)) {}
+		void call() {
+			T* componentPtr = (T*)component.getComponent();
+			if (componentPtr) // If the handle is still valid
+				(componentPtr->*functionPtr)(std::get<Args>(args)...);
+		}
+	private:
+		ComponentHandle component;
+		FunctionPtr functionPtr;
+		std::shared_ptr<ComponentFunctionHandleImpl<T, R, Args...>> function;
+		std::tuple<Args...> args;
+	};
+
+	template<typename T, typename R, typename... Args>
+	std::shared_ptr<IComponentFunctionHandleImpl<Args...>> bind(T* component, R(T::*ptr)(Args...)) {
+		return std::make_shared<ComponentFunctionHandleImpl<T, R, Args...>>(ComponentFunctionHandleImpl(ComponentHandle(component->getComponentID(), component->getOwner()), ptr));
 	}
 
+	template<typename T, typename R, typename Arg, typename... Args>
+	std::shared_ptr<IComponentFunctionHandleImpl<>> bind(T* component, R(T::* ptr)(Arg, Args...), Arg arg, Args... args) {
+		return std::make_shared<ComponentFunctionHandleWrapper<T, R, Arg, Args...>>(ComponentFunctionHandleWrapper(ComponentHandle(component->getComponentID(), component->getOwner()), ptr, arg, args...));
+	}
 
 	template<typename R, typename... Args>
 	class ComponentFunctionHandle {
 	public:
 		ComponentFunctionHandle() {}
-		~ComponentFunctionHandle() {}
-		template<typename T>
-		ComponentFunctionHandle(ComponentFunctionHandleImpl<T, R, Args...> function) {
-			this->function = std::make_shared<ComponentFunctionHandleImpl<T, R, Args...>>(function);
+		ComponentFunctionHandle(std::shared_ptr<IComponentFunctionHandleImpl<Args...>> function) : function(function) {
 		}
+		~ComponentFunctionHandle() {}
 
-		template<typename T>
-		ComponentFunctionHandle& operator=(ComponentFunctionHandleImpl<T, R, Args...> function) {
-			this->function = std::make_shared<ComponentFunctionHandleImpl<T, R, Args...>>(function);
+		ComponentFunctionHandle& operator=(std::shared_ptr<IComponentFunctionHandleImpl<Args...>> function) {
+			this->function = function;
 			return *this;
 		}
+
 		/* Calls the bound function. If none exists nothing happens. */
 		void call(Args... args) {
 			if (function)
