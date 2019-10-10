@@ -292,7 +292,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	group->childForceExpandHeight = false;
 	group->childForceExpandWidth = true;
 	group->shrinkableChildHeight = false;
-	group->shrinkableChildWidth = false;
+	group->shrinkableChildWidth = true;
 	entry.setParent(scrollPanel);
 
 	// Entry content
@@ -307,6 +307,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	labelFieldLayout->setFlexibleSize(Vector2(1, 0));
 	HorizontalLayoutGroup* labelLayoutGroup = labelField.addComponent<HorizontalLayoutGroup>();
 	labelLayoutGroup->childForceExpandWidth = true;
+	labelLayoutGroup->shrinkableChildWidth = true;
 	labelLayoutGroup->paddingLeft = 5;
 	labelLayoutGroup->paddingRight = 2;
 	labelLayoutGroup->childAlignment = Alignment::LEFT;
