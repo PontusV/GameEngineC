@@ -108,7 +108,7 @@ int LevelEditor::initiate() {
 	file->optionHeight = 25;
 	file->boxWidth = 300;
 	file->addOption("Create Empty Object", Core::bind(file, &DropDown::test));
-	// ---------------------------------------------------Inspector-----------------------------------------------------------------
+	// ---------------------------------------------------Right Panel-----------------------------------------------------------------
 	// Right Panel.
 	int inspectorWidth = 400;
 	int inspectorHeight = 1000;
@@ -134,6 +134,7 @@ int LevelEditor::initiate() {
 	rplayoutGroup->paddingLeft = 10;
 	rplayoutGroup->paddingBottom = 10;
 	rightPanel.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
+	// ----------------------------------------------------Inspector-----------------------------------------------------------------
 	int textPadding = 5;
 	int backgroundPadding = 3;
 	Text inspectorLabelText = Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
@@ -166,15 +167,15 @@ int LevelEditor::initiate() {
 		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
 	);
 	inspector.setParent(rightPanel);
-	//*/
-	//------------------------------------------------------GAME---------------------------------------------------------------------
+	// ---------------------------------------------------Hierarchy------------------------------------------------------------------
+	// -----------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = sceneWorld->createEntity("Test_Button",
 		Image("resources/images/invaders.png"),
 		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
 		Border(1, Color(255,255,255,255), editorSortingLayer),
-		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
+		RectTransform(650, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
 	MouseDrag* mouseDrag = button.addComponent<MouseDrag>();
 	mouseDrag->padding = 20;

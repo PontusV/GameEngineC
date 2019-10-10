@@ -28,8 +28,7 @@ bool Scene::destroyEntity(Entity entity, bool chained) {
 	onEntityDestroyed(entity, chained);
 
 	// Call onDestroy
-	std::vector<Behaviour*> scripts = manager->getComponents<Behaviour>(entity);
-	for (Behaviour* script : scripts) {
+	for (Behaviour* script : manager->getComponents<Behaviour>(entity)) {
 		script->onDestroy();
 	}
 
@@ -70,8 +69,12 @@ Handle Scene::getEntityHandle(std::string name) {
 }
 
 void Scene::removeComponent(Entity entity, ComponentTypeID componentTypeID) {
-	EntityLocation location = manager->removeComponent(entity, componentTypeID);
 	Handle handle = getEntityHandle(entity);
+	if (componentTypeID == typeof(Behaviour)) {
+		Behaviour* script = static_cast<Behaviour*>(handle.getComponent(componentTypeID));
+		script->onDestroy();
+	}
+	EntityLocation location = manager->removeComponent(entity, componentTypeID);
 	handle.updateLocation(location);
 	prepEntity(handle);
 	onEntityChanged(handle);

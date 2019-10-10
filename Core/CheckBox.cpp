@@ -43,19 +43,25 @@ void CheckBox::awake() {
 		Shader shader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
 		Vector2 position = rect->getRectOffset();
 		// Create graphics
-		EntityHandle background = createEntity(ownerHandle.getEntityName() + "_Background",
+		background = createEntity(ownerHandle.getEntityName() + "_Background",
 			Image("resources/images/ui/CheckBox-background.png", shader, Color(255, 255, 255, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ(), Alignment::TOP_LEFT)
 		);
 		background.setParent(owner);
 		background.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
-		EntityHandle border = createEntity(ownerHandle.getEntityName() + "_Border",
+		border = createEntity(ownerHandle.getEntityName() + "_Border",
 			Image("resources/images/ui/CheckBox-border.png", shader, Color(0, 0, 0, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001f, Alignment::TOP_LEFT)
 		);
 		border.setParent(owner);
 		border.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
 	}
+}
+
+void CheckBox::onDestroy() {
+	destroyEntity(tick);
+	destroyEntity(background);
+	destroyEntity(border);
 }
 
 void CheckBox::onMouseButtonPressedAsButton(int buttoncode, int mods) {

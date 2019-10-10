@@ -10,6 +10,7 @@ namespace Core {
 		CheckBox(bool toggle = false);
 		~CheckBox();
 		void awake() override;
+		void onDestroy() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 
 		void setToggle(bool value);
@@ -26,6 +27,8 @@ namespace Core {
 		bool toggle = false;
 		
 		EntityHandle tick;
+		EntityHandle background;
+		EntityHandle border;
 	};
 }
 #endif
