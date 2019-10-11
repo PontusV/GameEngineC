@@ -20,7 +20,7 @@ InputField::~InputField()
 }
 
 
-void InputField::awake() {
+void InputField::start() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle ownerHandle = owner;
 	if (rect) {
@@ -44,6 +44,12 @@ void InputField::awake() {
 		textHighlight.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideAndDontSave);
 		textHighlight.setParent(inputText);
 	}
+}
+
+void InputField::onDestroy() {
+	destroyEntity(inputText);
+	destroyEntity(textMark);
+	destroyEntity(textHighlight);
 }
 
 void InputField::submit() {

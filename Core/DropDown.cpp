@@ -23,7 +23,7 @@ DropDown::~DropDown() {
 }
 
 
-void DropDown::awake() {
+void DropDown::start() {
 	EntityHandle ownerHandle = owner;
 	// Create text
 	if (!owner.hasComponent<Text>())

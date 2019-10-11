@@ -26,7 +26,7 @@ namespace Core {
 		void close();
 		void addOption(std::string label, ComponentFunctionHandle<void> function);
 
-		void awake() override;
+		void start() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;

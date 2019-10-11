@@ -17,6 +17,7 @@ namespace Core {
 		RectMask();
 		~RectMask();
 
+		void start() override;
 		void onTransformChanged() override;
 		void onChildAdded(EntityHandle entity) override;
 		void onChildRemoved(EntityHandle entity) override;

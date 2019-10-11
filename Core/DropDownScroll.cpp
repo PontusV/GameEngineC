@@ -51,7 +51,7 @@ void DropDownScroll::open() {
 			button,
 			RectSprite({ 20,20,20,255 })
 		);
-		menuOption.setParent(menuBoxContent.getEntity());
+		menuOption.setParent(menuBoxContent);
 
 		// Button Text
 		Alignment textAlignment = Alignment::LEFT;
@@ -64,7 +64,7 @@ void DropDownScroll::open() {
 			Text(options[i].text, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
 			RectTransform(textPosX, textPosY, 0, 0, z + 0.1f, textAlignment)
 		);
-		menuOptionText.setParent(menuOption.getEntity());
+		menuOptionText.setParent(menuOption);
 
 		yOffset += optionHeight;
 	}
@@ -76,14 +76,14 @@ void DropDownScroll::open() {
 			RectSprite(borderColor),
 			RectTransform((float)-borderSize, 0.0f, boxWidth + 20 + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorder.setParent(menuBox.getEntity());
+		menuBoxBorder.setParent(menuBox);
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(ownerHandle.getEntityName() + "_DropDownBox_BorderTop",
 			RectSprite(borderColor),
 			RectTransform(size.x, (float)-borderSize, boxWidth + 20 - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
-		menuBoxBorderTop.setParent(menuBox.getEntity());
+		menuBoxBorderTop.setParent(menuBox);
 	}
 
 	// Scroll Bar

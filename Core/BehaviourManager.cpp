@@ -34,7 +34,7 @@ void BehaviourManager::update(float deltaTime) {
 	// LateUpdate
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
-		if (behaviour.enabled) { // Check if enabled
+		if (behaviour.enabled && behaviour.started) { // Check if enabled
 			behaviour.lateUpdate(deltaTime);
 		}
 	}
@@ -45,7 +45,7 @@ void BehaviourManager::onPreRender() {
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
-		if (behaviour.enabled) { // Check if enabled
+		if (behaviour.enabled && behaviour.started) { // Check if enabled
 			behaviour.onPreRender();
 		}
 	}
@@ -56,7 +56,7 @@ void BehaviourManager::onPostRender() {
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
-		if (behaviour.enabled) { // Check if enabled
+		if (behaviour.enabled && behaviour.started) { // Check if enabled
 			behaviour.onPostRender();
 		}
 	}

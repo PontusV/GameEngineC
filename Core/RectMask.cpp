@@ -12,6 +12,10 @@ RectMask::~RectMask() {
 }
 
 
+void RectMask::start() {
+	onTransformChanged();
+}
+
 void RectMask::onTransformChanged() {
 	updateMask();
 }

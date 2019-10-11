@@ -9,7 +9,7 @@ namespace Core {
 	public:
 		CheckBox(bool toggle = false);
 		~CheckBox();
-		void awake() override;
+		void start() override;
 		void onDestroy() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 

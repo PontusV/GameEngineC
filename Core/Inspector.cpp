@@ -79,53 +79,56 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 }
 
 
-void Inspector::awake() {
+void Inspector::start() {
 	// create scroll panel for targetComponentList
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
-		if (!scrollPanel.isValid()) {
-			HorizontalLayoutGroup* parentGroup = ((EntityHandle)owner).addComponent<HorizontalLayoutGroup>();
-			parentGroup->childForceExpandHeight = true;
-			parentGroup->childForceExpandWidth = true;
-			parentGroup->shrinkableChildHeight = true;
-			parentGroup->shrinkableChildWidth = true;
-			parentGroup->spacing = 10;
+		HorizontalLayoutGroup* parentGroup = ((EntityHandle)owner).addComponent<HorizontalLayoutGroup>();
+		parentGroup->childForceExpandHeight = true;
+		parentGroup->childForceExpandWidth = true;
+		parentGroup->shrinkableChildHeight = true;
+		parentGroup->shrinkableChildWidth = true;
+		parentGroup->spacing = 10;
 
-			scrollPanel = createEntity("Inspector_Scroll_Panel",
-				RectMask(),
-				RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
-			);
-			ScrollRect* scrollRect = scrollPanel.addComponent<ScrollRect>();
-			scrollRect->paddingBottom = 10;
-			LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
-			element->setFlexibleSize(Vector2(1, 1));
-			element->setFlexibleSizeEnabled(true);
-			element->setMinSize(Vector2(0, 0));
-			element->setMinSizeEnabled(true);
-			VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
-			group->childForceExpandHeight = false;
-			group->childForceExpandWidth = true;
-			group->shrinkableChildHeight = false;
-			group->shrinkableChildWidth = true;
-			group->spacing = 5;
-			group->paddingTop = 10;
-			group->paddingLeft = 10;
-			group->paddingRight = 0;
-			scrollPanel.setParent(owner);
-		}
-		if (!scrollBar.isValid()) {
-			scrollBar = createEntity("Inspector_Scroll_Bar",
-				ScrollBar(scrollPanel),
-				RectTransform(0, 0, 20, 500, rect->getZ() + 10.0f)
-			);
-			LayoutElement* element = scrollBar.addComponent<LayoutElement>();
-			element->setMinSize(Vector2(20, 0));
-			element->setMinSizeEnabled(true);
-			element->setFlexibleSize(Vector2(0, 1));
-			element->setFlexibleSizeEnabled(true);
-			scrollBar.setParent(owner);
-		}
+		scrollPanel = createEntity("Inspector_Scroll_Panel",
+			RectMask(),
+			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
+		);
+		ScrollRect* scrollRect = scrollPanel.addComponent<ScrollRect>();
+		scrollRect->paddingBottom = 10;
+		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
+		element->setFlexibleSize(Vector2(1, 1));
+		element->setFlexibleSizeEnabled(true);
+		element->setMinSize(Vector2(0, 0));
+		element->setMinSizeEnabled(true);
+		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
+		group->childForceExpandHeight = false;
+		group->childForceExpandWidth = true;
+		group->shrinkableChildHeight = false;
+		group->shrinkableChildWidth = true;
+		group->spacing = 5;
+		group->paddingTop = 10;
+		group->paddingLeft = 10;
+		group->paddingRight = 0;
+		scrollPanel.setParent(owner);
+
+		scrollBar = createEntity("Inspector_Scroll_Bar",
+			ScrollBar(scrollPanel),
+			RectTransform(0, 0, 20, 500, rect->getZ() + 10.0f)
+		);
+		LayoutElement* scrollBarElement = scrollBar.addComponent<LayoutElement>();
+		scrollBarElement->setMinSize(Vector2(20, 0));
+		scrollBarElement->setMinSizeEnabled(true);
+		scrollBarElement->setFlexibleSize(Vector2(0, 1));
+		scrollBarElement->setFlexibleSizeEnabled(true);
+		scrollBar.setParent(owner);
 	}
+}
+
+
+void Inspector::onDestroy() {
+	destroyEntity(scrollPanel);
+	destroyEntity(scrollBar);
 }
 
 void Inspector::clearEntries() {

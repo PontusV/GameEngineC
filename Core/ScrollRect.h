@@ -12,7 +12,7 @@ namespace Core {
 		~ScrollRect();
 
 		void onScroll(float xOffset, float yOffset) override;
-		void onPostLayoutUpdate() override;
+		void onPreRender() override;
 		bool hasChanged();
 
 		void onChildAdded(EntityHandle entity) override;

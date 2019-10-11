@@ -14,7 +14,7 @@ namespace Core {
 		void onMouseButtonReleased(int buttoncode, int mods) override;
 		void onMouseDrag(float mouseX, float mouseY) override;
 
-
+		PROPERTY()
 		float padding = 0; // Padding around the area that triggers the drag event
 
 	private:

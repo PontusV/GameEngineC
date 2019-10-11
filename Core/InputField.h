@@ -22,7 +22,8 @@ namespace Core {
 		~InputField();
 
 
-		void awake() override;
+		void start() override;
+		void onDestroy() override;
 		void update(float deltaTime) override;
 		void onSelect() override;
 		void onDeselect() override;

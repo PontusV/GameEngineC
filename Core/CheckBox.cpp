@@ -35,7 +35,7 @@ void CheckBox::hideTick() {
 	}
 }
 
-void CheckBox::awake() {
+void CheckBox::start() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle ownerHandle = owner;
 	if (rect) {

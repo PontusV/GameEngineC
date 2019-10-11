@@ -12,8 +12,9 @@ namespace Core {
 		ScrollBar();
 		~ScrollBar();
 
-		void awake() override;
-		void onPostLayoutUpdate() override;
+		void start() override;
+		void onDestroy() override;
+		void onPreRender() override;
 		void onMouseDrag(float mouseX, float mouseY);
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;

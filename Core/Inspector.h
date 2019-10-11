@@ -22,7 +22,8 @@ namespace Core {
 		Inspector();
 		~Inspector();
 
-		void awake() override;
+		void start() override;
+		void onDestroy() override;
 		void lateUpdate(float deltaTime) override;
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 

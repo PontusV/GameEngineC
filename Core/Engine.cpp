@@ -131,7 +131,6 @@ int Engine::start() {
 	glfwSetFramebufferSizeCallback(window.getWindow(), framebuffer_size_callback);
 
 	FpsCounter fpsCounter;
-	//unsigned char debugLayer = graphics.createLayer();
 	EntityHandle fpsDisplay = debugScene->createEntity("FPS_Display",
 		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255)),
 		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
@@ -152,8 +151,7 @@ int Engine::start() {
 		lastFrame = currentFrame;
 
 		// Fps
-		Text* text = fpsDisplay.getComponent<Text>();
-		fpsCounter.tick(deltaTime, text);
+		fpsCounter.tick(deltaTime, fpsDisplay.getComponent<Text>());
 
 		// Poll events
 		glfwPollEvents();

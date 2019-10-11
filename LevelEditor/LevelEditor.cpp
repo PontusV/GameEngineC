@@ -46,10 +46,11 @@ int LevelEditor::initiate() {
 	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }),
 		WindowScale(true, 1.0f, false, 0),
+		HorizontalLayoutGroup(),
 		RectTransform(0, 0, 500, 25, 10.0f, Alignment::TOP_LEFT)
 	);
 	menuBar.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
-	HorizontalLayoutGroup* layoutGroup = menuBar.addComponent<HorizontalLayoutGroup>();
+	HorizontalLayoutGroup* layoutGroup = menuBar.getComponent<HorizontalLayoutGroup>();
 	layoutGroup->paddingLeft = 1;
 	layoutGroup->paddingRight = 1;
 	layoutGroup->spacing = 1;
@@ -144,9 +145,10 @@ int LevelEditor::initiate() {
 	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
 	// Tabs
 	EntityHandle tabContainer = sceneUI->createEntity("Tab_Container",
+		HorizontalLayoutGroup(),
 		RectTransform(0, 0, 0, 0, 1.04f, Alignment::TOP_LEFT)
 	);
-	HorizontalLayoutGroup* tabsLayoutGroup = tabContainer.addComponent<HorizontalLayoutGroup>();
+	HorizontalLayoutGroup* tabsLayoutGroup = tabContainer.getComponent<HorizontalLayoutGroup>();
 	tabsLayoutGroup->spacing = 5;
 	tabContainer.setParent(rightPanel);
 	// Inspector Tab

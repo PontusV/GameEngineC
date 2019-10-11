@@ -52,13 +52,6 @@ void UISystem::update() {
 		updateLayoutSizes(&group);
 		updateLayout(&group);
 	}
-
-	// Notify UIBehaviour of PostLayoutUpdate
-	std::size_t behavioursSize = behavioursGroup.size();
-	for (std::size_t i = 0; i < behavioursSize; i++) {
-		UIBehaviour& behaviour = behavioursGroup.get<UIBehaviour>(i);
-		behaviour.onPostLayoutUpdate();
-	}
 }
 
 void UISystem::onWindowResize() {
