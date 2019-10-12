@@ -101,8 +101,6 @@ void EditorPanel::start() {
 	content.setParent(owner);
 	inspectorButton->clickFunction = Core::bind(this, &EditorPanel::selectTab, Tab::Inspector); // Display Inspector View
 	heirarchyButton->clickFunction = Core::bind(this, &EditorPanel::selectTab, Tab::Hierarchy); // Display Heirarchy View
-
-	selectTab(currentTab);
 }
 
 void EditorPanel::selectTab(Tab tab) {

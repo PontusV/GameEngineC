@@ -97,9 +97,7 @@ void Scene::awake() {
 void Scene::awakeEntity(Handle entity) {
 	std::vector<Behaviour*> scripts = entity.getComponents<Behaviour>();
 	for (Behaviour* script : scripts) {
-		script->awake();
-		if (script->isEnabled())
-			script->onEnable();
+		script->activate();
 	}
 }
 
@@ -107,9 +105,7 @@ void Scene::awakeComponent(Handle entity, ComponentTypeID componentID) {
 	// Awake script
 	for (Behaviour* script : entity.getComponents<Behaviour>()) {
 		if (script->getComponentID() == componentID) {
-			script->awake();
-			if (script->isEnabled())
-				script->onEnable();
+			script->activate();
 			break;
 		}
 	}
