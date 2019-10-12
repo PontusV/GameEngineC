@@ -29,6 +29,8 @@ bool Scene::destroyEntity(Entity entity, bool chained) {
 
 	// Call onDestroy
 	for (Behaviour* script : manager->getComponents<Behaviour>(entity)) {
+		if (script->isEnabled())
+			script->onDisable();
 		script->onDestroy();
 	}
 
@@ -96,6 +98,8 @@ void Scene::awakeEntity(Handle entity) {
 	std::vector<Behaviour*> scripts = entity.getComponents<Behaviour>();
 	for (Behaviour* script : scripts) {
 		script->awake();
+		if (script->isEnabled())
+			script->onEnable();
 	}
 }
 
@@ -104,6 +108,8 @@ void Scene::awakeComponent(Handle entity, ComponentTypeID componentID) {
 	for (Behaviour* script : entity.getComponents<Behaviour>()) {
 		if (script->getComponentID() == componentID) {
 			script->awake();
+			if (script->isEnabled())
+				script->onEnable();
 			break;
 		}
 	}

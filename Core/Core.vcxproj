@@ -232,6 +232,7 @@
     <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GameObjectData.cpp" />
     <ClCompile Include="GridLayoutGroup.cpp" />
+    <ClCompile Include="HierarchyView.cpp" />
     <ClCompile Include="HorizontalLayoutGroup.cpp" />
     <ClCompile Include="InputField.cpp" />
     <ClCompile Include="Inspector.cpp" />
@@ -324,6 +325,7 @@
     <ClInclude Include="GameObjectData.h" />
     <ClInclude Include="GridLayoutGroup.h" />
     <ClInclude Include="HideFlags.h" />
+    <ClInclude Include="HierarchyView.h" />
     <ClInclude Include="HorizontalLayoutGroup.h" />
     <ClInclude Include="ILayoutElement.h" />
     <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />

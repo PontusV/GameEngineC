@@ -14,12 +14,17 @@ Behaviour::~Behaviour() {
 }
 
 void Behaviour::enable() {
+	if (!enabled && started) onEnable();
 	enabled = true;
 }
 
 void Behaviour::disable() {
-	started = false;
+	if (enabled && started) onDisable();
 	enabled = false;
+}
+
+bool Behaviour::isEnabled() {
+	return enabled;
 }
 
 void Behaviour::destroyEntity(const EntityHandle& handle) {

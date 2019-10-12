@@ -22,22 +22,23 @@ namespace Core {
 		Inspector();
 		~Inspector();
 
-		void start() override;
-		void onDestroy() override;
+		void onEnable() override;
+		void onDisable() override;
 		void lateUpdate(float deltaTime) override;
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 
 		void inspect(EntityHandle entity);
 		/* Recreates target component list if target exists. */
 		void refresh();
-		void createEntries();
 
 		template<typename T>
 		void addComponentToTarget();
 		void removeComponentFromTarget(ComponentTypeID typeID);
 
 	private:
+		void createEntries();
 		void clearEntries();
+
 		void addComponentEntry(Component* component, std::size_t id);
 		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component, Mirror::Property& rootProp, void* instance, std::size_t typeID);
 		EntityHandle createPropertyValueField(std::string label, PropertyValueID value, Component* root, Mirror::Property& rootProp, void* instance, std::size_t typeID, std::string entityName);

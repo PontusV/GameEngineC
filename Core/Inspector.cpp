@@ -79,7 +79,7 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 }
 
 
-void Inspector::start() {
+void Inspector::onEnable() {
 	// create scroll panel for targetComponentList
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
@@ -123,10 +123,13 @@ void Inspector::start() {
 		scrollBarElement->setFlexibleSizeEnabled(true);
 		scrollBar.setParent(owner);
 	}
+	// Check if a target exists
+	if (currentTarget.isValid())
+		inspect(currentTarget);
 }
 
 
-void Inspector::onDestroy() {
+void Inspector::onDisable() {
 	destroyEntity(scrollPanel);
 	destroyEntity(scrollBar);
 }

@@ -13,6 +13,7 @@
 #include "../Core/WindowScale.h"
 #include "../Core/DragAndResize.h"
 #include "../Core/Inspector.h"
+#include "../Core/RectButton.h"
 
 #include "../Core/Maths/Vector2.h"
 #include "../Core/Maths/Vector3.h"
@@ -154,9 +155,14 @@ int LevelEditor::initiate() {
 	// Inspector Tab
 	EntityHandle inspectorLabelRect = sceneUI->createEntity("Inspector_label_background",
 		RectSprite(Color(100, 100, 100, 255)),
+		RectButton(),
 		LayoutElement(),
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
+	RectButton* inspectorButton = inspectorLabelRect.getComponent<RectButton>();
+	inspectorButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
+	inspectorButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
+	inspectorButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
 	LayoutElement* labelRectLE = inspectorLabelRect.getComponent<LayoutElement>();
 	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
 	labelRectLE->setMinSizeEnabled(true);
@@ -175,9 +181,14 @@ int LevelEditor::initiate() {
 	labelRectHeight = hierarchyLabelSize.y + textPadding * 2;
 	EntityHandle hierarchyLabelRect = sceneUI->createEntity("Hierarchy_label_background",
 		RectSprite(Color(100, 100, 100, 255)),
+		RectButton(),
 		LayoutElement(),
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
+	RectButton* heirarchyButton = hierarchyLabelRect.getComponent<RectButton>();
+	heirarchyButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
+	heirarchyButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
+	heirarchyButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
 	labelRectLE = hierarchyLabelRect.getComponent<LayoutElement>();
 	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
 	labelRectLE->setMinSizeEnabled(true);
@@ -192,12 +203,14 @@ int LevelEditor::initiate() {
 	hierarchyLabel.setParent(hierarchyLabelRect);
 
 	// Inspector background
-	EntityHandle inspector = sceneUI->createEntity("Inspector_background",
+	EntityHandle content = sceneUI->createEntity("Inspector_background",
 		Inspector(),
 		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
 	);
-	inspector.setParent(rightPanel);
+	content.setParent(rightPanel);
+	//inspectorButton->clickFunction = ; // Display Inspector View
+	//heirarchyButton->clickFunction = ; // Display Heirarchy View
 	// ---------------------------------------------------Hierarchy------------------------------------------------------------------
 	// -----------------------------------------------------GAME---------------------------------------------------------------------
 	// Button

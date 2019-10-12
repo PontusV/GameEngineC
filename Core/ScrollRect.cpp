@@ -39,12 +39,6 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 void ScrollRect::onPreRender() {
 	refreshContentBounds();
 	checkScrollArea();
-	/*for (RectTransform* rect : owner.getComponentsInImmediateChildren<RectTransform>()) {
-		if (rect->hasChanged()) {
-			refreshContentBounds();
-			checkScrollArea();
-		}
-	}*/
 }
 
 void ScrollRect::refreshContentBounds() {
@@ -55,7 +49,7 @@ void ScrollRect::refreshContentBounds() {
 		float right = rect->getSize().x;
 		std::vector<RectTransform*> rectTransforms = owner.getComponentsInImmediateChildren<RectTransform>();
 		for (const RectTransform* transform : rectTransforms) {
-			for (Vector2 vertex : transform->getLocalVertices()) {
+			for (const Vector2& vertex : transform->getLocalVertices()) {
 				if (vertex.x < left)
 					left = vertex.x;
 				else if (vertex.x > right)

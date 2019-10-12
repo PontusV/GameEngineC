@@ -62,8 +62,7 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 	// Notify behaviours of change in transform
 	if (!blockNotify && matrixChanged) {
 		for (Behaviour* behaviour : owner.getComponents<Behaviour>()) {
-			if (behaviour->enabled && behaviour->started)
-				behaviour->onTransformChanged();
+			behaviour->onTransformChanged();
 		}
 	}
 }

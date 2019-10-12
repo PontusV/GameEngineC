@@ -27,6 +27,10 @@ namespace Core {
 		virtual void lateUpdate(float deltaTime) {};
 		/* Called when this component is destroyed. */
 		virtual void onDestroy() {};
+		/* Called when this component becomes enabled and has started. */
+		virtual void onEnable() {};
+		/* Called when this component becomes disabled and has started. */
+		virtual void onDisable() {};
 
 		//
 		virtual void onPreRender() {};
@@ -64,10 +68,12 @@ namespace Core {
 
 		void enable();
 		void disable();
+		bool isEnabled();
 
+	private:
+		bool enabled = false;
 	public:
 		bool started = false;
-		bool enabled = false;
 		bool runInEditMode = true;
 
 		static Input* input;
