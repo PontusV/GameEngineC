@@ -12,8 +12,8 @@
 #include "../Core/VerticalLayoutGroup.h"
 #include "../Core/WindowScale.h"
 #include "../Core/DragAndResize.h"
-#include "../Core/Inspector.h"
 #include "../Core/RectButton.h"
+#include "../Core/EditorPanel.h"
 
 #include "../Core/Maths/Vector2.h"
 #include "../Core/Maths/Vector3.h"
@@ -110,11 +110,12 @@ int LevelEditor::initiate() {
 	file->optionHeight = 25;
 	file->boxWidth = 300;
 	file->addOption("Create Empty Object", Core::bind(file, &DropDown::test));
-	// ---------------------------------------------------Right Panel-----------------------------------------------------------------
+	// ---------------------------------------------------Editor Panel-----------------------------------------------------------------
 	// Right Panel.
 	int inspectorWidth = 400;
 	int inspectorHeight = 1000;
 	EntityHandle rightPanel = sceneUI->createEntity("Right_Panel",
+		EditorPanel(),
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		VerticalLayoutGroup(),
@@ -136,82 +137,6 @@ int LevelEditor::initiate() {
 	rplayoutGroup->paddingLeft = 10;
 	rplayoutGroup->paddingBottom = 10;
 	rightPanel.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
-	// ----------------------------------------------------Inspector-----------------------------------------------------------------
-	int textPadding = 5;
-	int backgroundPadding = 3;
-	Text inspectorLabelText = Text("Inspector", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
-	Text hierarchyLabelText = Text("Hierarchy", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255));
-	Vector2 inspectorLabelSize = inspectorLabelText.getSize();
-	int labelRectWidth = inspectorLabelSize.x + textPadding * 2;
-	int labelRectHeight = inspectorLabelSize.y + textPadding * 2;
-	// Tabs
-	EntityHandle tabContainer = sceneUI->createEntity("Tab_Container",
-		HorizontalLayoutGroup(),
-		RectTransform(0, 0, 0, 0, 1.04f, Alignment::TOP_LEFT)
-	);
-	HorizontalLayoutGroup* tabsLayoutGroup = tabContainer.getComponent<HorizontalLayoutGroup>();
-	tabsLayoutGroup->spacing = 5;
-	tabContainer.setParent(rightPanel);
-	// Inspector Tab
-	EntityHandle inspectorLabelRect = sceneUI->createEntity("Inspector_label_background",
-		RectSprite(Color(100, 100, 100, 255)),
-		RectButton(),
-		LayoutElement(),
-		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
-	);
-	RectButton* inspectorButton = inspectorLabelRect.getComponent<RectButton>();
-	inspectorButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-	inspectorButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
-	inspectorButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
-	LayoutElement* labelRectLE = inspectorLabelRect.getComponent<LayoutElement>();
-	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
-	labelRectLE->setMinSizeEnabled(true);
-	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
-	labelRectLE->setFlexibleSizeEnabled(true);
-	inspectorLabelRect.setParent(tabContainer);
-	// Inspector label
-	EntityHandle inspectorLabel = sceneUI->createEntity("Inspector_label",
-		inspectorLabelText,
-		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
-	);
-	inspectorLabel.setParent(inspectorLabelRect);
-	// Hierarchy Tab
-	Vector2 hierarchyLabelSize = hierarchyLabelText.getSize();
-	labelRectWidth = hierarchyLabelSize.x + textPadding * 2;
-	labelRectHeight = hierarchyLabelSize.y + textPadding * 2;
-	EntityHandle hierarchyLabelRect = sceneUI->createEntity("Hierarchy_label_background",
-		RectSprite(Color(100, 100, 100, 255)),
-		RectButton(),
-		LayoutElement(),
-		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
-	);
-	RectButton* heirarchyButton = hierarchyLabelRect.getComponent<RectButton>();
-	heirarchyButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-	heirarchyButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
-	heirarchyButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
-	labelRectLE = hierarchyLabelRect.getComponent<LayoutElement>();
-	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
-	labelRectLE->setMinSizeEnabled(true);
-	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
-	labelRectLE->setFlexibleSizeEnabled(true);
-	hierarchyLabelRect.setParent(tabContainer);
-	// Hierarchy label
-	EntityHandle hierarchyLabel = sceneUI->createEntity("Hierarchy_label",
-		hierarchyLabelText,
-		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
-	);
-	hierarchyLabel.setParent(hierarchyLabelRect);
-
-	// Inspector background
-	EntityHandle content = sceneUI->createEntity("Inspector_background",
-		Inspector(),
-		RectSprite(Color(175, 0, 0, 255)),
-		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
-	);
-	content.setParent(rightPanel);
-	//inspectorButton->clickFunction = ; // Display Inspector View
-	//heirarchyButton->clickFunction = ; // Display Heirarchy View
-	// ---------------------------------------------------Hierarchy------------------------------------------------------------------
 	// -----------------------------------------------------GAME---------------------------------------------------------------------
 	// Button
 	EntityHandle button = sceneWorld->createEntity("Test_Button",

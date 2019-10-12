@@ -80,10 +80,9 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 
 
 void Inspector::onEnable() {
-	// create scroll panel for targetComponentList
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
-		HorizontalLayoutGroup* parentGroup = ((EntityHandle)owner).addComponent<HorizontalLayoutGroup>();
+		HorizontalLayoutGroup* parentGroup = owner.getComponent<HorizontalLayoutGroup>();
 		parentGroup->childForceExpandHeight = true;
 		parentGroup->childForceExpandWidth = true;
 		parentGroup->shrinkableChildHeight = true;
@@ -125,7 +124,7 @@ void Inspector::onEnable() {
 	}
 	// Check if a target exists
 	if (currentTarget.isValid())
-		inspect(currentTarget);
+		refresh();
 }
 
 
@@ -410,7 +409,8 @@ void Inspector::inspect(EntityHandle entity) {
 		HideFlags hideFlags = entity.getEntityHideFlags();
 		if (hideFlags == HideFlags::HideInInspector) return;
 		currentTarget = entity;
-		refresh();
+		if (isEnabled())
+			refresh();
 	}
 }
 

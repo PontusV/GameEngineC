@@ -16,7 +16,7 @@ namespace Core {
 		Mirror::Property prop;
 	};
 
-	CLASS() Inspector : public Behaviour {
+	CLASS(hideInInspector) Inspector : public Behaviour {
 		GENERATED_BODY()
 	public:
 		Inspector();

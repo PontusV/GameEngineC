@@ -227,6 +227,7 @@
     <ClCompile Include="ContentSizeFitter.cpp" />
     <ClCompile Include="DragAndResize.cpp" />
     <ClCompile Include="DropDownScroll.cpp" />
+    <ClCompile Include="EditorPanel.cpp" />
     <ClCompile Include="FunctionCaller.cpp" />
     <ClCompile Include="DropDown.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
@@ -318,6 +319,7 @@
     <ClInclude Include="ContentSizeFitter.h" />
     <ClInclude Include="DragAndResize.h" />
     <ClInclude Include="DropDownScroll.h" />
+    <ClInclude Include="EditorPanel.h" />
     <ClInclude Include="FunctionCaller.h" />
     <ClInclude Include="DropDown.h" />
     <ClInclude Include="EntityLocation.h" />
