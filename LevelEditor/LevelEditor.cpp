@@ -111,16 +111,14 @@ int LevelEditor::initiate() {
 	file->boxWidth = 300;
 	file->addOption("Create Empty Object", Core::bind(file, &DropDown::test));
 	// ---------------------------------------------------Editor Panel-----------------------------------------------------------------
-	// Right Panel.
-	int inspectorWidth = 400;
-	int inspectorHeight = 1000;
+	// Right Panel
 	EntityHandle rightPanel = sceneUI->createEntity("Right_Panel",
 		EditorPanel(),
 		RectSprite(Color(60,60,60,255)),
 		WindowAnchor(Alignment::TOP_RIGHT, 0, 20),
 		VerticalLayoutGroup(),
 		DragAndResize(),
-		RectTransform(1000, 50, inspectorWidth, inspectorHeight, 1.0f, Alignment::TOP_RIGHT)
+		RectTransform(0, 0, 400, 1000, 1.0f, Alignment::TOP_RIGHT)
 	);
 	DragAndResize* rpdar = rightPanel.getComponent<DragAndResize>();
 	rpdar->top = false;
@@ -144,7 +142,7 @@ int LevelEditor::initiate() {
 		Text("Button!", "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255, 255)),
 		Button("resources/images/invaders.png", "resources/images/gubbe.bmp", "resources/images/awesomeface.png"),
 		Border(1, Color(255,255,255,255), editorSortingLayer),
-		RectTransform(650, 250, 300, 300, 0.0f, Alignment::CENTER)
+		RectTransform(250, 250, 300, 300, 0.0f, Alignment::CENTER)
 	);
 	MouseDrag* mouseDrag = button.addComponent<MouseDrag>();
 	mouseDrag->padding = 20;

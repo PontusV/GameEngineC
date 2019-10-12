@@ -43,10 +43,10 @@ void ScrollRect::onPreRender() {
 
 void ScrollRect::refreshContentBounds() {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
-		float top = 0.0f;
-		float left = 0.0f;
-		float bottom = rect->getSize().y;
-		float right = rect->getSize().x;
+		float top = paddingTop;
+		float left = paddingLeft;
+		float bottom = rect->getSize().y - paddingBottom;
+		float right = rect->getSize().x - paddingRight;
 		std::vector<RectTransform*> rectTransforms = owner.getComponentsInImmediateChildren<RectTransform>();
 		for (const RectTransform* transform : rectTransforms) {
 			for (const Vector2& vertex : transform->getLocalVertices()) {
@@ -73,13 +73,13 @@ bool ScrollRect::hasChanged() {
 }
 
 void ScrollRect::onChildAdded(EntityHandle entity) {
-	refreshContentBounds();
-	checkScrollArea();
+	//refreshContentBounds();
+	//checkScrollArea();
 }
 
 void ScrollRect::onChildRemoved(EntityHandle entity) {
-	refreshContentBounds();
-	checkScrollArea();
+	//refreshContentBounds();
+	//checkScrollArea();
 }
 
 const Bounds& ScrollRect::getContentBounds() const {
