@@ -29,16 +29,31 @@ void RectButton::onDisable() {
 
 void RectButton::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (state == DISABLED) return;
-	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(PRESSED_DOWN);
-	}
+	changeState(PRESSED_DOWN);
+	if (buttoncode == MOUSE_BUTTON_LEFT)
+		leftPressed = true;
+	else if (buttoncode == MOUSE_BUTTON_MIDDLE)
+		middlePressed = true;
+	else if (buttoncode == MOUSE_BUTTON_RIGHT)
+		rightPressed = true;
 }
+
 void RectButton::onMouseButtonReleasedAsButton(int buttoncode, int mods) {
 	if (state == DISABLED) return;
-	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(HOVER_OVER);
+	if (buttoncode == MOUSE_BUTTON_LEFT && leftPressed) {
+		leftPressed = false;
 		clickFunction.call();
 	}
+	else if (buttoncode == MOUSE_BUTTON_MIDDLE && middlePressed) {
+		middlePressed = false;
+		clickFunction.call();
+	}
+	else if (buttoncode == MOUSE_BUTTON_RIGHT && rightPressed) {
+		rightPressed = false;
+		clickFunction.call();
+	}
+	if (state != DISABLED && !leftPressed && !middlePressed && !rightPressed)
+		changeState(HOVER_OVER);
 }
 
 void RectButton::onHoverover() {
@@ -56,10 +71,9 @@ void RectButton::changeState(ButtonState state) {
 	if (this->state == state) return;
 	this->state = state;
 
-	// Change image
+	// Change color
 	RectSprite* rect = owner.getComponent<RectSprite>();
 	if (rect) {
-		// Change color
 		rect->setColor(colors[state]);
 	}
 	else {

@@ -126,16 +126,20 @@ void HierarchyView::refresh() {
 		std::string name = entity.getEntityName();
 		Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 		RectButton button = RectButton();
-		button.colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(140, 140, 140);
-		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(60, 60, 60);
+		button.colors[RectButton::ButtonState::DEFAULT] = Color(255,255,255,0);
+		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255,255,255,80);
+		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0,0,0,80);
 		button.clickFunction = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
 		EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
-			text,
 			button,
 			RectSprite(),
-			RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f)
+			RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f, Alignment::LEFT)
 		);
+		EntityHandle label = createEntity("Hierarchy_entry_" + std::to_string(list.size()) + "_Label",
+			text,
+			RectTransform(5, 0, text.getSize().x, text.getSize().y, rect->getZ() + 0.1f, Alignment::LEFT)
+		);
+		label.setParent(entry);
 		entry.setParent(scrollPanel);
 		list.push_back(std::make_pair(entity.getEntity(), entry));
 	}

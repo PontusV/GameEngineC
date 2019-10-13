@@ -5,41 +5,71 @@ using namespace Core;
 
 
 Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : images{defaultImage, pressedImage, hoverImage} {
-	for (std::size_t i = 0; i < 3; i++) {
-		colors[i] = Color(255,255,255,255);
-	}
-} // Constructor
+	colors[DEFAULT]			= { 255,255,255,255 };
+	colors[PRESSED_DOWN]	= { 255,255,255,255 };
+	colors[HOVER_OVER]		= { 255,255,255,255 };
+	colors[DISABLED]		= { 255,255,255,255 };
+}
 
 Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage) : images{ Image(defaultImage), Image(pressedImage), Image(hoverImage) } {
-	for (std::size_t i = 0; i < 3; i++) {
-		colors[i] = Color(255, 255, 255, 255);
-	}
-} // Constructor
+	colors[DEFAULT]			= { 255,255,255,255 };
+	colors[PRESSED_DOWN]	= { 255,255,255,255 };
+	colors[HOVER_OVER]		= { 255,255,255,255 };
+	colors[DISABLED]		= { 255,255,255,255 };
+}
 
 Button::~Button() {
-} // Destructor
+}
 
 
 void Button::awake() {
+	changeState(DISABLED);
+}
+
+void Button::onEnable() {
 	changeState(DEFAULT);
 }
 
-void Button::onMouseButtonPressedAsButton(int buttoncode, int mods) {
-	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(PRESSED_DOWN);
-	}
+void Button::onDisable() {
+	changeState(DISABLED);
 }
+
+void Button::onMouseButtonPressedAsButton(int buttoncode, int mods) {
+	if (state == DISABLED) return;
+	changeState(PRESSED_DOWN);
+	if (buttoncode == MOUSE_BUTTON_LEFT)
+		leftPressed = true;
+	else if (buttoncode == MOUSE_BUTTON_MIDDLE)
+		middlePressed = true;
+	else if (buttoncode == MOUSE_BUTTON_RIGHT)
+		rightPressed = true;
+}
+
 void Button::onMouseButtonReleasedAsButton(int buttoncode, int mods) {
-	if (buttoncode == MOUSE_BUTTON_LEFT) {
-		changeState(HOVER_OVER);
+	if (state == DISABLED) return;
+	if (buttoncode == MOUSE_BUTTON_LEFT && leftPressed) {
+		leftPressed = false;
+		clickFunction.call();
 	}
+	else if (buttoncode == MOUSE_BUTTON_MIDDLE && middlePressed) {
+		middlePressed = false;
+		clickFunction.call();
+	}
+	else if (buttoncode == MOUSE_BUTTON_RIGHT && rightPressed) {
+		rightPressed = false;
+		clickFunction.call();
+	}
+	if (state != DISABLED && !leftPressed && !middlePressed && !rightPressed)
+		changeState(HOVER_OVER);
 }
 
 void Button::onHoverover() {
+	if (state == DISABLED) return;
 	changeState(HOVER_OVER);
 }
 
 void Button::onHoverout() {
+	if (state == DISABLED) return;
 	if (state == PRESSED_DOWN || state == HOVER_OVER)
 		changeState(DEFAULT);
 }

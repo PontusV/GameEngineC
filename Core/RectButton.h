@@ -37,8 +37,10 @@ namespace Core {
 		ComponentFunctionHandle<void> clickFunction;
 
 	private:
-		//PROPERTY() // ENUM!
 		ButtonState state = ButtonState::DISABLED;
+		bool leftPressed = false;
+		bool middlePressed = false;
+		bool rightPressed = false;
 	};
 }
 #endif

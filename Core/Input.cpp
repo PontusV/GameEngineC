@@ -142,25 +142,41 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+					script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
 			}
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
 			if (event.mouseButton.action == GLFW_PRESS) {
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonReleased(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+					script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
 			}
 		}
