@@ -50,10 +50,10 @@ void EntityHandle::setEntityHideFlags(HideFlags hideFlags) {
 	return scene->getEntityManager()->setEntityHideFlags(entity, hideFlags);
 }
 
-bool EntityHandle::operator==(const EntityHandle& other) {
+bool EntityHandle::operator==(const EntityHandle& other) const {
 	return entity.getID() == other.entity.getID();
 }
-bool EntityHandle::operator!=(const EntityHandle& other) {
+bool EntityHandle::operator!=(const EntityHandle& other) const {
 	return !(*this == other);
 }
 

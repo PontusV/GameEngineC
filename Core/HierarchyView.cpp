@@ -73,30 +73,16 @@ void HierarchyView::onEnable() {
 	timer = refreshTime;
 }
 
-void HierarchyView::createList() {
-	RectTransform* rect = owner.getComponent<RectTransform>();
+std::vector<EntityHandle> HierarchyView::getAllEntities() {
+	std::vector<EntityHandle> entities;
 	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
-	if (!rect) return;
 	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
 		if (scene.get() == editorScene) continue;
 		for (EntityHandle entity : scene->getAllEntities()) {
-			std::string name = entity.getEntityName();
-			Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
-			RectButton button = RectButton();
-			button.colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-			button.colors[RectButton::ButtonState::HOVER_OVER] = Color(140, 140, 140);
-			button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(60, 60, 60);
-			button.clickFunction = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
-			EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
-				text,
-				button,
-				RectSprite(),
-				RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f)
-			);
-			entry.setParent(scrollPanel);
-			list.push_back(entry);
+			entities.push_back(entity);
 		}
 	}
+	return entities;
 }
 
 void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
@@ -104,20 +90,61 @@ void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
 }
 
 void HierarchyView::clearList() {
-	for (EntityHandle& entry : list) {
-		destroyEntity(entry);
+	for (auto& entry : list) {
+		destroyEntity(entry.second);
 	}
 	list.clear();
 }
 
+std::vector<EntityHandle>::iterator contains(std::vector<EntityHandle>& entities, const Entity& entity) {
+	for (auto it = entities.begin(); it != entities.end(); it++) {
+		if (it->getEntity() == entity) return it;
+	}
+	return entities.end();
+}
+
 void HierarchyView::refresh() {
-	clearList();
-	createList();
+	std::vector<EntityHandle> entities = getAllEntities();
+	// Remove destroyed Entries
+	auto it = list.begin();
+	while (it != list.end()) {
+		auto iterator = contains(entities, it->first);
+		if (iterator != entities.end()) {
+			it++;
+			entities.erase(iterator);
+		}
+		else {
+			destroyEntity(it->second);
+			list.erase(it);
+		}
+	}
+	// Add new Entries
+	RectTransform* rect = owner.getComponent<RectTransform>();
+	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
+	if (!rect) return;
+	for (EntityHandle& entity : entities) {
+		std::string name = entity.getEntityName();
+		Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+		RectButton button = RectButton();
+		button.colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
+		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(140, 140, 140);
+		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(60, 60, 60);
+		button.clickFunction = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
+		EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
+			text,
+			button,
+			RectSprite(),
+			RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f)
+		);
+		entry.setParent(scrollPanel);
+		list.push_back(std::make_pair(entity.getEntity(), entry));
+	}
 }
 
 void HierarchyView::onDisable() {
 	destroyEntity(scrollPanel);
 	destroyEntity(scrollBar);
+	list.clear();
 }
 
 void HierarchyView::lateUpdate(float deltaTime) {

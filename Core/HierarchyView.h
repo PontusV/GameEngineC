@@ -16,14 +16,14 @@ namespace Core {
 
 		void refresh();
 		void clearList();
-		void createList();
+		std::vector<EntityHandle> getAllEntities();
 
 		void onDestroyEntityClick(EntityHandle entity);
 	private:
 		float refreshTime = 0.2f;
 		float timer = 0.0f;
 	private:
-		std::vector<EntityHandle> list;
+		std::vector<std::pair<Entity, EntityHandle>> list; // List of current entries
 
 		EntityHandle currentTarget;
 		EntityHandle scrollPanel;

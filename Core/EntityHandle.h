@@ -32,8 +32,8 @@ namespace Core {
 		HideFlags getEntityHideFlags();
 		void setEntityHideFlags(HideFlags hideFlags);
 
-		bool operator==(const EntityHandle& other);
-		bool operator!=(const EntityHandle& other);
+		bool operator==(const EntityHandle& other) const;
+		bool operator!=(const EntityHandle& other) const;
 	};
 
 	// --------------------------- Template Function Definitions --------------------------------
