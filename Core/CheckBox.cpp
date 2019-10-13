@@ -71,7 +71,7 @@ void CheckBox::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 void CheckBox::setToggle(bool value) {
 	if (value != toggle) {
 		toggle = value;
-		onToggle.call(value);
+		onToggle.invoke(value);
 		if (value)
 			showTick();
 		else

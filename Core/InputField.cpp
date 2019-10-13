@@ -56,7 +56,7 @@ void InputField::submit() {
 	Text* textComponent = inputText.getComponent<Text>();
 	std::wstring input = textComponent->getText();
 	textComponent->setText(input);
-	onSubmit.call(input);
+	onSubmit.invoke(input);
 }
 
 void InputField::onMouseDrag(float mouseX, float mouseY) {

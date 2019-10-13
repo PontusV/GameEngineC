@@ -12,7 +12,7 @@ namespace Core {
 		IComponentFunctionHandleImpl() {}
 	public:
 		virtual ~IComponentFunctionHandleImpl() {}
-		virtual void call(Args... args) = 0;
+		virtual void invoke(Args... args) = 0;
 	};
 
 	template<typename T, typename R, typename... Args>
@@ -21,7 +21,7 @@ namespace Core {
 		typedef R(T::* FunctionPtr)(Args...);
 	public:
 		ComponentFunctionHandleImpl(ComponentHandle component, FunctionPtr ptr) : component(component), functionPtr(ptr) {}
-		void call(Args... args) {
+		void invoke(Args... args) {
 			T* componentPtr = (T*)component.getComponent();
 			if (componentPtr) // If the handle is still valid
 				(componentPtr->*functionPtr)(args...);
@@ -37,7 +37,7 @@ namespace Core {
 		typedef R(T::* FunctionPtr)(Args...);
 	public:
 		ComponentFunctionHandleWrapper(ComponentHandle component, FunctionPtr ptr, Args... args) : component(component), functionPtr(ptr), args(std::make_tuple(args...)) {}
-		void call() {
+		void invoke() {
 			T* componentPtr = (T*)component.getComponent();
 			if (componentPtr) // If the handle is still valid
 				(componentPtr->*functionPtr)(std::get<Args>(args)...);
@@ -73,9 +73,9 @@ namespace Core {
 		}
 
 		/* Calls the bound function. If none exists nothing happens. */
-		void call(Args... args) {
+		void invoke(Args... args) {
 			if (function)
-				function->call(args...);
+				function->invoke(args...);
 		}
 		bool isNull() {
 			return function == nullptr;
