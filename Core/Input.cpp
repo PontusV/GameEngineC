@@ -142,6 +142,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
+				lastClickTarget = target;
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
@@ -162,6 +163,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
 			if (event.mouseButton.action == GLFW_PRESS) {
+				lastClickTarget = target;
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);

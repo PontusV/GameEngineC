@@ -414,15 +414,12 @@ void Inspector::inspect(EntityHandle entity) {
 	}
 }
 
-void Inspector::onMouseButtonPressed(int buttoncode, int mods) {
-	EntityHandle target = input->getLastClicked();
-	if (target.getEntity() != currentTarget.getEntity()) {
-		inspect(target);
-	}
-}
-
 void Inspector::lateUpdate(float deltaTime) {
 	if (currentTarget.getEntity().getID() == Entity::INVALID_ID) return;
+	if (!currentTarget.refresh()) {
+		currentTarget = EntityHandle();
+		clearEntries();
+	}
 	// Check if refresh is necessary
 	std::vector<Component*> components = getInspectableComponents(currentTarget);
 	if (components.size() != targetComponents.size()) {

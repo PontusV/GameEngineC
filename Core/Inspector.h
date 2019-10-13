@@ -25,7 +25,6 @@ namespace Core {
 		void onEnable() override;
 		void onDisable() override;
 		void lateUpdate(float deltaTime) override;
-		void onMouseButtonPressed(int buttoncode, int mods) override;
 
 		void inspect(EntityHandle entity);
 		/* Recreates target component list if target exists. */

@@ -9,6 +9,7 @@
 #include "ObjectData.h"
 #include "Scene.h"
 #include "Input.h"
+#include <GLFW/glfw3.h>
 using namespace Core;
 
 
@@ -124,4 +125,15 @@ void EditorPanel::selectTab(Tab tab) {
 		hierarchyTab.getComponent<RectButton>()->disable();
 	}
 	currentTab = tab;
+}
+
+void EditorPanel::onMouseButtonPressed(int buttoncode, int mods) {
+	if (buttoncode != GLFW_MOUSE_BUTTON_LEFT) return;
+	EntityHandle target = input->getLastClicked();
+	if (target.getEntity() != currentTarget.getEntity())
+		select(target);
+}
+void EditorPanel::select(EntityHandle target) {
+	currentTarget = target;
+	inspectorPanel.getComponent<Inspector>()->inspect(target);
 }

@@ -16,6 +16,9 @@ namespace Core {
 		EditorPanel();
 		~EditorPanel();
 
+		void onMouseButtonPressed(int buttoncode, int mods) override;
+		void select(EntityHandle target);
+
 		void start() override;
 		void selectTab(Tab index);
 	private:
