@@ -333,7 +333,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	removeButton->colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
 	removeButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);
 	removeButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(200, 0, 0);
-	removeButton->clickFunction = Core::bind(this, &Inspector::removeComponentFromTarget, (ComponentTypeID)component->getType().typeID);
+	removeButton->onLeftClick = Core::bind(this, &Inspector::removeComponentFromTarget, (ComponentTypeID)component->getType().typeID);
 	LayoutElement* removeButtonLayout = removeButtonEntity.addComponent<LayoutElement>();
 	removeButtonLayout->setFlexibleSizeEnabled(true);
 	removeButtonLayout->setFlexibleSize(Vector2(0, 0));

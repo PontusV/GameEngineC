@@ -45,7 +45,11 @@ namespace Core {
 		PROPERTY()
 		Color colors[4];
 		PROPERTY()
-		ComponentFunctionHandle<void> clickFunction;
+		ComponentFunctionHandle<void> onLeftClick;
+		PROPERTY()
+		ComponentFunctionHandle<void> onMiddleClick;
+		PROPERTY()
+		ComponentFunctionHandle<void> onRightClick;
 
 	private:
 		ButtonState	state = ButtonState::DISABLED;

@@ -97,14 +97,14 @@ void EditorPanel::start() {
 		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
 	);
-	HierarchyView* hierarchyView = content.addComponent<HierarchyView>();
+	HierarchyView* hierarchyView = content.addComponent(HierarchyView(ComponentHandle(this)));
 	Inspector* inspectorView = content.addComponent<Inspector>();
 	hierarchyView->disable();
 	inspectorPanel = ComponentHandle(inspectorView);
 	hierarchyPanel = ComponentHandle(hierarchyView);
 	content.setParent(owner);
-	inspectorButton->clickFunction = Core::bind(this, &EditorPanel::selectTab, Tab::Inspector); // Display Inspector View
-	heirarchyButton->clickFunction = Core::bind(this, &EditorPanel::selectTab, Tab::Hierarchy); // Display Heirarchy View
+	inspectorButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Inspector); // Display Inspector View
+	heirarchyButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Hierarchy); // Display Heirarchy View
 }
 
 void EditorPanel::selectTab(Tab tab) {
@@ -131,9 +131,10 @@ void EditorPanel::onMouseButtonPressed(int buttoncode, int mods) {
 	if (buttoncode != GLFW_MOUSE_BUTTON_LEFT) return;
 	EntityHandle target = input->getLastClicked();
 	if (target.getEntity() != currentTarget.getEntity())
-		select(target);
+		selectTarget(target);
 }
-void EditorPanel::select(EntityHandle target) {
+
+void EditorPanel::selectTarget(EntityHandle target) {
 	currentTarget = target;
 	inspectorPanel.getComponent<Inspector>()->inspect(target);
 }

@@ -45,7 +45,7 @@ void DropDownScroll::open() {
 		button.colors[RectButton::DEFAULT] = { 20,20,20,255 };
 		button.colors[RectButton::PRESSED_DOWN] = { 10,10,10,255 };
 		button.colors[RectButton::HOVER_OVER] = { 80,80,80,255 };
-		button.clickFunction = options[i].function;
+		button.onLeftClick = options[i].function;
 		EntityHandle menuOption = createEntity(ownerHandle.getEntityName() + "_DropDownOption_" + std::to_string(i),
 			RectTransform((float)boxPaddingX, (float)boxPaddingY + yOffset, optionWidth, optionHeight, z + 0.1f, Alignment::TOP_LEFT),
 			button,

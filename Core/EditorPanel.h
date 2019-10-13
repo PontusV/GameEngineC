@@ -16,10 +16,10 @@ namespace Core {
 		EditorPanel();
 		~EditorPanel();
 
-		void onMouseButtonPressed(int buttoncode, int mods) override;
-		void select(EntityHandle target);
 
 		void start() override;
+		void onMouseButtonPressed(int buttoncode, int mods) override;
+		void selectTarget(EntityHandle target);
 		void selectTab(Tab index);
 	private:
 		Tab currentTab;

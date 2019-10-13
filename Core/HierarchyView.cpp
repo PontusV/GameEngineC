@@ -15,6 +15,7 @@ using namespace Core;
 
 
 HierarchyView::HierarchyView() {}
+HierarchyView::HierarchyView(ComponentHandle editor) : editor(editor) {}
 HierarchyView::~HierarchyView() {}
 
 
@@ -129,7 +130,7 @@ void HierarchyView::refresh() {
 		button.colors[RectButton::ButtonState::DEFAULT] = Color(255,255,255,0);
 		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255,255,255,80);
 		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0,0,0,80);
-		button.clickFunction = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
+		button.onLeftClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
 		EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
 			button,
 			RectSprite(),

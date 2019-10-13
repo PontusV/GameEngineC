@@ -49,15 +49,15 @@ void Button::onMouseButtonReleasedAsButton(int buttoncode, int mods) {
 	if (state == DISABLED) return;
 	if (buttoncode == MOUSE_BUTTON_LEFT && leftPressed) {
 		leftPressed = false;
-		clickFunction.call();
+		onLeftClick.call();
 	}
 	else if (buttoncode == MOUSE_BUTTON_MIDDLE && middlePressed) {
 		middlePressed = false;
-		clickFunction.call();
+		onMiddleClick.call();
 	}
 	else if (buttoncode == MOUSE_BUTTON_RIGHT && rightPressed) {
 		rightPressed = false;
-		clickFunction.call();
+		onRightClick.call();
 	}
 	if (state != DISABLED && !leftPressed && !middlePressed && !rightPressed)
 		changeState(HOVER_OVER);
