@@ -21,6 +21,9 @@ namespace Core {
 	private:
 		Tab currentTab;
 		EntityHandle currentTarget;
+
+		EntityHandle inspectorTab;
+		EntityHandle hierarchyTab;
 		ComponentHandle inspectorPanel;
 		ComponentHandle hierarchyPanel;
 	};

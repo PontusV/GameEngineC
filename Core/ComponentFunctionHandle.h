@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 namespace Core {
 	template<typename... Args>
 	class IComponentFunctionHandleImpl {
@@ -45,7 +46,7 @@ namespace Core {
 		ComponentHandle component;
 		FunctionPtr functionPtr;
 		std::shared_ptr<ComponentFunctionHandleImpl<T, R, Args...>> function;
-		std::tuple<Args...> args;
+		std::tuple<typename std::remove_reference<Args>::type...> args;
 	};
 
 	template<typename T, typename R, typename... Args>

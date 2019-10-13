@@ -17,6 +17,11 @@ Scene::~Scene() {
 	clear();
 }
 
+
+const std::vector<Handle>& Scene::getAllEntities() const {
+	return entities;
+}
+
 bool Scene::destroyEntity(Entity entity) {
 	return destroyEntity(entity, false);
 }
@@ -38,8 +43,8 @@ bool Scene::destroyEntity(Entity entity, bool chained) {
 	// Destroy Children
 	Handle entityHandle = getEntityHandle(entity);
 	if (entityHandle.hasComponent<ChildManager>()) {
-		bool updateIt = entityHandle.getComponent<ChildManager>()->getChildCount() > 0;
-		while (entityHandle.getComponent<ChildManager>()->getChildCount() > 0) {
+		bool updateIt = entityHandle.getImmediateChildCount() > 0;
+		while (entityHandle.getImmediateChildCount() > 0) {
 			destroyEntity(getChild(entity, 0).getEntity(), true);
 		}
 		// Update the iterator if children were removed.

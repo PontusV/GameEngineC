@@ -6,6 +6,7 @@ using namespace Core;
 Input* Behaviour::input;
 Window* Behaviour::window;
 Camera* Behaviour::camera;
+SceneManager* Behaviour::sceneManager;
 
 Behaviour::Behaviour() : started(false), enabled(true) {
 }
@@ -38,11 +39,13 @@ void Behaviour::activate() {
 	active = true;
 }
 
-void Behaviour::destroyEntity(const EntityHandle& handle) {
-	destroyEntity(handle.getEntity());
+void Behaviour::destroyEntity(EntityHandle& handle) {
+	if (!handle.refresh()) return;
+	Scene* scene = handle.getScene();
+	scene->destroyEntityQueued(handle.getEntity());
 }
 
 void Behaviour::destroyEntity(Entity entity) {
-	Scene* scene = owner.getComponent<ObjectData>()->getScene();
+	Scene* scene = owner.getScene();
 	scene->destroyEntityQueued(entity);
 }

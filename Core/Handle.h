@@ -30,6 +30,7 @@ namespace Core {
 		bool isImmediateChild(Entity entity);
 
 		const Entity& getEntity() const;
+		Scene* getScene() const;
 
 		/* Checks if the handle is still pointing to the same Entity. */
 		bool isValid();

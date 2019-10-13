@@ -39,7 +39,7 @@ void ScrollBar::start() {
 }
 
 void ScrollBar::onDestroy() {
-	destroyEntity(handle);
+	//destroyEntity(handle);
 }
 
 void ScrollBar::onPreRender() {

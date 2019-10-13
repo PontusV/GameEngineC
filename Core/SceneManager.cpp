@@ -66,3 +66,19 @@ ScenePtr SceneManager::createScene(std::string name, ObjectType type) { // TODO:
 ScenePtr SceneManager::getScene(std::string name) {
 	return sceneMap[name];
 }
+
+std::vector<ScenePtr> SceneManager::getAllScenes() {
+	std::vector<ScenePtr> scenes;
+	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
+		scenes.push_back(it->second);
+	}
+	return scenes;
+}
+
+std::vector<std::pair<std::string, ScenePtr>> SceneManager::getAllScenesAsPairs() {
+	std::vector<std::pair<std::string, ScenePtr>> scenes;
+	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
+		scenes.push_back(*it);
+	}
+	return scenes;
+}

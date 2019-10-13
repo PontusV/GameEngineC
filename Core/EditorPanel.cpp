@@ -36,54 +36,57 @@ void EditorPanel::start() {
 	tabsLayoutGroup->spacing = 5;
 	tabContainer.setParent(owner);
 	// Inspector Tab
-	EntityHandle inspectorLabelRect = sceneUI->createEntity("Inspector_Tab",
+	inspectorTab = sceneUI->createEntity("Inspector_Tab",
 		RectSprite(Color(100, 100, 100, 255)),
 		//RectButton(),
 		//LayoutElement(),
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	RectButton* inspectorButton = inspectorLabelRect.addComponent<RectButton>();
-	inspectorButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-	inspectorButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
-	inspectorButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
-	LayoutElement* labelRectLE = inspectorLabelRect.addComponent<LayoutElement>();
+	RectButton* inspectorButton = inspectorTab.addComponent<RectButton>();
+	inspectorButton->colors[RectButton::ButtonState::DEFAULT] = Color(80, 80, 80);
+	inspectorButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(100, 100, 100);
+	inspectorButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(40, 40, 40);
+	inspectorButton->colors[RectButton::ButtonState::DISABLED] = Color(120, 120, 120);
+	inspectorButton->disable();
+	LayoutElement* labelRectLE = inspectorTab.addComponent<LayoutElement>();
 	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
 	labelRectLE->setMinSizeEnabled(true);
 	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
 	labelRectLE->setFlexibleSizeEnabled(true);
-	inspectorLabelRect.setParent(tabContainer);
+	inspectorTab.setParent(tabContainer);
 	// Inspector label
 	EntityHandle inspectorLabel = sceneUI->createEntity("Inspector_label",
 		inspectorLabelText,
 		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
 	);
-	inspectorLabel.setParent(inspectorLabelRect);
+	inspectorLabel.setParent(inspectorTab);
 	// Hierarchy Tab
 	Vector2 hierarchyLabelSize = hierarchyLabelText.getSize();
 	labelRectWidth = hierarchyLabelSize.x + textPadding * 2;
 	labelRectHeight = hierarchyLabelSize.y + textPadding * 2;
-	EntityHandle hierarchyLabelRect = sceneUI->createEntity("Hierarchy_Tab",
+	hierarchyTab = sceneUI->createEntity("Hierarchy_Tab",
 		RectSprite(Color(100, 100, 100, 255)),
 		//RectButton(),
 		//LayoutElement(),
 		RectTransform(0, 0, labelRectWidth, labelRectHeight, 1.05f, Alignment::TOP_LEFT)
 	);
-	RectButton* heirarchyButton = hierarchyLabelRect.addComponent<RectButton>();
-	heirarchyButton->colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
-	heirarchyButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(120, 120, 120);
-	heirarchyButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(80, 80, 80);
-	labelRectLE = hierarchyLabelRect.addComponent<LayoutElement>();
+	RectButton* heirarchyButton = hierarchyTab.addComponent<RectButton>();
+	heirarchyButton->colors[RectButton::ButtonState::DEFAULT] = Color(80, 80, 80);
+	heirarchyButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(100, 100, 100);
+	heirarchyButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(40, 40, 40);
+	heirarchyButton->colors[RectButton::ButtonState::DISABLED] = Color(120, 120, 120);
+	labelRectLE = hierarchyTab.addComponent<LayoutElement>();
 	labelRectLE->setMinSize(Vector2(labelRectWidth, labelRectHeight));
 	labelRectLE->setMinSizeEnabled(true);
 	labelRectLE->setFlexibleSize(Vector2(0.0f, 0.0f));
 	labelRectLE->setFlexibleSizeEnabled(true);
-	hierarchyLabelRect.setParent(tabContainer);
+	hierarchyTab.setParent(tabContainer);
 	// Hierarchy label
 	EntityHandle hierarchyLabel = sceneUI->createEntity("Hierarchy_label",
 		hierarchyLabelText,
 		RectTransform(textPadding, textPadding, labelRectWidth, labelRectHeight, 1.1f, Alignment::TOP_LEFT)
 	);
-	hierarchyLabel.setParent(hierarchyLabelRect);
+	hierarchyLabel.setParent(hierarchyTab);
 
 	// Inspector background
 	EntityHandle content = sceneUI->createEntity("EditorPanel_Content",
@@ -111,10 +114,14 @@ void EditorPanel::selectTab(Tab tab) {
 	if (tab == Tab::Inspector) {
 		inspectorView->enable();
 		hierarchyView->disable();
+		inspectorTab.getComponent<RectButton>()->disable();
+		hierarchyTab.getComponent<RectButton>()->enable();
 	}
 	else if (tab == Tab::Hierarchy) {
 		inspectorView->disable();
 		hierarchyView->enable();
+		inspectorTab.getComponent<RectButton>()->enable();
+		hierarchyTab.getComponent<RectButton>()->disable();
 	}
 	currentTab = tab;
 }

@@ -17,6 +17,10 @@ namespace Core {
 		ScenePtr createScene(std::string name, ObjectType type);
 		/* Retrieves a Scene by name */
 		ScenePtr getScene(std::string name);
+		/* Retrieves all loaded Scenes */
+		std::vector<ScenePtr> getAllScenes();
+		/* Retrieves all loaded Scenes and their names. */
+		std::vector<std::pair<std::string, ScenePtr>> getAllScenesAsPairs();
 		/* Saves scene to file */
 		void saveScene(ScenePtr scene, const char* fileName);
 		/* Loads scene from file */

@@ -30,6 +30,10 @@ const Entity& Handle::getEntity() const {
 	return entity;
 }
 
+Scene* Handle::getScene() const {
+	return scene;
+}
+
 ObjectType Handle::getObjectType() {
 	if (ObjectData* objectData = getComponent<ObjectData>()) {
 		return objectData->getLayer();

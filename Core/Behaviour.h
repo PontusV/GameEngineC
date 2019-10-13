@@ -11,6 +11,7 @@ namespace Core {
 	class Input;
 	class Window;
 	class Camera;
+	class SceneManager;
 
 	CLASS() Behaviour : public Component {
 		GENERATED_BODY()
@@ -82,6 +83,7 @@ namespace Core {
 		static Input* input;
 		static Window* window;
 		static Camera* camera;
+		static SceneManager* sceneManager;
 	protected:
 		Behaviour();
 
@@ -89,7 +91,9 @@ namespace Core {
 		template<typename... Ts>
 		EntityHandle createEntity(std::string name, Ts... components);
 
-		void destroyEntity(const EntityHandle& handle);
+		/* Destroys the Entity in its own scene. */
+		void destroyEntity(EntityHandle& handle);
+		/* Destroys the Entity in this Scene. */
 		void destroyEntity(Entity entity);
 	};
 

@@ -8,6 +8,7 @@ BehaviourManager::BehaviourManager(Engine* engine) {
 	Behaviour::input = &engine->getInput();
 	Behaviour::window = &engine->getGraphics().getWindow();
 	Behaviour::camera = &engine->getGraphics().getCamera();
+	Behaviour::sceneManager = &engine->getSceneManager();
 }
 
 

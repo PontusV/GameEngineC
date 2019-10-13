@@ -81,8 +81,9 @@ void EntityManager::destroyEntity(Entity entity, bool chained) {
 	// Exception check
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) {
-		std::cout << "EntityManager::destroyEntity::ERROR The entity does not exist in this manager!\n";
-		throw std::invalid_argument("EntityManager::destroyEntity::ERROR The entity does not exist in this manager!");
+		return;
+		//std::cout << "EntityManager::destroyEntity::ERROR The entity does not exist in this manager!\n";
+		//throw std::invalid_argument("EntityManager::destroyEntity::ERROR The entity does not exist in this manager!");
 	}
 	Archetype* archetype = it->second;
 

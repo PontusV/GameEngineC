@@ -12,13 +12,16 @@ namespace Core {
 		enum ButtonState {
 			DEFAULT = 0,
 			PRESSED_DOWN,
-			HOVER_OVER
+			HOVER_OVER,
+			DISABLED
 		};
 	public:
 		RectButton();
 		~RectButton();
 
 		void awake() override;
+		void onEnable() override;
+		void onDisable() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
 		void onHoverover() override;
@@ -29,13 +32,13 @@ namespace Core {
 
 	public:
 		PROPERTY()
-		Color colors[3];
+		Color colors[4];
 		PROPERTY()
 		ComponentFunctionHandle<void> clickFunction;
 
 	private:
 		//PROPERTY() // ENUM!
-		ButtonState state = ButtonState::DEFAULT;
+		ButtonState state = ButtonState::DISABLED;
 	};
 }
 #endif

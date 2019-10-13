@@ -6,7 +6,11 @@
 #include "RectMask.h"
 #include "ScrollRect.h"
 #include "ScrollBar.h"
+#include "Text.h"
+#include "RectButton.h"
+#include "RectSprite.h"
 #include "Input.h"
+#include "SceneManager.h"
 using namespace Core;
 
 
@@ -64,8 +68,51 @@ void HierarchyView::onEnable() {
 		scrollBarElement->setFlexibleSizeEnabled(true);
 		scrollBar.setParent(owner);
 	}
-	// TODO: Create list
 
+	refresh();
+	timer = refreshTime;
+}
+
+void HierarchyView::createList() {
+	RectTransform* rect = owner.getComponent<RectTransform>();
+	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
+	if (!rect) return;
+	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
+		if (scene.get() == editorScene) continue;
+		for (EntityHandle entity : scene->getAllEntities()) {
+			std::string name = entity.getEntityName();
+			Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+			RectButton button = RectButton();
+			button.colors[RectButton::ButtonState::DEFAULT] = Color(100, 100, 100);
+			button.colors[RectButton::ButtonState::HOVER_OVER] = Color(140, 140, 140);
+			button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(60, 60, 60);
+			button.clickFunction = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
+			EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
+				text,
+				button,
+				RectSprite(),
+				RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f)
+			);
+			entry.setParent(scrollPanel);
+			list.push_back(entry);
+		}
+	}
+}
+
+void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
+	destroyEntity(entity);
+}
+
+void HierarchyView::clearList() {
+	for (EntityHandle& entry : list) {
+		destroyEntity(entry);
+	}
+	list.clear();
+}
+
+void HierarchyView::refresh() {
+	clearList();
+	createList();
 }
 
 void HierarchyView::onDisable() {
@@ -74,5 +121,9 @@ void HierarchyView::onDisable() {
 }
 
 void HierarchyView::lateUpdate(float deltaTime) {
-
+	timer -= deltaTime;
+	if (timer <= 0) {
+		timer = refreshTime;
+		refresh();
+	}
 }

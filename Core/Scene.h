@@ -20,6 +20,8 @@ namespace Core {
 		Scene(EntityManager* entityManager, ObjectType type);
 		~Scene();
 
+		const std::vector<Handle>& getAllEntities() const;
+
 		/* Creates a new Entity in the Scene and adds it to the EntityManager. */
 		template <typename... Ts>
 		Handle createEntity(std::string name, Ts... components);
