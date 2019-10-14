@@ -120,7 +120,9 @@ namespace Core {
 			if (iterator == chunkMap.end()) return;
 
 			// Iterate through indices from chunkMap
-			for (std::size_t& index : (*iterator).second) {
+			for (auto it=iterator->second.begin(); it != iterator->second.end();) {
+				std::size_t index = *it;
+				iterator->second.erase(it);
 				if (index < data.size() - 1) {
 					std::iter_swap(data.begin() + index, data.end() - 1);
 					std::size_t otherChunkID = data[index].chunkPtr->getID();

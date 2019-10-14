@@ -153,6 +153,20 @@ int LevelEditor::initiate() {
 	behaviour->top = true;
 	behaviour->bottom = true;
 
+	// Object
+	EntityHandle object = sceneWorld->createEntity("Test_Object",
+		Image("resources/images/invaders.png"),
+		RectTransform(350, 550, 300, 300, 0.0f, Alignment::CENTER)
+	);
+	mouseDrag = object.addComponent<MouseDrag>();
+	mouseDrag->padding = 20;
+	behaviour = object.addComponent<DragAndResize>();
+	behaviour->edgeSize = 20;
+	behaviour->left = true;
+	behaviour->right = true;
+	behaviour->top = true;
+	behaviour->bottom = true;
+
 	// Level created, calling awake
 	sceneUI->awake();
 	sceneWorld->awake();
