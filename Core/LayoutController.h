@@ -37,8 +37,6 @@ namespace Core {
 		void refresh();
 		/* Marks all parents and self for layout update. */
 		void setDirty();
-		/* Marks self for layout update. */
-		void makeDirty();
 		bool isDirty();
 		bool isDirtySize();
 

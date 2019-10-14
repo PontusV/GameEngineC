@@ -122,7 +122,7 @@ void EditorPanel::start() {
 	hierarchyPanel = ComponentHandle(hierarchyView);
 	scrollPanel.setParent(content);
 
-	/*EntityHandle scrollBar = createEntity("Inspector_Scroll_Bar",
+	EntityHandle scrollBar = createEntity("Inspector_Scroll_Bar",
 		ScrollBar(scrollPanel),
 		RectTransform(0, 0, 20, 500, 1.06f)
 	);
@@ -131,7 +131,7 @@ void EditorPanel::start() {
 	scrollBarElement->setMinSizeEnabled(true);
 	scrollBarElement->setFlexibleSize(Vector2(0, 1));
 	scrollBarElement->setFlexibleSizeEnabled(true);
-	scrollBar.setParent(content);*/
+	scrollBar.setParent(content);
 
 	inspectorButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Inspector); // Display Inspector View
 	heirarchyButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Hierarchy); // Display Heirarchy View
