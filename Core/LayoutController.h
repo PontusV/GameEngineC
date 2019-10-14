@@ -35,7 +35,10 @@ namespace Core {
 
 		/* Updates layout and sets dirty to false. */
 		void refresh();
+		/* Marks all parents and self for layout update. */
 		void setDirty();
+		/* Marks self for layout update. */
+		void makeDirty();
 		bool isDirty();
 		bool isDirtySize();
 

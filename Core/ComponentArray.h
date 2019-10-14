@@ -124,6 +124,7 @@ namespace Core {
 				if (index < data.size() - 1) {
 					std::iter_swap(data.begin() + index, data.end() - 1);
 					data[index].chunkPtr->getID();
+					std::cout << data.size() << ", " << index << ", " << data[index].chunkPtr.use_count() << std::endl;
 					std::vector<std::size_t>& otherIndices = chunkMap.at(data[index].chunkPtr->getID());
 					for (std::size_t& otherIndex : otherIndices) {
 						if (otherIndex == data.size() - 1) {

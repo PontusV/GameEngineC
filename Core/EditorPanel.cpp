@@ -6,9 +6,13 @@
 #include "RectButton.h"
 #include "LayoutElement.h"
 #include "HorizontalLayoutGroup.h"
+#include "VerticalLayoutGroup.h"
 #include "ObjectData.h"
 #include "Scene.h"
 #include "Input.h"
+#include "ScrollRect.h"
+#include "ScrollBar.h"
+#include "RectMask.h"
 #include <GLFW/glfw3.h>
 using namespace Core;
 
@@ -91,18 +95,44 @@ void EditorPanel::start() {
 
 	// Inspector background
 	EntityHandle content = sceneUI->createEntity("EditorPanel_Content",
+		RectTransform(0, 0, 0, 0, 0)
+	);
+	HorizontalLayoutGroup* contentGroup = content.addComponent<HorizontalLayoutGroup>();
+	contentGroup->childForceExpandHeight = true;
+	contentGroup->childForceExpandWidth = true;
+	contentGroup->shrinkableChildHeight = true;
+	contentGroup->shrinkableChildWidth = true;
+	contentGroup->spacing = 0;
+	content.setParent(owner);
+	EntityHandle scrollPanel = sceneUI->createEntity("EditorPanel_Scroll_Panel",
 		//Inspector(),
 		//HierarchyView(),
-		HorizontalLayoutGroup(),
+		RectMask(),
+		LayoutElement(),
+		VerticalLayoutGroup(),
 		RectSprite(Color(175, 0, 0, 255)),
 		RectTransform(0, 0, 0, 0, 1.05f, Alignment::TOP_LEFT)
 	);
-	HierarchyView* hierarchyView = content.addComponent(HierarchyView(ComponentHandle(this)));
-	Inspector* inspectorView = content.addComponent<Inspector>();
+	ScrollRect* scrollRect = scrollPanel.addComponent<ScrollRect>();
+	scrollRect->paddingBottom = 10;
+	HierarchyView* hierarchyView = scrollPanel.addComponent(HierarchyView(ComponentHandle(this)));
+	Inspector* inspectorView = scrollPanel.addComponent<Inspector>();
 	hierarchyView->disable();
 	inspectorPanel = ComponentHandle(inspectorView);
 	hierarchyPanel = ComponentHandle(hierarchyView);
-	content.setParent(owner);
+	scrollPanel.setParent(content);
+
+	/*EntityHandle scrollBar = createEntity("Inspector_Scroll_Bar",
+		ScrollBar(scrollPanel),
+		RectTransform(0, 0, 20, 500, 1.06f)
+	);
+	LayoutElement* scrollBarElement = scrollBar.addComponent<LayoutElement>();
+	scrollBarElement->setMinSize(Vector2(20, 0));
+	scrollBarElement->setMinSizeEnabled(true);
+	scrollBarElement->setFlexibleSize(Vector2(0, 1));
+	scrollBarElement->setFlexibleSizeEnabled(true);
+	scrollBar.setParent(content);*/
+
 	inspectorButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Inspector); // Display Inspector View
 	heirarchyButton->onLeftClick = Core::bind(this, &EditorPanel::selectTab, Tab::Hierarchy); // Display Heirarchy View
 }
@@ -127,9 +157,14 @@ void EditorPanel::selectTab(Tab tab) {
 	currentTab = tab;
 }
 
+bool isTargetable(EntityHandle target) {
+	return target.refresh() && target.getEntityHideFlags() != HideFlags::HideInInspector;
+}
+
 void EditorPanel::onMouseButtonPressed(int buttoncode, int mods) {
 	if (buttoncode != GLFW_MOUSE_BUTTON_LEFT) return;
 	EntityHandle target = input->getLastClicked();
+	if (!isTargetable(target)) return;
 	if (target.getEntity() != currentTarget.getEntity())
 		selectTarget(target);
 }

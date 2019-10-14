@@ -10,15 +10,19 @@ UISystem::UISystem() {
 UISystem::~UISystem() {
 }
 
-void updateLayout(LayoutGroup* group) {
-	if (group->isDirty()) {
-		// Update parent layout
-		for (LayoutGroup* parentGroup : group->getOwner().getParent().getComponents<LayoutGroup>()) {
-			updateLayout(parentGroup);
-		}
+bool updateLayout(LayoutGroup* group) {
+	// Update parent layout
+	bool chainUpdate = false;
+	for (LayoutGroup* parentGroup : group->getOwner().getParent().getComponents<LayoutGroup>()) {
+		if (updateLayout(parentGroup))
+			chainUpdate = true;
+	}
+	if (chainUpdate || group->isDirty()) {
 		// Update self
 		group->refresh();
+		return true;
 	}
+	return false;
 }
 
 void updateLayoutSizes(LayoutGroup* group) {

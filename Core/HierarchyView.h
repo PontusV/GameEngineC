@@ -29,8 +29,6 @@ namespace Core {
 
 		ComponentHandle editor;
 		EntityHandle currentTarget;
-		EntityHandle scrollPanel;
-		EntityHandle scrollBar;
 	};
 }
 #endif

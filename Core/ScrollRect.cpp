@@ -28,7 +28,6 @@ void ScrollRect::checkScrollArea() {
 }
 
 void ScrollRect::onScroll(float xOffset, float yOffset) {
-	// getContentBounds
 	if (scrollableX)
 		offset.x += xOffset * speed;
 	if (scrollableY)

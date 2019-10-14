@@ -44,8 +44,6 @@ namespace Core {
 
 	private:
 		EntityHandle currentTarget;
-		EntityHandle scrollPanel;
-		EntityHandle scrollBar;
 		std::vector<EntityHandle> targetComponentList;
 		std::vector<ComponentTypeID> targetComponents;
 	};

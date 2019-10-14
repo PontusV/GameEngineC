@@ -7,8 +7,6 @@
 #include "RectButton.h"
 #include "RectSprite.h"
 #include "RectMask.h"
-#include "ScrollRect.h"
-#include "ScrollBar.h"
 #include "LayoutElement.h"
 #include "InputField.h"
 #include "HideFlags.h"
@@ -82,25 +80,13 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 void Inspector::onEnable() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
-		HorizontalLayoutGroup* parentGroup = owner.getComponent<HorizontalLayoutGroup>();
-		parentGroup->childForceExpandHeight = true;
-		parentGroup->childForceExpandWidth = true;
-		parentGroup->shrinkableChildHeight = true;
-		parentGroup->shrinkableChildWidth = true;
-		parentGroup->spacing = 10;
-
-		scrollPanel = createEntity("Inspector_Scroll_Panel",
-			RectMask(),
-			RectTransform(0, 0, 0, 0, rect->getZ() + 0.05f, Alignment::TOP_LEFT)
-		);
-		ScrollRect* scrollRect = scrollPanel.addComponent<ScrollRect>();
-		scrollRect->paddingBottom = 10;
-		LayoutElement* element = scrollPanel.addComponent<LayoutElement>();
+		LayoutElement* element = owner.getComponent<LayoutElement>();
 		element->setFlexibleSize(Vector2(1, 1));
 		element->setFlexibleSizeEnabled(true);
 		element->setMinSize(Vector2(0, 0));
 		element->setMinSizeEnabled(true);
-		VerticalLayoutGroup* group = scrollPanel.addComponent<VerticalLayoutGroup>();
+
+		VerticalLayoutGroup* group = owner.getComponent<VerticalLayoutGroup>();
 		group->childForceExpandHeight = false;
 		group->childForceExpandWidth = true;
 		group->shrinkableChildHeight = false;
@@ -108,19 +94,7 @@ void Inspector::onEnable() {
 		group->spacing = 5;
 		group->paddingTop = 10;
 		group->paddingLeft = 10;
-		group->paddingRight = 0;
-		scrollPanel.setParent(owner);
-
-		scrollBar = createEntity("Inspector_Scroll_Bar",
-			ScrollBar(scrollPanel),
-			RectTransform(0, 0, 20, 500, rect->getZ() + 10.0f)
-		);
-		LayoutElement* scrollBarElement = scrollBar.addComponent<LayoutElement>();
-		scrollBarElement->setMinSize(Vector2(20, 0));
-		scrollBarElement->setMinSizeEnabled(true);
-		scrollBarElement->setFlexibleSize(Vector2(0, 1));
-		scrollBarElement->setFlexibleSizeEnabled(true);
-		scrollBar.setParent(owner);
+		group->paddingRight = 10;
 	}
 	// Check if a target exists
 	if (currentTarget.isValid())
@@ -129,8 +103,7 @@ void Inspector::onEnable() {
 
 
 void Inspector::onDisable() {
-	destroyEntity(scrollPanel);
-	destroyEntity(scrollBar);
+	clearEntries();
 }
 
 void Inspector::clearEntries() {
@@ -298,7 +271,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	group->childForceExpandWidth = true;
 	group->shrinkableChildHeight = false;
 	group->shrinkableChildWidth = true;
-	entry.setParent(scrollPanel);
+	entry.setParent(owner);
 
 	// Entry content
 	EntityHandle labelField = createEntity(entryName + "_LabelField",
@@ -395,7 +368,7 @@ void Inspector::createEntries() {
 		filter.push_back(component->getType().typeID);
 	}
 	addComponentDropDownOption(dropDown, this, filter, Mirror::ReflectedTypes{});
-	addComponentButton.setParent(scrollPanel);
+	addComponentButton.setParent(owner);
 	targetComponentList.push_back(addComponentButton);
 }
 
