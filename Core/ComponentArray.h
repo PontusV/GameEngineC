@@ -123,8 +123,8 @@ namespace Core {
 			for (std::size_t& index : (*iterator).second) {
 				if (index < data.size() - 1) {
 					std::iter_swap(data.begin() + index, data.end() - 1);
-					data[index].chunkPtr->getID();
-					std::vector<std::size_t>& otherIndices = chunkMap.at(data[index].chunkPtr->getID());
+					std::size_t otherChunkID = data[index].chunkPtr->getID();
+					std::vector<std::size_t>& otherIndices = chunkMap.at(otherChunkID);
 					for (std::size_t& otherIndex : otherIndices) {
 						if (otherIndex == data.size() - 1) {
 							otherIndex = index;

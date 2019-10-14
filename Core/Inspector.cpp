@@ -76,7 +76,6 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 	addComponentDropDownOption(dropDown, inspector, filter, Mirror::TypeList<Ts...>{}); // Continue
 }
 
-
 void Inspector::onEnable() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (rect) {
@@ -100,7 +99,6 @@ void Inspector::onEnable() {
 	if (currentTarget.isValid())
 		refresh();
 }
-
 
 void Inspector::onDisable() {
 	clearEntries();
@@ -313,7 +311,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	removeButtonLayout->setMinSizeEnabled(true);
 	removeButtonLayout->setMinSize(Vector2(20, 20));
 	removeButtonEntity.setParent(labelField);
-	//*/
+
 	EntityHandle entryContent = createEntity(entryName + "_Content",
 		RectTransform(0,0,0,0,rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);

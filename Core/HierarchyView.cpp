@@ -6,12 +6,12 @@
 #include "Text.h"
 #include "RectButton.h"
 #include "RectSprite.h"
+#include "EditorPanel.h"
 #include "Input.h"
 #include "SceneManager.h"
 using namespace Core;
 
 
-HierarchyView::HierarchyView() {}
 HierarchyView::HierarchyView(ComponentHandle editor) : editor(editor) {}
 HierarchyView::~HierarchyView() {}
 
@@ -59,6 +59,10 @@ std::vector<EntityHandle> HierarchyView::getAllEntities() {
 	return entities;
 }
 
+void HierarchyView::onTargetEntityClick(EntityHandle entity) {
+	editor.getComponent<EditorPanel>()->selectTarget(entity);
+}
+
 void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
 	destroyEntity(entity);
 }
@@ -103,7 +107,8 @@ void HierarchyView::refresh() {
 		button.colors[RectButton::ButtonState::DEFAULT] = Color(255,255,255,0);
 		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255,255,255,80);
 		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0,0,0,80);
-		button.onLeftClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
+		button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
+		button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
 		EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
 			button,
 			RectSprite(),

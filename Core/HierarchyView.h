@@ -7,7 +7,6 @@ namespace Core {
 	CLASS(hideInInspector) HierarchyView : public Behaviour {
 		GENERATED_BODY()
 	public:
-		HierarchyView();
 		HierarchyView(ComponentHandle editor);
 		~HierarchyView();
 
@@ -20,6 +19,7 @@ namespace Core {
 		void clearList();
 		std::vector<EntityHandle> getAllEntities();
 
+		void onTargetEntityClick(EntityHandle entity);
 		void onDestroyEntityClick(EntityHandle entity);
 	private:
 		float refreshTime = 0.2f;
