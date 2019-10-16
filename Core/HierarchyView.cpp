@@ -39,7 +39,7 @@ void HierarchyView::onEnable() {
 		group->shrinkableChildWidth = true;
 		group->spacing = 5;
 		group->paddingTop = 10;
-		group->paddingLeft = 10;
+		group->paddingLeft = 0;
 		group->paddingRight = 10;
 	}
 
@@ -47,12 +47,22 @@ void HierarchyView::onEnable() {
 	timer = refreshTime;
 }
 
+std::vector<EntityHandle> HierarchyView::getRootEntities(std::vector<EntityHandle>& allEntities) {
+	std::vector<EntityHandle> entities;
+	for (EntityHandle& entity : allEntities) {
+		if (!entity.hasParent())
+		entities.push_back(entity);
+	}
+	return entities;
+}
+
 std::vector<EntityHandle> HierarchyView::getAllEntities() {
 	std::vector<EntityHandle> entities;
-	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
+	Scene* editorScene = owner.getScene();
 	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
 		if (scene.get() == editorScene) continue;
-		for (EntityHandle entity : scene->getRootEntities()) {
+		for (EntityHandle entity : scene->getAllEntities()) {
+			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			entities.push_back(entity);
 		}
 	}
@@ -81,6 +91,54 @@ std::vector<EntityHandle>::iterator contains(std::vector<EntityHandle>& entities
 	return entities.end();
 }
 
+void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, RectTransform* rect) {
+	static std::size_t entryHeight = 20;
+	std::string name = entity.getEntityName();
+	std::string entityName = "Hierarchy_entry_" + std::to_string(list.size());
+	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+
+	std::size_t childCount = entity.getChildCount();
+	std::size_t height = entryHeight * (childCount + 1);
+	std::size_t width = text.getSize().x + 12;
+
+	EntityHandle entry = createEntity(entityName,
+		RectTransform(0, 0, width, height, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	VerticalLayoutGroup* layoutGroup = entry.addComponent<VerticalLayoutGroup>();
+	layoutGroup->childForceExpandWidth = false;
+	layoutGroup->childForceExpandHeight = false;
+	layoutGroup->shrinkableChildWidth = false;
+	layoutGroup->shrinkableChildHeight = false;
+	layoutGroup->paddingLeft = 10;
+	layoutGroup->spacing = 5;
+
+	RectButton button = RectButton();
+	button.colors[RectButton::ButtonState::DEFAULT] = Color(255, 255, 255, 0);
+	button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 255, 255, 80);
+	button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0, 0, 0, 80);
+	button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
+	button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
+	EntityHandle buttonEntity = createEntity(entityName + "_Button",
+		button,
+		RectSprite(),
+		RectTransform(0, 0, width, entryHeight, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	EntityHandle label = createEntity(entityName + "_Label",
+		text,
+		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	label.setParent(buttonEntity);
+	buttonEntity.setParent(entry);
+	entry.setParent(parent);
+	list.push_back(std::make_pair(entity.getEntity(), entry));
+	// Add children
+	for (std::size_t i = 0; i < childCount; i++) {
+		EntityHandle child = entity.getChild(i);
+		if (child.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
+		addEntry(child, entry, rect);
+	}
+}
+
 void HierarchyView::refresh() {
 	std::vector<EntityHandle> entities = getAllEntities();
 	// Remove destroyed Entries
@@ -96,31 +154,12 @@ void HierarchyView::refresh() {
 			list.erase(it);
 		}
 	}
+	std::vector<EntityHandle> rootEntities = getRootEntities(entities);
 	// Add new Entries
 	RectTransform* rect = owner.getComponent<RectTransform>();
-	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
 	if (!rect) return;
-	for (EntityHandle& entity : entities) {
-		std::string name = entity.getEntityName();
-		Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
-		RectButton button = RectButton();
-		button.colors[RectButton::ButtonState::DEFAULT] = Color(255,255,255,0);
-		button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255,255,255,80);
-		button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0,0,0,80);
-		button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
-		button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
-		EntityHandle entry = createEntity("Hierarchy_entry_" + std::to_string(list.size()),
-			button,
-			RectSprite(),
-			RectTransform(0, 0, text.getSize().x, text.getSize().y + 10, rect->getZ() + 0.1f, Alignment::LEFT)
-		);
-		EntityHandle label = createEntity("Hierarchy_entry_" + std::to_string(list.size()) + "_Label",
-			text,
-			RectTransform(5, 0, text.getSize().x, text.getSize().y, rect->getZ() + 0.1f, Alignment::LEFT)
-		);
-		label.setParent(entry);
-		entry.setParent(owner);
-		list.push_back(std::make_pair(entity.getEntity(), entry));
+	for (EntityHandle& entity : rootEntities) {
+		addEntry(entity, owner, rect);
 	}
 }
 
