@@ -155,8 +155,8 @@ int LevelEditor::initiate() {
 
 	// Object
 	EntityHandle object = sceneWorld->createEntity("Test_Object",
-		Image("resources/images/invaders.png"),
-		RectTransform(350, 550, 300, 300, 0.0f, Alignment::CENTER)
+		Image("resources/images/awesomeface.png"),
+		RectTransform(100, 100, 100, 100, 0.0f, Alignment::CENTER)
 	);
 	mouseDrag = object.addComponent<MouseDrag>();
 	mouseDrag->padding = 20;
@@ -166,6 +166,13 @@ int LevelEditor::initiate() {
 	behaviour->right = true;
 	behaviour->top = true;
 	behaviour->bottom = true;
+
+	// Object
+	EntityHandle child = sceneWorld->createEntity("Test_Child",
+		Image("resources/images/invaders.png"),
+		RectTransform(350, 550, 300, 300, 0.0f, Alignment::CENTER)
+	);
+	child.setParent(object);
 
 	// Level created, calling awake
 	sceneUI->awake();

@@ -14,9 +14,6 @@ namespace Core {
 		EntityHandle();
 		~EntityHandle();
 
-		void setParent(const Entity& entity);
-		void setParent(EntityHandle entity);
-
 		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
 		template<typename T, class... Args>
 		T* addComponent(Args&&... args);
@@ -27,10 +24,6 @@ namespace Core {
 		template<typename T>
 		void removeComponent();
 		void removeComponent(ComponentTypeID componentTypeID);
-
-		std::string getEntityName();
-		HideFlags getEntityHideFlags();
-		void setEntityHideFlags(HideFlags hideFlags);
 
 		bool operator==(const EntityHandle& other) const;
 		bool operator!=(const EntityHandle& other) const;

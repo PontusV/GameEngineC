@@ -96,7 +96,7 @@ void Inspector::onEnable() {
 		group->paddingRight = 10;
 	}
 	// Check if a target exists
-	if (currentTarget.isValid())
+	if (currentTarget.refresh())
 		refresh();
 }
 

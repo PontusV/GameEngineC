@@ -52,7 +52,7 @@ std::vector<EntityHandle> HierarchyView::getAllEntities() {
 	Scene* editorScene = owner.getComponent<ObjectData>()->getScene();
 	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
 		if (scene.get() == editorScene) continue;
-		for (EntityHandle entity : scene->getAllEntities()) {
+		for (EntityHandle entity : scene->getRootEntities()) {
 			entities.push_back(entity);
 		}
 	}

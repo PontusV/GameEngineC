@@ -5,6 +5,7 @@
 #include "EntityLocation.h"
 #include "ComponentTypeInfo.h"
 #include "ObjectType.h"
+#include "HideFlags.h"
 #include <vector>
 
 typedef std::size_t ComponentTypeID;
@@ -32,9 +33,11 @@ namespace Core {
 		const Entity& getEntity() const;
 		Scene* getScene() const;
 
-		/* Checks if the handle is still pointing to the same Entity. */
+		/* Checks if pointed towards a valid Entity ID. */
 		bool isValid();
-		/* Returns true if Handle is valid. If not, the handle is updated and returns true if the update was successful. */
+		/* Checks if the Handle is pointing to the correct location in memory. */
+		bool isUpdated();
+		/* Returns true if the Handle is valid. If not, the handle is updated and returns true if the update was successful. */
 		bool refresh();
 
 		/* Updates the Handle so it points towards the target Entity. */
@@ -87,6 +90,13 @@ namespace Core {
 
 		ObjectType getObjectType();
 
+		std::string getEntityName();
+		HideFlags getEntityHideFlags();
+		void setEntityHideFlags(HideFlags hideFlags);
+		
+		bool hasParent();
+		void setParent(const Entity& entity);
+		void setParent(Handle entity);
 		Handle getParent();
 		Handle getChild(std::size_t index);
 		std::size_t getImmediateChildCount();

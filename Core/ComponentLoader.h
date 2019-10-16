@@ -56,7 +56,7 @@ namespace Core {
 	}
 	template<typename T>
 	void ComponentLoader::addComponentFromFile_impl(std::istream& is, EntityHandle& go) {
-		if (!go.isValid()) {
+		if (!go.refresh()) {
 			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!\n";
 			throw std::invalid_argument("ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!");
 		}

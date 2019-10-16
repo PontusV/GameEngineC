@@ -42,6 +42,14 @@ ObjectType Handle::getObjectType() {
 }
 
 bool Handle::isValid() {
+	/*if (auto chunk = locationData.chunk.lock()) {
+		return chunk->getEntity(locationData.index) == entity;
+	}
+	return false;*/
+	return entity.getID() != Entity::INVALID_ID;
+}
+
+bool Handle::isUpdated() {
 	if (auto chunk = locationData.chunk.lock()) {
 		return chunk->getEntity(locationData.index) == entity;
 	}
@@ -49,9 +57,9 @@ bool Handle::isValid() {
 }
 
 bool Handle::refresh() {
-	if (isValid()) return true;
+	if (isUpdated()) return true;
 	update();
-	return isValid();
+	return isUpdated();
 }
 
 void Handle::update() {
@@ -66,6 +74,10 @@ void Handle::updateLocation(EntityLocation location) {
 
 const EntityLocation& Handle::getLocation() const {
 	return locationData;
+}
+
+bool Handle::hasParent() {
+	return hasComponent<ParentEntity>();
 }
 
 bool Handle::isChild(Entity entity) {
@@ -179,6 +191,38 @@ std::vector<Component*> Handle::getComponentsDownwards() {
 	std::vector<Component*> childComponents = getComponentsInChildren();
 	components.insert(components.end(), childComponents.begin(), childComponents.end());
 	return components;
+}
+
+std::string Handle::getEntityName() {
+	if (refresh()) {
+		return scene->getEntityManager()->getEntityName(entity);
+	}
+	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!";
+	return "Invalid";
+}
+
+HideFlags Handle::getEntityHideFlags() {
+	HideFlags result = scene->getEntityManager()->getEntityHideFlags(entity);
+	Handle parent = getParent();
+	while (parent.refresh()) {
+		HideFlags hideFlags = parent.getEntityHideFlags();
+		result = result | hideFlags;
+		parent = parent.getParent();
+	}
+	return result;
+}
+
+void Handle::setEntityHideFlags(HideFlags hideFlags) {
+	return scene->getEntityManager()->setEntityHideFlags(entity, hideFlags);
+}
+
+void Handle::setParent(const Entity& entity) {
+	Handle parent = scene->getEntityHandle(entity);
+	setParent(parent);
+}
+
+void Handle::setParent(Handle entity) {
+	scene->setParentQueued(*this, entity);
 }
 
 Handle Handle::getParent() {

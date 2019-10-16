@@ -22,6 +22,15 @@ const std::vector<Handle>& Scene::getAllEntities() const {
 	return entities;
 }
 
+std::vector<Handle> Scene::getRootEntities() {
+	std::vector<Handle> roots;
+	for (Handle& entity : entities) {
+		if (!entity.hasParent())
+			roots.push_back(entity);
+	}
+	return roots;
+}
+
 bool Scene::destroyEntity(Entity entity) {
 	return destroyEntity(entity, false);
 }
@@ -388,7 +397,7 @@ void Scene::deserialize(std::istream& is) {
 		// Add ParentEntity component
 		EntityHandle parent = getEntityHandle(parentName);
 		EntityHandle child = getEntityHandle(childName);
-		if (parent.isValid())
+		if (parent.refresh())
 			child.setParent(parent);
 		else
 			destroyEntity(child.getEntity());
