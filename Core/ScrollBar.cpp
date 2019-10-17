@@ -113,7 +113,7 @@ void ScrollBar::onMouseDrag(float mouseX, float mouseY) {
 
 void ScrollBar::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 	if (!target.refresh()) return;
-	if (input->getLastClicked() == handle) {
+	if (input->getLastLeftClicked() == handle) {
 		handlePrevPos = input->getMousePosition();
 		handleDrag = true;
 		handle.getComponent<RectSprite>()->setColor(handleColorDragging);

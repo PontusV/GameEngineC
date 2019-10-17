@@ -60,7 +60,7 @@ namespace Core {
 		const Vector2& getMousePosition() const;
 
 		EntityHandle getHoverTarget();
-		EntityHandle getLastClicked();
+		EntityHandle getLastLeftClicked();
 
 	private:
 		EntityHandle getEntityAtPos(float x, float y);
@@ -102,7 +102,9 @@ namespace Core {
 		Vector2 mousePosition;		// Mouse position in screen space
 		bool mouseMoved;
 		EntityHandle hoverTarget;
-		EntityHandle lastClickTarget;
+		EntityHandle lastLeftClickTarget;
+		EntityHandle lastMiddleClickTarget;
+		EntityHandle lastRightClickTarget;
 		float timeSinceLastClick;
 		bool leftMouseButtonPressed;
 	};

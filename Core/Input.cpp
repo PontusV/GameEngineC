@@ -25,8 +25,8 @@ void Input::update(float dt) {
 	// Mouse Drag
 	if (mouseMoved) {
 		mouseMoved = false;
-		if (leftMouseButtonPressed && lastClickTarget.refresh()) {
-			std::vector<Behaviour*> scripts = lastClickTarget.getComponentsUpwards<Behaviour>();
+		if (leftMouseButtonPressed && lastLeftClickTarget.refresh()) {
+			std::vector<Behaviour*> scripts = lastLeftClickTarget.getComponentsUpwards<Behaviour>();
 			for (Behaviour* script : scripts) {
 				script->onMouseDrag(mousePosition.x, mousePosition.y);
 			}
@@ -103,7 +103,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 			if (event.mouseButton.action == GLFW_PRESS) {
 				float clickTime = (float)glfwGetTime() - timeSinceLastClick;
 
-				lastClickTarget = target;
+				lastLeftClickTarget = target;
 				leftMouseButtonPressed = true;
 				timeSinceLastClick = (float)glfwGetTime();
 
@@ -114,22 +114,22 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				for (Selectable* script : selectedScripts) {
 					script->select();
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
-				for (std::size_t i = 0; i < scriptArray.size(); i++) {
-					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
-				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
-				if (clickTime <= DOUBLE_CLICK_THRESHOLD && lastClickTarget.getEntity() == target.getEntity()) {
+				if (clickTime <= DOUBLE_CLICK_THRESHOLD && lastLeftClickTarget.getEntity() == target.getEntity()) {
 					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 						script->onDoubleClick();
 					}
 				}
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
+				}
 			}
 			else if (event.mouseButton.action == GLFW_RELEASE) {
 				leftMouseButtonPressed = false;
-				if (target.getEntity() == lastClickTarget.getEntity()) {
+				if (target.getEntity() == lastLeftClickTarget.getEntity()) {
 					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 					}
@@ -142,43 +142,47 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				lastClickTarget = target;
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
-				for (std::size_t i = 0; i < scriptArray.size(); i++) {
-					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
-				}
+				lastRightClickTarget = target;
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
-			}
-			else if (event.mouseButton.action == GLFW_RELEASE) {
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
-				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+			}
+			else if (event.mouseButton.action == GLFW_RELEASE) {
+				if (target.getEntity() == lastRightClickTarget.getEntity()) {
+					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
+						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
+					}
+				}
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
 			}
 		}
 		else if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_MIDDLE) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				lastClickTarget = target;
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
-				for (std::size_t i = 0; i < scriptArray.size(); i++) {
-					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
-				}
+				lastMiddleClickTarget = target;
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
-			}
-			else if (event.mouseButton.action == GLFW_RELEASE) {
 				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
-				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
-					script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+			}
+			else if (event.mouseButton.action == GLFW_RELEASE) {
+				if (target.getEntity() == lastMiddleClickTarget.getEntity()) {
+					for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
+						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
+					}
+				}
+				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				for (std::size_t i = 0; i < scriptArray.size(); i++) {
+					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
 			}
 		}
@@ -374,6 +378,6 @@ const Vector2& Input::getMousePosition() const {
 	return mousePosition;
 }
 
-EntityHandle Input::getLastClicked() {
-	return lastClickTarget;
+EntityHandle Input::getLastLeftClicked() {
+	return lastLeftClickTarget;
 }

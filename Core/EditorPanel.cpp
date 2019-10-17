@@ -163,7 +163,7 @@ bool isTargetable(EntityHandle target) {
 
 void EditorPanel::onMouseButtonPressed(int buttoncode, int mods) {
 	if (buttoncode != GLFW_MOUSE_BUTTON_LEFT) return;
-	EntityHandle target = input->getLastClicked();
+	EntityHandle target = input->getLastLeftClicked();
 	if (!isTargetable(target)) return;
 	if (target.getEntity() != currentTarget.getEntity())
 		selectTarget(target);

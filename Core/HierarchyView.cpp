@@ -9,6 +9,7 @@
 #include "EditorPanel.h"
 #include "Input.h"
 #include "SceneManager.h"
+#include <algorithm>
 using namespace Core;
 
 
@@ -17,7 +18,7 @@ HierarchyView::~HierarchyView() {}
 
 
 void HierarchyView::onMouseButtonPressed(int buttoncode, int mods) {
-	EntityHandle target = input->getLastClicked();
+	EntityHandle target = input->getLastLeftClicked();
 	if (target.getEntity() != currentTarget.getEntity()) {
 		currentTarget = target;
 	}
@@ -47,23 +48,55 @@ void HierarchyView::onEnable() {
 	timer = refreshTime;
 }
 
-std::vector<EntityHandle> HierarchyView::getRootEntities(std::vector<EntityHandle>& allEntities) {
+/*std::vector<EntityHandle> HierarchyView::getRootEntities(std::vector<EntityHandle>& allEntities) {
 	std::vector<EntityHandle> entities;
 	for (EntityHandle& entity : allEntities) {
 		if (!entity.hasParent())
 		entities.push_back(entity);
 	}
 	return entities;
+}*/
+
+std::size_t HierarchyView::getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities) {
+	if (parent.isValid()) {
+		std::size_t childCount = parent.getChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			if (parent.getChild(i) == entity) {
+				return i;
+			}
+		}
+	}
+	else {
+		std::size_t i = 0;
+		for (Handle& root : rootEntities) {
+			if (root == entity) return i;
+			i++;
+		}
+	}
+	return 0;
 }
 
-std::vector<EntityHandle> HierarchyView::getAllEntities() {
-	std::vector<EntityHandle> entities;
+std::size_t getDepth(Handle parent) {
+	std::size_t depth = 0;
+	while (parent.isValid()) {
+		parent = parent.getParent();
+		depth++;
+	}
+	return depth;
+}
+
+std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
+	std::vector<HierarchyEntry> entities;
 	Scene* editorScene = owner.getScene();
 	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
 		if (scene.get() == editorScene) continue;
+		std::vector<Handle> rootEntities = scene->getRootEntities();
 		for (EntityHandle entity : scene->getAllEntities()) {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
-			entities.push_back(entity);
+			EntityHandle parent = entity.getParent();
+			std::size_t order = getOrder(entity, parent, rootEntities);
+			std::size_t depth = getDepth(parent);
+			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
 	}
 	return entities;
@@ -78,23 +111,17 @@ void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
 }
 
 void HierarchyView::clearList() {
-	for (auto& entry : list) {
+	for (auto& entry : listMap) {
 		destroyEntity(entry.second);
 	}
+	listMap.clear();
 	list.clear();
-}
-
-std::vector<EntityHandle>::iterator contains(std::vector<EntityHandle>& entities, const Entity& entity) {
-	for (auto it = entities.begin(); it != entities.end(); it++) {
-		if (it->getEntity() == entity) return it;
-	}
-	return entities.end();
 }
 
 void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, RectTransform* rect) {
 	static std::size_t entryHeight = 20;
 	std::string name = entity.getEntityName();
-	std::string entityName = "Hierarchy_entry_" + std::to_string(list.size());
+	std::string entityName = "Hierarchy_entry_" + entity.getEntityName();
 	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 
 	std::size_t childCount = entity.getChildCount();
@@ -130,36 +157,53 @@ void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, RectTransform
 	label.setParent(buttonEntity);
 	buttonEntity.setParent(entry);
 	entry.setParent(parent);
-	list.push_back(std::make_pair(entity.getEntity(), entry));
-	// Add children
-	for (std::size_t i = 0; i < childCount; i++) {
-		EntityHandle child = entity.getChild(i);
-		if (child.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
-		addEntry(child, entry, rect);
+	listMap[entity.getEntity()] = entry;
+}
+
+bool HierarchyView::isDirty(HierarchyEntry entry) {
+	for (HierarchyEntry& element : list) {
+		if (element.entity == entry.entity) {
+			return element.depth != entry.depth || element.order != entry.order || element.parent != entry.parent;
+		}
 	}
+	return false;
+}
+
+std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& entities, const Entity& entity) {
+	for (auto it = entities.begin(); it != entities.end(); it++) {
+		if (it->entity.getEntity() == entity) return it;
+	}
+	return entities.end();
 }
 
 void HierarchyView::refresh() {
-	std::vector<EntityHandle> entities = getAllEntities();
+	std::vector<HierarchyEntry> entities = getAllEntities();
 	// Remove destroyed Entries
 	auto it = list.begin();
 	while (it != list.end()) {
-		auto iterator = contains(entities, it->first);
-		if (iterator != entities.end()) {
+		auto iterator = contains(entities, it->entity.getEntity());
+		if (iterator != entities.end() && !isDirty(*it)) {
 			it++;
 			entities.erase(iterator);
 		}
 		else {
-			destroyEntity(it->second);
+			destroyEntity(listMap[it->entity.getEntity()]);
+			listMap.erase(it->entity.getEntity());
 			list.erase(it);
 		}
 	}
-	std::vector<EntityHandle> rootEntities = getRootEntities(entities);
 	// Add new Entries
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	if (!rect) return;
-	for (EntityHandle& entity : rootEntities) {
-		addEntry(entity, owner, rect);
+	std::sort(entities.begin(), entities.end(), [](const HierarchyEntry& lhs, const HierarchyEntry& rhs) {
+		return lhs.depth < rhs.depth;
+	});
+	for (HierarchyEntry& newEntry : entities) {
+		if (newEntry.parent.isValid())
+			addEntry(newEntry.entity, listMap[newEntry.parent.getEntity()], rect);
+		else
+			addEntry(newEntry.entity, owner, rect);
+		list.push_back(newEntry);
 	}
 }
 

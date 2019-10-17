@@ -3,8 +3,18 @@
 #include "Behaviour.h"
 #include "EntityHandle.h"
 #include "ComponentHandle.h"
+#include <vector>
+#include <map>
 #include "HierarchyView.generated.h"
 namespace Core {
+
+	struct HierarchyEntry {
+		HierarchyEntry(EntityHandle entity, EntityHandle parent, std::size_t order, std::size_t depth) : entity(entity), parent(parent), order(order), depth(depth) {}
+		EntityHandle entity;
+		EntityHandle parent;
+		std::size_t order;
+		std::size_t depth;
+	};
 
 	class RectTransform;
 
@@ -22,17 +32,19 @@ namespace Core {
 		void refresh();
 		void clearList();
 		void addEntry(EntityHandle& entity, Handle& parent, RectTransform* rect);
-		/* Filters out all entities who have a parent. */
-		std::vector<EntityHandle> getRootEntities(std::vector<EntityHandle>& entities);
-		std::vector<EntityHandle> getAllEntities();
+		std::vector<HierarchyEntry> getAllEntities();
 
 		void onTargetEntityClick(EntityHandle entity);
 		void onDestroyEntityClick(EntityHandle entity);
 	private:
+		bool isDirty(HierarchyEntry entity);
+		std::size_t getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities);
+	private:
 		float refreshTime = 0.2f;
 		float timer = 0.0f;
-	private:
-		std::vector<std::pair<Entity, EntityHandle>> list; // List of current entries
+
+		std::vector<HierarchyEntry> list;
+		std::map<Entity, EntityHandle> listMap;
 
 		ComponentHandle editor;
 		EntityHandle currentTarget;
