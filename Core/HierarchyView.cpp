@@ -94,7 +94,7 @@ void HierarchyView::target(EntityHandle entity) {
 	currentTarget = entity;
 	it = listMap.find(currentTarget.getEntity());
 	if (it != listMap.end()) {
-		it->second.highlight.getComponent<RectSprite>()->setColor(Color(50, 50, 200, 255));
+		it->second.highlight.getComponent<RectSprite>()->setColor(highlightColor);
 	}
 }
 
@@ -141,7 +141,7 @@ void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, std::size_t d
 	button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
 	button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
 	EntityHandle highlight = createEntity(entityName + "_Background",
-		RectSprite(Color(50, 50, 255, entity == currentTarget ? 255 : 0)),
+		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
 		RectTransform(0, 0, 0, entryHeight, rect->getZ() + 0.01f, Alignment::LEFT)
 	);
 	EntityHandle buttonEntity = createEntity(entityName + "_Button",

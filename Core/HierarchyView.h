@@ -3,6 +3,7 @@
 #include "Behaviour.h"
 #include "EntityHandle.h"
 #include "ComponentHandle.h"
+#include "Color.h"
 #include <vector>
 #include <map>
 #include "HierarchyView.generated.h"
@@ -50,6 +51,7 @@ namespace Core {
 	private:
 		float refreshTime = 0.2f;
 		float timer = 0.0f;
+		Color highlightColor = Color(50, 50, 150, 255);
 
 		std::vector<HierarchyEntry> list;
 		std::map<Entity, EntryHandle> listMap;
