@@ -16,6 +16,11 @@ namespace Core {
 		std::size_t depth;
 	};
 
+	struct EntryHandle {
+		EntityHandle entry;
+		EntityHandle highlight;
+	};
+
 	class RectTransform;
 
 	CLASS(hideInInspector) HierarchyView : public Behaviour {
@@ -27,24 +32,27 @@ namespace Core {
 		void onEnable() override;
 		void onDisable() override;
 		void lateUpdate(float deltaTime) override;
-		void onMouseButtonPressed(int buttoncode, int mods) override;
 
+		void target(EntityHandle entity);
+
+	private:
 		void refresh();
 		void clearList();
-		void addEntry(EntityHandle& entity, Handle& parent, RectTransform* rect);
+		void addEntry(EntityHandle& entity, Handle& parent, std::size_t depth, RectTransform* rect);
 		std::vector<HierarchyEntry> getAllEntities();
 
 		void onTargetEntityClick(EntityHandle entity);
 		void onDestroyEntityClick(EntityHandle entity);
-	private:
-		bool isDirty(HierarchyEntry entity);
-		std::size_t getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities);
+
+		bool isDirty(HierarchyEntry entity) const;
+		std::size_t getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities) const;
+		std::size_t getDepth(Handle parent) const;
 	private:
 		float refreshTime = 0.2f;
 		float timer = 0.0f;
 
 		std::vector<HierarchyEntry> list;
-		std::map<Entity, EntityHandle> listMap;
+		std::map<Entity, EntryHandle> listMap;
 
 		ComponentHandle editor;
 		EntityHandle currentTarget;

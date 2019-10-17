@@ -172,4 +172,5 @@ void EditorPanel::onMouseButtonPressed(int buttoncode, int mods) {
 void EditorPanel::selectTarget(EntityHandle target) {
 	currentTarget = target;
 	inspectorPanel.getComponent<Inspector>()->inspect(target);
+	hierarchyPanel.getComponent<HierarchyView>()->target(target);
 }
