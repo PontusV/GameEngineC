@@ -49,6 +49,8 @@ namespace Core {
 		PROPERTY()
 		ComponentFunctionHandle<void, std::wstring> onSubmit;
 		PROPERTY()
+		ComponentFunctionHandle<void, std::wstring> onChange;
+		PROPERTY()
 		std::size_t characterLimit = 255;
 		PROPERTY()
 		Color markColor = Color(0, 0, 0, 255);

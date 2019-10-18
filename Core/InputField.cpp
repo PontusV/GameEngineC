@@ -228,6 +228,7 @@ void InputField::backSpace() {
 				selectedTextIndex = newText.size();
 			pressTextIndex = selectedTextIndex;
 			updateTextHighlight();
+			onChange.invoke(newText);
 		}
 	}
 }
@@ -250,6 +251,7 @@ void InputField::deleteText() {
 				selectedTextIndex = newText.size();
 			pressTextIndex = selectedTextIndex;
 			updateTextHighlight();
+			onChange.invoke(newText);
 		}
 	}
 }
@@ -433,6 +435,7 @@ void InputField::write(std::wstring input) {
 				textComponent->setText(newText);
 				selectedTextIndex += input.size();
 				pressTextIndex = selectedTextIndex;
+				onChange.invoke(newText);
 			}
 		}
 	}

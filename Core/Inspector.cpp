@@ -168,7 +168,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 			inputFieldComponent->contentType = InputField::ContentType::Decimal;
 		else
 			inputFieldComponent->contentType = InputField::ContentType::Integer;
-		inputFieldComponent->onSubmit = Core::bind(editor, &PropertyEditor::onTextSubmit);
+		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
 	}
 	else if (propType.isString() || propType.isWideString()) {
@@ -180,7 +180,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		InputField* inputFieldComponent = inputField.addComponent<InputField>();
 		inputFieldComponent->setText(propValue);
 		inputFieldComponent->contentType = InputField::ContentType::Standard;
-		inputFieldComponent->onSubmit = Core::bind(editor, &PropertyEditor::onTextSubmit);
+		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
 	}
 	else if (propType.isBool()) {
