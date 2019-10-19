@@ -32,6 +32,8 @@ namespace Core {
 
 		/* Writes text at the selected index. */
 		void write(std::wstring input);
+		/* Highlights all text inside the InputField. */
+		void selectAll();
 
 		void setText(std::wstring text);
 		void setText(std::string text);
@@ -69,8 +71,6 @@ namespace Core {
 		void traverseLeft();
 		/* Moves the selectedTextIndex one step to the right, if possible. */
 		void traverseRight();
-		/* Highlight all text inside the inputField. */
-		void selectAll();
 
 		/* Returns true if text was deleted. */
 		bool deleteHighlightedText();

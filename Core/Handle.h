@@ -39,6 +39,8 @@ namespace Core {
 		bool isUpdated();
 		/* Returns true if the Handle is valid. If not, the handle is updated and returns true if the update was successful. */
 		bool refresh();
+		/* Makes the Handle invalid. */
+		void clear();
 
 		/* Updates the Handle so it points towards the target Entity. */
 		void update();

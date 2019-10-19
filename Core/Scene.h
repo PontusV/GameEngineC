@@ -11,7 +11,7 @@
 #include "FunctionCaller.h"
 #include <string>
 #include <vector>
-#include <queue>
+#include <deque>
 
 namespace Core {
 	/* Contains a collection of entities. */
@@ -63,6 +63,13 @@ namespace Core {
 		ObjectType getType();
 		/* Calls all the functions in queue and clears it. */
 		void processQueue();
+		/* Retrieves component from queued createEntity and addComponent */
+		template<typename T>
+		T* getComponentFromQueue(Entity entity);
+		/* Retrieves components from queued createEntity and addComponent */
+		template<typename T>
+		std::vector<T*> getComponentsFromQueue(Entity entity);
+
 		/* Calls awake on all Entities contained by this Scene. Future Entities and Components will be awaken once added. Does nothing if the Scene has already been awaken. */
 		void awake();
 		/* Destroys all Entities contained by this Scene. */
@@ -82,7 +89,8 @@ namespace Core {
 
 		void prepEntity(Handle entity);
 		std::vector<Handle>::iterator findEntity(Entity entity);
-		std::queue<IFunctionCaller*> functionQueue;
+		std::deque<IFunctionCaller*> functionQueue;
+		std::map<Entity, std::vector<int>> entityQueueMap;
 
 	private:
 		const ObjectType type;
@@ -134,6 +142,37 @@ namespace Core {
 		removeComponent(entity, typeIDof(T));
 	}
 
+	template<typename T>
+	T* Scene::getComponentFromQueue(Entity entity) {
+		auto it = entityQueueMap.find(entity);
+		if (it == entityQueueMap.end()) return nullptr;
+
+		for (const std::size_t& queueIndex : it->second) {
+			std::vector<void*> argumentPtrs = functionQueue[queueIndex]->getArgumentPointers();
+			for (std::size_t i = 1; i < argumentPtrs.size(); i++) {
+				Component* component = static_cast<Component*>(argumentPtrs[i]);
+				if (typeof(T) == component->getType().typeID) return static_cast<T*>(component);
+			}
+		}
+		return nullptr;
+	}
+
+	template<typename T>
+	std::vector<T*> Scene::getComponentsFromQueue(Entity entity) {
+		std::vector<T*> components;
+		auto it = entityQueueMap.find(entity);
+		if (it == entityQueueMap.end()) return components;
+
+		for (const std::size_t& queueIndex : it->second) {
+			std::vector<void*> argumentPtrs = functionQueue[queueIndex]->getArgumentPointers();
+			for (std::size_t i = 1; i < argumentPtrs.size(); i++) {
+				Component* component = static_cast<Component*>(argumentPtrs[i]);
+				if (typeof(T) == component->getType().typeID) components.push_back(static_cast<T*>(component));
+			}
+		}
+		return components;
+	}
+
 	template<typename... Ts>
 	Handle Scene::createEntityQueued(std::string name, Ts& ... components) {
 		Entity entity = manager->generateEntity(name);
@@ -141,7 +180,11 @@ namespace Core {
 		for (Component* component : componentVec) {
 			component->setOwner(Handle(entity, this));
 		}
-		functionQueue.push(new FunctionCaller<Handle, Scene, Entity, Ts&...>(&Scene::addEntity<Ts...>, *this, entity, components...));
+
+		// Add queue index to map
+		entityQueueMap[entity].push_back(functionQueue.size());
+
+		functionQueue.push_back(new FunctionCaller<Handle, Scene, Entity, Ts & ...>(&Scene::addEntity<Ts...>, *this, entity, components...));
 		return Handle(entity, this);
 	}
 
@@ -149,13 +192,17 @@ namespace Core {
 	T* Scene::addComponentQueued(Entity entity, T& component) {
 		component.setOwner(Handle(entity, this));
 		auto function = new FunctionCaller<void, Scene, Entity, T&>(&Scene::addComponent<T>, *this, entity, component);
-		functionQueue.push(function);
+
+		// Add queue index to map
+		entityQueueMap[entity].push_back(functionQueue.size());
+
+		functionQueue.push_back(function);
 		return function->getArgument<T>();
 	}
 
 	template<typename T>
 	void Scene::removeComponentQueued(Entity entity) {
-		functionQueue.push(new FunctionCaller<void, Scene, Entity>(&Scene::removeComponent<T>, *this, entity));
+		functionQueue.push_back(new FunctionCaller<void, Scene, Entity>(&Scene::removeComponent<T>, *this, entity));
 	}
 }
 #endif

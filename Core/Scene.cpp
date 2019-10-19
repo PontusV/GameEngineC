@@ -97,7 +97,7 @@ void Scene::removeComponent(Entity entity, ComponentTypeID componentTypeID) {
 }
 
 void Scene::removeComponentQueued(Entity entity, ComponentTypeID componentTypeID) {
-	functionQueue.push(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
+	functionQueue.push_back(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
 }
 
 void Scene::awake() {
@@ -181,11 +181,11 @@ void Scene::destroyEntityQueued(Entity entity) {
 	for (std::size_t i = 0; i < childCount; i++) {
 		manager->removeEntityName(handle.getChild(i).getEntity());
 	}
-	functionQueue.push(new FunctionCaller<bool, Scene, Entity>(&Scene::destroyEntity, *this, entity));
+	functionQueue.push_back(new FunctionCaller<bool, Scene, Entity>(&Scene::destroyEntity, *this, entity));
 }
 
 void Scene::setParentQueued(Handle entity, Handle parent) {
-	functionQueue.push(new FunctionCaller<void, Scene, Handle, Handle>(&Scene::setParent, *this, entity, parent));
+	functionQueue.push_back(new FunctionCaller<void, Scene, Handle, Handle>(&Scene::setParent, *this, entity, parent));
 }
 
 void Scene::setParent(Handle entityHandle, Handle parentHandle) {
@@ -261,11 +261,12 @@ void Scene::onEntityChanged(Handle entity) {
 }
 
 void Scene::processQueue() {
+	entityQueueMap.clear();
 	while (!functionQueue.empty()) {
 		IFunctionCaller* fun = functionQueue.front();
 		fun->call();
 		delete fun;
-		functionQueue.pop();
+		functionQueue.pop_front();
 	}
 }
 
@@ -273,7 +274,7 @@ void Scene::clear() {
 	// Clears and deletes all stored function calls
 	while (!functionQueue.empty()) {
 		delete functionQueue.front();
-		functionQueue.pop();
+		functionQueue.pop_front();
 	}
 	// Destroys all Entities
 	for (Handle& entity : entities) {

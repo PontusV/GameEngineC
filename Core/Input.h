@@ -66,7 +66,7 @@ namespace Core {
 		Input(Engine* engine);
 		~Input();
 
-		void update(float dt);
+		void update(float deltaTime);
 		void addInputEvent(const InputEvent& event);
 
 		/* Returns true if the key is held down. */
@@ -92,6 +92,13 @@ namespace Core {
 		TComponentHandle<InputField> getKeyboardFocus();
 		bool hasKeyboardFocus();
 
+		/* Deselects the currently selected target. */
+		void deselect();
+		/* Deselected the current target and selects a new target */
+		void select(EntityHandle entity, bool wasNext = false);
+		/* Selects the next target as set by the currently selected target. */
+		void selectNext();
+
 		// Helper
 		void setMousePosition(Vector2 position);
 		/* Returns mouse position in screen space. */
@@ -105,7 +112,11 @@ namespace Core {
 		void processInputEvent(const InputEvent& event, EntityHandle& target);
 
 		// KEY
+		/* Process input and determines what Action to call. */
+		void onKeyEvent(const KeyEvent& event);
+		/* Marks the key as pressed and held down. */
 		void keyPressed(const KeyEvent& event);
+		/* Marks the key as released and not held down. */
 		void keyReleased(const KeyEvent& event);
 		/* Appends text to the current text written this frame. */
 		void typeText(unsigned int codepoint);
@@ -127,6 +138,10 @@ namespace Core {
 
 		// Others
 		EntityHandle selectedTarget;
+		const float SELECT_NEXT_DELAY = 0.05F; // The delay before selecting next
+		const float INITIAL_SELECT_NEXT_DELAY = 0.5f; // The initial delay before repeating selectNext
+		float timeBeforeNextSelect = 0.0f;
+		bool selectNextHeldDown = false;
 
 		// Input buffer
 		std::vector<InputEvent> events;

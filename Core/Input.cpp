@@ -21,7 +21,7 @@ Input::Input(Engine* engine) : engine(engine) {
 Input::~Input() {
 }
 
-void Input::update(float dt) {
+void Input::update(float deltaTime) {
 	// Mouse Drag
 	if (mouseMoved) {
 		mouseMoved = false;
@@ -78,6 +78,13 @@ void Input::update(float dt) {
 	for (InputEvent& event : events) {
 		processInputEvent(event, hoverTarget);
 	}
+	if (selectNextHeldDown) {
+		if (timeBeforeNextSelect <= 0.0) {
+			timeBeforeNextSelect += SELECT_NEXT_DELAY;
+			selectNext();
+		}
+		timeBeforeNextSelect -= deltaTime;
+	}
 
 	// Clear input events
 	events.clear();
@@ -90,22 +97,30 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		typeText(event.chr.codepoint);
 		break;
 	case INPUT_EVENT_KEY:
-		if (hasKeyboardFocus()) {
-			if (event.key.action == GLFW_RELEASE && event.key.keycode == GLFW_KEY_ESCAPE) {
-				// Deselect. TODO: Put deselect in function
-				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
-					script->deselect();
-				}
-				selectedTarget = EntityHandle();
-				return;
-			}
-		}
 		if (event.key.action == GLFW_PRESS) {
 			keyPressed(event.key);
 		}
 		else if (event.key.action == GLFW_RELEASE) {
 			keyReleased(event.key);
 		}
+		if (hasKeyboardFocus()) {
+			if (event.key.action == GLFW_RELEASE && event.key.keycode == GLFW_KEY_ESCAPE) {
+				deselect();
+				selectedTarget = EntityHandle();
+				return;
+			}
+			if (event.key.keycode == GLFW_KEY_TAB) {
+				if (event.key.action == GLFW_PRESS) {
+					selectNextHeldDown = true;
+					timeBeforeNextSelect = INITIAL_SELECT_NEXT_DELAY;
+					selectNext();
+				}
+				else if (event.key.action == GLFW_RELEASE)
+					selectNextHeldDown = false;
+				return;
+			}
+		}
+		onKeyEvent(event.key);
 		break;
 	case INPUT_EVENT_MOUSEBUTTON:
 		if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_LEFT) {
@@ -116,13 +131,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				leftMouseButtonPressed = true;
 				timeSinceLastClick = (float)glfwGetTime();
 
-				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
-					script->deselect();
-				}
-				selectedTarget = target;
-				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
-					script->select();
-				}
+				select(target);
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
@@ -203,6 +212,36 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		break;
 	}
 }
+// ------------------------------- SELECT -----------------------------------
+
+void Input::deselect() {
+	for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
+		script->deselect();
+	}
+}
+
+void Input::select(EntityHandle target, bool wasNext) {
+	deselect();
+	selectedTarget = target;
+	for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
+		script->select();
+		if (wasNext && script->getType().typeID == typeIDof(InputField)) {
+			static_cast<InputField*>(script)->selectAll();
+		}
+	}
+}
+
+void Input::selectNext() {
+	// Find next selectable
+	for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
+		EntityHandle nextSelect = script->getNext();
+		if (nextSelect.refresh()) {
+			// Goes to next selectable
+			select(nextSelect, true);
+			return;
+		}
+	}
+}
 
 // ------------------------------- MOUSE -----------------------------------
 void Input::mouseButtonPressed(const MouseButtonEvent& event) const {
@@ -242,14 +281,8 @@ bool Input::getKeyReleased(int keycode) const {
 	return std::find(keysReleased.begin(), keysReleased.end(), keycode) != keysReleased.end();
 }
 
-void Input::keyPressed(const KeyEvent& event) {
-	// Update list
-	if (std::find(keysDown.begin(), keysDown.end(), event.keycode) == keysDown.end()) {
-		keysDown.push_back(event.keycode);
-		keysPressed.push_back(event.keycode);
-	}
+void Input::onKeyEvent(const KeyEvent& event) {
 	if (hasKeyboardFocus()) return;
-
 	// Find Action
 	auto it = keyBinds.find(ButtonInput(event.keycode, event.mods));
 	if (it == keyBinds.end()) return;
@@ -257,7 +290,10 @@ void Input::keyPressed(const KeyEvent& event) {
 
 	// Notify keylisteners
 	for (std::vector<KeyListener*>::const_iterator i = keyListeners.begin(); i != keyListeners.end(); ++i) { //Notify listeners
-		(*i)->keyPressed(action.name);
+		if (event.action == Action::PRESS)
+			(*i)->keyPressed(action.name);
+		else if (event.action == Action::RELEASE)
+			(*i)->keyReleased(action.name);
 	}
 
 	// Call Action callback
@@ -276,36 +312,18 @@ void Input::keyPressed(const KeyEvent& event) {
 	}
 }
 
+void Input::keyPressed(const KeyEvent& event) {
+	// Update list
+	if (std::find(keysDown.begin(), keysDown.end(), event.keycode) == keysDown.end()) {
+		keysDown.push_back(event.keycode);
+		keysPressed.push_back(event.keycode);
+	}
+}
+
 void Input::keyReleased(const KeyEvent& event) {
 	// Update list
 	keysDown.erase(std::find(keysDown.begin(), keysDown.end(), event.keycode));
 	keysReleased.push_back(event.keycode);
-	if (hasKeyboardFocus()) return;
-
-	// Find Action
-	auto it = keyBinds.find(ButtonInput(event.keycode, event.mods));
-	if (it == keyBinds.end()) return;
-	const Action& action = it->second;
-
-	// Notify keylisteners
-	for (std::vector<KeyListener*>::const_iterator i = keyListeners.begin(); i != keyListeners.end(); ++i) { //Notify listeners
-		(*i)->keyReleased(action.name);
-	}
-
-	// Call Action callback
-	auto it2 = action.callbacks.find(Action::RELEASE);
-	std::vector<ComponentFunctionHandle<void>> callbacks = it2 == action.callbacks.end() ? std::vector<ComponentFunctionHandle<void>>() : it2->second;
-	for (auto iterator = callbacks.begin(); iterator != callbacks.end();) {
-		ComponentFunctionHandle<void>& callback = *iterator;
-		if (callback.isValid()) {
-			callback.invoke();
-			it++;
-		}
-		else {
-			// Removes invalid callback
-			callbacks.erase(iterator);
-		}
-	}
 }
 
 void Input::addKeyListener(KeyListener* listener) {

@@ -1,6 +1,7 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
 #include "Behaviour.h"
+#include "EntityHandle.h"
 #include <ReflectionParser/ReflectionTypes.h>
 #include "PropertyValueID.h"
 #include "ReflectedObjectHandle.h"
@@ -9,6 +10,7 @@
 namespace Core {
 
 	class ReflectedObject;
+	class Selectable;
 
 	struct PropertyInstance {
 		std::size_t lineIndex;
@@ -42,6 +44,9 @@ namespace Core {
 		EntityHandle createPropertyField(std::string name, Mirror::Property& prop, Component* component, Mirror::Property& rootProp, void* instance, std::size_t typeID);
 		EntityHandle createPropertyValueField(std::string label, PropertyValueID value, Component* root, Mirror::Property& rootProp, void* instance, std::size_t typeID, std::string entityName);
 
+		void setNextSelectable(const EntityHandle& entity);
+		EntityHandle firstSelectable;
+		EntityHandle prevSelectable;
 	private:
 		EntityHandle currentTarget;
 		std::vector<EntityHandle> targetComponentList;

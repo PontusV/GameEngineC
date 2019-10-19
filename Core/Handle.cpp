@@ -34,6 +34,11 @@ Scene* Handle::getScene() const {
 	return scene;
 }
 
+void Handle::clear() {
+	entity = Entity(0);
+	scene = nullptr;
+}
+
 ObjectType Handle::getObjectType() {
 	if (ObjectData* objectData = getComponent<ObjectData>()) {
 		return objectData->getLayer();

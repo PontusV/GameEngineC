@@ -29,6 +29,14 @@ Inspector::~Inspector()
 {
 }
 
+void Inspector::setNextSelectable(const EntityHandle& entity) {
+	for (Selectable* selectable : owner.getScene()->getComponentsFromQueue<Selectable>(prevSelectable.getEntity())) {
+		selectable->setNext(entity);
+	}
+	if (!prevSelectable.isValid()) firstSelectable = entity;
+	prevSelectable = entity;
+}
+
 std::vector<Component*> getInspectableComponents(EntityHandle target) {
 	std::vector<Component*> components;
 	for (Component* component : target.getComponents()) {
@@ -170,6 +178,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 			inputFieldComponent->contentType = InputField::ContentType::Integer;
 		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
+		setNextSelectable(inputField);
 	}
 	else if (propType.isString() || propType.isWideString()) {
 		EntityHandle inputField = createEntity(entityName + "_InputField",
@@ -182,6 +191,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		inputFieldComponent->contentType = InputField::ContentType::Standard;
 		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
+		setNextSelectable(inputField);
 	}
 	else if (propType.isBool()) {
 		EntityHandle propValueDisplay = createEntity(entityName + "_Value",
@@ -331,9 +341,17 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		propField.setParent(entryContent);
 	}
 	entryContent.setParent(entry);
+
 	// End of Entry content
 	targetComponentList.push_back(entry);
 	targetComponents.push_back(component->getTypeID());
+
+	// Clear prevSelectable & Complete chain
+	for (Selectable* selectable : owner.getScene()->getComponentsFromQueue<Selectable>(prevSelectable.getEntity())) {
+		selectable->setNext(firstSelectable);
+	}
+	firstSelectable.clear();
+	prevSelectable.clear();
 }
 
 void Inspector::createEntries() {

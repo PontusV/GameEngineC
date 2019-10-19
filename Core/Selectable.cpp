@@ -25,3 +25,12 @@ void Selectable::deselect() {
 bool Selectable::isSelected() {
 	return selected;
 }
+
+void Selectable::setNext(EntityHandle entity) {
+	nextSelectable = entity;
+}
+
+EntityHandle Selectable::getNext() {
+	nextSelectable.refresh();
+	return nextSelectable;
+}

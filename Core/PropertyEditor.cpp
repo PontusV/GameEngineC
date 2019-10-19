@@ -33,6 +33,7 @@ void PropertyEditor::onTextSubmit(std::wstring value) {
 	Mirror::VariableType& type = valueID.prop.type;
 
 	if (type.isNumber()) {
+		if (value.empty()) value = L"0";
 		if (type.isDecimal()) {
 			setValue(valueID, instanceHandle, rootProp, std::stod(value));
 		}

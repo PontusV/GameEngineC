@@ -2,6 +2,7 @@
 #define SELECTABLE_H
 
 #include "Behaviour.h"
+#include "EntityHandle.h"
 #include "Selectable.generated.h"
 
 namespace Core {
@@ -16,11 +17,15 @@ namespace Core {
 		virtual void onDeselect() {}
 		bool isSelected();
 
+		void setNext(EntityHandle entity);
+		EntityHandle getNext();
+
 	protected:
 		Selectable();
 
 	private:
 		bool selected = false;
+		EntityHandle nextSelectable;
 	};
 }
 #endif
