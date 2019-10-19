@@ -74,7 +74,6 @@ void Input::update(float dt) {
 	// Clear old key pressed/released
 	keysPressed.clear();
 	keysReleased.clear();
-	typedText.clear();
 	// Process input events
 	for (InputEvent& event : events) {
 		processInputEvent(event, hoverTarget);
@@ -91,6 +90,16 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 		typeText(event.chr.codepoint);
 		break;
 	case INPUT_EVENT_KEY:
+		if (hasKeyboardFocus()) {
+			if (event.key.action == GLFW_RELEASE && event.key.keycode == GLFW_KEY_ESCAPE) {
+				// Deselect. TODO: Put deselect in function
+				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
+					script->deselect();
+				}
+				selectedTarget = EntityHandle();
+				return;
+			}
+		}
 		if (event.key.action == GLFW_PRESS) {
 			keyPressed(event.key);
 		}
@@ -107,11 +116,11 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				leftMouseButtonPressed = true;
 				timeSinceLastClick = (float)glfwGetTime();
 
-				for (Selectable* script : selectedScripts) {
+				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
 					script->deselect();
 				}
-				selectedScripts = target.getComponentsUpwards<Selectable>();
-				for (Selectable* script : selectedScripts) {
+				selectedTarget = target;
+				for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
 					script->select();
 				}
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
@@ -214,20 +223,11 @@ std::string Input::getKeyName(int keycode, int scancode) const {
 }
 
 void Input::typeText(unsigned int codepoint) {
+	if (!hasKeyboardFocus()) return;
 	wchar_t character = (wchar_t)codepoint;
-	typedText += character;
-}
-
-const std::wstring& Input::getTextTyped() const {
-	return typedText;
-}
-
-std::string Input::getButtonName(int keycode) const {
-	std::map<int, std::string>::const_iterator pos = keyBinds.find(keycode);
-	if (pos != keyBinds.end())
-		return pos->second;
-	else
-		return "";
+	std::wstring text;
+	text.push_back(character);
+	keyboardFocus.get()->write(text);
 }
 
 bool Input::getKeyDown(int keycode) const {
@@ -242,31 +242,37 @@ bool Input::getKeyReleased(int keycode) const {
 	return std::find(keysReleased.begin(), keysReleased.end(), keycode) != keysReleased.end();
 }
 
-std::vector<int> Input::getKeysDown() {
-	return keysDown;
-}
-
-std::vector<int> Input::getKeysPressed() {
-	return keysPressed;
-}
-
-std::vector<int> Input::getKeysReleased() {
-	return keysReleased;
-}
-
 void Input::keyPressed(const KeyEvent& event) {
 	// Update list
 	if (std::find(keysDown.begin(), keysDown.end(), event.keycode) == keysDown.end()) {
 		keysDown.push_back(event.keycode);
 		keysPressed.push_back(event.keycode);
 	}
-	//
-	std::string buttonName = getButtonName(event.keycode);
-	if (buttonName == "") //Return if no buttonName was found
-		return;
+	if (hasKeyboardFocus()) return;
 
+	// Find Action
+	auto it = keyBinds.find(ButtonInput(event.keycode, event.mods));
+	if (it == keyBinds.end()) return;
+	const Action& action = it->second;
+
+	// Notify keylisteners
 	for (std::vector<KeyListener*>::const_iterator i = keyListeners.begin(); i != keyListeners.end(); ++i) { //Notify listeners
-		(*i)->keyPressed(buttonName);
+		(*i)->keyPressed(action.name);
+	}
+
+	// Call Action callback
+	auto it2 = action.callbacks.find(Action::PRESS);
+	std::vector<ComponentFunctionHandle<void>> callbacks = it2 == action.callbacks.end() ? std::vector<ComponentFunctionHandle<void>>() : it2->second;
+	for (auto iterator = callbacks.begin(); iterator != callbacks.end();) {
+		ComponentFunctionHandle<void>& callback = *iterator;
+		if (callback.isValid()) {
+			callback.invoke();
+			it++;
+		}
+		else {
+			// Removes invalid callback
+			callbacks.erase(iterator);
+		}
 	}
 }
 
@@ -274,13 +280,31 @@ void Input::keyReleased(const KeyEvent& event) {
 	// Update list
 	keysDown.erase(std::find(keysDown.begin(), keysDown.end(), event.keycode));
 	keysReleased.push_back(event.keycode);
-	//
-	std::string buttonName = getButtonName(event.keycode);
-	if (buttonName == "") //Return if no buttonName was found
-		return;
+	if (hasKeyboardFocus()) return;
 
+	// Find Action
+	auto it = keyBinds.find(ButtonInput(event.keycode, event.mods));
+	if (it == keyBinds.end()) return;
+	const Action& action = it->second;
+
+	// Notify keylisteners
 	for (std::vector<KeyListener*>::const_iterator i = keyListeners.begin(); i != keyListeners.end(); ++i) { //Notify listeners
-		(*i)->keyReleased(buttonName);
+		(*i)->keyReleased(action.name);
+	}
+
+	// Call Action callback
+	auto it2 = action.callbacks.find(Action::RELEASE);
+	std::vector<ComponentFunctionHandle<void>> callbacks = it2 == action.callbacks.end() ? std::vector<ComponentFunctionHandle<void>>() : it2->second;
+	for (auto iterator = callbacks.begin(); iterator != callbacks.end();) {
+		ComponentFunctionHandle<void>& callback = *iterator;
+		if (callback.isValid()) {
+			callback.invoke();
+			it++;
+		}
+		else {
+			// Removes invalid callback
+			callbacks.erase(iterator);
+		}
 	}
 }
 
@@ -288,8 +312,36 @@ void Input::addKeyListener(KeyListener* listener) {
 	keyListeners.push_back(listener);
 }
 
-void Input::addKeyBind(int keyCode, std::string buttonName) {
-	keyBinds[keyCode] = buttonName;
+void Input::addAction(std::string actionName, int buttoncode, int modFlags) {
+	keyBinds[ButtonInput(buttoncode, modFlags)] = Action(actionName, modFlags);
+}
+
+void Input::addActionCallback(std::string actionName, int actioncode, ComponentFunctionHandle<void> function) {
+	for (auto it = keyBinds.begin(); it != keyBinds.end(); it++) {
+		Action& action = it->second;
+		if (action.name == actionName) {
+			action.callbacks[actioncode].push_back(function);
+			return;
+		}
+	}
+	std::cout << "An action with the given name (" << actionName << ") does not exist!" << std::endl;
+	throw std::invalid_argument("An action with the given name does not exist!");
+}
+
+void Input::focusKeyboard(TComponentHandle<InputField> entity) {
+	keyboardFocus = entity;
+}
+
+void Input::clearFocusKeyboard() {
+	keyboardFocus.clear();
+}
+
+TComponentHandle<InputField> Input::getKeyboardFocus() {
+	return keyboardFocus;
+}
+
+bool Input::hasKeyboardFocus() {
+	return keyboardFocus.isValid();
 }
 
 struct HitDetectData {

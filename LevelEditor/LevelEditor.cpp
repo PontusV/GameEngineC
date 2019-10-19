@@ -181,14 +181,14 @@ int LevelEditor::initiate() {
 	sceneWorld->awake();
 
 	// Keybinds
-	engine.getInput().addKeyBind(GLFW_KEY_ESCAPE, "Terminate");
-	engine.getInput().addKeyBind(GLFW_KEY_F5, "Save");
-	engine.getInput().addKeyBind(GLFW_KEY_F9, "Load");
+	engine.getInput().addAction("Terminate", GLFW_KEY_ESCAPE);
+	engine.getInput().addAction("Save", GLFW_KEY_F5);
+	engine.getInput().addAction("Load", GLFW_KEY_F9);
 
-	engine.getInput().addKeyBind(GLFW_KEY_LEFT, "Camera_move_left");
-	engine.getInput().addKeyBind(GLFW_KEY_UP, "Camera_move_up");
-	engine.getInput().addKeyBind(GLFW_KEY_RIGHT, "Camera_move_right");
-	engine.getInput().addKeyBind(GLFW_KEY_DOWN, "Camera_move_down");
+	engine.getInput().addAction("Camera_move_left", GLFW_KEY_LEFT);
+	engine.getInput().addAction("Camera_move_up", GLFW_KEY_UP);
+	engine.getInput().addAction("Camera_move_right", GLFW_KEY_RIGHT);
+	engine.getInput().addAction("Camera_move_down", GLFW_KEY_DOWN);
 
 	// Window hints
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
@@ -197,23 +197,23 @@ int LevelEditor::initiate() {
 	return engine.start();
 }
 
-void LevelEditor::keyPressed(std::string buttonName) {
-	if (buttonName == "Save") {
+void LevelEditor::keyPressed(std::string actionName) {
+	if (actionName == "Save") {
 		//engine.saveScene("level.dat");
 	}
-	else if (buttonName == "Load") {
+	else if (actionName == "Load") {
 		//ScenePtr loadedLevel = engine.loadScene("level.dat");
 	}
-	else if (buttonName == "Camera_move_left") {
+	else if (actionName == "Camera_move_left") {
 		engine.getGraphics().getCamera().moveX(-100);
 	}
-	else if (buttonName == "Camera_move_up") {
+	else if (actionName == "Camera_move_up") {
 		engine.getGraphics().getCamera().moveY(-100);
 	}
-	else if (buttonName == "Camera_move_right") {
+	else if (actionName == "Camera_move_right") {
 		engine.getGraphics().getCamera().moveX(100);
 	}
-	else if (buttonName == "Camera_move_down") {
+	else if (actionName == "Camera_move_down") {
 		engine.getGraphics().getCamera().moveY(100);
 	}
 }

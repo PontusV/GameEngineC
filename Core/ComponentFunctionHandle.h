@@ -13,6 +13,7 @@ namespace Core {
 	public:
 		virtual ~IComponentFunctionHandleImpl() {}
 		virtual void invoke(Args... args) = 0;
+		virtual bool isValid() = 0;
 	};
 
 	template<typename T, typename R, typename... Args>
@@ -25,6 +26,9 @@ namespace Core {
 			T* componentPtr = (T*)component.getComponent();
 			if (componentPtr) // If the handle is still valid
 				(componentPtr->*functionPtr)(args...);
+		}
+		bool isValid() {
+			return component.isValid();
 		}
 	private:
 		ComponentHandle component;
@@ -41,6 +45,9 @@ namespace Core {
 			T* componentPtr = (T*)component.getComponent();
 			if (componentPtr) // If the handle is still valid
 				(componentPtr->*functionPtr)(std::get<Args>(args)...);
+		}
+		bool isValid() {
+			return component.isValid();
 		}
 	private:
 		ComponentHandle component;
@@ -77,8 +84,15 @@ namespace Core {
 			if (function)
 				function->invoke(args...);
 		}
+		/* Returns true if a function has been assigned */
 		bool isNull() {
 			return function == nullptr;
+		}
+		/* Returns true if a function has been assigned and if the Handle is valid. */
+		bool isValid() {
+			if (function)
+				function->isValid();
+			return false;
 		}
 	private:
 		std::shared_ptr<IComponentFunctionHandleImpl<Args...>> function;

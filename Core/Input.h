@@ -5,14 +5,18 @@
 
 #include "Sprite.h"
 #include "RectTransform.h"
+#include "InputField.h"
 #include "GameObjectData.h"
 #include "UIObjectData.h"
 #include "ComponentGroup.h"
 #include "ComponentArray.h"
 
 #include "EntityHandle.h"
+#include "ComponentHandle.h"
+#include "ComponentFunctionHandle.h"
 #include "InputEvent.h"
 #include "Maths/Vector2.h"
+
 
 #include <map>
 #include <string>
@@ -24,6 +28,38 @@ namespace Core {
 	class Engine;
 	class KeyListener;
 	class Selectable;
+
+	class InputModifierFlags { // Same as GLFW https://www.glfw.org/docs/latest/group__mods.html#ga14994d3196c290aaa347248e51740274
+		static constexpr int CTRL		= 0x0001;
+		static constexpr int SHIFT		= 0x0002;
+		static constexpr int ALT		= 0x0004;
+		static constexpr int SUPER		= 0x0008;
+		static constexpr int CAPS_LOCK	= 0x0010;
+		static constexpr int NUM_LOCK	= 0x0020;
+	};
+
+	struct Action {
+		static constexpr int RELEASE	= 0; // See GLFW_RELEASE
+		static constexpr int PRESS		= 1; // See GLFW_PRESS
+		Action() {} // TODO: Try to remove this since Action should not be default constructed
+		Action(std::string name, int modFlags) : name(name) {}
+		std::string name;
+		std::map<int, std::vector<ComponentFunctionHandle<void>>> callbacks; // Action, function handle
+	};
+
+	struct ButtonInput {
+		ButtonInput(int code, int modFlags = 0) : code(code), modFlags(modFlags) {}
+		int code;
+		int modFlags;
+		bool operator<(const ButtonInput& other) const {
+			if (code < other.code) return true;
+			if (code > other.code) return false;
+			return modFlags < other.modFlags;
+		}
+		bool operator==(const ButtonInput& other) const {
+			return code == other.code && modFlags == other.modFlags;
+		}
+	};
 
 	class Input {
 	public:
@@ -39,20 +75,22 @@ namespace Core {
 		bool getKeyPressed(int keycode) const;
 		/* Returns true if the key was released this frame. */
 		bool getKeyReleased(int keycode) const;
-		/* Returns a vector of all keys currently being held down. */
-		std::vector<int> getKeysDown();
-		/* Returns a vector of all keys that got pressed this frame. */
-		std::vector<int> getKeysPressed();
-		/* Returns a vector of all keys that got released this frame. */
-		std::vector<int> getKeysReleased();
 		/* Returns the character for the printable key, identified by the keycode. */
 		std::string getKeyName(int keycode, int scancode = 0) const;
-		/* Returns a string of the text typed this frame. */
-		const std::wstring& getTextTyped() const;
 
-		//Observer
+		/* Observer. Only used by Editor. */
 		void addKeyListener(KeyListener* listener);
-		void addKeyBind(int keyCode, std::string buttonName);
+		/* Adds Action */
+		void addAction(std::string actionName, int buttoncode, int modFlags = 0);
+		/* Adds a callback function to be called when the Action is triggered. Action means for example Press or Release, etc... */
+		void addActionCallback(std::string actionName, int action, ComponentFunctionHandle<void> function);
+		/* Redirects all key input to the InputField. */
+		void focusKeyboard(TComponentHandle<InputField> component);
+		/* Removes focus for keyboard */
+		void clearFocusKeyboard();
+		/* Returns a handle to the keyboard focus */
+		TComponentHandle<InputField> getKeyboardFocus();
+		bool hasKeyboardFocus();
 
 		// Helper
 		void setMousePosition(Vector2 position);
@@ -69,7 +107,7 @@ namespace Core {
 		// KEY
 		void keyPressed(const KeyEvent& event);
 		void keyReleased(const KeyEvent& event);
-		std::string getButtonName(int keycode) const;
+		/* Appends text to the current text written this frame. */
 		void typeText(unsigned int codepoint);
 
 		// MOUSEBUTTON
@@ -78,25 +116,24 @@ namespace Core {
 
 	private:
 		Engine* engine;
+
+		// Keyboard
 		std::vector<KeyListener*> keyListeners;
-		std::map<int, std::string> keyBinds;
+		std::map<ButtonInput, Action> keyBinds; // buttoncode, Action
 		std::vector<int> keysPressed;
 		std::vector<int> keysDown;
 		std::vector<int> keysReleased;
-		std::wstring typedText; // contains the text typed this frame
-		std::vector<Selectable*> selectedScripts;
+		TComponentHandle<InputField> keyboardFocus;
 
-		// Input cache
+		// Others
+		EntityHandle selectedTarget;
+
+		// Input buffer
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
 		ComponentGroup<Sprite, RectTransform, GameObjectData> spriteGroup;
 		ComponentGroup<Sprite, RectTransform, UIObjectData> spriteGroupUI;
-
-		//TODO: List of contexts, A context contains a list of keybinds.
-		//Input types: Actions (happens once on either buttonDown or buttonUp), States, Ranges
-		//std::map<int, std::string> keyBindsPressed;
-		//std::map<int, std::string> keyBindsReleased;
 
 	private:
 		Vector2 mousePosition;		// Mouse position in screen space

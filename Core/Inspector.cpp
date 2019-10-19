@@ -404,6 +404,7 @@ void Inspector::lateUpdate(float deltaTime) {
 			}
 		}
 	}
+	// Update Property values
 }
 
 void Inspector::removeComponentFromTarget(ComponentTypeID typeID) {

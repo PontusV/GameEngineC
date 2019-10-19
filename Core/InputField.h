@@ -30,6 +30,9 @@ namespace Core {
 		void onMouseDrag(float mouseX, float mouseY) override;
 		void onDoubleClick() override;
 
+		/* Writes text at the selected index. */
+		void write(std::wstring input);
+
 		void setText(std::wstring text);
 		void setText(std::string text);
 
@@ -68,8 +71,6 @@ namespace Core {
 		void traverseRight();
 		/* Highlight all text inside the inputField. */
 		void selectAll();
-		/* Writes text at the selected index. */
-		void write(std::wstring input);
 
 		/* Returns true if text was deleted. */
 		bool deleteHighlightedText();

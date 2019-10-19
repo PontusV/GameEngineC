@@ -149,9 +149,9 @@ void InputField::update(float deltaTime) {
 		submit();
 	}
 	
-	// Check for text input
-	std::wstring textInput = input->getTextTyped();
-	write(textInput);
+	// Check for text input. TODO: Remove
+	//std::wstring textInput = input->getTextTyped();
+	//write(textInput);
 
 	// Text Mark (Blinking)
 	markTime += deltaTime;
@@ -178,6 +178,7 @@ void InputField::onSelect() {
 	markTime = 0.0f;
 	showMark();
 	showHighlight();
+	input->focusKeyboard(TComponentHandle<InputField>(this));
 }
 
 void InputField::onDeselect() {
@@ -186,6 +187,7 @@ void InputField::onDeselect() {
 	selectedTextIndex = 0;
 	hideMark();
 	hideHighlight();
+	input->clearFocusKeyboard();
 }
 
 bool InputField::deleteHighlightedText() {
