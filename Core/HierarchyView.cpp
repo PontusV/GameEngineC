@@ -70,7 +70,7 @@ std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			EntityHandle parent = entity.getParent();
 			std::size_t order = getOrder(entity, parent, rootEntities);
-			std::size_t depth = parent.getDepth();
+			std::size_t depth = entity.getDepth();
 			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
 	}

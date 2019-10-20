@@ -58,7 +58,7 @@ void UISystem::update() {
 			bool add = true;
 			for (auto it = dirtyRoots.begin(); it != dirtyRoots.end();) {
 				EntityHandle& root = *it;
-				if (root.isParent(groupEntity.getEntity())) {
+				if (root.isParent(groupEntity.getEntity()) || root == groupEntity) {
 					dirtyRoots.erase(it);
 					continue;
 				}

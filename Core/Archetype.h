@@ -64,16 +64,16 @@ namespace Core {
 		//Checking for space in existing chunks
 		for (std::shared_ptr<Chunk> chunk : chunks) {
 			if (!chunk->isFull()) {
-				chunk->add(entity, components...);
-				return EntityLocation(chunk->getIndex(entity), chunk); // TODO: Get index from chunk::add
+				std::size_t index = chunk->add(entity, components...);
+				return EntityLocation(index, chunk);
 			}
 		}
 
 		//No space found, adding new chunk
 		createChunk();
 		std::shared_ptr<Chunk> chunk = chunks.back();
-		chunk->add(entity, components...);
-		return EntityLocation(chunk->getIndex(entity), chunk); // TODO: Get index from chunk::add
+		std::size_t index = chunk->add(entity, components...);
+		return EntityLocation(index, chunk);
 	}
 
 	template<typename T>

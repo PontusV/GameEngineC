@@ -36,7 +36,7 @@ namespace Core {
 
 		/* Adds entity and components to the back of the chunk. */
 		template<typename... Ts>
-		void add(Entity entity, Ts&... componentPack);
+		std::size_t add(Entity entity, Ts&... componentPack);
 		void destroy(Entity entity);
 		void remove(Entity entity);
 
@@ -107,12 +107,14 @@ namespace Core {
 	// --------------------------- Template Function Definitions --------------------------------
 
 	template<typename... Ts>
-	void Chunk::add(Entity entity, Ts&... componentPack) {
+	std::size_t Chunk::add(Entity entity, Ts&... componentPack) {
 		if (isFull()) throw std::invalid_argument("Chunk::add::ERROR there is no more room in this chunk!");
 
-		getEntity(size) = entity;
-		(setComponent(size, componentPack), ...);
+		std::size_t index = size;
+		getEntity(index) = entity;
+		(setComponent(index, componentPack), ...);
 		size++;
+		return index;
 	}
 
 	template<typename T>

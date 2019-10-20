@@ -57,7 +57,7 @@ ScenePtr SceneManager::loadScene(const char* fileName) { //To be added: file loc
 	return scene;
 }
 
-ScenePtr SceneManager::createScene(std::string name, ObjectType type) { // TODO: Link name to Scene
+ScenePtr SceneManager::createScene(std::string name, ObjectType type) {
 	ScenePtr scene = std::make_shared<Scene>(entityManager, type);
 	sceneMap[name] = scene;
 	return scene;

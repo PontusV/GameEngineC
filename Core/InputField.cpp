@@ -73,6 +73,7 @@ void InputField::update(float deltaTime) {
 	static constexpr float markBlinkTime = 1.5f;
 
 	if (!selected) return;
+	// TODO: Home & End. Shift + Home & Shift + End
 	// Select all (ctrl + a)
 	if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_A)) {
 		selectAll();
