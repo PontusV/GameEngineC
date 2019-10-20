@@ -12,6 +12,9 @@
 #include <memory>
 using namespace Core;
 
+const float Input::SELECT_NEXT_DELAY = 0.05f; // The delay before selecting next
+const float Input::INITIAL_SELECT_NEXT_DELAY = 0.5f; // The initial delay before repeating selectNext
+
 Input::Input(Engine* engine) : engine(engine) {
 	mouseMoved = true;
 	leftMouseButtonPressed = false;
@@ -220,14 +223,11 @@ void Input::deselect() {
 	}
 }
 
-void Input::select(EntityHandle target, bool wasNext) {
+void Input::select(EntityHandle target) {
 	deselect();
 	selectedTarget = target;
 	for (Selectable* script : selectedTarget.getComponentsUpwards<Selectable>()) {
 		script->select();
-		if (wasNext && script->getType().typeID == typeIDof(InputField)) {
-			static_cast<InputField*>(script)->selectAll();
-		}
 	}
 }
 
@@ -237,20 +237,13 @@ void Input::selectNext() {
 		EntityHandle nextSelect = script->getNext();
 		if (nextSelect.refresh()) {
 			// Goes to next selectable
-			select(nextSelect, true);
+			select(nextSelect);
 			return;
 		}
 	}
 }
 
 // ------------------------------- MOUSE -----------------------------------
-void Input::mouseButtonPressed(const MouseButtonEvent& event) const {
-
-}
-
-void Input::mouseButtonReleased(const MouseButtonEvent& event) const {
-
-}
 
 // ------------------------------- KEY -----------------------------------
 

@@ -3,6 +3,7 @@
 #include "ReflectionPolymorph.generated.h"
 using namespace Core;
 
+const float PropertyEditor::PROPERTY_UPDATE_DELAY = 0.2f;
 
 template<typename T>
 void setValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle, Mirror::Property& rootProp, T&& value) {
@@ -27,6 +28,37 @@ T getValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle)
 	else {
 		return Mirror::polyGetValue<T>(valueID.prop, instance, typeID);
 	}
+}
+
+void PropertyEditor::start() {
+	if (InputField * inputField = owner.getComponentInChildren<InputField>()) {
+		display = ComponentHandle(inputField);
+		displayType = PropertyFieldType::INPUT_FIELD;
+	}
+	else if (CheckBox * checkbox = owner.getComponentInChildren<CheckBox>()) {
+		display = ComponentHandle(checkbox);
+		displayType = PropertyFieldType::CHECKBOX;
+	}
+}
+
+void PropertyEditor::update(float deltaTime) {
+	// Update Property values
+	if (currentPropertyUpdateTime <= 0) {
+		std::wstring value = propertyValueToString(valueID, instanceHandle);
+		if (displayType == PropertyFieldType::INPUT_FIELD) {
+			if (InputField* inputField = display.getComponent<InputField>()) {
+				if (!inputField->isSelected())
+					inputField->setText(value);
+			}
+		}
+		else if (displayType == PropertyFieldType::CHECKBOX) {
+			if (CheckBox* checkbox = display.getComponent<CheckBox>()) {
+				checkbox->setToggle(value == L"true");
+			}
+		}
+		currentPropertyUpdateTime += PROPERTY_UPDATE_DELAY;
+	}
+	currentPropertyUpdateTime -= deltaTime;
 }
 
 void PropertyEditor::onTextSubmit(std::wstring value) {
@@ -140,13 +172,7 @@ std::wstring PropertyEditor::propertyValueToString(PropertyValueID valueID, Refl
 		return getValue<std::wstring>(valueID, instanceHandle);
 	}
 	else if (prop.type.isObject()) {
-		if (prop.type.name == "Vector2") {
-			Vector2 size = getValue<Vector2>(valueID, instanceHandle);
-			return L"x: " + std::to_wstring(size.x) + L", y: " + std::to_wstring(size.y);
-		}
-		else {
-			return L"instance of " + std::wstring(prop.type.name.begin(), prop.type.name.end());
-		}
+		return L"instance of " + std::wstring(prop.type.name.begin(), prop.type.name.end());
 	}
 	return L"ERROR!";
 }

@@ -20,6 +20,7 @@
 
 using namespace Core;
 
+
 Inspector::Inspector()
 {
 }
@@ -140,13 +141,22 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	EntityHandle propValueField = createEntity(entityName,
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
-	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, rootProp, instanceHandle));
 	std::size_t propTypeID = Mirror::getTypeID(value.prop.type.name);
+	Mirror::VariableType& propType = value.prop.type;
 	if (propTypeID) {
 		VerticalLayoutGroup* fieldLayout = propValueField.addComponent<VerticalLayoutGroup>();
 		fieldLayout->spacing = 3;
 		fieldLayout->shrinkableChildHeight = false;
 		fieldLayout->shrinkableChildWidth = false;
+
+		void* propInstance = getInstanceOfValue(instance, typeID, value);
+		Mirror::Class classType = Mirror::getType(propType.name);
+		for (std::size_t i = 0; i < classType.properties.size(); i++) {
+			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, value.prop, propInstance, propTypeID);
+			propField.setParent(propValueField);
+		}
+
+		return propValueField;
 	}
 	else {
 		HorizontalLayoutGroup* fieldLayout = propValueField.addComponent<HorizontalLayoutGroup>();
@@ -154,8 +164,8 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		fieldLayout->shrinkableChildHeight = false;
 		fieldLayout->shrinkableChildWidth = false;
 	}
+	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, rootProp, instanceHandle));
 	// -------------- Content --------------
-	Mirror::VariableType& propType = value.prop.type;
 	std::wstring propValue = PropertyEditor::propertyValueToString(value, instanceHandle);
 	// Label
 	EntityHandle propLabel = createEntity(entityName + "_Label");
@@ -201,14 +211,6 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		checkBox->setToggle(propValue == L"true");
 		checkBox->onToggle = Core::bind(editor, &PropertyEditor::onBoolSubmit);
 		propValueDisplay.setParent(propValueField);
-	}
-	else if (propTypeID) {
-		void* propInstance = getInstanceOfValue(instance, typeID, value);
-		Mirror::Class classType = Mirror::getType(propType.name);
-		for (std::size_t i = 0; i < classType.properties.size(); i++) {
-			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, value.prop, propInstance, propTypeID);
-			propField.setParent(propValueField);
-		}
 	}
 	else {
 		EntityHandle propValueDisplay = createEntity(entityName + "_Value");
@@ -422,7 +424,6 @@ void Inspector::lateUpdate(float deltaTime) {
 			}
 		}
 	}
-	// Update Property values
 }
 
 void Inspector::removeComponentFromTarget(ComponentTypeID typeID) {

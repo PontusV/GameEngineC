@@ -94,12 +94,12 @@ namespace Core {
 
 		/* Deselects the currently selected target. */
 		void deselect();
-		/* Deselected the current target and selects a new target */
-		void select(EntityHandle entity, bool wasNext = false);
+		/* Deselected the current target and selects the given target */
+		void select(EntityHandle entity);
 		/* Selects the next target as set by the currently selected target. */
 		void selectNext();
 
-		// Helper
+		/* Sets the mouse position in screen space */
 		void setMousePosition(Vector2 position);
 		/* Returns mouse position in screen space. */
 		const Vector2& getMousePosition() const;
@@ -121,10 +121,6 @@ namespace Core {
 		/* Appends text to the current text written this frame. */
 		void typeText(unsigned int codepoint);
 
-		// MOUSEBUTTON
-		void mouseButtonPressed(const MouseButtonEvent& event) const;
-		void mouseButtonReleased(const MouseButtonEvent& event) const;
-
 	private:
 		Engine* engine;
 
@@ -138,8 +134,8 @@ namespace Core {
 
 		// Others
 		EntityHandle selectedTarget;
-		const float SELECT_NEXT_DELAY = 0.05F; // The delay before selecting next
-		const float INITIAL_SELECT_NEXT_DELAY = 0.5f; // The initial delay before repeating selectNext
+		static const float SELECT_NEXT_DELAY; // The delay before selecting next
+		static const float INITIAL_SELECT_NEXT_DELAY; // The initial delay before repeating selectNext
 		float timeBeforeNextSelect = 0.0f;
 		bool selectNextHeldDown = false;
 

@@ -141,6 +141,7 @@ namespace Core {
 			if (T * ptr = child.getComponent<T>()) // Check if child has the component
 				return ptr;
 		}
+		return nullptr;
 	}
 	template<typename T>
 	std::vector<T*> Handle::getComponentsInImmediateChildren() {
@@ -162,6 +163,7 @@ namespace Core {
 			if (T* ptr = child.getComponent<T>()) // Check if child has the component
 				return ptr;
 		}
+		return nullptr;
 	}
 
 	template<typename T>

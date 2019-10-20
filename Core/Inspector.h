@@ -2,6 +2,7 @@
 #define INSPECTOR_H
 #include "Behaviour.h"
 #include "EntityHandle.h"
+#include "PropertyEditor.h"
 #include <ReflectionParser/ReflectionTypes.h>
 #include "PropertyValueID.h"
 #include "ReflectedObjectHandle.h"
