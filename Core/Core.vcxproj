@@ -82,7 +82,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -102,7 +102,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32;</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -119,7 +119,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -142,7 +142,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -160,7 +160,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../libs;$(ProjectDir)../libs/win32;</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -168,7 +168,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>$(ProjectDir)exe\ReflectionParser.exe $(ProjectDir)</Command>
+      <Command>$(ProjectDir)parser\ReflectionParser.exe $(ProjectDir)src</Command>
       <Message>Running Reflection Parser</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -180,7 +180,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include/ReflectionParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -208,202 +208,239 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Archetype.cpp" />
-    <ClCompile Include="Border.cpp" />
-    <ClCompile Include="Bounds.cpp" />
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CheckBox.cpp" />
-    <ClCompile Include="ChildManager.cpp" />
-    <ClCompile Include="Chunk.cpp" />
-    <ClCompile Include="Clipboard.cpp" />
-    <ClCompile Include="Color.cpp" />
-    <ClCompile Include="ComponentFunctionHandle.cpp" />
-    <ClCompile Include="ComponentHandle.cpp" />
-    <ClCompile Include="ComponentLoader.cpp" />
-    <ClCompile Include="ComponentRegistry.cpp" />
-    <ClCompile Include="ComponentType.cpp" />
-    <ClCompile Include="ComponentTypeInfo.cpp" />
-    <ClCompile Include="ContentSizeFitter.cpp" />
-    <ClCompile Include="DragAndResize.cpp" />
-    <ClCompile Include="DropDownScroll.cpp" />
-    <ClCompile Include="EditorPanel.cpp" />
-    <ClCompile Include="FunctionCaller.cpp" />
-    <ClCompile Include="DropDown.cpp" />
-    <ClCompile Include="FpsCounter.cpp" />
-    <ClCompile Include="GameObjectData.cpp" />
-    <ClCompile Include="GridLayoutGroup.cpp" />
-    <ClCompile Include="HierarchyView.cpp" />
-    <ClCompile Include="HorizontalLayoutGroup.cpp" />
-    <ClCompile Include="InputField.cpp" />
-    <ClCompile Include="Inspector.cpp" />
-    <ClCompile Include="LayoutController.cpp" />
-    <ClCompile Include="LayoutGroup.cpp" />
-    <ClCompile Include="Maths\Matrix4.cpp" />
-    <ClCompile Include="MouseDrag.cpp" />
-    <ClCompile Include="ObjectData.cpp" />
-    <ClCompile Include="ObjectType.cpp" />
-    <ClCompile Include="PropertyEditor.cpp" />
-    <ClCompile Include="RectButton.cpp" />
-    <ClCompile Include="RectTransform.cpp" />
-    <ClCompile Include="ReflectedObject.cpp" />
-    <ClCompile Include="ReflectedObjectHandle.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="ScrollBar.cpp" />
-    <ClCompile Include="ScrollRect.cpp" />
-    <ClCompile Include="Selectable.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Handle.cpp" />
-    <ClCompile Include="LayoutElement.cpp" />
-    <ClCompile Include="RectMask.cpp" />
-    <ClCompile Include="ParentEntity.cpp" />
-    <ClCompile Include="PostProcessor.cpp" />
-    <ClCompile Include="RectSprite.cpp" />
-    <ClCompile Include="Renderer2D.cpp" />
-    <ClCompile Include="BatchRenderer2D.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityHandle.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
-    <ClCompile Include="Font.cpp" />
-    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="glad.c" />
-    <ClCompile Include="Behaviour.cpp" />
-    <ClCompile Include="BehaviourManager.cpp" />
-    <ClCompile Include="Texture2D.cpp" />
-    <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="KeyListener.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Physics.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="Serializable.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Text.cpp" />
-    <ClCompile Include="TexturedSprite.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="UIBehaviour.cpp" />
-    <ClCompile Include="UIDContainer.cpp" />
-    <ClCompile Include="UIObjectData.cpp" />
-    <ClCompile Include="UISystem.cpp" />
-    <ClCompile Include="Maths\Vector2.cpp" />
-    <ClCompile Include="Maths\Vector4.cpp" />
-    <ClCompile Include="Maths\Vector3.cpp" />
-    <ClCompile Include="VerticalLayoutGroup.cpp" />
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="WindowAnchor.cpp" />
-    <ClCompile Include="WindowScale.cpp" />
+    <ClCompile Include="src\components\DragAndResize.cpp" />
+    <ClCompile Include="src\components\Behaviour.cpp" />
+    <ClCompile Include="src\components\editor\EditorPanel.cpp" />
+    <ClCompile Include="src\components\editor\HierarchyView.cpp" />
+    <ClCompile Include="src\components\editor\Inspector.cpp" />
+    <ClCompile Include="src\components\editor\PropertyEditor.cpp" />
+    <ClCompile Include="src\components\editor\ReflectedObjectHandle.cpp" />
+    <ClCompile Include="src\components\engine\GameObjectData.cpp" />
+    <ClCompile Include="src\components\engine\ObjectData.cpp" />
+    <ClCompile Include="src\components\engine\UIObjectData.cpp" />
+    <ClCompile Include="src\components\entity\ChildManager.cpp" />
+    <ClCompile Include="src\components\entity\ParentEntity.cpp" />
+    <ClCompile Include="src\components\graphics\Image.cpp" />
+    <ClCompile Include="src\components\graphics\Sprite.cpp" />
+    <ClCompile Include="src\components\graphics\Text.cpp" />
+    <ClCompile Include="src\components\graphics\TexturedSprite.cpp" />
+    <ClCompile Include="src\components\graphics\ui\Border.cpp" />
+    <ClCompile Include="src\components\graphics\ui\Button.cpp" />
+    <ClCompile Include="src\components\graphics\ui\ContentSizeFitter.cpp" />
+    <ClCompile Include="src\components\graphics\ui\DropDown.cpp" />
+    <ClCompile Include="src\components\graphics\ui\DropDownScroll.cpp" />
+    <ClCompile Include="src\components\graphics\ui\GridLayoutGroup.cpp" />
+    <ClCompile Include="src\components\graphics\ui\HorizontalLayoutGroup.cpp" />
+    <ClCompile Include="src\components\graphics\ui\LayoutController.cpp" />
+    <ClCompile Include="src\components\graphics\ui\LayoutElement.cpp" />
+    <ClCompile Include="src\components\graphics\ui\LayoutGroup.cpp" />
+    <ClCompile Include="src\components\graphics\ui\RectButton.cpp" />
+    <ClCompile Include="src\components\graphics\ui\RectMask.cpp" />
+    <ClCompile Include="src\components\graphics\ui\ScrollBar.cpp" />
+    <ClCompile Include="src\components\graphics\ui\ScrollRect.cpp" />
+    <ClCompile Include="src\components\graphics\ui\UIBehaviour.cpp" />
+    <ClCompile Include="src\components\graphics\ui\VerticalLayoutGroup.cpp" />
+    <ClCompile Include="src\components\graphics\ui\WindowScale.cpp" />
+    <ClCompile Include="src\components\input\CheckBox.cpp" />
+    <ClCompile Include="src\components\input\InputField.cpp" />
+    <ClCompile Include="src\engine\FpsCounter.cpp" />
+    <ClCompile Include="src\components\graphics\RectSprite.cpp" />
+    <ClCompile Include="src\components\input\Selectable.cpp" />
+    <ClCompile Include="src\components\graphics\ui\WindowAnchor.cpp" />
+    <ClCompile Include="src\components\MouseDrag.cpp" />
+    <ClCompile Include="src\components\RectTransform.cpp" />
+    <ClCompile Include="src\components\Transform.cpp" />
+    <ClCompile Include="src\engine\BehaviourManager.cpp" />
+    <ClCompile Include="src\engine\Engine.cpp" />
+    <ClCompile Include="src\engine\ResourceManager.cpp" />
+    <ClCompile Include="src\entity\Archetype.cpp" />
+    <ClCompile Include="src\entity\Chunk.cpp" />
+    <ClCompile Include="src\entity\Component\Component.cpp" />
+    <ClCompile Include="src\entity\Component\ComponentLoader.cpp" />
+    <ClCompile Include="src\entity\Component\ComponentRegistry.cpp" />
+    <ClCompile Include="src\entity\Component\ComponentType.cpp" />
+    <ClCompile Include="src\entity\Entity.cpp" />
+    <ClCompile Include="src\entity\EntityManager.cpp" />
+    <ClCompile Include="src\entity\handle\ComponentFunctionHandle.cpp" />
+    <ClCompile Include="src\entity\handle\ComponentHandle.cpp" />
+    <ClCompile Include="src\entity\handle\EntityHandle.cpp" />
+    <ClCompile Include="src\entity\handle\Handle.cpp" />
+    <ClCompile Include="src\graphics\Camera.cpp" />
+    <ClCompile Include="src\graphics\data\Color.cpp" />
+    <ClCompile Include="src\graphics\data\Shader.cpp" />
+    <ClCompile Include="src\graphics\data\Texture2D.cpp" />
+    <ClCompile Include="src\graphics\font\Font.cpp" />
+    <ClCompile Include="src\graphics\font\FontManager.cpp" />
+    <ClCompile Include="src\graphics\Graphics.cpp" />
+    <ClCompile Include="src\graphics\renderer\BatchRenderer2D.cpp" />
+    <ClCompile Include="src\graphics\renderer\PostProcessor.cpp" />
+    <ClCompile Include="src\graphics\renderer\Renderer2D.cpp" />
+    <ClCompile Include="src\graphics\UISystem.cpp" />
+    <ClCompile Include="src\graphics\Window.cpp" />
+    <ClCompile Include="src\input\Input.cpp" />
+    <ClCompile Include="src\input\KeyListener.cpp" />
+    <ClCompile Include="src\maths\Matrix4.cpp" />
+    <ClCompile Include="src\maths\Vector2.cpp" />
+    <ClCompile Include="src\maths\Vector3.cpp" />
+    <ClCompile Include="src\maths\Vector4.cpp" />
+    <ClCompile Include="src\physics\Physics.cpp" />
+    <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\scene\SceneManager.cpp" />
+    <ClCompile Include="src\utils\Bounds.cpp" />
+    <ClCompile Include="src\utils\Clipboard.cpp" />
+    <ClCompile Include="src\utils\FunctionCaller.cpp" />
+    <ClCompile Include="src\utils\Serializable.cpp" />
+    <ClCompile Include="src\utils\UIDContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Algorithm.h" />
-    <ClInclude Include="Alignment.h" />
-    <ClInclude Include="Anchor.h" />
-    <ClInclude Include="Archetype.h" />
-    <ClInclude Include="BatchConfig.h" />
-    <ClInclude Include="Border.h" />
-    <ClInclude Include="Bounds.h" />
-    <ClInclude Include="Button.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CheckBox.h" />
-    <ClInclude Include="ChildManager.h" />
-    <ClInclude Include="Clipboard.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="ComponentFunctionHandle.h" />
-    <ClInclude Include="ComponentHandle.h" />
-    <ClInclude Include="ComponentLoader.h" />
-    <ClInclude Include="ComponentRegistry.h" />
-    <ClInclude Include="ComponentType.h" />
-    <ClInclude Include="ComponentTypeInfo.h" />
-    <ClInclude Include="ContentSizeFitter.h" />
-    <ClInclude Include="DragAndResize.h" />
-    <ClInclude Include="DropDownScroll.h" />
-    <ClInclude Include="EditorPanel.h" />
-    <ClInclude Include="FunctionCaller.h" />
-    <ClInclude Include="DropDown.h" />
-    <ClInclude Include="EntityLocation.h" />
-    <ClInclude Include="FpsCounter.h" />
-    <ClInclude Include="GameObjectData.h" />
-    <ClInclude Include="GridLayoutGroup.h" />
-    <ClInclude Include="HideFlags.h" />
-    <ClInclude Include="HierarchyView.h" />
-    <ClInclude Include="HorizontalLayoutGroup.h" />
-    <ClInclude Include="ILayoutElement.h" />
-    <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />
-    <ClInclude Include="InputField.h" />
-    <ClInclude Include="Inspector.h" />
-    <ClInclude Include="LayoutController.h" />
-    <ClInclude Include="LayoutGroup.h" />
-    <ClInclude Include="Maths\MatrixTransform.h" />
-    <ClInclude Include="Maths\Matrix4.h" />
-    <ClInclude Include="MouseDrag.h" />
-    <ClInclude Include="ObjectData.h" />
-    <ClInclude Include="ObjectType.h" />
-    <ClInclude Include="PropertyEditor.h" />
-    <ClInclude Include="PropertyValueID.h" />
-    <ClInclude Include="RectButton.h" />
-    <ClInclude Include="RectTransform.h" />
-    <ClInclude Include="ReflectedObject.h" />
-    <ClInclude Include="ReflectedObjectHandle.h" />
-    <ClInclude Include="ReflectionMacros.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="ScrollBar.h" />
-    <ClInclude Include="ScrollRect.h" />
-    <ClInclude Include="Selectable.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Handle.h" />
-    <ClInclude Include="InputEvent.h" />
-    <ClInclude Include="LayoutElement.h" />
-    <ClInclude Include="RectMask.h" />
-    <ClInclude Include="ParentEntity.h" />
-    <ClInclude Include="PostProcessor.h" />
-    <ClInclude Include="RectSprite.h" />
-    <ClInclude Include="Renderer2D.h" />
-    <ClInclude Include="BatchRenderer2D.h" />
-    <ClInclude Include="Chunk.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ComponentArray.h" />
-    <ClInclude Include="ComponentArrayManager.h" />
-    <ClInclude Include="ComponentGroup.h" />
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityHandle.h" />
-    <ClInclude Include="EntityManager.h" />
-    <ClInclude Include="Font.h" />
-    <ClInclude Include="FontManager.h" />
-    <ClInclude Include="Behaviour.h" />
-    <ClInclude Include="BehaviourManager.h" />
-    <ClInclude Include="TArray.h" />
-    <ClInclude Include="Renderable2D.h" />
-    <ClInclude Include="Texture2D.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="KeyListener.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Physics.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
-    <ClInclude Include="resource2.h" />
-    <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="Serializable.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Text.h" />
-    <ClInclude Include="TexturedSprite.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="UIBehaviour.h" />
-    <ClInclude Include="UIDContainer.h" />
-    <ClInclude Include="UIObjectData.h" />
-    <ClInclude Include="UISystem.h" />
-    <ClInclude Include="Maths\Vector2.h" />
-    <ClInclude Include="Maths\Vector4.h" />
-    <ClInclude Include="Maths\Vector3.h" />
-    <ClInclude Include="VerticalLayoutGroup.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="WindowAnchor.h" />
-    <ClInclude Include="WindowScale.h" />
+    <ClInclude Include="src\collections\TArray.h" />
+    <ClInclude Include="src\components\DragAndResize.generated.h" />
+    <ClInclude Include="src\components\DragAndResize.h" />
+    <ClInclude Include="src\components\Behaviour.generated.h" />
+    <ClInclude Include="src\components\Behaviour.h" />
+    <ClInclude Include="src\components\editor\EditorPanel.generated.h" />
+    <ClInclude Include="src\components\editor\EditorPanel.h" />
+    <ClInclude Include="src\components\editor\HierarchyView.generated.h" />
+    <ClInclude Include="src\components\editor\HierarchyView.h" />
+    <ClInclude Include="src\components\editor\Inspector.generated.h" />
+    <ClInclude Include="src\components\editor\Inspector.h" />
+    <ClInclude Include="src\components\editor\PropertyEditor.generated.h" />
+    <ClInclude Include="src\components\editor\PropertyEditor.h" />
+    <ClInclude Include="src\components\editor\PropertyValueID.h" />
+    <ClInclude Include="src\components\editor\ReflectedObjectHandle.h" />
+    <ClInclude Include="src\components\engine\GameObjectData.generated.h" />
+    <ClInclude Include="src\components\engine\GameObjectData.h" />
+    <ClInclude Include="src\components\engine\ObjectData.generated.h" />
+    <ClInclude Include="src\components\engine\ObjectData.h" />
+    <ClInclude Include="src\components\engine\UIObjectData.generated.h" />
+    <ClInclude Include="src\components\engine\UIObjectData.h" />
+    <ClInclude Include="src\components\entity\ChildManager.generated.h" />
+    <ClInclude Include="src\components\entity\ChildManager.h" />
+    <ClInclude Include="src\components\entity\ParentEntity.generated.h" />
+    <ClInclude Include="src\components\entity\ParentEntity.h" />
+    <ClInclude Include="src\components\graphics\Image.generated.h" />
+    <ClInclude Include="src\components\graphics\Image.h" />
+    <ClInclude Include="src\components\graphics\Sprite.generated.h" />
+    <ClInclude Include="src\components\graphics\Sprite.h" />
+    <ClInclude Include="src\components\graphics\Text.generated.h" />
+    <ClInclude Include="src\components\graphics\Text.h" />
+    <ClInclude Include="src\components\graphics\TexturedSprite.generated.h" />
+    <ClInclude Include="src\components\graphics\TexturedSprite.h" />
+    <ClInclude Include="src\components\graphics\ui\Border.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\Border.h" />
+    <ClInclude Include="src\components\graphics\ui\Button.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\Button.h" />
+    <ClInclude Include="src\components\graphics\ui\ContentSizeFitter.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\ContentSizeFitter.h" />
+    <ClInclude Include="src\components\graphics\ui\DropDown.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\DropDown.h" />
+    <ClInclude Include="src\components\graphics\ui\DropDownScroll.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\DropDownScroll.h" />
+    <ClInclude Include="src\components\graphics\ui\GridLayoutGroup.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\GridLayoutGroup.h" />
+    <ClInclude Include="src\components\graphics\ui\HorizontalLayoutGroup.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\HorizontalLayoutGroup.h" />
+    <ClInclude Include="src\components\graphics\ui\ILayoutElement.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutController.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutController.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutElement.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutElement.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutGroup.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\LayoutGroup.h" />
+    <ClInclude Include="src\components\graphics\ui\RectButton.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\RectButton.h" />
+    <ClInclude Include="src\components\graphics\ui\RectMask.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\RectMask.h" />
+    <ClInclude Include="src\components\graphics\ui\ScrollBar.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\ScrollBar.h" />
+    <ClInclude Include="src\components\graphics\ui\ScrollRect.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\ScrollRect.h" />
+    <ClInclude Include="src\components\graphics\ui\UIBehaviour.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\UIBehaviour.h" />
+    <ClInclude Include="src\components\graphics\ui\VerticalLayoutGroup.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\VerticalLayoutGroup.h" />
+    <ClInclude Include="src\components\graphics\ui\WindowAnchor.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\WindowAnchor.h" />
+    <ClInclude Include="src\components\graphics\ui\WindowScale.generated.h" />
+    <ClInclude Include="src\components\graphics\ui\WindowScale.h" />
+    <ClInclude Include="src\components\input\CheckBox.generated.h" />
+    <ClInclude Include="src\components\input\CheckBox.h" />
+    <ClInclude Include="src\components\input\InputField.generated.h" />
+    <ClInclude Include="src\components\input\InputField.h" />
+    <ClInclude Include="src\engine\FpsCounter.h" />
+    <ClInclude Include="src\components\graphics\RectSprite.generated.h" />
+    <ClInclude Include="src\components\graphics\RectSprite.h" />
+    <ClInclude Include="src\components\input\Selectable.generated.h" />
+    <ClInclude Include="src\components\input\Selectable.h" />
+    <ClInclude Include="src\components\MouseDrag.generated.h" />
+    <ClInclude Include="src\components\MouseDrag.h" />
+    <ClInclude Include="src\components\RectTransform.generated.h" />
+    <ClInclude Include="src\components\RectTransform.h" />
+    <ClInclude Include="src\components\Transform.generated.h" />
+    <ClInclude Include="src\components\Transform.h" />
+    <ClInclude Include="src\engine\BehaviourManager.h" />
+    <ClInclude Include="src\engine\Engine.h" />
+    <ClInclude Include="src\engine\ResourceManager.h" />
+    <ClInclude Include="src\entity\Archetype.h" />
+    <ClInclude Include="src\entity\Chunk.h" />
+    <ClInclude Include="src\entity\component\Component.generated.h" />
+    <ClInclude Include="src\entity\component\Component.h" />
+    <ClInclude Include="src\entity\component\ComponentArray.h" />
+    <ClInclude Include="src\entity\component\ComponentArrayManager.h" />
+    <ClInclude Include="src\entity\component\ComponentGroup.h" />
+    <ClInclude Include="src\entity\component\ComponentLoader.h" />
+    <ClInclude Include="src\entity\component\ComponentRegistry.h" />
+    <ClInclude Include="src\entity\component\ComponentType.h" />
+    <ClInclude Include="src\entity\component\ComponentTypeInfo.h" />
+    <ClInclude Include="src\entity\Entity.h" />
+    <ClInclude Include="src\entity\EntityLocation.h" />
+    <ClInclude Include="src\entity\EntityManager.h" />
+    <ClInclude Include="src\entity\handle\ComponentFunctionHandle.h" />
+    <ClInclude Include="src\entity\handle\ComponentHandle.h" />
+    <ClInclude Include="src\entity\handle\EntityHandle.h" />
+    <ClInclude Include="src\entity\handle\Handle.h" />
+    <ClInclude Include="src\entity\HideFlags.h" />
+    <ClInclude Include="src\graphics\Camera.h" />
+    <ClInclude Include="src\graphics\data\Color.generated.h" />
+    <ClInclude Include="src\graphics\data\Color.h" />
+    <ClInclude Include="src\graphics\data\Shader.h" />
+    <ClInclude Include="src\graphics\data\Texture2D.h" />
+    <ClInclude Include="src\graphics\font\Font.h" />
+    <ClInclude Include="src\graphics\font\FontManager.h" />
+    <ClInclude Include="src\graphics\Graphics.h" />
+    <ClInclude Include="src\graphics\renderer\BatchConfig.h" />
+    <ClInclude Include="src\graphics\renderer\BatchRenderer2D.h" />
+    <ClInclude Include="src\graphics\renderer\PostProcessor.h" />
+    <ClInclude Include="src\graphics\renderer\Renderable2D.h" />
+    <ClInclude Include="src\graphics\renderer\Renderer2D.h" />
+    <ClInclude Include="src\graphics\UISystem.h" />
+    <ClInclude Include="src\graphics\Window.h" />
+    <ClInclude Include="src\input\Input.h" />
+    <ClInclude Include="src\input\InputEvent.h" />
+    <ClInclude Include="src\input\KeyListener.h" />
+    <ClInclude Include="src\maths\Algorithm.h" />
+    <ClInclude Include="src\maths\Matrix4.h" />
+    <ClInclude Include="src\maths\MatrixTransform.h" />
+    <ClInclude Include="src\maths\Vector2.generated.h" />
+    <ClInclude Include="src\maths\Vector2.h" />
+    <ClInclude Include="src\maths\Vector3.h" />
+    <ClInclude Include="src\maths\Vector4.h" />
+    <ClInclude Include="src\physics\Physics.h" />
+    <ClInclude Include="src\ReflectionEnum.generated.h" />
+    <ClInclude Include="src\ReflectionPolymorph.generated.h" />
+    <ClInclude Include="src\scene\ObjectType.h" />
+    <ClInclude Include="src\scene\Scene.h" />
+    <ClInclude Include="src\scene\SceneManager.h" />
+    <ClInclude Include="src\utils\Alignment.h" />
+    <ClInclude Include="src\utils\Anchor.h" />
+    <ClInclude Include="src\utils\Bounds.h" />
+    <ClInclude Include="src\utils\Clipboard.h" />
+    <ClInclude Include="src\utils\FunctionCaller.h" />
+    <ClInclude Include="src\utils\Serializable.h" />
+    <ClInclude Include="src\utils\UIDContainer.h" />
+    <ClInclude Include="src\ReflectionMacros.h" />
+    <ClInclude Include="src\engine\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
