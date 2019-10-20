@@ -10,19 +10,17 @@ UISystem::UISystem() {
 UISystem::~UISystem() {
 }
 
-bool updateLayout(LayoutGroup* group) {
-	// Update parent layout
-	bool chainUpdate = false;
-	for (LayoutGroup* parentGroup : group->getOwner().getParent().getComponents<LayoutGroup>()) {
-		if (updateLayout(parentGroup))
-			chainUpdate = true;
+void updateLayout(LayoutGroup* group) {
+	// Update self
+	group->refresh();
+	// Update children layout
+	Handle handle = group->getOwner();
+	std::size_t childCount = handle.getImmediateChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		for (LayoutGroup* childGroup : handle.getChild(i).getComponents<LayoutGroup>()) {
+			updateLayout(childGroup);
+		}
 	}
-	if (chainUpdate || group->isDirty()) {
-		// Update self
-		group->refresh();
-		return true;
-	}
-	return false;
 }
 
 void updateLayoutSizes(LayoutGroup* group) {
@@ -50,11 +48,32 @@ void UISystem::update() {
 	}
 
 	// Update Layout Groups
+	std::vector<EntityHandle> dirtyRoots;
 	std::size_t layoutGroupSize = layoutGroupComponentGroup.size();
 	for (std::size_t i = 0; i < layoutGroupSize; i++) {
 		LayoutGroup& group = layoutGroupComponentGroup.get<LayoutGroup>(i);
 		updateLayoutSizes(&group);
-		updateLayout(&group);
+		if (group.isDirty()) {
+			Handle groupEntity = group.getOwner();
+			bool add = true;
+			for (auto it = dirtyRoots.begin(); it != dirtyRoots.end();) {
+				EntityHandle& root = *it;
+				if (root.isParent(groupEntity.getEntity())) {
+					dirtyRoots.erase(it);
+					continue;
+				}
+				if (groupEntity.isParent(root.getEntity())) {
+					add = false;
+				}
+				it++;
+			}
+			if (add)
+				dirtyRoots.push_back(groupEntity);
+		}
+	}
+	for (EntityHandle& root : dirtyRoots) {
+		for (LayoutGroup* rootGroup : root.getComponents<LayoutGroup>())
+		updateLayout(rootGroup);
 	}
 }
 

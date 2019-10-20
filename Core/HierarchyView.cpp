@@ -60,15 +60,6 @@ std::size_t HierarchyView::getOrder(EntityHandle& entity, EntityHandle& parent, 
 	return 0;
 }
 
-std::size_t HierarchyView::getDepth(Handle parent) const {
-	std::size_t depth = 0;
-	while (parent.isValid()) {
-		parent = parent.getParent();
-		depth++;
-	}
-	return depth;
-}
-
 std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 	std::vector<HierarchyEntry> entities;
 	Scene* editorScene = owner.getScene();
@@ -79,7 +70,7 @@ std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			EntityHandle parent = entity.getParent();
 			std::size_t order = getOrder(entity, parent, rootEntities);
-			std::size_t depth = getDepth(parent);
+			std::size_t depth = parent.getDepth();
 			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
 	}

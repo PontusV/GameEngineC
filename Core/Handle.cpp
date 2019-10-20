@@ -34,6 +34,16 @@ Scene* Handle::getScene() const {
 	return scene;
 }
 
+std::size_t Handle::getDepth() {
+	Handle parent = getParent();
+	std::size_t depth = 0;
+	while (parent.isValid()) {
+		parent = parent.getParent();
+		depth++;
+	}
+	return depth;
+}
+
 void Handle::clear() {
 	entity = Entity(0);
 	scene = nullptr;

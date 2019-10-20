@@ -47,7 +47,6 @@ namespace Core {
 
 		bool isDirty(HierarchyEntry entity) const;
 		std::size_t getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities) const;
-		std::size_t getDepth(Handle parent) const;
 	private:
 		float refreshTime = 0.2f;
 		float timer = 0.0f;

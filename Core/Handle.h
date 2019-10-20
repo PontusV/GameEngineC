@@ -47,6 +47,9 @@ namespace Core {
 		void updateLocation(EntityLocation location);
 		const EntityLocation& getLocation() const;
 
+		/* Returns the number of parents above in the hierarchy. */
+		std::size_t getDepth();
+
 		template<typename T>
 		bool hasComponent();
 		bool hasComponent(ComponentType type);
