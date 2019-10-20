@@ -168,7 +168,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>$(ProjectDir)parser\ReflectionParser.exe $(ProjectDir)src</Command>
+      <Command>$(ProjectDir)parser\ReflectionParser.exe $(ProjectDir)src -I$(ProjectDir)src</Command>
       <Message>Running Reflection Parser</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>

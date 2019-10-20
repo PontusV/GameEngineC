@@ -44,7 +44,7 @@ int LevelEditor::initiate() {
 	ScenePtr sceneWorld = engine.getSceneManager().createScene("World", ObjectType::World);
 	unsigned char editorSortingLayer = 0;
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
-	/*EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
+	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }),
 		WindowScale(true, 1.0f, false, 0),
 		HorizontalLayoutGroup(),
@@ -179,7 +179,6 @@ int LevelEditor::initiate() {
 	// Level created, calling awake
 	sceneUI->awake();
 	sceneWorld->awake();
-	*/
 
 	// Keybinds
 	engine.getInput().addAction("Terminate", GLFW_KEY_ESCAPE);
