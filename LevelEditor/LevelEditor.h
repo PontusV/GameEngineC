@@ -1,10 +1,12 @@
 #ifndef EDITOR_H
 #define EDITOR_H
-#include "../Core/src/engine/Engine.h"
-#include "../Core/src/input/KeyListener.h"
+#include "../Core/Engine.h"
+#include "../Core/KeyListener.h"
 #include <string>
 
-class LevelEditor : public Core::KeyListener {
+class LevelEditor :
+	public Core::KeyListener
+{
 public:
 	LevelEditor();
 	~LevelEditor();

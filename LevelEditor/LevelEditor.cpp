@@ -1,22 +1,22 @@
 #include "LevelEditor.h"
 #include <GLFW/glfw3.h>
 
-#include "../Core/src/scene/Scene.h"
-#include "../Core/src/components/RectTransform.h"
-#include "../Core/src/components/graphics/ui/DropDown.h"
-#include "../Core/src/components/graphics/ui/Button.h"
-#include "../Core/src/components/graphics/ui/WindowAnchor.h"
-#include "../Core/src/components/MouseDrag.h"
-#include "../Core/src/components/graphics/ui/LayoutElement.h"
-#include "../Core/src/components/graphics/ui/HorizontalLayoutGroup.h"
-#include "../Core/src/components/graphics/ui/VerticalLayoutGroup.h"
-#include "../Core/src/components/graphics/ui/WindowScale.h"
-#include "../Core/src/components/DragAndResize.h"
-#include "../Core/src/components/graphics/ui/RectButton.h"
-#include "../Core/src/components/editor/EditorPanel.h"
+#include "../Core/Scene.h"
+#include "../Core/RectTransform.h"
+#include "../Core/DropDown.h"
+#include "../Core/Button.h"
+#include "../Core/WindowAnchor.h"
+#include "../Core/MouseDrag.h"
+#include "../Core/LayoutElement.h"
+#include "../Core/HorizontalLayoutGroup.h"
+#include "../Core/VerticalLayoutGroup.h"
+#include "../Core/WindowScale.h"
+#include "../Core/DragAndResize.h"
+#include "../Core/RectButton.h"
+#include "../Core/EditorPanel.h"
 
-#include "../Core/src/maths/Vector2.h"
-#include "../Core/src/maths/Vector3.h"
+#include "../Core/Maths/Vector2.h"
+#include "../Core/Maths/Vector3.h"
 
 using namespace Core;
 
@@ -44,7 +44,7 @@ int LevelEditor::initiate() {
 	ScenePtr sceneWorld = engine.getSceneManager().createScene("World", ObjectType::World);
 	unsigned char editorSortingLayer = 0;
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
-	/*EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
+	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",
 		RectSprite({ 60, 60, 60, 255 }),
 		WindowScale(true, 1.0f, false, 0),
 		HorizontalLayoutGroup(),
@@ -179,7 +179,6 @@ int LevelEditor::initiate() {
 	// Level created, calling awake
 	sceneUI->awake();
 	sceneWorld->awake();
-	*/
 
 	// Keybinds
 	engine.getInput().addAction("Terminate", GLFW_KEY_ESCAPE);
