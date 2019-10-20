@@ -66,588 +66,699 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\DragAndResize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\MouseDrag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\BehaviourManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Component\Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Component\ComponentLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Component\ComponentRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Component\ComponentType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Archetype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Chunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\UISystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\KeyListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maths\Matrix4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maths\Vector2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maths\Vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maths\Vector4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\physics\Physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\Bounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\Clipboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\FunctionCaller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\Serializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\UIDContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\RectTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\WindowAnchor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\RectSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\FpsCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\input\Selectable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\Behaviour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\EditorPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\HierarchyView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\PropertyEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\ReflectedObjectHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\engine\GameObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\engine\ObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\engine\UIObjectData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\entity\ChildManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\entity\ParentEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\Border.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\ContentSizeFitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\DropDown.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\DropDownScroll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\GridLayoutGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\HorizontalLayoutGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\LayoutController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\LayoutElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\LayoutGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\RectButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\RectMask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\ScrollBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\ScrollRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\UIBehaviour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\VerticalLayoutGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\ui\WindowScale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\Image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\Text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\TexturedSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\input\CheckBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\input\InputField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\handle\ComponentFunctionHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\handle\ComponentHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\handle\EntityHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\handle\Handle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\data\Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\data\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\data\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\font\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\font\FontManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\renderer\BatchRenderer2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\renderer\PostProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\renderer\Renderer2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\EntityManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Archetype.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BatchRenderer2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Chunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FontManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FpsCounter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyListener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Serializable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Button.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="ChildManager.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="ParentEntity.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Text.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Border.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Handle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutElement.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Bounds.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PostProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DropDown.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FunctionCaller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="RectButton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentFunctionHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseDrag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HorizontalLayoutGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalLayoutGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GridLayoutGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectTransform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectSprite.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="UISystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Behaviour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BehaviourManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UIBehaviour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowAnchor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContentSizeFitter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowScale.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DragAndResize.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Inspector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentType.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentTypeInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InputField.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Selectable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Clipboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CheckBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectMask.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="UIDContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReflectedObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReflectedObjectHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PropertyEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths\Vector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths\Matrix4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths\Vector4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths\Vector3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TexturedSprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentRegistry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ScrollRect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DropDownScroll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ScrollBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UIObjectData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectType.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HierarchyView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource2.h">
+    <ClInclude Include="src\collections\TArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Algorithm.h">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
+    <ClInclude Include="src\components\DragAndResize.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="src\components\DragAndResize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
+    <ClInclude Include="src\components\MouseDrag.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Archetype.h">
-      <Filter>Header Files\Systems\Entity</Filter>
+    <ClInclude Include="src\components\MouseDrag.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BatchRenderer2D.h">
+    <ClInclude Include="src\engine\BehaviourManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\Archetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\Chunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\EntityLocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\HideFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Graphics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\UISystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\InputEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\KeyListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Matrix4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\MatrixTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Vector2.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Vector2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maths\Vector4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\Physics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\ObjectType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Alignment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Anchor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Bounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Clipboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\FunctionCaller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Serializable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\UIDContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\RectTransform.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\RectTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Transform.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReflectionMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\RectSprite.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\RectSprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\stb_image.h">
       <Filter>Header Files\Systems\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="BatchConfig.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Chunk.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentGroup.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentArrayManager.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentArray.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="ChildManager.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityManager.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="FontManager.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\Systems\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="InputEvent.h">
-      <Filter>Header Files\Systems\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyListener.h">
-      <Filter>Header Files\Systems\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="ParentEntity.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics.h">
-      <Filter>Header Files\Systems\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderable2D.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer2D.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Serializable.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Text.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture2D.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="FpsCounter.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Border.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityLocation.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Handle.h">
-      <Filter>Header Files\Systems\Entity\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityHandle.h">
-      <Filter>Header Files\Systems\Entity\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentHandle.h">
-      <Filter>Header Files\Systems\Entity\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="LayoutElement.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Bounds.h">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Color.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="GridLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="HorizontalLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="LayoutController.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalLayoutGroup.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="PostProcessor.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseDrag.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts</Filter>
-    </ClInclude>
-    <ClInclude Include="FunctionCaller.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="DropDown.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Anchor.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Alignment.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentFunctionHandle.h">
-      <Filter>Header Files\Systems\Entity\Handle</Filter>
-    </ClInclude>
-    <ClInclude Include="RectButton.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="RectSprite.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Behaviour.h">
-      <Filter>Header Files\Systems\Entity\Component\Scripts</Filter>
-    </ClInclude>
-    <ClInclude Include="BehaviourManager.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowAnchor.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIBehaviour.h">
-      <Filter>Header Files\Systems\Entity\Component\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UISystem.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files\Systems\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="RectTransform.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ILayoutElement.h">
+    <ClInclude Include="src\engine\FpsCounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ContentSizeFitter.h">
+    <ClInclude Include="src\components\input\Selectable.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LayoutGroup.h">
+    <ClInclude Include="src\components\input\Selectable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowScale.h">
+    <ClInclude Include="src\components\Behaviour.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DragAndResize.h">
+    <ClInclude Include="src\components\Behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inspector.h">
+    <ClInclude Include="src\components\editor\EditorPanel.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReflectionMacros.h">
+    <ClInclude Include="src\components\editor\EditorPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentLoader.h">
+    <ClInclude Include="src\components\editor\HierarchyView.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentType.h">
+    <ClInclude Include="src\components\editor\HierarchyView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentTypeInfo.h">
+    <ClInclude Include="src\components\editor\Inspector.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputField.h">
+    <ClInclude Include="src\components\editor\Inspector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HideFlags.h">
+    <ClInclude Include="src\components\editor\PropertyEditor.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Selectable.h">
+    <ClInclude Include="src\components\editor\PropertyEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReflectionParser\ReflectionMacros.h">
+    <ClInclude Include="src\components\editor\PropertyValueID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Clipboard.h">
+    <ClInclude Include="src\components\editor\ReflectedObjectHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CheckBox.h">
+    <ClInclude Include="src\components\engine\GameObjectData.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RectMask.h">
-      <Filter>Header Files\Systems\Entity\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="UIDContainer.h">
+    <ClInclude Include="src\components\engine\GameObjectData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TArray.h">
+    <ClInclude Include="src\components\engine\ObjectData.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReflectedObject.h">
+    <ClInclude Include="src\components\engine\ObjectData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReflectedObjectHandle.h">
+    <ClInclude Include="src\components\engine\UIObjectData.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PropertyEditor.h">
+    <ClInclude Include="src\components\engine\UIObjectData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PropertyValueID.h">
+    <ClInclude Include="src\components\entity\ChildManager.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Maths\Vector2.h">
+    <ClInclude Include="src\components\entity\ChildManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Maths\Matrix4.h">
+    <ClInclude Include="src\components\entity\ParentEntity.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Maths\Vector4.h">
+    <ClInclude Include="src\components\entity\ParentEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Maths\Vector3.h">
+    <ClInclude Include="src\components\graphics\ui\Border.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Maths\MatrixTransform.h">
+    <ClInclude Include="src\components\graphics\ui\Border.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TexturedSprite.h">
+    <ClInclude Include="src\components\graphics\ui\Button.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentRegistry.h">
+    <ClInclude Include="src\components\graphics\ui\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScrollRect.h">
+    <ClInclude Include="src\components\graphics\ui\ContentSizeFitter.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DropDownScroll.h">
+    <ClInclude Include="src\components\graphics\ui\ContentSizeFitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScrollBar.h">
+    <ClInclude Include="src\components\graphics\ui\DropDown.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="src\components\graphics\ui\DropDown.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectData.h">
+    <ClInclude Include="src\components\graphics\ui\DropDownScroll.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectData.h">
+    <ClInclude Include="src\components\graphics\ui\DropDownScroll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UIObjectData.h">
+    <ClInclude Include="src\components\graphics\ui\GridLayoutGroup.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files\Systems\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
+    <ClInclude Include="src\components\graphics\ui\GridLayoutGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectType.h">
+    <ClInclude Include="src\components\graphics\ui\HorizontalLayoutGroup.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HierarchyView.h">
+    <ClInclude Include="src\components\graphics\ui\HorizontalLayoutGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditorPanel.h">
+    <ClInclude Include="src\components\graphics\ui\ILayoutElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutController.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutElement.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutGroup.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\LayoutGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\RectButton.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\RectButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\RectMask.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\RectMask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\ScrollBar.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\ScrollBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\ScrollRect.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\ScrollRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\UIBehaviour.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\UIBehaviour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\VerticalLayoutGroup.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\VerticalLayoutGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\WindowAnchor.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\WindowAnchor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\WindowScale.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\ui\WindowScale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Image.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Sprite.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Text.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\TexturedSprite.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\TexturedSprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\input\CheckBox.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\input\CheckBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\input\InputField.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\input\InputField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\Component.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentArrayManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\component\ComponentTypeInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\handle\ComponentFunctionHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\handle\ComponentHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\handle\EntityHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\handle\Handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\data\Color.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\data\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\data\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\data\Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\font\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\font\FontManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\renderer\BatchConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\renderer\BatchRenderer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\renderer\PostProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\renderer\Renderable2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\renderer\Renderer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReflectionEnum.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReflectionPolymorph.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
