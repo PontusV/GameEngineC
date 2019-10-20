@@ -2,7 +2,7 @@
 #define VECTOR_2_H
 #include <cstddef>
 #include <ReflectionParser/ReflectionMacros.h>
-#include "../Vector2.generated.h"
+#include "Vector2.generated.h"
 namespace Core {
 	CLASS() Vector2 {
 		GENERATED_BODY()

@@ -41,7 +41,6 @@ namespace Core {
 	struct Action {
 		static constexpr int RELEASE	= 0; // See GLFW_RELEASE
 		static constexpr int PRESS		= 1; // See GLFW_PRESS
-		Action() {} // TODO: Try to remove this since Action should not be default constructed
 		Action(std::string name, int modFlags) : name(name) {}
 		std::string name;
 		std::map<int, std::vector<ComponentFunctionHandle<void>>> callbacks; // Action, function handle

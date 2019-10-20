@@ -324,7 +324,7 @@ void Input::addKeyListener(KeyListener* listener) {
 }
 
 void Input::addAction(std::string actionName, int buttoncode, int modFlags) {
-	keyBinds[ButtonInput(buttoncode, modFlags)] = Action(actionName, modFlags);
+	keyBinds.insert(std::make_pair(ButtonInput(buttoncode, modFlags), Action(actionName, modFlags)));
 }
 
 void Input::addActionCallback(std::string actionName, int actioncode, ComponentFunctionHandle<void> function) {

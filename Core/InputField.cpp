@@ -149,10 +149,6 @@ void InputField::update(float deltaTime) {
 	if (input->getKeyPressed(GLFW_KEY_ENTER)) {
 		submit();
 	}
-	
-	// Check for text input. TODO: Remove
-	//std::wstring textInput = input->getTextTyped();
-	//write(textInput);
 
 	// Text Mark (Blinking)
 	markTime += deltaTime;
