@@ -23,10 +23,10 @@ void HierarchyMover::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 void HierarchyMover::onMouseButtonReleased(int buttoncode, int mods) {
 	// Hide graphics
 	if (dragging) {
-		destroyEntity(graphics);
 		dragging = false;
 		const Vector2& mousePos = input->getMousePosition();
 		EntityHandle drop = input->getEntityAtPos(mousePos.x, mousePos.y, std::vector<Entity>{graphics.getEntity()});
+		destroyEntity(graphics);
 		if (drop == owner) return;
 		if (HierarchyMover* mover = drop.getComponent<HierarchyMover>()) {
 			// TODO: Make Entities able to switch Scene
