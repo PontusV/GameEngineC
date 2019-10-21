@@ -1,22 +1,22 @@
 #include "LevelEditor.h"
 #include <GLFW/glfw3.h>
 
-#include "../Core/src/scene/Scene.h"
-#include "../Core/src/components/RectTransform.h"
-#include "../Core/src/components/graphics/ui/DropDown.h"
-#include "../Core/src/components/graphics/ui/Button.h"
-#include "../Core/src/components/graphics/ui/WindowAnchor.h"
-#include "../Core/src/components/MouseDrag.h"
-#include "../Core/src/components/graphics/ui/LayoutElement.h"
-#include "../Core/src/components/graphics/ui/HorizontalLayoutGroup.h"
-#include "../Core/src/components/graphics/ui/VerticalLayoutGroup.h"
-#include "../Core/src/components/graphics/ui/WindowScale.h"
-#include "../Core/src/components/DragAndResize.h"
-#include "../Core/src/components/graphics/ui/RectButton.h"
-#include "../Core/src/components/editor/EditorPanel.h"
+#include "scene/Scene.h"
+#include "components/RectTransform.h"
+#include "components/graphics/ui/DropDown.h"
+#include "components/graphics/ui/Button.h"
+#include "components/graphics/ui/WindowAnchor.h"
+#include "components/MouseDrag.h"
+#include "components/graphics/ui/LayoutElement.h"
+#include "components/graphics/ui/HorizontalLayoutGroup.h"
+#include "components/graphics/ui/VerticalLayoutGroup.h"
+#include "components/graphics/ui/WindowScale.h"
+#include "components/DragAndResize.h"
+#include "components/graphics/ui/RectButton.h"
+#include "components/editor/EditorPanel.h"
 
-#include "../Core/src/maths/Vector2.h"
-#include "../Core/src/maths/Vector3.h"
+#include "maths/Vector2.h"
+#include "maths/Vector3.h"
 
 using namespace Core;
 

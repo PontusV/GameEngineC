@@ -1,7 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
-#include "../Core/src/engine/Engine.h"
-#include "../Core/src/input/KeyListener.h"
+#include "engine/Engine.h"
+#include "input/KeyListener.h"
 #include <string>
 
 class LevelEditor : public Core::KeyListener {
