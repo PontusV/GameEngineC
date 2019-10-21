@@ -6,6 +6,7 @@
 #include "components/graphics/Text.h"
 #include "components/graphics/ui/RectButton.h"
 #include "components/graphics/RectSprite.h"
+#include "HierarchyMover.h"
 #include "EditorPanel.h"
 #include "input/Input.h"
 #include "scene/SceneManager.h"
@@ -105,7 +106,7 @@ void HierarchyView::clearList() {
 	list.clear();
 }
 
-void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, std::size_t depth, RectTransform* rect) {
+void HierarchyView::addEntry(EntityHandle& entity, Handle& parentEntry, std::size_t depth, RectTransform* rect) {
 	static std::size_t entryHeight = 20;
 	std::string name = entity.getEntityName();
 	std::string entityName = "Hierarchy_entry_" + entity.getEntityName();
@@ -138,26 +139,18 @@ void HierarchyView::addEntry(EntityHandle& entity, Handle& parent, std::size_t d
 	EntityHandle buttonEntity = createEntity(entityName + "_Button",
 		button,
 		RectSprite(),
-		RectTransform((depth + 1) * 10, 0, width, entryHeight, rect->getZ() + 0.1f, Alignment::LEFT)
+		HierarchyMover(ComponentHandle(this), entity),
+		RectTransform((depth + 1) * 10, 0, width, entryHeight, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
-		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.1f, Alignment::LEFT)
+		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	highlight.setParent(entry);
 	label.setParent(buttonEntity);
 	buttonEntity.setParent(highlight);
-	entry.setParent(parent);
+	entry.setParent(parentEntry);
 	listMap[entity.getEntity()] = { entry, highlight };
-}
-
-bool HierarchyView::isDirty(HierarchyEntry entry) const {
-	for (const HierarchyEntry& element : list) {
-		if (element.entity == entry.entity) {
-			return element.depth != entry.depth || element.order != entry.order || element.parent != entry.parent;
-		}
-	}
-	return false;
 }
 
 std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& entities, const Entity& entity) {
@@ -167,13 +160,27 @@ std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& enti
 	return entities.end();
 }
 
+bool HierarchyView::isDirty(HierarchyEntry entry) {
+	for (const HierarchyEntry& element : list) {
+		if (element.entity == entry.entity) {
+			if (element.depth != entry.depth || element.order != entry.order || element.parent != entry.parent) return true;
+			if (entry.parent.isValid()) {
+				auto it = contains(list, entry.parent.getEntity());
+				if (it == list.end()) return true;
+				return isDirty(*it);
+			}
+		}
+	}
+	return false;
+}
+
 void HierarchyView::refresh() {
 	std::vector<HierarchyEntry> entities = getAllEntities();
 	// Remove destroyed Entries
 	auto it = list.begin();
 	while (it != list.end()) {
 		auto iterator = contains(entities, it->entity.getEntity());
-		if (iterator != entities.end() && !isDirty(*it)) {
+		if (iterator != entities.end() && !isDirty(*iterator)) {
 			it++;
 			entities.erase(iterator);
 		}

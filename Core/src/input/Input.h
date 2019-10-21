@@ -106,8 +106,9 @@ namespace Core {
 		EntityHandle getHoverTarget();
 		EntityHandle getLastLeftClicked();
 
+		/* Gets the Entity at the front as the given position in screen space. */
+		EntityHandle getEntityAtPos(float x, float y, std::vector<Entity> ignoreList = std::vector<Entity>());
 	private:
-		EntityHandle getEntityAtPos(float x, float y);
 		void processInputEvent(const InputEvent& event, EntityHandle& target);
 
 		// KEY

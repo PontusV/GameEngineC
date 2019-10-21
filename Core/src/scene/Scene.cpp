@@ -65,7 +65,7 @@ bool Scene::destroyEntity(Entity entity, bool chained) {
 	manager->destroyEntity(entity);
 	entities.erase(it);
 
-	return false;
+	return true;
 }
 std::vector<Handle>::iterator Scene::findEntity(Entity entity) {
 	for (auto it = entities.begin(); it != entities.end(); it++) {
@@ -190,6 +190,7 @@ void Scene::setParentQueued(Handle entity, Handle parent) {
 
 void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 	if (parentHandle.getEntity().getID() == Entity::INVALID_ID) return; // Cannot set Invalid Entity to parent
+	if (entityHandle == parentHandle) throw std::invalid_argument("Cannot make an Entity a parent/child of itself!");
 	Entity entity = entityHandle.getEntity();
 	Entity parent = parentHandle.getEntity();
 	// Notify previous parent of removal

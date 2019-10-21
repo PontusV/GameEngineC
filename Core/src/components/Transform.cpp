@@ -10,7 +10,7 @@ using namespace Core;
 Transform::Transform(float x, float y, float z, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale) {
 }
 
-Transform::Transform() : position(0, 0) {
+Transform::Transform() : position(0, 0), z(0), rotation(0.0f), scale(1.0f) {
 }
 
 Transform::~Transform() {

@@ -23,6 +23,10 @@ namespace Core {
 			return Vector4(vec.x / length, vec.y / length, vec.z / length, vec.w / length);
 		}
 
+		inline float distance(const Vector2& lhs, const Vector2 rhs) {
+			return std::abs(std::sqrt(std::pow(rhs.x - lhs.x, 2) + std::pow(rhs.y - lhs.y, 2)));
+		}
+
 		inline Matrix4 ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
 			Matrix4 result;
 			result[0][0] = 2 / (right - left);

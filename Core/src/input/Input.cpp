@@ -361,17 +361,27 @@ struct HitDetectData {
 	float sortingOrder;
 };
 
+/* Utility */
+bool contains(const std::vector<Entity>& list, const Entity& value) {
+	for (const Entity& entry : list) {
+		if (entry == value) return true;
+	}
+	return false;
+}
+
 // -------------- HELPERS ------------------
-EntityHandle Input::getEntityAtPos(float x, float y) {
+EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreList) {
 	std::size_t spriteGroupSize = spriteGroup.size();
 	std::size_t spriteGroupUISize = spriteGroupUI.size();
 	HitDetectData currentHit;
 	
 	// --------------------------------- UI -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupUISize; i++) {
+		Entity&			entity		= spriteGroupUI.getEntity(i);
 		Sprite&			sprite		= spriteGroupUI.get<Sprite>(i);
 		RectTransform&	transform	= spriteGroupUI.get<RectTransform>(i);
 
+		if (contains(ignoreList, entity)) continue;
 		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window
@@ -394,9 +404,11 @@ EntityHandle Input::getEntityAtPos(float x, float y) {
 
 	// --------------------------------- World -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupSize; i++) {
+		Entity&			entity		= spriteGroup.getEntity(i);
 		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
 		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
 
+		if (contains(ignoreList, entity)) continue;
 		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window

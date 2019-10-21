@@ -40,9 +40,10 @@ void Behaviour::activate() {
 }
 
 void Behaviour::destroyEntity(EntityHandle& handle) {
-	if (!handle.refresh()) return;
+	if (!handle.isValid()) return;
 	Scene* scene = handle.getScene();
 	scene->destroyEntityQueued(handle.getEntity());
+	handle.clear();
 }
 
 void Behaviour::destroyEntity(Entity entity) {

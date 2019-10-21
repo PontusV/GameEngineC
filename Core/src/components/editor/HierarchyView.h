@@ -45,7 +45,7 @@ namespace Core {
 		void onTargetEntityClick(EntityHandle entity);
 		void onDestroyEntityClick(EntityHandle entity);
 
-		bool isDirty(HierarchyEntry entity) const;
+		bool isDirty(HierarchyEntry entity);
 		std::size_t getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities) const;
 	private:
 		float refreshTime = 0.2f;
