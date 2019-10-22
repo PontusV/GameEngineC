@@ -6,7 +6,8 @@
 #include "components/graphics/Text.h"
 #include "components/graphics/ui/RectButton.h"
 #include "components/graphics/RectSprite.h"
-#include "HierarchyMover.h"
+#include "HierarchySceneMover.h"
+#include "HierarchyEntityMover.h"
 #include "EditorPanel.h"
 #include "input/Input.h"
 #include "scene/SceneManager.h"
@@ -99,6 +100,10 @@ void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
 }
 
 void HierarchyView::clearList() {
+	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
+		destroyEntity(it->second);
+	}
+	sceneMap.clear();
 	for (auto& entry : listMap) {
 		destroyEntity(entry.second.entry);
 	}
@@ -106,20 +111,21 @@ void HierarchyView::clearList() {
 	list.clear();
 }
 
-void HierarchyView::addEntry(EntityHandle& entity, Handle& parentEntry, std::size_t depth, RectTransform* rect) {
-	static std::size_t entryHeight = 20;
-	std::string name = entity.getEntityName();
-	std::string entityName = "Hierarchy_entry_" + entity.getEntityName();
-	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect) {
+	static const std::size_t ENTRY_HEIGHT = 20;
+	EntityHandle& entity = entry.entity;
+	EntityHandle parent = entry.parent.isValid() ? listMap[entry.parent.getEntity()].entry : sceneMap.at(entity.getScene()->getName());
+	std::size_t depth = entry.depth + 1;
 
-	std::size_t childCount = entity.getChildCount();
-	std::size_t height = entryHeight * (childCount + 1);
+	std::string name = entity.getEntityName();
+	std::string entityName = "Hierarchy_entry_" + name;
+	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 	std::size_t width = text.getSize().x + 12;
 
-	EntityHandle entry = createEntity(entityName,
-		RectTransform(0, 0, width, height, rect->getZ() + 0.1f, Alignment::LEFT)
+	EntityHandle entryHandle = createEntity(entityName,
+		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-	VerticalLayoutGroup* layoutGroup = entry.addComponent<VerticalLayoutGroup>();
+	VerticalLayoutGroup* layoutGroup = entryHandle.addComponent<VerticalLayoutGroup>();
 	layoutGroup->childForceExpandWidth = true;
 	layoutGroup->childForceExpandHeight = false;
 	layoutGroup->shrinkableChildWidth = true;
@@ -132,25 +138,72 @@ void HierarchyView::addEntry(EntityHandle& entity, Handle& parentEntry, std::siz
 	button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0, 0, 0, 80);
 	button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
 	button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
-	EntityHandle highlight = createEntity(entityName + "_Background",
+	EntityHandle highlightHandle = createEntity(entityName + "_Background",
 		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
-		RectTransform(0, 0, 0, entryHeight, rect->getZ() + 0.01f, Alignment::LEFT)
+		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
 	);
 	EntityHandle buttonEntity = createEntity(entityName + "_Button",
 		button,
 		RectSprite(),
-		HierarchyMover(ComponentHandle(this), entity),
-		RectTransform((depth + 1) * 10, 0, width, entryHeight, rect->getZ() + 0.2f, Alignment::LEFT)
+		HierarchyEntityMover(ComponentHandle(this), entity),
+		RectTransform((depth + 1) * 10, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
 		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
-	highlight.setParent(entry);
+	highlightHandle.setParent(entryHandle);
 	label.setParent(buttonEntity);
-	buttonEntity.setParent(highlight);
-	entry.setParent(parentEntry);
-	listMap[entity.getEntity()] = { entry, highlight };
+	buttonEntity.setParent(highlightHandle);
+	entryHandle.setParent(parent);
+
+	listMap[entity.getEntity()] = { entryHandle, highlightHandle };
+	list.push_back(entry);
+}
+
+void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransform* rect) {
+	static const std::size_t ENTRY_HEIGHT = 20;
+	EntityHandle parent = owner;
+	static const std::size_t depth = 0;
+
+	std::string entityName = "Hierarchy_entry_" + name;
+	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+	std::size_t width = text.getSize().x + 12;
+
+	EntityHandle entryHandle = createEntity(entityName,
+		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	VerticalLayoutGroup* layoutGroup = entryHandle.addComponent<VerticalLayoutGroup>();
+	layoutGroup->childForceExpandWidth = true;
+	layoutGroup->childForceExpandHeight = false;
+	layoutGroup->shrinkableChildWidth = true;
+	layoutGroup->shrinkableChildHeight = false;
+	layoutGroup->spacing = 5;
+
+	RectButton button = RectButton();
+	button.colors[RectButton::ButtonState::DEFAULT] = Color(255, 255, 255, 0);
+	button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 255, 255, 80);
+	button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0, 0, 0, 80);
+	EntityHandle highlightHandle = createEntity(entityName + "_Background",
+		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, false ? highlightColor.a : 0)),
+		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
+	);
+	EntityHandle buttonEntity = createEntity(entityName + "_Button",
+		button,
+		RectSprite(),
+		HierarchySceneMover(ComponentHandle(this), scene),
+		RectTransform((depth + 1) * 10, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
+	);
+	EntityHandle label = createEntity(entityName + "_Label",
+		text,
+		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
+	);
+	highlightHandle.setParent(entryHandle);
+	label.setParent(buttonEntity);
+	buttonEntity.setParent(highlightHandle);
+	entryHandle.setParent(parent);
+
+	sceneMap.insert(std::make_pair(name, entryHandle));
 }
 
 std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& entities, const Entity& entity) {
@@ -158,6 +211,13 @@ std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& enti
 		if (it->entity.getEntity() == entity) return it;
 	}
 	return entities.end();
+}
+
+std::vector<std::pair<std::string, ScenePtr>>::iterator contains(std::vector<std::pair<std::string, ScenePtr>>& scenes, const std::string& sceneName) {
+	for (auto it = scenes.begin(); it != scenes.end(); it++) {
+		if (it->first == sceneName) return it;
+	}
+	return scenes.end();
 }
 
 bool HierarchyView::isDirty(HierarchyEntry entry) {
@@ -175,6 +235,34 @@ bool HierarchyView::isDirty(HierarchyEntry entry) {
 }
 
 void HierarchyView::refresh() {
+	RectTransform* rect = owner.getComponent<RectTransform>();
+	if (!rect) return;
+	// Scenes
+	std::vector<std::pair<std::string, ScenePtr>> scenes = sceneManager->getAllScenesAsPairs();
+	for (auto sceneIt = sceneMap.begin(); sceneIt != sceneMap.end();) {
+		auto sceneIterator = contains(scenes, sceneIt->first);
+		if (sceneIterator != scenes.end()) {
+			scenes.erase(sceneIterator);
+			sceneIt++;
+		}
+		else {
+			EntityHandle& entry = sceneIt->second;
+			for (auto it = list.begin(); it != list.end();) {
+				if (it->entity.getScene()->getName() == sceneIt->first) {
+					listMap.erase(it->entity.getEntity());
+					list.erase(it);
+				}
+				else {
+					it++;
+				}
+			}
+			destroyEntity(entry);
+		}
+	}
+	for (std::pair<std::string, ScenePtr>& scenePair : scenes) {
+		createSceneEntry(scenePair.first, scenePair.second.get(), rect);
+	}
+	// Entities
 	std::vector<HierarchyEntry> entities = getAllEntities();
 	// Remove destroyed Entries
 	auto it = list.begin();
@@ -191,17 +279,11 @@ void HierarchyView::refresh() {
 		}
 	}
 	// Add new Entries
-	RectTransform* rect = owner.getComponent<RectTransform>();
-	if (!rect) return;
 	std::sort(entities.begin(), entities.end(), [](const HierarchyEntry& lhs, const HierarchyEntry& rhs) {
 		return lhs.depth < rhs.depth;
 	});
 	for (HierarchyEntry& newEntry : entities) {
-		if (newEntry.parent.isValid())
-			addEntry(newEntry.entity, listMap[newEntry.parent.getEntity()].entry, newEntry.depth, rect);
-		else
-			addEntry(newEntry.entity, owner, newEntry.depth, rect);
-		list.push_back(newEntry);
+		createEntityEntry(newEntry, rect);
 	}
 }
 

@@ -1,17 +1,19 @@
-#ifndef HIERARCHY_MOVER_h
-#define HIERARCHY_MOVER_h
+#ifndef HIERARCHY_SCENE_MOVER_h
+#define HIERARCHY_SCENE_MOVER_h
 #include "components/Behaviour.h"
 #include "maths/Vector2.h"
 #include "entity/handle/EntityHandle.h"
 #include "entity/handle/ComponentHandle.h"
-#include "HierarchyMover.generated.h"
+#include "HierarchySceneMover.generated.h"
 namespace Core {
-	/* Moves Entities in the Hierarchy by drag and drop. */
-	CLASS() HierarchyMover : public Behaviour {
+	class Scene;
+
+	/* Moves Scenes in the Hierarchy by drag and drop. */
+	CLASS() HierarchySceneMover : public Behaviour {
 		GENERATED_BODY()
 	public:
-		HierarchyMover(ComponentHandle hierarchy, EntityHandle target);
-		~HierarchyMover();
+		HierarchySceneMover(ComponentHandle hierarchy, Scene* scene);
+		~HierarchySceneMover();
 
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;
@@ -19,7 +21,7 @@ namespace Core {
 		void onDestroy() override;
 
 	public:
-		EntityHandle target;
+		Scene* scene;
 	private:
 		bool dragging = false;
 		Vector2 startPos;

@@ -17,11 +17,12 @@ namespace Core {
 	/* Contains a collection of entities. */
 	class Scene : public Serializable {
 	public:
-		Scene(EntityManager* entityManager, ObjectType type);
+		Scene(EntityManager* entityManager, std::string name, ObjectType type);
 		~Scene();
 
 		const std::vector<Handle>& getAllEntities() const;
 		std::vector<Handle> getRootEntities();
+		std::string getName();
 
 		/* Creates a new Entity in the Scene and adds it to the EntityManager. */
 		template <typename... Ts>
@@ -97,6 +98,7 @@ namespace Core {
 		std::vector<Handle> entities;		// A list of entities contained by this scene
 		EntityManager* manager;				// Manages the Entities in this Scene
 		bool isAwake;
+		std::string name;
 	};
 
 	template <typename... Ts>

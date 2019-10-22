@@ -240,6 +240,10 @@ void Handle::setParent(Handle entity) {
 	scene->setParentQueued(*this, entity);
 }
 
+void Handle::removeParent() {
+	scene->setParentQueued(*this, Handle(Entity(0), scene));
+}
+
 Handle Handle::getParent() {
 	ParentEntity* parentCmp = static_cast<ParentEntity*>(getComponent(typeIDof(ParentEntity))); // Get component with ComponentTypeID is much faster
 	if (parentCmp) {

@@ -102,6 +102,7 @@ namespace Core {
 		bool hasParent();
 		void setParent(const Entity& entity);
 		void setParent(Handle entity);
+		void removeParent();
 		Handle getParent();
 		Handle getChild(std::size_t index);
 		std::size_t getImmediateChildCount();

@@ -318,7 +318,10 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\editor\HierarchyMover.cpp">
+    <ClCompile Include="src\components\editor\HierarchySceneMover.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\editor\HierarchyEntityMover.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -764,7 +767,10 @@
     <ClInclude Include="src\entity\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchyMover.h">
+    <ClInclude Include="src\components\editor\HierarchySceneMover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\editor\HierarchyEntityMover.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

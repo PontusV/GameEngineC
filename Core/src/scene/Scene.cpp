@@ -10,13 +10,16 @@
 using namespace Core;
 
 
-Scene::Scene(EntityManager* entityManager, ObjectType type) : manager(entityManager), type(type), isAwake(false) {
+Scene::Scene(EntityManager* entityManager, std::string name, ObjectType type) : manager(entityManager), name(name), type(type), isAwake(false) {
 }
 
 Scene::~Scene() {
 	clear();
 }
 
+std::string Scene::getName() {
+	return name;
+}
 
 const std::vector<Handle>& Scene::getAllEntities() const {
 	return entities;
@@ -189,11 +192,12 @@ void Scene::setParentQueued(Handle entity, Handle parent) {
 }
 
 void Scene::setParent(Handle entityHandle, Handle parentHandle) {
-	if (parentHandle.getEntity().getID() == Entity::INVALID_ID) return; // Cannot set Invalid Entity to parent
 	if (entityHandle == parentHandle) throw std::invalid_argument("Cannot make an Entity a parent/child of itself!");
+	if (entityHandle.getScene() != parentHandle.getScene()) throw std::invalid_argument("Cannot make Entities in different Scenes be parent and child");
+
 	Entity entity = entityHandle.getEntity();
 	Entity parent = parentHandle.getEntity();
-	// Notify previous parent of removal
+	// Notify previous parent of removal & remove
 	Handle currentParent = getParent(entity);
 	if (currentParent.refresh()) {
 		for (Behaviour* behaviour : currentParent.getComponentsUpwards<Behaviour>()) {
@@ -206,25 +210,31 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 			removeComponent<ChildManager>(currentParent.getEntity());
 	}
 
-	// Add ChildManager to new parent if none already exists
-	if (!manager->hasComponent<ChildManager>(parent)) {
-		ChildManager childManager;
-		addComponent<ChildManager>(parent, childManager);
-	}
+	if (parent.getID() != Entity::INVALID_ID) {
+		// Add ChildManager to new parent if none already exists
+		if (!manager->hasComponent<ChildManager>(parent)) {
+			ChildManager childManager;
+			addComponent<ChildManager>(parent, childManager);
+		}
 
-	// Modify ParentEntity component
-	ParentEntity* parentComponent = manager->getComponent<ParentEntity>(entity);
-	if (!parentComponent) {
-		ParentEntity component;
-		addComponent<ParentEntity>(entity, component);
-		parentComponent = manager->getComponent<ParentEntity>(entity);
-	}
-	parentComponent->setParent(parentHandle);
+		// Modify ParentEntity component
+		ParentEntity* parentComponent = manager->getComponent<ParentEntity>(entity);
+		if (!parentComponent) {
+			ParentEntity component;
+			addComponent<ParentEntity>(entity, component);
+			parentComponent = manager->getComponent<ParentEntity>(entity);
+		}
+		parentComponent->setParent(parentHandle);
 
-	// Notify new parent of added child
-	parentHandle.getComponent<ChildManager>()->onChildAdded(entityHandle);
-	for (Behaviour* behaviour : parentHandle.getComponentsUpwards<Behaviour>()) {
-		behaviour->onChildAdded(entityHandle);
+		// Notify new parent of added child
+		parentHandle.getComponent<ChildManager>()->onChildAdded(entityHandle);
+		for (Behaviour* behaviour : parentHandle.getComponentsUpwards<Behaviour>()) {
+			behaviour->onChildAdded(entityHandle);
+		}
+	}
+	else {
+		if (manager->hasComponent<ParentEntity>(entity))
+			removeComponent<ParentEntity>(entity);
 	}
 }
 
