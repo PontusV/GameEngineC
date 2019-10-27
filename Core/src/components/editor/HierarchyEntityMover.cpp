@@ -72,10 +72,10 @@ void HierarchyEntityMover::onMouseDrag(float mouseX, float mouseY) {
 	}
 }
 
-bool HierarchyEntityMover::setOrder(EntityHandle entity, EntityHandle target, std::size_t order) {
+bool HierarchyEntityMover::setOrder(Handle entity, EntityHandle target, std::size_t order) {
 	// Check for parent switch
 	if (target == entity) return false;
-	if (target.getChildCount() == 0) {
+	if (target.isValid() && target.getChildCount() == 0) {
 		target = target.getParent();
 		order++;
 	}
@@ -104,6 +104,7 @@ bool HierarchyEntityMover::setOrder(EntityHandle entity, EntityHandle target, st
 	}
 	else {
 		// Scene
+		hierarchy.getComponent<HierarchyView>()->setRootIndex(entity, order);
 	}
 	return false;
 }

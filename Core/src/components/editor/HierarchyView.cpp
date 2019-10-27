@@ -45,16 +45,46 @@ void HierarchyView::onEnable() {
 	timer = refreshTime;
 }
 
+std::size_t HierarchyView::getRootIndex(const Handle& handle) {
+	auto it = rootMap.find(handle.getScene()->getName());
+	if (it == rootMap.end()) {
+		std::cout << "HierarchyView::getRootIndex::ERROR The Scene does not exist in the rootMap.";
+		return 0;
+	}
+	std::vector<Entity>& roots = it->second;
+	auto entityIt = std::find(roots.begin(), roots.end(), handle.getEntity());
+	if (entityIt == roots.end()) {
+		//std::cout << "HierarchyView::setRootIndex::ERROR The Entity has not been given a root index.";
+		roots.push_back(handle.getEntity());
+		return roots.size() - 1;
+	}
+	return entityIt - roots.begin();
+}
+
+void HierarchyView::setRootIndex(const Handle& handle, std::size_t index) {
+	auto it = rootMap.find(handle.getScene()->getName());
+	if (it == rootMap.end()) return;
+	std::vector<Entity>& roots = it->second;
+	auto entityIt = std::find(roots.begin(), roots.end(), handle.getEntity());
+	if (entityIt == roots.end()) {
+		std::cout << "HierarchyView::setRootIndex::ERROR The Entity has not been given a root index.";
+		return;
+	}
+	auto eraseIt = roots.erase(entityIt);
+	if (index > eraseIt - roots.begin()) index--;
+	if (index >= roots.size()) index = roots.size();
+	roots.insert(roots.begin() + index, handle.getEntity());
+}
+
 std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 	std::vector<HierarchyEntry> entities;
 	Scene* editorScene = owner.getScene();
 	for (const ScenePtr& scene : sceneManager->getAllScenes()) {
 		if (scene.get() == editorScene) continue;
-		std::vector<Handle> rootEntities = scene->getRootEntities();
 		for (EntityHandle entity : scene->getAllEntities()) {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			EntityHandle parent = entity.getParent();
-			std::size_t order = entity.getSiblingIndex();
+			std::size_t order = entity.hasParent() ? entity.getSiblingIndex() : getRootIndex(entity); // TODO: Different for root objects
 			std::size_t depth = entity.getDepth();
 			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
@@ -111,7 +141,7 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 
 	std::string name = entity.getEntityName();
 	std::string entityName = "Hierarchy_entry_" + name;
-	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+	Text text = Text(name + "_" + std::to_string(order), "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 	std::size_t width = text.getSize().x + 12;
 
 	VerticalLayoutGroup layoutGroup = VerticalLayoutGroup();
@@ -201,7 +231,7 @@ void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransfo
 	label.setParent(header);
 	entryHandle.setParent(owner);
 	// Order Rect
-	createOrderRect(entityName, EntityHandle(), order, rect).setParent(entryHandle);
+	createOrderRect(entityName, EntityHandle(), 0, rect).setParent(entryHandle);
 
 	sceneMap.insert(std::make_pair(name, entryHandle));
 }
@@ -258,11 +288,14 @@ void HierarchyView::refresh() {
 				}
 			}
 			destroyEntity(entry);
+			auto rootMapIt = rootMap.find(sceneIt->first);
+			rootMap.erase(rootMapIt);
 		}
 	}
 	// Add new scenes
 	for (std::pair<std::string, ScenePtr>& scenePair : scenes) {
 		createSceneEntry(scenePair.first, scenePair.second.get(), rect);
+		rootMap.insert(std::make_pair(scenePair.first, std::vector<Entity>{}));
 	}
 	// Entities
 	std::vector<HierarchyEntry> entities = getAllEntities();
@@ -275,6 +308,22 @@ void HierarchyView::refresh() {
 			entities.erase(iterator);
 		}
 		else {
+			if (it->depth == 0 && iterator->depth != 0) { // Check if root converting to child
+				auto rootMapIt = rootMap.find(it->entity.getScene()->getName());
+				if (rootMapIt != rootMap.end()) {
+					std::vector<Entity>& roots = rootMapIt->second;
+					auto rootIt = std::find(roots.begin(), roots.end(), it->entity.getEntity());
+					if (rootIt != roots.end()) {
+						roots.erase(rootIt);
+					}
+					else {
+						std::cout << "HierarchyView::refresh::ERROR The Entity did not have a root order.";
+					}
+				}
+				else {
+					std::cout << "HierarchyView::refresh::ERROR The Scene does not exist in the rootMap.";
+				}
+			}
 			destroyEntity(listMap[it->entity.getEntity()].entry);
 			listMap.erase(it->entity.getEntity());
 			list.erase(it);

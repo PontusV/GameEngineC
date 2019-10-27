@@ -37,6 +37,8 @@ namespace Core {
 		void lateUpdate(float deltaTime) override;
 
 		void target(EntityHandle entity);
+		std::size_t getRootIndex(const Handle& entity);
+		void setRootIndex(const Handle& entity, std::size_t index);
 
 	private:
 		void refresh();
@@ -60,6 +62,7 @@ namespace Core {
 
 		std::vector<HierarchyEntry> list;
 		std::map<Entity, EntryHandle> listMap;
+		std::map<std::string, std::vector<Entity>> rootMap;
 		std::map<std::string, EntityHandle> sceneMap;
 		std::map<Entity, std::size_t> dirtyOrderMap;
 
