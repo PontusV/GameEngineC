@@ -108,6 +108,9 @@ namespace Core {
 		std::size_t getImmediateChildCount();
 		std::size_t getChildCount();
 
+		void setSiblingIndex(std::size_t index);
+		std::size_t getSiblingIndex();
+
 	protected:
 		// Data required to update itself
 		Scene* scene = nullptr;

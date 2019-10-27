@@ -117,6 +117,10 @@ void Transform::setZ(float value) {
 	z = value;
 }
 
+void Transform::setChanged() {
+	changed = true;
+}
+
 bool Transform::hasChanged() {
 	return changed;
 }

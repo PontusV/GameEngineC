@@ -35,8 +35,8 @@ namespace Core {
 		virtual void onDisable() {};
 
 		//
-		virtual void onPreRender() {};
-		virtual void onPostRender() {};
+		virtual void onPreRender(float deltaTime) {};
+		virtual void onPostRender(float deltaTime) {};
 
 		// Input
 		/* Called when a mouse button was pressed. */

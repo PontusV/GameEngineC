@@ -3,6 +3,7 @@
 #include "entity/component/ComponentLoader.h"
 #include "components/entity/ParentEntity.h"
 #include "components/entity/ChildManager.h"
+#include "components/Transform.h"
 #include "components/Behaviour.h"
 
 #include <iostream>
@@ -192,8 +193,14 @@ void Scene::setParentQueued(Handle entity, Handle parent) {
 }
 
 void Scene::setParent(Handle entityHandle, Handle parentHandle) {
-	if (entityHandle == parentHandle) throw std::invalid_argument("Cannot make an Entity a parent/child of itself!");
-	if (entityHandle.getScene() != parentHandle.getScene()) throw std::invalid_argument("Cannot make Entities in different Scenes be parent and child");
+	if (entityHandle == parentHandle) {
+		std::cout << "Cannot make an Entity a parent/child of itself!"  << std::endl;
+		throw std::invalid_argument("Cannot make an Entity a parent/child of itself!");
+	}
+	if (entityHandle.getScene() != parentHandle.getScene()) {
+		std::cout << "Cannot make Entities in different Scenes be parent and child" << std::endl;
+		throw std::invalid_argument("Cannot make Entities in different Scenes be parent and child");
+	}
 
 	Entity entity = entityHandle.getEntity();
 	Entity parent = parentHandle.getEntity();
@@ -232,9 +239,11 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 			behaviour->onChildAdded(entityHandle);
 		}
 	}
-	else {
-		if (manager->hasComponent<ParentEntity>(entity))
-			removeComponent<ParentEntity>(entity);
+	else if (manager->hasComponent<ParentEntity>(entity)) {
+		removeComponent<ParentEntity>(entity);
+	}
+	if (Transform* transform = entityHandle.getComponent<Transform>()) {
+		transform->setChanged();
 	}
 }
 

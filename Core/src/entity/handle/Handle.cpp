@@ -6,6 +6,8 @@
 #include "components/entity/ParentEntity.h"
 #include "components/entity/ChildManager.h"
 
+#include <algorithm>
+
 using namespace Core;
 
 Handle::Handle(Entity entity, Scene* scene) : entity(entity), scene(scene) {
@@ -32,6 +34,45 @@ const Entity& Handle::getEntity() const {
 
 Scene* Handle::getScene() const {
 	return scene;
+}
+
+void Handle::setSiblingIndex(std::size_t index) {
+	Handle parent = getParent();
+
+	if (parent.isValid()) {
+		// Entity
+		ChildManager* childManager = parent.getComponent<ChildManager>();
+		if (childManager) {
+			std::vector<Handle>& children = childManager->getChildren();
+			std::iter_swap(children.begin() + index, std::find(children.begin(), children.end(), *this));
+		}
+	}
+	else {
+		// Scene
+		//std::vector<Handle> rootEntities = scene->getRootEntities();
+	}
+}
+
+std::size_t Handle::getSiblingIndex() {
+	Handle parent = getParent();
+	if (parent.isValid()) {
+		// Entity
+		std::size_t childCount = parent.getImmediateChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			if (parent.getChild(i).getEntity() == entity) {
+				return i;
+			}
+		}
+	}
+	else {
+		// Scene
+		std::size_t i = 0;
+		for (Handle& root : scene->getRootEntities()) {
+			if (root.getEntity() == entity) return i;
+			i++;
+		}
+	}
+	return 0;
 }
 
 std::size_t Handle::getDepth() {

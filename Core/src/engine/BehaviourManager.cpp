@@ -41,24 +41,24 @@ void BehaviourManager::update(float deltaTime) {
 	}
 }
 
-void BehaviourManager::onPreRender() {
+void BehaviourManager::onPreRender(float deltaTime) {
 	std::size_t scriptAmount = behaviourGroup.size();
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
 		if (behaviour.isEnabled() && behaviour.started) { // Check if enabled
-			behaviour.onPreRender();
+			behaviour.onPreRender(deltaTime);
 		}
 	}
 }
 
-void BehaviourManager::onPostRender() {
+void BehaviourManager::onPostRender(float deltaTime) {
 	std::size_t scriptAmount = behaviourGroup.size();
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
 		if (behaviour.isEnabled() && behaviour.started) { // Check if enabled
-			behaviour.onPostRender();
+			behaviour.onPostRender(deltaTime);
 		}
 	}
 }

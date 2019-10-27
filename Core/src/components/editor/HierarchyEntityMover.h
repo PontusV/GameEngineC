@@ -21,6 +21,8 @@ namespace Core {
 	public:
 		EntityHandle target;
 	private:
+		bool setOrder(EntityHandle entity, EntityHandle parent, std::size_t order);
+	private:
 		bool dragging = false;
 		Vector2 startPos;
 		EntityHandle graphics;

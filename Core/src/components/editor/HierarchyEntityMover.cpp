@@ -1,5 +1,6 @@
 #include "HierarchyEntityMover.h"
 #include "HierarchySceneMover.h"
+#include "HierarchyOrderRect.h"
 #include "input/Input.h"
 #include "graphics/Camera.h"
 #include "graphics/data/Color.h"
@@ -8,6 +9,7 @@
 #include "HierarchyView.h"
 #include "components/RectTransform.h"
 #include "components/graphics/RectSprite.h"
+#include "components/entity/ChildManager.h"
 using namespace Core;
 
 const float HierarchyEntityMover::START_DRAG_DISTANCE = 10;
@@ -30,7 +32,6 @@ void HierarchyEntityMover::onMouseButtonReleased(int buttoncode, int mods) {
 		destroyEntity(graphics);
 		if (drop == owner) return;
 		if (HierarchyEntityMover* mover = drop.getComponent<HierarchyEntityMover>()) {
-			// TODO: Make Entities able to switch Scene
 			if (target == mover->target || mover->target.isParent(target.getEntity()) || target.getParent() == mover->target || target.getScene() != mover->target.getScene()) return;
 			target.setParent(mover->target);
 		}
@@ -39,6 +40,10 @@ void HierarchyEntityMover::onMouseButtonReleased(int buttoncode, int mods) {
 			if (mover->scene != target.getScene()) {
 				// TODO: Change scene
 			}
+		}
+		else if (HierarchyOrderRect* orderRect = drop.getComponent<HierarchyOrderRect>()) {
+			if (target != orderRect->entity)
+				setOrder(target, orderRect->entity, orderRect->order);
 		}
 	}
 }
@@ -65,4 +70,40 @@ void HierarchyEntityMover::onMouseDrag(float mouseX, float mouseY) {
 			);
 		}
 	}
+}
+
+bool HierarchyEntityMover::setOrder(EntityHandle entity, EntityHandle target, std::size_t order) {
+	// Check for parent switch
+	if (target == entity) return false;
+	if (target.getChildCount() == 0) {
+		target = target.getParent();
+		order++;
+	}
+	else order = 0;
+	EntityHandle currentParent = entity.getParent();
+	std::vector<Handle> rootEntities = entity.getScene()->getRootEntities();
+	std::size_t currentOrder = entity.getSiblingIndex();
+	if (currentParent != target) {
+		if (!target.isValid()) {
+			entity.removeParent();
+		}
+		else if (entity != target) {
+			entity.setParent(target);
+		}
+	}
+	else if (target.isValid()) {
+		// Entity
+		ChildManager* childManager = target.getComponent<ChildManager>();
+		if (childManager) {
+			if (currentOrder < order) order--;
+			if (order > childManager->getChildCount()) order = childManager->getChildCount();
+			entity.setSiblingIndex(order);
+			return true;
+		}
+		return false;
+	}
+	else {
+		// Scene
+	}
+	return false;
 }

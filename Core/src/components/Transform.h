@@ -51,6 +51,8 @@ namespace Core {
 		void setY(float value);
 		void setZ(float value);
 
+		/* Marks this transform for an update */
+		void setChanged();
 		bool hasChanged();
 
 	protected:

@@ -42,7 +42,8 @@ void ScrollBar::onDestroy() {
 	//destroyEntity(handle);
 }
 
-void ScrollBar::onPreRender() {
+void ScrollBar::onPreRender(float deltaTime) {
+	if (!handle.refresh()) return;
 	if (!target.refresh()) {
 		RectTransform* handleRect = handle.getComponent<RectTransform>();
 		if (handleRect->getSize().y != 0.0f || handleRect->getSize().x != 0.0f)

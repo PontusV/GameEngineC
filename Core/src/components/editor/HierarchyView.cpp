@@ -6,8 +6,10 @@
 #include "components/graphics/Text.h"
 #include "components/graphics/ui/RectButton.h"
 #include "components/graphics/RectSprite.h"
+#include "components/entity/ChildManager.h"
 #include "HierarchySceneMover.h"
 #include "HierarchyEntityMover.h"
+#include "HierarchyOrderRect.h"
 #include "EditorPanel.h"
 #include "input/Input.h"
 #include "scene/SceneManager.h"
@@ -33,7 +35,7 @@ void HierarchyView::onEnable() {
 		group->childForceExpandWidth = true;
 		group->shrinkableChildHeight = false;
 		group->shrinkableChildWidth = true;
-		group->spacing = 5;
+		group->spacing = 0;
 		group->paddingTop = 10;
 		group->paddingLeft = 0;
 		group->paddingRight = 0;
@@ -41,25 +43,6 @@ void HierarchyView::onEnable() {
 
 	refresh();
 	timer = refreshTime;
-}
-
-std::size_t HierarchyView::getOrder(EntityHandle& entity, EntityHandle& parent, std::vector<Handle>& rootEntities) const {
-	if (parent.isValid()) {
-		std::size_t childCount = parent.getChildCount();
-		for (std::size_t i = 0; i < childCount; i++) {
-			if (parent.getChild(i) == entity) {
-				return i;
-			}
-		}
-	}
-	else {
-		std::size_t i = 0;
-		for (Handle& root : rootEntities) {
-			if (root == entity) return i;
-			i++;
-		}
-	}
-	return 0;
 }
 
 std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
@@ -71,7 +54,7 @@ std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 		for (EntityHandle entity : scene->getAllEntities()) {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			EntityHandle parent = entity.getParent();
-			std::size_t order = getOrder(entity, parent, rootEntities);
+			std::size_t order = entity.getSiblingIndex();
 			std::size_t depth = entity.getDepth();
 			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
@@ -111,26 +94,36 @@ void HierarchyView::clearList() {
 	list.clear();
 }
 
+EntityHandle HierarchyView::createOrderRect(std::string name, EntityHandle entity, std::size_t order, RectTransform* rect) {
+	return createEntity(name + "_Order_Rect",
+		HierarchyOrderRect(entity, order),
+		RectSprite(Color(0, 0, 0, 10)),
+		RectTransform(0, 20, 0, 10, rect->getZ() + 0.3f, Alignment::CENTER)
+	);
+}
+
 void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect) {
-	static const std::size_t ENTRY_HEIGHT = 20;
+	static const std::size_t ENTRY_HEIGHT = 15;
 	EntityHandle& entity = entry.entity;
 	EntityHandle parent = entry.parent.isValid() ? listMap[entry.parent.getEntity()].entry : sceneMap.at(entity.getScene()->getName());
 	std::size_t depth = entry.depth + 1;
+	std::size_t& order = entry.order;
 
 	std::string name = entity.getEntityName();
 	std::string entityName = "Hierarchy_entry_" + name;
 	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 	std::size_t width = text.getSize().x + 12;
 
+	VerticalLayoutGroup layoutGroup = VerticalLayoutGroup();
+	layoutGroup.childForceExpandWidth = true;
+	layoutGroup.childForceExpandHeight = false;
+	layoutGroup.shrinkableChildWidth = true;
+	layoutGroup.shrinkableChildHeight = false;
+	layoutGroup.spacing = 0;
 	EntityHandle entryHandle = createEntity(entityName,
+		layoutGroup,
 		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-	VerticalLayoutGroup* layoutGroup = entryHandle.addComponent<VerticalLayoutGroup>();
-	layoutGroup->childForceExpandWidth = true;
-	layoutGroup->childForceExpandHeight = false;
-	layoutGroup->shrinkableChildWidth = true;
-	layoutGroup->shrinkableChildHeight = false;
-	layoutGroup->spacing = 5;
 
 	RectButton button = RectButton();
 	button.colors[RectButton::ButtonState::DEFAULT] = Color(255, 255, 255, 0);
@@ -139,6 +132,7 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 	button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
 	button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
 	EntityHandle highlightHandle = createEntity(entityName + "_Background",
+		layoutGroup,
 		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
 		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
 	);
@@ -146,62 +140,68 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 		button,
 		RectSprite(),
 		HierarchyEntityMover(ComponentHandle(this), entity),
-		RectTransform((depth + 1) * 10, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
-		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectTransform((depth) * 20, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	highlightHandle.setParent(entryHandle);
 	label.setParent(buttonEntity);
 	buttonEntity.setParent(highlightHandle);
 	entryHandle.setParent(parent);
 
+	// Order Rects
+	//createOrderRect(entityName, entry.parent, order + 1, rect).setParent(entryHandle);
+	createOrderRect(entityName, entry.entity, order, rect).setParent(entryHandle);
+
 	listMap[entity.getEntity()] = { entryHandle, highlightHandle };
-	list.push_back(entry);
+	std::size_t index = 0;
+
+	// Sort new entry
+	auto it = list.begin();
+	while (it != list.end()) {
+		const HierarchyEntry& rhs = *it;
+		if (depth < rhs.depth || depth == rhs.depth && order < rhs.order) break;
+		it++;
+	}
+	list.insert(it, entry);
 }
 
 void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransform* rect) {
 	static const std::size_t ENTRY_HEIGHT = 20;
-	EntityHandle parent = owner;
 	static const std::size_t depth = 0;
+	std::size_t order = sceneMap.size();
 
 	std::string entityName = "Hierarchy_entry_" + name;
-	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(0, 0, 0));
 	std::size_t width = text.getSize().x + 12;
 
+	VerticalLayoutGroup layoutGroup = VerticalLayoutGroup();
+	layoutGroup.childForceExpandWidth = true;
+	layoutGroup.childForceExpandHeight = false;
+	layoutGroup.shrinkableChildWidth = true;
+	layoutGroup.shrinkableChildHeight = false;
+	layoutGroup.spacing = 0;
 	EntityHandle entryHandle = createEntity(entityName,
+		layoutGroup,
 		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-	VerticalLayoutGroup* layoutGroup = entryHandle.addComponent<VerticalLayoutGroup>();
-	layoutGroup->childForceExpandWidth = true;
-	layoutGroup->childForceExpandHeight = false;
-	layoutGroup->shrinkableChildWidth = true;
-	layoutGroup->shrinkableChildHeight = false;
-	layoutGroup->spacing = 5;
 
-	RectButton button = RectButton();
-	button.colors[RectButton::ButtonState::DEFAULT] = Color(255, 255, 255, 0);
-	button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 255, 255, 80);
-	button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0, 0, 0, 80);
-	EntityHandle highlightHandle = createEntity(entityName + "_Background",
-		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, false ? highlightColor.a : 0)),
-		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
-	);
-	EntityHandle buttonEntity = createEntity(entityName + "_Button",
-		button,
-		RectSprite(),
+	EntityHandle header = createEntity(entityName + "_Header",
 		HierarchySceneMover(ComponentHandle(this), scene),
-		RectTransform((depth + 1) * 10, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectSprite(Color(200, 200, 200, 255)),
+		RectTransform(0, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
 		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
-	highlightHandle.setParent(entryHandle);
-	label.setParent(buttonEntity);
-	buttonEntity.setParent(highlightHandle);
-	entryHandle.setParent(parent);
+	header.setParent(entryHandle);
+	label.setParent(header);
+	entryHandle.setParent(owner);
+	// Order Rect
+	createOrderRect(entityName, EntityHandle(), order, rect).setParent(entryHandle);
 
 	sceneMap.insert(std::make_pair(name, entryHandle));
 }
@@ -239,6 +239,7 @@ void HierarchyView::refresh() {
 	if (!rect) return;
 	// Scenes
 	std::vector<std::pair<std::string, ScenePtr>> scenes = sceneManager->getAllScenesAsPairs();
+	// Remove destroyed Scenes
 	for (auto sceneIt = sceneMap.begin(); sceneIt != sceneMap.end();) {
 		auto sceneIterator = contains(scenes, sceneIt->first);
 		if (sceneIterator != scenes.end()) {
@@ -259,6 +260,7 @@ void HierarchyView::refresh() {
 			destroyEntity(entry);
 		}
 	}
+	// Add new scenes
 	for (std::pair<std::string, ScenePtr>& scenePair : scenes) {
 		createSceneEntry(scenePair.first, scenePair.second.get(), rect);
 	}
@@ -280,10 +282,25 @@ void HierarchyView::refresh() {
 	}
 	// Add new Entries
 	std::sort(entities.begin(), entities.end(), [](const HierarchyEntry& lhs, const HierarchyEntry& rhs) {
-		return lhs.depth < rhs.depth;
+		if (lhs.depth < rhs.depth) return true;
+		if (lhs.depth > rhs.depth) return false;
+		return lhs.order < rhs.order;
 	});
 	for (HierarchyEntry& newEntry : entities) {
 		createEntityEntry(newEntry, rect);
+		// Updating dirty order map
+		Entity parent(0);
+		if (newEntry.parent.isValid())
+			parent = newEntry.parent.getEntity();
+
+		auto it = dirtyOrderMap.find(parent);
+		if (it != dirtyOrderMap.end()) {
+			if (it->second > newEntry.order)
+				it->second = newEntry.order;
+		}
+		else {
+			dirtyOrderMap.insert(std::make_pair(parent, newEntry.order));
+		}
 	}
 }
 
@@ -291,10 +308,43 @@ void HierarchyView::onDisable() {
 	clearList();
 }
 
+void HierarchyView::updateOrder() {
+	for (auto orderIt = dirtyOrderMap.begin(); orderIt != dirtyOrderMap.end(); orderIt++) {
+		// Update order
+		const Entity& entity = orderIt->first;
+		std::size_t& order = orderIt->second;
+
+		for (HierarchyEntry& entry : list) {
+			EntityHandle entityEntry = getEntryHandle(entry.entity.getEntity());
+			if (!entityEntry.isValid())
+				std::cout << "HierarchyView::UpdateOrder::ERROR Entity does not have any Entry" << std::endl;
+			else
+				entityEntry.setSiblingIndex(entry.order + 2);
+		}
+
+		// Force update layout
+		auto listMapIt = listMap.find(entity);
+		if (listMapIt != listMap.end()) {
+			if (LayoutGroup* layout = listMapIt->second.entry.getComponent<LayoutGroup>()) {
+				layout->setDirty();
+			}
+		}
+	}
+	dirtyOrderMap.clear();
+}
+
 void HierarchyView::lateUpdate(float deltaTime) {
+	updateOrder();
 	timer -= deltaTime;
 	if (timer <= 0) {
 		timer = refreshTime;
 		refresh();
 	}
+}
+
+EntityHandle HierarchyView::getEntryHandle(const Entity& entity) {
+	auto entryIt = listMap.find(entity);
+	if (entryIt == listMap.end())
+		return EntityHandle();
+	return entryIt->second.entry;
 }

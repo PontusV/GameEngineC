@@ -37,7 +37,7 @@ void ScrollRect::onScroll(float xOffset, float yOffset) {
 	checkScrollArea();
 }
 
-void ScrollRect::onPreRender() {
+void ScrollRect::onPreRender(float deltaTime) {
 	refreshContentBounds();
 	checkScrollArea();
 }

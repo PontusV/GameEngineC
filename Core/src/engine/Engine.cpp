@@ -157,16 +157,16 @@ int Engine::start() {
 		glfwPollEvents();
 
 		// Update systems
+		sceneManager.update();
 		input.update(deltaTime);
 		behaviourManager.update(deltaTime);
-		sceneManager.update();
 		graphics.update(deltaTime);
 		physics.update(deltaTime);
 
 		// Render
-		behaviourManager.onPreRender();
+		behaviourManager.onPreRender(deltaTime);
 		graphics.render(deltaTime);
-		behaviourManager.onPostRender();
+		behaviourManager.onPostRender(deltaTime);
 
 
 		// 1ms sleep

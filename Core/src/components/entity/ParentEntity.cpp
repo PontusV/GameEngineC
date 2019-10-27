@@ -16,7 +16,7 @@ ParentEntity::~ParentEntity() {
 
 
 void ParentEntity::setParent(Handle parent) {
-	if (!parent.refresh()) {
+	if (!parent.isValid()) {
 		std::cout << "ParentEntity::setParent::ERROR Cannot add invalid Parent to Entity\n";
 		throw std::invalid_argument("ParentEntity::setParent::ERROR Cannot add invalid Parent");
 	}

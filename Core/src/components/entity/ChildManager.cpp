@@ -7,17 +7,19 @@ ChildManager::~ChildManager()
 {
 }
 
-void ChildManager::onChildAdded(Handle entity) {
+bool ChildManager::onChildAdded(Handle entity) {
 	children.push_back(entity);
+	return true;
 }
 
-void ChildManager::onChildRemoved(Handle entity) {
+bool ChildManager::onChildRemoved(Handle entity) {
 	for (auto it = children.begin(); it != children.end(); it++) {
 		if (*it == entity) {
 			children.erase(it);
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 std::size_t ChildManager::getChildCount() {

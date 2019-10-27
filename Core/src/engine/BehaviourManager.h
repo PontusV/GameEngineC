@@ -17,9 +17,9 @@ namespace Core {
 		/* Calls Behaviour::update() on all behaviours. */
 		void update(float deltaTime);
 		/* Calls Behavior::onPreRender() on all behaviours */
-		void onPreRender();
+		void onPreRender(float deltaTime);
 		/* Calls Behavior::onPostRender() on all behaviours */
-		void onPostRender();
+		void onPostRender(float deltaTime);
 
 		ComponentArray<Behaviour>& getAllScripts();
 

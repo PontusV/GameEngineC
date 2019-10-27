@@ -209,6 +209,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="src\components\editor\HierarchyOrderRect.cpp" />
     <ClCompile Include="src\components\editor\HierarchyEntityMover.cpp" />
     <ClCompile Include="src\components\editor\HierarchySceneMover.cpp" />
     <ClCompile Include="src\components\DragAndResize.cpp" />
@@ -296,6 +297,7 @@
     <ClCompile Include="src\utils\UIDContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\editor\HierarchyOrderRect.h" />
     <ClInclude Include="src\components\editor\HierarchySceneMover.h" />
     <ClInclude Include="src\components\editor\HierarchyEntityMover.h" />
     <ClInclude Include="src\collections\TArray.h" />
