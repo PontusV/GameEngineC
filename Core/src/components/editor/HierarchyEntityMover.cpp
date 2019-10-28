@@ -23,12 +23,18 @@ void HierarchyEntityMover::onMouseButtonPressedAsButton(int buttoncode, int mods
 	startPos = input->getMousePosition();
 }
 
+Handle HierarchyEntityMover::getEntityBelow() {
+	const Vector2& mousePos = input->getMousePosition();
+	return input->getEntityAtPos(mousePos.x, mousePos.y, std::vector<Entity>{graphics.getEntity()});
+}
+
 void HierarchyEntityMover::onMouseButtonReleased(int buttoncode, int mods) {
 	// Hide graphics
 	if (dragging) {
 		dragging = false;
-		const Vector2& mousePos = input->getMousePosition();
-		EntityHandle drop = input->getEntityAtPos(mousePos.x, mousePos.y, std::vector<Entity>{graphics.getEntity()});
+		hoverOut(entityBelow);
+		entityBelow.clear();
+		EntityHandle drop = getEntityBelow();
 		destroyEntity(graphics);
 		if (drop == owner) return;
 		if (HierarchyEntityMover* mover = drop.getComponent<HierarchyEntityMover>()) {
@@ -50,12 +56,38 @@ void HierarchyEntityMover::onDestroy() {
 	destroyEntity(graphics);
 }
 
+void HierarchyEntityMover::hoverOut(EntityHandle entity) {
+	if (HierarchyEntityMover* mover = entityBelow.getComponent<HierarchyEntityMover>()) {
+		mover->getOwner().getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+	}
+	else if (HierarchyOrderRect* orderRect = entityBelow.getComponent<HierarchyOrderRect>()) {
+		orderRect->getOwner().getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+	}
+}
+
+void HierarchyEntityMover::hoverOver(EntityHandle entity) {
+	if (HierarchyEntityMover* mover = entityBelow.getComponent<HierarchyEntityMover>()) {
+		mover->getOwner().getComponent<RectSprite>()->setColor(Color(100, 100, 100, 255));
+	}
+	else if (HierarchyOrderRect* orderRect = entityBelow.getComponent<HierarchyOrderRect>()) {
+		orderRect->getOwner().getComponent<RectSprite>()->setColor(Color(50, 50, 255, 255));
+	}
+}
+
 void HierarchyEntityMover::onMouseDrag(float mouseX, float mouseY) {
 	if (dragging) {
 		// Move graphics
 		if (RectTransform* rect = graphics.getComponent<RectTransform>()) {
 			Vector2 pos = camera->getViewMatrix() * input->getMousePosition();
 			rect->setPosition(pos);
+
+			// TODO: Highlight order rects & Entries
+			EntityHandle currentEntityBelow = getEntityBelow();
+			if (currentEntityBelow != entityBelow) {
+				hoverOut(entityBelow);
+				entityBelow = getEntityBelow();
+				hoverOver(entityBelow);
+			}
 		}
 	}
 	else if (maths::distance(startPos, input->getMousePosition()) >= START_DRAG_DISTANCE) {

@@ -22,8 +22,13 @@ namespace Core {
 		EntityHandle target;
 	private:
 		bool setOrder(Handle entity, EntityHandle parent, std::size_t order);
+		Handle getEntityBelow();
+
+		void hoverOut(EntityHandle entity);
+		void hoverOver(EntityHandle entity);
 	private:
 		bool dragging = false;
+		EntityHandle entityBelow;
 		Vector2 startPos;
 		EntityHandle graphics;
 		ComponentHandle hierarchy;

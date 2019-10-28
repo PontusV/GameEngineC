@@ -17,6 +17,10 @@
 using namespace Core;
 
 
+const std::size_t SCENE_ENTRY_HEIGHT = 20;
+const std::size_t ENTITY_ENTRY_HEIGHT = 15;
+const std::size_t ORDER_RECT_HEIGHT = 10;
+
 HierarchyView::HierarchyView(ComponentHandle editor) : editor(editor) {}
 HierarchyView::~HierarchyView() {}
 
@@ -124,12 +128,11 @@ EntityHandle HierarchyView::createOrderRect(std::string name, EntityHandle entit
 	return createEntity(name + "_Order_Rect",
 		HierarchyOrderRect(entity, order),
 		RectSprite(Color(0, 0, 0, 10)),
-		RectTransform(0, 20, 0, 10, rect->getZ() + 0.3f, Alignment::CENTER)
+		RectTransform(0, 20, 0, ORDER_RECT_HEIGHT, rect->getZ() + 0.3f, Alignment::CENTER)
 	);
 }
 
 void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect) {
-	static const std::size_t ENTRY_HEIGHT = 15;
 	EntityHandle& entity = entry.entity;
 	EntityHandle parent = entry.parent.isValid() ? listMap[entry.parent.getEntity()].entry : sceneMap.at(entity.getScene()->getName());
 	std::size_t depth = entry.depth + 1;
@@ -160,13 +163,13 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 	EntityHandle highlightHandle = createEntity(entityName + "_Background",
 		layoutGroup,
 		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
-		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
+		RectTransform(0, 0, 0, ENTITY_ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
 	);
 	EntityHandle buttonEntity = createEntity(entityName + "_Button",
 		button,
 		RectSprite(),
 		HierarchyEntityMover(ComponentHandle(this), entity),
-		RectTransform(0, 0, 0, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectTransform(0, 0, 0, ENTITY_ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
@@ -194,7 +197,6 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 }
 
 void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransform* rect) {
-	static const std::size_t ENTRY_HEIGHT = 20;
 	static const std::size_t depth = 0;
 	std::size_t order = sceneMap.size();
 
@@ -216,7 +218,7 @@ void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransfo
 	EntityHandle header = createEntity(entityName + "_Header",
 		HierarchySceneMover(ComponentHandle(this), scene),
 		RectSprite(Color(200, 200, 200, 255)),
-		RectTransform(0, 0, width, ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectTransform(0, 0, width, SCENE_ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
