@@ -127,7 +127,7 @@ void HierarchyView::clearList() {
 EntityHandle HierarchyView::createOrderRect(std::string name, EntityHandle entity, std::size_t order, RectTransform* rect) {
 	return createEntity(name + "_Order_Rect",
 		HierarchyOrderRect(entity, order),
-		RectSprite(Color(0, 0, 0, 10)),
+		RectSprite(Color(0, 0, 0, 0)),
 		RectTransform(0, 20, 0, ORDER_RECT_HEIGHT, rect->getZ() + 0.3f, Alignment::CENTER)
 	);
 }
