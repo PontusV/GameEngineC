@@ -37,20 +37,11 @@ Scene* Handle::getScene() const {
 }
 
 void Handle::setSiblingIndex(std::size_t index) {
-	Handle parent = getParent();
+	scene->setSiblingIndex(*this, index);
+}
 
-	if (parent.isValid()) {
-		// Entity
-		ChildManager* childManager = parent.getComponent<ChildManager>();
-		if (childManager) {
-			std::vector<Handle>& children = childManager->getChildren();
-			std::iter_swap(children.begin() + index, std::find(children.begin(), children.end(), *this));
-		}
-	}
-	else {
-		// Scene
-		//std::vector<Handle> rootEntities = scene->getRootEntities();
-	}
+void Handle::setSiblingIndexQueued(std::size_t index) {
+	scene->setSiblingIndexQueued(*this, index);
 }
 
 std::size_t Handle::getSiblingIndex() {
@@ -65,12 +56,7 @@ std::size_t Handle::getSiblingIndex() {
 		}
 	}
 	else {
-		// Scene
-		std::size_t i = 0;
-		for (Handle& root : scene->getRootEntities()) {
-			if (root.getEntity() == entity) return i;
-			i++;
-		}
+		std::cout << "Handle::getSiblingIndex::ERROR Cannot get the sibling index of a root object!" << std::endl;
 	}
 	return 0;
 }

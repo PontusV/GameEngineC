@@ -109,6 +109,7 @@ namespace Core {
 		std::size_t getChildCount();
 
 		void setSiblingIndex(std::size_t index);
+		void setSiblingIndexQueued(std::size_t index);
 		std::size_t getSiblingIndex();
 
 	protected:

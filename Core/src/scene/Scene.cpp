@@ -104,6 +104,29 @@ void Scene::removeComponentQueued(Entity entity, ComponentTypeID componentTypeID
 	functionQueue.push_back(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
 }
 
+void Scene::setSiblingIndex(Handle entity, std::size_t index) {
+	Handle parent = entity.getParent();
+
+	if (parent.isValid()) {
+		// Entity
+		ChildManager* childManager = parent.getComponent<ChildManager>();
+		if (childManager) {
+			std::vector<Handle>& children = childManager->getChildren();
+			auto it = std::find(children.begin(), children.end(), entity);
+			children.erase(it);
+			if (it - children.begin() < index) index--;
+			children.insert(children.begin() + index, entity);
+		}
+	}
+	else {
+		std::cout << "Scene::setSiblingIndex::ERROR Cannot set the sibling index of a root object!" << std::endl;
+	}
+}
+
+void Scene::setSiblingIndexQueued(Handle entity, std::size_t index) {
+	functionQueue.push_back(new FunctionCaller<void, Scene, Handle, std::size_t>(&Scene::setSiblingIndex, *this, entity, index));
+}
+
 void Scene::awake() {
 	isAwake = true;
 	// Loop through all entities

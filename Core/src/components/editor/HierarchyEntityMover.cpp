@@ -36,9 +36,8 @@ void HierarchyEntityMover::onMouseButtonReleased(int buttoncode, int mods) {
 			target.setParent(mover->target);
 		}
 		else if (HierarchySceneMover* mover = drop.getComponent<HierarchySceneMover>()) {
-			target.removeParent();
-			if (mover->scene != target.getScene()) {
-				// TODO: Change scene
+			if (mover->scene == target.getScene()) {
+				target.removeParent();
 			}
 		}
 		else if (HierarchyOrderRect* orderRect = drop.getComponent<HierarchyOrderRect>()) {
@@ -82,20 +81,20 @@ bool HierarchyEntityMover::setOrder(Handle entity, EntityHandle target, std::siz
 	else order = 0;
 	EntityHandle currentParent = entity.getParent();
 	std::vector<Handle> rootEntities = entity.getScene()->getRootEntities();
-	std::size_t currentOrder = entity.getSiblingIndex();
 	if (currentParent != target) {
 		if (!target.isValid()) {
 			entity.removeParent();
+			hierarchy.getComponent<HierarchyView>()->setRootIndex(entity, order);
 		}
 		else if (entity != target) {
 			entity.setParent(target);
+			entity.setSiblingIndexQueued(order);
 		}
 	}
 	else if (target.isValid()) {
 		// Entity
 		ChildManager* childManager = target.getComponent<ChildManager>();
 		if (childManager) {
-			if (currentOrder < order) order--;
 			if (order > childManager->getChildCount()) order = childManager->getChildCount();
 			entity.setSiblingIndex(order);
 			return true;

@@ -41,7 +41,6 @@ void HierarchyView::onEnable() {
 		group->paddingRight = 0;
 	}
 
-	refresh();
 	timer = refreshTime;
 }
 
@@ -54,7 +53,6 @@ std::size_t HierarchyView::getRootIndex(const Handle& handle) {
 	std::vector<Entity>& roots = it->second;
 	auto entityIt = std::find(roots.begin(), roots.end(), handle.getEntity());
 	if (entityIt == roots.end()) {
-		//std::cout << "HierarchyView::setRootIndex::ERROR The Entity has not been given a root index.";
 		roots.push_back(handle.getEntity());
 		return roots.size() - 1;
 	}
@@ -65,14 +63,12 @@ void HierarchyView::setRootIndex(const Handle& handle, std::size_t index) {
 	auto it = rootMap.find(handle.getScene()->getName());
 	if (it == rootMap.end()) return;
 	std::vector<Entity>& roots = it->second;
-	auto entityIt = std::find(roots.begin(), roots.end(), handle.getEntity());
-	if (entityIt == roots.end()) {
-		std::cout << "HierarchyView::setRootIndex::ERROR The Entity has not been given a root index.";
-		return;
-	}
-	auto eraseIt = roots.erase(entityIt);
-	if (index > eraseIt - roots.begin()) index--;
 	if (index >= roots.size()) index = roots.size();
+	auto entityIt = std::find(roots.begin(), roots.end(), handle.getEntity());
+	if (entityIt != roots.end()) {
+		auto eraseIt = roots.erase(entityIt);
+		if (index > eraseIt - roots.begin()) index--;
+	}
 	roots.insert(roots.begin() + index, handle.getEntity());
 }
 
@@ -84,7 +80,7 @@ std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 		for (EntityHandle entity : scene->getAllEntities()) {
 			if (entity.getEntityHideFlags() == HideFlags::HideInHierarchy) continue;
 			EntityHandle parent = entity.getParent();
-			std::size_t order = entity.hasParent() ? entity.getSiblingIndex() : getRootIndex(entity); // TODO: Different for root objects
+			std::size_t order = entity.hasParent() ? entity.getSiblingIndex() : getRootIndex(entity);
 			std::size_t depth = entity.getDepth();
 			entities.push_back(HierarchyEntry(entity, parent, order, depth));
 		}
@@ -141,7 +137,7 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 
 	std::string name = entity.getEntityName();
 	std::string entityName = "Hierarchy_entry_" + name;
-	Text text = Text(name + "_" + std::to_string(order), "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+	Text text = Text(name, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
 	std::size_t width = text.getSize().x + 12;
 
 	VerticalLayoutGroup layoutGroup = VerticalLayoutGroup();
@@ -182,7 +178,6 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 	entryHandle.setParent(parent);
 
 	// Order Rects
-	//createOrderRect(entityName, entry.parent, order + 1, rect).setParent(entryHandle);
 	createOrderRect(entityName, entry.entity, order, rect).setParent(entryHandle);
 
 	listMap[entity.getEntity()] = { entryHandle, highlightHandle };
@@ -364,11 +359,13 @@ void HierarchyView::updateOrder() {
 		std::size_t& order = orderIt->second;
 
 		for (HierarchyEntry& entry : list) {
+			if (entry.order < order && entry.entity.getEntity() != entity) continue;
 			EntityHandle entityEntry = getEntryHandle(entry.entity.getEntity());
 			if (!entityEntry.isValid())
 				std::cout << "HierarchyView::UpdateOrder::ERROR Entity does not have any Entry" << std::endl;
-			else
+			else if (entityEntry.hasParent())
 				entityEntry.setSiblingIndex(entry.order + 2);
+			else std::cout << entityEntry.getEntityName() << std::endl;
 		}
 
 		// Force update layout

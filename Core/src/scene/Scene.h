@@ -55,8 +55,8 @@ namespace Core {
 		Handle getChild(Entity entity, int index) const;
 		std::size_t getImmediateChildCount(Entity entity) const;
 
-		//void setSiblingIndex(std::size_t index)
-		//void setSiblingIndexQueued(std::size_t index);
+		void setSiblingIndex(Handle entity, std::size_t index);
+		void setSiblingIndexQueued(Handle entity, std::size_t index);
 
 		/* Returns a Handle to the Entity. */
 		Handle getEntityHandle(Entity entity);
