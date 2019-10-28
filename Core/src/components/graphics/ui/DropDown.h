@@ -30,8 +30,8 @@ namespace Core {
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonPressed(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;
-		void onHoverover() override;
-		void onHoverout() override;
+		void onHoverOver() override;
+		void onHoverOut() override;
 		void onDestroy() override;
 		// State: Default, Hover, Open
 		void test();

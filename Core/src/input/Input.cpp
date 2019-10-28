@@ -42,14 +42,14 @@ void Input::update(float deltaTime) {
 		// Hover out
 		if (!target.isParent(hoverTarget.getEntity())) {
 			for (Behaviour* script : hoverTarget.getComponents<Behaviour>()) {
-				script->onHoverout();
+				script->onHoverOut();
 			}
 			// Hover out - parents
 			Handle parent = hoverTarget.getParent();
 			while (parent.refresh()) {
 				if (parent == target) break;
 				for (Behaviour* script : parent.getComponents<Behaviour>()) {
-					script->onHoverout();
+					script->onHoverOut();
 				}
 				parent = parent.getParent();
 			}
@@ -57,14 +57,14 @@ void Input::update(float deltaTime) {
 		// Hover over
 		if (!hoverTarget.isParent(target.getEntity())) {
 			for (Behaviour* script : target.getComponents<Behaviour>()) {
-				script->onHoverover();
+				script->onHoverOver();
 			}
 			// Hover over - parents
 			Handle parent = target.getParent();
 			while (parent.refresh()) {
 				if (parent == hoverTarget) break;
 				for (Behaviour* script : parent.getComponents<Behaviour>()) {
-					script->onHoverover();
+					script->onHoverOver();
 				}
 				parent = parent.getParent();
 			}

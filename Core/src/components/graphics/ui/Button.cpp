@@ -63,12 +63,12 @@ void Button::onMouseButtonReleasedAsButton(int buttoncode, int mods) {
 		changeState(HOVER_OVER);
 }
 
-void Button::onHoverover() {
+void Button::onHoverOver() {
 	if (state == DISABLED) return;
 	changeState(HOVER_OVER);
 }
 
-void Button::onHoverout() {
+void Button::onHoverOut() {
 	if (state == DISABLED) return;
 	if (state == PRESSED_DOWN || state == HOVER_OVER)
 		changeState(DEFAULT);

@@ -18,8 +18,8 @@ using namespace Core;
 
 
 const std::size_t SCENE_ENTRY_HEIGHT = 20;
-const std::size_t ENTITY_ENTRY_HEIGHT = 15;
-const std::size_t ORDER_RECT_HEIGHT = 10;
+const std::size_t ENTITY_ENTRY_HEIGHT = 16;
+const std::size_t ORDER_RECT_HEIGHT = 8;
 
 HierarchyView::HierarchyView(ComponentHandle editor) : editor(editor) {}
 HierarchyView::~HierarchyView() {}

@@ -32,8 +32,8 @@ namespace Core {
 		void onDisable() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleasedAsButton(int buttoncode, int mods) override;
-		void onHoverover() override;
-		void onHoverout() override;
+		void onHoverOver() override;
+		void onHoverOut() override;
 
 		Image* getImages();
 	private:

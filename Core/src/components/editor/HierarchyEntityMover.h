@@ -16,7 +16,14 @@ namespace Core {
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;
 		void onMouseButtonReleased(int buttoncode, int mods) override;
 		void onMouseDrag(float mouseX, float mouseY) override;
+		void onHoverOver() override;
+		void onHoverOut() override;
 		void onDestroy() override;
+
+		/* Called when a HierarchyEntry is moved over. */
+		void onMoveOver();
+		/* Called when a HierarchyEntry is moved out. */
+		void onMoveOut();
 
 	public:
 		EntityHandle target;

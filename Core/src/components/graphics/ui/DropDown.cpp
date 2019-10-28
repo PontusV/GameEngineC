@@ -59,7 +59,7 @@ void DropDown::onMouseButtonReleased(int buttoncode, int mods) {
 	}
 }
 
-void DropDown::onHoverover() {
+void DropDown::onHoverOver() {
 	if (isOpen) return;
 	Sprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {
@@ -67,7 +67,7 @@ void DropDown::onHoverover() {
 	}
 }
 
-void DropDown::onHoverout() {
+void DropDown::onHoverOut() {
 	if (isOpen) return;
 	Sprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {

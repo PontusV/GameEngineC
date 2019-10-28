@@ -11,6 +11,11 @@ namespace Core {
 		HierarchyOrderRect(EntityHandle entity, std::size_t order);
 		~HierarchyOrderRect();
 
+		/* Called when a HierarchyEntry is moved over. */
+		void onMoveOver();
+		/* Called when a HierarchyEntry is moved out. */
+		void onMoveOut();
+
 	public:
 		EntityHandle entity;
 		std::size_t order;

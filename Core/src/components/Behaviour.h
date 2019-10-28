@@ -52,9 +52,9 @@ namespace Core {
 		/* Called when the owner was double clicked on. */
 		virtual void onDoubleClick() {}
 		/* Called when the mouse hovers over the owner. */
-		virtual void onHoverover() {}
+		virtual void onHoverOver() {}
 		/* Called when the mouse stops hovering over the owner. */
-		virtual void onHoverout() {}
+		virtual void onHoverOut() {}
 		/* Called when the mouse scroll is moved while the mouse points on the owner. */
 		virtual void onScroll(float xoffset, float yoffset) {}
 

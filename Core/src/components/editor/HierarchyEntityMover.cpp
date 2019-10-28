@@ -47,7 +47,7 @@ void HierarchyEntityMover::onMouseButtonReleased(int buttoncode, int mods) {
 			}
 		}
 		else if (HierarchyOrderRect* orderRect = drop.getComponent<HierarchyOrderRect>()) {
-			if (target != orderRect->entity)
+			if (target == orderRect->entity || orderRect->entity.isParent(target.getEntity()) || target.getParent() == orderRect->entity || target.getScene() != orderRect->entity.getScene()) return;
 				setOrder(target, orderRect->entity, orderRect->order);
 		}
 	}
@@ -58,20 +58,36 @@ void HierarchyEntityMover::onDestroy() {
 
 void HierarchyEntityMover::hoverOut(EntityHandle entity) {
 	if (HierarchyEntityMover* mover = entityBelow.getComponent<HierarchyEntityMover>()) {
-		mover->getOwner().getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+		mover->onMoveOut();
 	}
 	else if (HierarchyOrderRect* orderRect = entityBelow.getComponent<HierarchyOrderRect>()) {
-		orderRect->getOwner().getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+		orderRect->onMoveOut();
 	}
 }
 
 void HierarchyEntityMover::hoverOver(EntityHandle entity) {
 	if (HierarchyEntityMover* mover = entityBelow.getComponent<HierarchyEntityMover>()) {
-		mover->getOwner().getComponent<RectSprite>()->setColor(Color(100, 100, 100, 255));
+		mover->onMoveOver();
 	}
 	else if (HierarchyOrderRect* orderRect = entityBelow.getComponent<HierarchyOrderRect>()) {
-		orderRect->getOwner().getComponent<RectSprite>()->setColor(Color(50, 50, 255, 255));
+		orderRect->onMoveOver();
 	}
+}
+
+void HierarchyEntityMover::onHoverOver() {
+	onMoveOver();
+}
+
+void HierarchyEntityMover::onHoverOut() {
+	onMoveOut();
+}
+
+void HierarchyEntityMover::onMoveOut() {
+	owner.getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+}
+
+void HierarchyEntityMover::onMoveOver() {
+	owner.getComponent<RectSprite>()->setColor(Color(255, 255, 255, 80));
 }
 
 void HierarchyEntityMover::onMouseDrag(float mouseX, float mouseY) {
