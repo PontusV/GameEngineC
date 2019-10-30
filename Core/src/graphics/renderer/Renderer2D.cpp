@@ -63,11 +63,11 @@ void Renderer2D::flush() {
 	// Sort list of renderable copies
 	std::sort(std::begin(renderableBuffer), &renderableBuffer[renderablesSize], [](Renderable2D& l, Renderable2D& r) {
 
-		if (l.sortingLayer > r.sortingLayer) return true;
-		if (r.sortingLayer > l.sortingLayer) return false;
-
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
+
+		if (l.sortingLayer < r.sortingLayer) return true;
+		if (r.sortingLayer < l.sortingLayer) return false;
 
 		if (l.shaderID > r.shaderID) return true;
 		if (r.shaderID > l.shaderID) return false;

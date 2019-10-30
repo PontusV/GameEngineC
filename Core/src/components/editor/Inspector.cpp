@@ -313,6 +313,11 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		RectSprite(Color(255, 40, 40)),
 		RectTransform(0, 0, 20, 20, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
+	EntityHandle removeButtonCross = createEntity(entryName + "_RemoveButton_Cross",
+		Image("resources/images/ui/cross.png"),
+		RectTransform(10, 10, 10, 10, rect->getZ() + 0.201f, Alignment::CENTER)
+	);
+	removeButtonCross.setParent(removeButtonEntity);
 	RectButton* removeButton = removeButtonEntity.addComponent<RectButton>();
 	removeButton->colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
 	removeButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);

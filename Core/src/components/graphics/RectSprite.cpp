@@ -3,7 +3,7 @@
 using namespace Core;
 
 
-RectSprite::RectSprite(Color color) : Sprite(color) {
+RectSprite::RectSprite(Color color, std::size_t sortingLayer) : Sprite(color, sortingLayer) {
 } // Constructor
 
 RectSprite::~RectSprite() {

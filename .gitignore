@@ -10,3 +10,4 @@ Release/*
 *.db
 *.ipch
 .vs/*
+gimp/*
