@@ -1,5 +1,6 @@
 #include "Inspector.h"
 #include "input/Input.h"
+#include "engine/ResourceManager.h"
 #include "components/graphics/ui/HorizontalLayoutGroup.h"
 #include "components/graphics/ui/VerticalLayoutGroup.h"
 #include "components/RectTransform.h"
@@ -144,17 +145,41 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	Mirror::VariableType& propType = value.prop.type;
 
 	// Label
+	HorizontalLayoutGroup propLabelFieldLayout = HorizontalLayoutGroup();
+	propLabelFieldLayout.spacing = 5;
+	EntityHandle propLabelField = createEntity(entityName + "_Label_Field",
+		propLabelFieldLayout,
+		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f)
+	);
+	propLabelField.setParent(propValueField);
+
 	EntityHandle propLabel = createEntity(entityName + "_Label");
 	RectTransform* propTextRect = propLabel.addComponent(RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::LEFT));
 	Text* propText = propLabel.addComponent(Text(label + ":", "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
 	propTextRect->setSize(propText->getSize());
-	propLabel.setParent(propValueField);
+	propLabel.setParent(propLabelField);
 
 	if (propTypeID) {
 		VerticalLayoutGroup* fieldLayout = propValueField.addComponent<VerticalLayoutGroup>();
 		fieldLayout->spacing = 3;
 		fieldLayout->shrinkableChildHeight = false;
 		fieldLayout->shrinkableChildWidth = false;
+
+		Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
+		Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
+		//collapsibleButton.onLeftClick = ;
+		EntityHandle collapsibleIcon = createEntity(entityName + "_Collapsible_Icon",
+			Image("resources/images/ui/arrow.png", figureShader),
+			collapsibleButton,
+			RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
+		);
+		LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
+		collapsibleLayout->setFlexibleSizeEnabled(true);
+		collapsibleLayout->setFlexibleSize(Vector2(0, 0));
+		collapsibleLayout->setMinSizeEnabled(true);
+		collapsibleLayout->setMinSize(Vector2(10, 10));
+		collapsibleIcon.setParent(propLabelField);
+		collapsibleIcon.setSiblingIndexQueued(0);
 
 		void* propInstance = getInstanceOfValue(instance, typeID, value);
 		Mirror::Class classType = Mirror::getType(propType.name);
@@ -284,7 +309,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	group->shrinkableChildWidth = true;
 	entry.setParent(owner);
 
-	// Entry content
+	// Entry Label Field
 	EntityHandle labelField = createEntity(entryName + "_LabelField",
 		RectSprite(Color(40, 40, 40)),
 		RectTransform(0, 0, 0, 24, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
@@ -299,8 +324,24 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	labelLayoutGroup->shrinkableChildWidth = true;
 	labelLayoutGroup->paddingLeft = 5;
 	labelLayoutGroup->paddingRight = 2;
+	labelLayoutGroup->spacing = 5;
 	labelLayoutGroup->childAlignment = Alignment::LEFT;
 	labelField.setParent(entry);
+
+	Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
+	Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
+	//collapsibleButton.onLeftClick = ;
+	EntityHandle collapsibleIcon = createEntity(entryName + "_Collapsible_Icon",
+		Image("resources/images/ui/arrow.png", figureShader),
+		collapsibleButton,
+		RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
+	);
+	LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
+	collapsibleLayout->setFlexibleSizeEnabled(true);
+	collapsibleLayout->setFlexibleSize(Vector2(0, 0));
+	collapsibleLayout->setMinSizeEnabled(true);
+	collapsibleLayout->setMinSize(Vector2(10, 10));
+	collapsibleIcon.setParent(labelField);
 	EntityHandle label = createEntity(entryName + "_Label",
 		Text(type.name, "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255)),
 		RectTransform(0, 12, 0, 24, rect->getZ() + 0.1f, Alignment::LEFT)
@@ -330,6 +371,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	removeButtonLayout->setMinSize(Vector2(20, 20));
 	removeButtonEntity.setParent(labelField);
 
+	// Entry content
 	EntityHandle entryContent = createEntity(entryName + "_Content",
 		RectTransform(0,0,0,0,rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);

@@ -5,17 +5,9 @@ using namespace Core;
 
 
 Button::Button(Image defaultImage, Image pressedImage, Image hoverImage) : images{defaultImage, pressedImage, hoverImage} {
-	colors[DEFAULT]			= { 255,255,255,255 };
-	colors[PRESSED_DOWN]	= { 255,255,255,255 };
-	colors[HOVER_OVER]		= { 255,255,255,255 };
-	colors[DISABLED]		= { 255,255,255,255 };
 }
 
 Button::Button(const char* defaultImage, const char* pressedImage, const char* hoverImage) : images{ Image(defaultImage), Image(pressedImage), Image(hoverImage) } {
-	colors[DEFAULT]			= { 255,255,255,255 };
-	colors[PRESSED_DOWN]	= { 255,255,255,255 };
-	colors[HOVER_OVER]		= { 255,255,255,255 };
-	colors[DISABLED]		= { 255,255,255,255 };
 }
 
 Button::~Button() {
@@ -82,10 +74,12 @@ void Button::changeState(ButtonState state) {
 	Image* image = owner.getComponent<Image>();
 	if (image) {
 		images[state].reload();
-		// Change image
+		// Change texture
 		image->set(images[state].getFileName());
 		// Change color
-		image->setColor(colors[state]);
+		image->setColor(images[state].getColor());
+		// Change shader
+		image->setShader(images[state].getShader());
 	}
 	else {
 		std::cout << "Button: Could not find Image component!\n";

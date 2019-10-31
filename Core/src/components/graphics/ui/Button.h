@@ -22,8 +22,8 @@ namespace Core {
 		};
 	public:
 		// Constructor / Destructor
-		Button(Image defaultImage, Image pressedImage, Image hoverImage);
-		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage);
+		Button(Image defaultImage, Image pressedImage, Image hoverImage); // TODO: Add disabledImage option, default of disabled is default
+		Button(const char* defaultImage, const char* pressedImage, const char* hoverImage); // TODO: Add disabledImage option, default of disabled is default
 		Button() {}
 		~Button();
 
@@ -42,8 +42,6 @@ namespace Core {
 	public:
 		PROPERTY()
 		Image images[4];
-		PROPERTY()
-		Color colors[4];
 		PROPERTY()
 		ComponentFunctionHandle<void> onLeftClick;
 		PROPERTY()
