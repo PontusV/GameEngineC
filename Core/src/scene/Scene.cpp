@@ -104,6 +104,59 @@ void Scene::removeComponentQueued(Entity entity, ComponentTypeID componentTypeID
 	functionQueue.push_back(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
 }
 
+bool Scene::activate(Handle entity) {
+	if (entity.refresh()) {
+		Handle parent = entity.getParent();
+		if (parent.isValid() && !parent.isActive()) return false; // Cannot activate an Entity with an inactive parent
+		// Activates self
+		if (auto chunk = entity.getLocation().chunk.lock()) {
+			if (chunk->activate(entity.getLocation().index)) {
+				// Enables all behaviours
+				for (Behaviour* behaviour : entity.getComponents<Behaviour>())
+					behaviour->enable();
+			}
+			else {
+				return false;
+			}
+		}
+		// Activates children
+		std::size_t childCount = entity.getImmediateChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			activate(entity.getChild(i));
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Scene::deactivate(Handle entity) {
+	if (entity.refresh()) {
+		// Deactivates children
+		std::size_t childCount = entity.getImmediateChildCount();
+		for (std::size_t i = 0; i < childCount; i++) {
+			deactivate(entity.getChild(i));
+		}
+		// Deactivates self
+		if (auto chunk = entity.getLocation().chunk.lock()) {
+			if (chunk->deactivate(entity.getLocation().index)) {
+				// Disables all behaviours
+				for (Behaviour* behaviour : entity.getComponents<Behaviour>())
+					behaviour->disable();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void Scene::activateQueued(Handle entity) {
+	functionQueue.push_back(new FunctionCaller<bool, Scene, Handle>(&Scene::activate, *this, entity));
+}
+
+void Scene::deactivateQueued(Handle entity) {
+	functionQueue.push_back(new FunctionCaller<bool, Scene, Handle>(&Scene::deactivate, *this, entity));
+}
+
 void Scene::setSiblingIndex(Handle entity, std::size_t index) {
 	Handle parent = entity.getParent();
 

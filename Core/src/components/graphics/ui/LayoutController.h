@@ -32,6 +32,8 @@ namespace Core {
 		void onChildAdded(EntityHandle entity) override;
 		void onChildRemoved(EntityHandle entity) override;
 		void onChildChanged(EntityHandle entity) override;
+		void onEnable() override;
+		void onDisable() override;
 
 		/* Updates layout and sets dirty to false. */
 		void refresh();

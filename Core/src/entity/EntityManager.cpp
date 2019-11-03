@@ -20,7 +20,6 @@ Entity EntityManager::generateEntity(std::string name) {
 EntityLocation EntityManager::getLocation(Entity entity) {
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) return EntityLocation(); // Returns invalid location
-
 	return it->second->getLocation(entity);
 }
 
@@ -216,8 +215,8 @@ std::vector<Component*> EntityManager::getComponents(Entity entity) {
 }
 
 EntityLocation EntityManager::moveEntity(Entity entity, Archetype* src, Archetype* dest) {
-	EntityLocation location = dest->addEntity(entity);
-	dest->copyEntity(entity, src->getComponentDataBlocks(entity));
+	std::shared_ptr<Chunk> chunk = src->getContainer(entity);
+	EntityLocation location = dest->moveEntity(entity, chunk->getComponentDataBlocks(entity), !chunk->isActive(entity));
 	removeEntity(entity);
 	entityMap.insert(std::make_pair(entity, dest));
 	return location;

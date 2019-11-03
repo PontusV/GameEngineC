@@ -30,6 +30,12 @@ namespace Core {
 		/* Returns true if the given Entity is an immediate child of the Entity this instance points to. */
 		bool isImmediateChild(Entity entity);
 
+		/* Activates the Entity and enables all behaviours. */
+		void activate();
+		/* Deactivates the Entity and disables all behaviours. */
+		void deactivate();
+		bool isActive();
+
 		const Entity& getEntity() const;
 		Scene* getScene() const;
 
@@ -64,16 +70,16 @@ namespace Core {
 		std::vector<Component*> getComponents(ComponentType type);
 
 		template<typename T>
-		T* getComponentInChildren();
-		std::vector<Component*> getComponentsInChildren();
+		T* getComponentInChildren(bool includeInactive = false);
+		std::vector<Component*> getComponentsInChildren(bool includeInactive = false);
 		template<typename T>
-		std::vector<T*> getComponentsInChildren();
+		std::vector<T*> getComponentsInChildren(bool includeInactive = false);
 
 		template<typename T>
-		T* getComponentInImmediateChildren();
-		std::vector<Component*> getComponentsInImmediateChildren();
+		T* getComponentInImmediateChildren(bool includeInactive = false);
+		std::vector<Component*> getComponentsInImmediateChildren(bool includeInactive = false);
 		template<typename T>
-		std::vector<T*> getComponentsInImmediateChildren();
+		std::vector<T*> getComponentsInImmediateChildren(bool includeInactive = false);
 
 		template<typename T>
 		T* getComponentInParents();
@@ -88,10 +94,10 @@ namespace Core {
 		std::vector<T*> getComponentsUpwards();
 
 		/* Returns all components attached to the entity, its children and the childrens children, etc... */
-		std::vector<Component*> getComponentsDownwards();
+		std::vector<Component*> getComponentsDownwards(bool includeInactive = false);
 		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
 		template<typename T>
-		std::vector<T*> getComponentsDownwards();
+		std::vector<T*> getComponentsDownwards(bool includeInactive = false);
 
 		ObjectType getObjectType();
 
@@ -142,46 +148,54 @@ namespace Core {
 	}
 
 	template<typename T>
-	T* Handle::getComponentInImmediateChildren() {
+	T* Handle::getComponentInImmediateChildren(bool includeInactive) {
 		std::size_t childCount = getImmediateChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
 			Handle child = getChild(i);
-			if (T * ptr = child.getComponent<T>()) // Check if child has the component
-				return ptr;
+			if (child.isActive() || includeInactive) {
+				if (T* ptr = child.getComponent<T>()) // Check if child has the component
+					return ptr;
+			}
 		}
 		return nullptr;
 	}
 	template<typename T>
-	std::vector<T*> Handle::getComponentsInImmediateChildren() {
+	std::vector<T*> Handle::getComponentsInImmediateChildren(bool includeInactive) {
 		std::vector<T*> components;
 		std::size_t childCount = getImmediateChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
 			Handle child = getChild(i);
-			std::vector<T*> childComponents = child.getComponents<T>();
-			components.insert(components.end(), childComponents.begin(), childComponents.end());
+			if (child.isActive() || includeInactive) {
+				std::vector<T*> childComponents = child.getComponents<T>();
+				components.insert(components.end(), childComponents.begin(), childComponents.end());
+			}
 		}
 		return components;
 	}
 
 	template<typename T>
-	T* Handle::getComponentInChildren() {
+	T* Handle::getComponentInChildren(bool includeInactive) {
 		std::size_t childCount = getChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
 			Handle child = getChild(i);
-			if (T* ptr = child.getComponent<T>()) // Check if child has the component
-				return ptr;
+			if (child.isActive() || includeInactive) {
+				if (T* ptr = child.getComponent<T>()) // Check if child has the component
+					return ptr;
+			}
 		}
 		return nullptr;
 	}
 
 	template<typename T>
-	std::vector<T*> Handle::getComponentsInChildren() {
+	std::vector<T*> Handle::getComponentsInChildren(bool includeInactive) {
 		std::vector<T*> components;
 		std::size_t childCount = getChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
 			Handle child = getChild(i);
-			std::vector<T*> childComponents = child.getComponents<T>();
-			components.insert(components.end(), childComponents.begin(), childComponents.end());
+			if (child.isActive() || includeInactive) {
+				std::vector<T*> childComponents = child.getComponents<T>();
+				components.insert(components.end(), childComponents.begin(), childComponents.end());
+			}
 		}
 		return components;
 	}
@@ -220,9 +234,9 @@ namespace Core {
 	}
 
 	template<typename T>
-	std::vector<T*> Handle::getComponentsDownwards() {
+	std::vector<T*> Handle::getComponentsDownwards(bool includeInactive) {
 		std::vector<T*> components = getComponents<T>();
-		std::vector<T*> childComponents = getComponentsInChildren<T>();
+		std::vector<T*> childComponents = getComponentsInChildren<T>(includeInactive);
 		components.insert(components.end(), childComponents.begin(), childComponents.end());
 		return components;
 	}

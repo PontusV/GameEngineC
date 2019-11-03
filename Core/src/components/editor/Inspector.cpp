@@ -263,7 +263,7 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 	fieldLayout->paddingTop = 5;
 	fieldLayout->paddingBottom = 5;
 	fieldLayout->paddingRight = 5;
-	fieldLayout->paddingLeft = 5;
+	fieldLayout->paddingLeft = component == instance ? 5 : 10;
 
 	// Create Field Body
 	if (Mirror::isArrayType(prop.type)) {
@@ -329,11 +329,11 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	labelField.setParent(entry);
 
 	Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
-	Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
+	//Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
 	//collapsibleButton.onLeftClick = ;
 	EntityHandle collapsibleIcon = createEntity(entryName + "_Collapsible_Icon",
 		Image("resources/images/ui/arrow.png", figureShader),
-		collapsibleButton,
+		//collapsibleButton,
 		RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
 	);
 	LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
@@ -391,6 +391,8 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 		propField.setParent(entryContent);
 	}
 	entryContent.setParent(entry);
+	Button* collapsibleButton = collapsibleIcon.addComponent(Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255))));
+	collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, entryContent);
 
 	// End of Entry content
 	targetComponentList.push_back(entry);
@@ -476,4 +478,11 @@ void Inspector::lateUpdate(float deltaTime) {
 
 void Inspector::removeComponentFromTarget(ComponentTypeID typeID) {
 	currentTarget.removeComponent(typeID);
+}
+
+void Inspector::collapse(EntityHandle contentHandle) {
+	if (contentHandle.isActive())
+		contentHandle.deactivate();
+	else
+		contentHandle.activate();
 }

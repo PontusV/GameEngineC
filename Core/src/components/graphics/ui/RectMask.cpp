@@ -23,7 +23,7 @@ void RectMask::onTransformChanged() {
 void RectMask::onChildAdded(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
-		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
+		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>(true)) {
 			sprite->clip(getComponentID(), vertices);
 			childSprites.push_back(ComponentHandle(sprite));
 		}
@@ -32,7 +32,7 @@ void RectMask::onChildAdded(EntityHandle entity) {
 
 void RectMask::onChildRemoved(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
-		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
+		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>(true)) {
 			sprite->removeClip(getComponentID());
 			bool removed = false;
 			for (auto it = childSprites.begin(); it != childSprites.end(); it++) {
@@ -53,7 +53,7 @@ void RectMask::onChildRemoved(EntityHandle entity) {
 void RectMask::onChildChanged(EntityHandle entity) {
 	if (RectTransform* rect = owner.getComponent<RectTransform>()) {
 		auto vertices = rect->getVertices();
-		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>()) {
+		for (Sprite* sprite : entity.getComponentsDownwards<Sprite>(true)) {
 			if (!sprite->hasMaskFromSender(getComponentID())) {
 				sprite->clip(getComponentID(), vertices);
 				childSprites.push_back(ComponentHandle(sprite));

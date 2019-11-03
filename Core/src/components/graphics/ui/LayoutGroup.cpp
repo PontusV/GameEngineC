@@ -26,6 +26,7 @@ std::vector<LayoutElementData> LayoutGroup::getLayoutElementData(bool shrinkable
 	std::vector<LayoutElementData> elements;
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = owner.getChild(i);
+		if (!child.isActive()) continue;
 		Vector2 flexibleSize = LayoutController::getFlexibleSize(child);
 		Vector2 prefSize = LayoutController::getPrefSize(child);
 		Vector2 minSize;

@@ -60,8 +60,20 @@ void Archetype::removeEntity(Entity entity) {
 	}
 }
 
-void Archetype::copyEntity(Entity entity, std::vector<ComponentDataBlock> sources) {
-	getContainer(entity)->copyEntity(entity, sources);
+EntityLocation Archetype::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive) {
+	//Checking for space in existing chunks
+	for (std::shared_ptr<Chunk> chunk : chunks) {
+		if (!chunk->isFull()) {
+			std::size_t index = chunk->moveEntity(entity, sources, inactive);
+			return EntityLocation(index, chunk);
+		}
+	}
+
+	//No space found, adding new chunk
+	createChunk();
+	std::shared_ptr<Chunk> chunk = chunks.back();
+	std::size_t index = chunk->moveEntity(entity, sources, inactive);
+	return EntityLocation(index, chunk);
 }
 
 
@@ -117,6 +129,7 @@ std::shared_ptr<Chunk> Archetype::getContainer(Entity entity) {
 			return chunk;
 		}
 	}
+	std::cout << "Archetype::getContainer::ERROR The entity(" << entity.getID() << ") is not contained by this Archetype!" << std::endl;
 	throw std::invalid_argument("Archetype::getContainer::ERROR The entity is not contained by this Archetype!");
 }
 

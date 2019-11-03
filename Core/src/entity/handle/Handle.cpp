@@ -36,6 +36,22 @@ Scene* Handle::getScene() const {
 	return scene;
 }
 
+void Handle::activate() {
+	scene->activateQueued(*this);
+}
+
+void Handle::deactivate() {
+	scene->deactivateQueued(*this);
+}
+
+bool Handle::isActive() {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock())
+			return chunk->isActive(locationData.index);
+	}
+	return false;
+}
+
 void Handle::setSiblingIndex(std::size_t index) {
 	scene->setSiblingIndex(*this, index);
 }
@@ -187,24 +203,28 @@ std::vector<Component*> Handle::getComponents() {
 	return std::vector<Component*>(); // Empty
 }
 
-std::vector<Component*> Handle::getComponentsInImmediateChildren() {
+std::vector<Component*> Handle::getComponentsInImmediateChildren(bool includeInactive) {
 	std::vector<Component*> components;
 	std::size_t childCount = getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = getChild(i);
-		std::vector<Component*> childComponents = child.getComponents();
-		components.insert(components.end(), childComponents.begin(), childComponents.end());
+		if (child.isActive() || includeInactive) {
+			std::vector<Component*> childComponents = child.getComponents();
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
+		}
 	}
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsInChildren() {
+std::vector<Component*> Handle::getComponentsInChildren(bool includeInactive) {
 	std::vector<Component*> components;
 	std::size_t childCount = getChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = getChild(i);
-		std::vector<Component*> childComponents = child.getComponents();
-		components.insert(components.end(), childComponents.begin(), childComponents.end());
+		if (child.isActive() || includeInactive) {
+			std::vector<Component*> childComponents = child.getComponents();
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
+		}
 	}
 	return components;
 }
@@ -228,9 +248,9 @@ std::vector<Component*> Handle::getComponentsUpwards() {
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsDownwards() {
+std::vector<Component*> Handle::getComponentsDownwards(bool includeInactive) {
 	std::vector<Component*> components = getComponents();
-	std::vector<Component*> childComponents = getComponentsInChildren();
+	std::vector<Component*> childComponents = getComponentsInChildren(includeInactive);
 	components.insert(components.end(), childComponents.begin(), childComponents.end());
 	return components;
 }

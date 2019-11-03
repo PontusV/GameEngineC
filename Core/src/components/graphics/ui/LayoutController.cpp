@@ -15,6 +15,14 @@ LayoutController::~LayoutController() {
 }
 
 
+void LayoutController::onEnable() {
+	setDirty();
+}
+
+void LayoutController::onDisable() {
+	setDirty();
+}
+
 void LayoutController::onRectTransformResized() {
 	setDirty();
 }

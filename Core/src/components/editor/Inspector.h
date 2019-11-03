@@ -37,6 +37,8 @@ namespace Core {
 		void addComponentToTarget();
 		void removeComponentFromTarget(ComponentTypeID typeID);
 
+		void collapse(EntityHandle contentHandle);
+
 	private:
 		void createEntries();
 		void clearEntries();

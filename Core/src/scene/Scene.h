@@ -58,6 +58,15 @@ namespace Core {
 		void setSiblingIndex(Handle entity, std::size_t index);
 		void setSiblingIndexQueued(Handle entity, std::size_t index);
 
+		/* Activates the Entity and enables all behaviours. Activates all children. Cannot activate an Entity with an inactive parent. Returns true if successful. */
+		bool activate(Handle entity);
+		/* Deactivates the Entity and disables all behaviours. Deactivates all children. Returns true if successful. */
+		bool deactivate(Handle entity);
+		/* Activates the Entity and enables all behaviours next frame. Activates all children. Cannot activate an Entity with an inactive parent. */
+		void activateQueued(Handle entity);
+		/* Deactivates the Entity and disables all behaviours next frame. Deativates all children. */
+		void deactivateQueued(Handle entity);
+
 		/* Returns a Handle to the Entity. */
 		Handle getEntityHandle(Entity entity);
 		/* Finds the Entity by name and returns a Handle to the Entity. */

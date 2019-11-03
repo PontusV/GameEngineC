@@ -390,6 +390,7 @@
     <ClInclude Include="src\engine\ResourceManager.h" />
     <ClInclude Include="src\entity\Archetype.h" />
     <ClInclude Include="src\entity\Chunk.h" />
+    <ClInclude Include="src\entity\ComponentDataBlock.h" />
     <ClInclude Include="src\entity\component\Component.generated.h" />
     <ClInclude Include="src\entity\component\Component.h" />
     <ClInclude Include="src\entity\component\ComponentArray.h" />

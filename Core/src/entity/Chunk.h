@@ -2,6 +2,7 @@
 #define CHUNK_H
 
 #include "Entity.h"
+#include "ComponentDataBlock.h"
 #include "component/ComponentTypeInfo.h"
 #include "component/ComponentType.h"
 #include <vector>
@@ -9,11 +10,6 @@
 namespace Core {
 
 	class Component; // Forward declare
-
-	struct ComponentDataBlock {
-		void* ptr;
-		ComponentTypeID typeID;
-	};
 
 	struct ComponentDataArrayInfo {
 		ComponentDataArrayInfo(char* beginPtr, ComponentTypeID typeID, std::size_t size) : size(size), typeID(typeID), beginPtr(beginPtr) {}
@@ -39,6 +35,13 @@ namespace Core {
 		std::size_t add(Entity entity, Ts&... componentPack);
 		void destroy(Entity entity);
 		void remove(Entity entity);
+
+		bool activate(Entity entity);
+		bool activate(std::size_t index);
+		bool deactivate(Entity entity);
+		bool deactivate(std::size_t index);
+		bool isActive(Entity entity);
+		bool isActive(std::size_t index);
 
 		template<typename T>
 		void setComponent(Entity entity, T& component);
@@ -69,7 +72,8 @@ namespace Core {
 		std::vector<ComponentDataArrayInfo> getComponentArrayInfo(ComponentType type);
 
 		std::vector<ComponentDataBlock> getComponentDataBlocks(Entity entity);
-		void copyEntity(Entity entity, std::vector<ComponentDataBlock> sources);
+		/* Moves the Entity to this chunk. */
+		std::size_t moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive = false);
 
 		std::size_t getIndex(Entity entity);
 		std::vector<Component*> getComponents(std::size_t index);
@@ -83,6 +87,7 @@ namespace Core {
 		std::size_t getStride();
 
 	private:
+		std::size_t addInactive(Entity entity);
 		void destroy(std::size_t index);
 		void remove(std::size_t index);
 		char* getComponentBeginPtr(ComponentTypeID typeID);
@@ -92,6 +97,9 @@ namespace Core {
 		char* getEntityBeginPtr();
 		Entity* getEntityPtr(std::size_t index);
 
+		/* Swaps the location of the Entities in the specified indices. Throws exception if invalid indices. */
+		void swap(std::size_t index, std::size_t otherIndex);
+
 	private:
 		std::size_t MAX_SIZE; // Size of entries
 		std::size_t BUFFER_SIZE;
@@ -100,6 +108,7 @@ namespace Core {
 
 		std::size_t id;
 		std::size_t size;
+		std::size_t inactiveSize;
 		std::vector<ComponentDataArrayInfo> types;
 	};
 
