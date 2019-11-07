@@ -228,7 +228,7 @@ void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransfo
 	label.setParent(header);
 	entryHandle.setParent(owner);
 	// Order Rect
-	createOrderRect(entityName, EntityHandle(), 0, rect).setParent(entryHandle);
+	createOrderRect(entityName, EntityHandle(Entity(Entity::INVALID_ID), scene), 0, rect).setParent(entryHandle);
 
 	sceneMap.insert(std::make_pair(name, entryHandle));
 }

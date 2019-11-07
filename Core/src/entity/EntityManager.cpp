@@ -185,10 +185,9 @@ EntityLocation EntityManager::moveEntity(Entity entity, Archetype* src, Archetyp
 	if (src->isEmpty()) {
 		removeArchetype(src);
 	}
-	/*auto it = entityMap.find(entity);
-	if (it != entityMap.end())
-		it->second = dest;*/
-	entityMap.find(entity)->second = dest;
+	auto it = entityMap.find(entity);
+	if (it == entityMap.end()) throw std::invalid_argument("EntityManager::moveEntity::ERROR The given entity is not contained by this EntityManager.");
+	it->second = dest;
 
 	return location;
 }

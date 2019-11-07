@@ -179,6 +179,7 @@ int Engine::start() {
 
 Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physics(), behaviourManager(this) {
 }
+
 Engine::~Engine() {
 }
 

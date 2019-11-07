@@ -8,10 +8,14 @@ SceneManager::SceneManager(EntityManager* entityManager) : entityManager(entityM
 
 }
 SceneManager::~SceneManager() {
-	// Unload all entities and components
+	clear();
+}
+
+void SceneManager::clear() {
 	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
 		it->second->clear();
 	}
+	sceneMap.clear();
 }
 
 

@@ -13,6 +13,9 @@ namespace Core {
 	public:
 		SceneManager(EntityManager* entityManager);
 		~SceneManager();
+		/* Removes all Scenes. Unloads all entities and components they contain. */
+		void clear();
+
 		/* Creates a new Scene and loads it */
 		ScenePtr createScene(std::string name, ObjectType type);
 		/* Retrieves a Scene by name */

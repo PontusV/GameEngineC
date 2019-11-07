@@ -23,11 +23,11 @@ namespace Core {
 		void terminate();
 
 		// Systems
-		EntityManager& getEntityManager();
-		SceneManager& getSceneManager();
 		Input& getInput();
 		Graphics& getGraphics();
 		Physics& getPhysics();
+		EntityManager& getEntityManager();
+		SceneManager& getSceneManager();
 		BehaviourManager& getBehaviourManager();
 
 	private:
