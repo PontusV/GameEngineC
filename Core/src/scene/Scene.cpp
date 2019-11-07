@@ -58,7 +58,7 @@ bool Scene::destroyEntity(Entity entity, bool chained) {
 	if (entityHandle.hasComponent<ChildManager>()) {
 		bool updateIt = entityHandle.getImmediateChildCount() > 0;
 		while (entityHandle.getImmediateChildCount() > 0) {
-			destroyEntity(getChild(entity, 0).getEntity(), true);
+			destroyEntity(entityHandle.getChild(0).getEntity(), true);
 		}
 		// Update the iterator if children were removed.
 		if (updateIt) {
@@ -166,7 +166,7 @@ void Scene::setSiblingIndex(Handle entity, std::size_t index) {
 		if (childManager) {
 			std::vector<Handle>& children = childManager->getChildren();
 			auto it = std::find(children.begin(), children.end(), entity);
-			children.erase(it);
+			it = children.erase(it);
 			if (it - children.begin() < index) index--;
 			children.insert(children.begin() + index, entity);
 		}
@@ -295,10 +295,13 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 
 	if (parent.getID() != Entity::INVALID_ID) {
 		// Add ChildManager to new parent if none already exists
-		if (!manager->hasComponent<ChildManager>(parent)) {
-			ChildManager childManager;
-			addComponent<ChildManager>(parent, childManager);
+		ChildManager* childManager = parentHandle.getComponent<ChildManager>();
+		if (!childManager) {
+			ChildManager newChildManager;
+			addComponent<ChildManager>(parent, newChildManager);
+			childManager = manager->getComponent<ChildManager>(parent);
 		}
+		childManager->onChildAdded(entityHandle);
 
 		// Modify ParentEntity component
 		ParentEntity* parentComponent = manager->getComponent<ParentEntity>(entity);
@@ -310,7 +313,6 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 		parentComponent->setParent(parentHandle);
 
 		// Notify new parent of added child
-		parentHandle.getComponent<ChildManager>()->onChildAdded(entityHandle);
 		for (Behaviour* behaviour : parentHandle.getComponentsUpwards<Behaviour>()) {
 			behaviour->onChildAdded(entityHandle);
 		}

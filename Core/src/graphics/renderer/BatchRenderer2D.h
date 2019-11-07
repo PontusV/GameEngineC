@@ -51,7 +51,7 @@ namespace Core {
 
 		// Reuse VBO buffer
 		BatchConfig& getConfig();
-		inline bool hasRoom();
+		bool hasRoom();
 
 		void init();
 		void begin();

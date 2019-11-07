@@ -118,11 +118,11 @@ namespace Core {
 		void chunkRemoved(std::size_t chunkID) {
 			auto iterator = chunkMap.find(chunkID);
 			if (iterator == chunkMap.end()) return;
-
+			std::vector<std::size_t>& vec = iterator->second;
 			// Iterate through indices from chunkMap
-			for (auto it=iterator->second.begin(); it != iterator->second.end();) {
+			for (auto it=vec.begin(); it != vec.end();) {
 				std::size_t index = *it;
-				iterator->second.erase(it);
+				it = vec.erase(it);
 				if (index < data.size() - 1) {
 					std::iter_swap(data.begin() + index, data.end() - 1);
 					std::size_t otherChunkID = data[index].chunkPtr->getID();
@@ -136,7 +136,7 @@ namespace Core {
 				}
 				data.pop_back();
 			}
-			chunkMap.erase(iterator);
+			iterator = chunkMap.erase(iterator);
 		}
 
 	private:

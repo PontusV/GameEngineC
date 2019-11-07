@@ -73,18 +73,20 @@ void EntityManager::setEntityHideFlags(Entity entity, HideFlags hideFlags) {
 }
 
 void EntityManager::destroyEntity(Entity entity) {
-	destroyEntity(entity, false);
-}
-
-void EntityManager::destroyEntity(Entity entity, bool chained) {
 	// Exception check
 	auto it = entityMap.find(entity);
 	if (it == entityMap.end()) {
 		return;
-		//std::cout << "EntityManager::destroyEntity::ERROR The entity does not exist in this manager!\n";
-		//throw std::invalid_argument("EntityManager::destroyEntity::ERROR The entity does not exist in this manager!");
+		//std::cout << "EntityManager::removeEntity::ERROR The entity does not exist in this manager!\n";
+		//throw std::invalid_argument("EntityManager::removeEntity::ERROR The entity does not exist in this manager!");
 	}
 	Archetype* archetype = it->second;
+	archetype->removeEntity(entity);
+
+	if (archetype->isEmpty()) {
+		removeArchetype(archetype);
+	}
+	entityMap.erase(it);
 
 	// Remove hideflags entry
 	auto iterator = entityHideFlags.find(entity);
@@ -92,47 +94,8 @@ void EntityManager::destroyEntity(Entity entity, bool chained) {
 		std::cout << "EntityManager::removeEntity::ERROR There was an error when trying to remove the hideflags of Entity: " << entity.getID() << std::endl;
 		throw std::invalid_argument("EntityManager::removeEntity::ERROR The Entity does not have hideflags!");
 	}
-	entityHideFlags.erase(iterator);
+	iterator = entityHideFlags.erase(iterator);
 	removeEntityName(entity);
-
-	removeEntity(entity, archetype);
-	entityMap.erase(it);
-
-	archetype->destroyEntity(entity);
-
-	if (archetype->isEmpty()) {
-		removeArchetype(archetype);
-	}
-}
-
-/* Removes specified entity and its components from the Archetype that stores it. */
-void EntityManager::removeEntity(Entity entity) {
-	// Exception check
-	auto it = entityMap.find(entity);
-	if (it == entityMap.end()) {
-		std::cout << "EntityManager::removeEntity::ERROR The entity does not exist in this manager!\n";
-		throw std::invalid_argument("EntityManager::removeEntity::ERROR The entity does not exist in this manager!");
-	}
-	Archetype* archetype = it->second;
-
-	removeEntity(entity, archetype);
-	entityMap.erase(it);
-
-	archetype->removeEntity(entity);
-
-	if (archetype->isEmpty()) {
-		removeArchetype(archetype);
-	}
-}
-
-void EntityManager::removeEntity(Entity entity, Archetype* archetype) {
-	// Call destructor on components marked for destruction
-	std::vector<Component*> components = archetype->getComponents(entity);
-	for (Component* component : components) {
-		if (component->isDestroyed()) {
-			component->~Component();
-		}
-	}
 }
 
 EntityLocation EntityManager::removeComponent(Entity entity, ComponentTypeID typeID) {
@@ -217,8 +180,16 @@ std::vector<Component*> EntityManager::getComponents(Entity entity) {
 EntityLocation EntityManager::moveEntity(Entity entity, Archetype* src, Archetype* dest) {
 	std::shared_ptr<Chunk> chunk = src->getContainer(entity);
 	EntityLocation location = dest->moveEntity(entity, chunk->getComponentDataBlocks(entity), !chunk->isActive(entity));
-	removeEntity(entity);
-	entityMap.insert(std::make_pair(entity, dest));
+
+	src->removeEntity(entity);
+	if (src->isEmpty()) {
+		removeArchetype(src);
+	}
+	/*auto it = entityMap.find(entity);
+	if (it != entityMap.end())
+		it->second = dest;*/
+	entityMap.find(entity)->second = dest;
+
 	return location;
 }
 

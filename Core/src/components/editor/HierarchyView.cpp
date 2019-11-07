@@ -278,7 +278,7 @@ void HierarchyView::refresh() {
 			for (auto it = list.begin(); it != list.end();) {
 				if (it->entity.getScene()->getName() == sceneIt->first) {
 					listMap.erase(it->entity.getEntity());
-					list.erase(it);
+					it = list.erase(it);
 				}
 				else {
 					it++;
@@ -302,10 +302,10 @@ void HierarchyView::refresh() {
 		auto iterator = contains(entities, it->entity.getEntity());
 		if (iterator != entities.end() && !isDirty(*iterator)) {
 			it++;
-			entities.erase(iterator);
+			iterator = entities.erase(iterator);
 		}
 		else {
-			if (it->depth == 0 && iterator->depth != 0) { // Check if root converting to child
+			if (iterator != entities.end() && it->depth == 0 && iterator->depth != 0) { // Check if root converting to child
 				auto rootMapIt = rootMap.find(it->entity.getScene()->getName());
 				if (rootMapIt != rootMap.end()) {
 					std::vector<Entity>& roots = rootMapIt->second;
@@ -323,7 +323,7 @@ void HierarchyView::refresh() {
 			}
 			destroyEntity(listMap[it->entity.getEntity()].entry);
 			listMap.erase(it->entity.getEntity());
-			list.erase(it);
+			it = list.erase(it);
 		}
 	}
 	// Add new Entries

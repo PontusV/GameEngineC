@@ -34,19 +34,6 @@ void Archetype::clear() {
 		removeChunk(0);
 }
 
-void Archetype::destroyEntity(Entity entity) {
-	for (std::size_t i = 0; i < chunks.size(); i++) {
-		if (chunks[i]->contains(entity)) {
-			chunks[i]->destroy(entity);
-
-			if (chunks[i]->isEmpty()) {
-				removeChunk(i);
-			}
-			return;
-		}
-	}
-}
-
 void Archetype::removeEntity(Entity entity) {
 	for (std::size_t i = 0; i < chunks.size(); i++) {
 		if (chunks[i]->contains(entity)) {

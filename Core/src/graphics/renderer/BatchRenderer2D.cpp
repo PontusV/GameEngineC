@@ -62,7 +62,7 @@ BatchConfig& BatchRenderer2D::getConfig() {
 	return *config;
 }
 
-inline bool BatchRenderer2D::hasRoom() {
+bool BatchRenderer2D::hasRoom() {
 	static int vertices = 4;
 	return (verticiesCount + vertices) <= RENDERER_MAX_VERTICES;
 }

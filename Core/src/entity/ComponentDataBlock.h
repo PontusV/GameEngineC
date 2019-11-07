@@ -5,7 +5,6 @@ namespace Core {
 	struct ComponentDataBlock {
 		void* ptr;
 		std::size_t typeID;
-		std::size_t size;
 	};
 }
 #endif

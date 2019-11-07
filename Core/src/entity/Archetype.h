@@ -21,7 +21,6 @@ namespace Core {
 
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts&... components);
-		void destroyEntity(Entity entity);
 		void removeEntity(Entity entity);
 		/* Moves the Entity to this Archetype. */
 		EntityLocation moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive = false);

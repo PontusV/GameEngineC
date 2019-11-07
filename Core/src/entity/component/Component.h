@@ -21,10 +21,6 @@ namespace Core {
 
 		Handle getOwner();
 		void setOwner(Handle owner);
-		/* Marks the Component for destruction. */
-		void destroy();
-		/* Looks if the Component is marked for destruction. */
-		bool isDestroyed();
 
 		ComponentID getComponentID() const;
 
@@ -32,7 +28,6 @@ namespace Core {
 		Handle owner;
 
 	private:
-		bool destruct = false;
 		ComponentID componentID;
 		static UIDContainer<1000000> uniqueIDContainer;
 	};

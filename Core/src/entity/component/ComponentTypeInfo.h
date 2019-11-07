@@ -14,7 +14,7 @@
 namespace Core {
 	struct IComponentTypeInfo {
 	public:
-		IComponentTypeInfo(ComponentType type, const char* name, std::size_t size) : type(type), name(name), size(size) {}
+		IComponentTypeInfo(ComponentType type, std::string name, std::size_t size) : type(type), name(name), size(size) {}
 
 		bool operator==(const ComponentTypeID& other) {
 			return type.getTypeID() == other;
@@ -39,7 +39,7 @@ namespace Core {
 					break;
 				}
 			}
-			type = ComponentType(typeIDs);
+			getTypeImpl() = ComponentType(typeIDs);
 		}
 
 		static void setTypeID(ComponentTypeID value) {
@@ -50,19 +50,18 @@ namespace Core {
 			return id;
 		}
 
-		static const ComponentType& getType() {
-			return type;
+		static ComponentType getType() {
+			return getTypeImpl();
 		}
 
-		static const char* getName() { // Used for parameter packs
-			return T::getClassType().name.c_str();
+		static std::string getName() { // Used for parameter packs
+			return T::getClassType().name;
 		}
 
-		/* ATM makes use of RTTI. Swap typeid.name() with name */
 		static void print() {
 			std::cout << "ComponentTypeInfo: " << T::getClassType().name << "(" << id << ")\n";
 			std::cout << "Derived: ";
-			auto derivedList = type.getDerivedList();
+			auto derivedList = getTypeImpl().getDerivedList();
 			for (std::size_t i = 0; i < derivedList.size(); i++) {
 				std::cout << derivedList[i];
 				if (i != derivedList.size() - 1)
@@ -73,13 +72,13 @@ namespace Core {
 
 	private:
 		static ComponentTypeID id;
-		static ComponentType type;
+		static ComponentType& getTypeImpl() {
+			static ComponentType type;
+			return type;
+		}
 	};
 
 	template<typename T>
 	ComponentTypeID ComponentTypeInfo<T>::id = 0;
-
-	template<typename T>
-	ComponentType ComponentTypeInfo<T>::type = ComponentType();
 }
 #endif

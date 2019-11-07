@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "component/Component.h"
+#include "ReflectionPolymorph.generated.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -32,25 +33,12 @@ Chunk::Chunk(std::vector<IComponentTypeInfo> infoVec) : size(0), inactiveSize(0)
 Chunk::~Chunk() {
 	// Call destructors
 	while (size != 0) {
-		destroy(size - 1);
+		remove(size - 1);
 	}
 	while (inactiveSize != 0) {
-		destroy(MAX_SIZE - inactiveSize);
+		remove(MAX_SIZE - inactiveSize);
 	}
 	delete[] buffer;
-}
-
-void Chunk::destroy(Entity entity) {
-	int index = getIndex(entity);
-	destroy(index);
-}
-
-void Chunk::destroy(std::size_t index) {
-	// Call component destructors (destroy object without releasing memory from buffer)
-	for (Component* component : getComponents(index)) {
-		component->~Component();
-	}
-	remove(index);
 }
 
 void Chunk::remove(Entity entity) {
@@ -59,6 +47,10 @@ void Chunk::remove(Entity entity) {
 }
 
 void Chunk::remove(std::size_t index) {
+	// Call component destructors (destroy object without releasing memory from buffer)
+	for (Component* component : getComponents(index)) {
+		component->~Component();
+	}
 	if (isActive(index)) { // Active
 		if (index < size - 1) { // Only swap if index isnt back of active chunk
 			swap(index, size - 1);
@@ -123,9 +115,9 @@ void Chunk::swap(std::size_t index, std::size_t otherIndex) {
 
 	for (std::size_t i = 0; i < types.size(); i++) {
 		char* temp = new char[types[i].size];
-		std::memcpy(temp, iComponents[i], types[i].size);
-		std::memcpy(iComponents[i], lComponents[i], types[i].size);
-		std::memcpy(lComponents[i], temp, types[i].size);
+		Mirror::memcpy(temp, iComponents[i], types[i].typeID);
+		Mirror::memcpy(iComponents[i], lComponents[i], types[i].typeID);
+		Mirror::memcpy(lComponents[i], temp, types[i].typeID);
 		delete[] temp;
 	}
 
@@ -197,7 +189,7 @@ std::vector<ComponentDataBlock> Chunk::getComponentDataBlocks(Entity entity) {
 	std::vector<ComponentDataBlock> blocks;
 	for (ComponentDataArrayInfo& info : types) {
 		void* ptr = &info.beginPtr[stride * index];
-		blocks.push_back({ ptr, info.typeID, info.size });
+		blocks.push_back({ ptr, info.typeID });
 	}
 
 	return blocks;
@@ -254,11 +246,14 @@ std::size_t Chunk::moveEntity(Entity entity, std::vector<ComponentDataBlock> sou
 
 	std::size_t i = 0;
 	for (ComponentDataBlock& src : sources) {
-		if (char* dest = getComponentBeginPtr(src.typeID)) {
+		/*if (char* dest = getComponentBeginPtr(src.typeID)) {
 			std::memcpy(&dest[stride * index], src.ptr, src.size);
 		} else {
 			Component* component = (Component*)src.ptr;
 			component->destroy();
+		}*/
+		if (char* dest = getComponentBeginPtr(src.typeID)) {
+			Mirror::memcpy(&dest[stride * index], src.ptr, src.typeID);
 		}
 	}
 	return index;

@@ -2,6 +2,7 @@
 #define COMPONENT_TYPE_H
 
 #include <vector>
+#include <stdexcept>
 
 namespace Core {
 
@@ -10,11 +11,14 @@ namespace Core {
 	/* A collection of ComponentTypeIDs, all deriving from the type with typeID equal to the first entry. */
 	class ComponentType {
 	public:
-		ComponentType(std::vector<ComponentTypeID> idList) : idList(idList) {}
-		ComponentType() {}
+		ComponentType(std::vector<ComponentTypeID> idList) : idList(idList) {
+		}
+		ComponentType() {
+		}
 		~ComponentType() {}
 
 		ComponentTypeID getTypeID() const {
+			if (idList.empty()) throw std::invalid_argument("Cannot get typeID from invalid ComponentType");
 			return idList[0];
 		}
 

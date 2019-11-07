@@ -125,7 +125,7 @@ void VerticalLayoutGroup::expandHeight(std::vector<LayoutElementData>& elements,
 				else if (heightGoalDif > 0) {
 					e.size.y += heightGoalDif;
 					excessHeight -= heightGoalDif;
-					sortedLayoutElements.erase(iterator);
+					iterator = sortedLayoutElements.erase(iterator);
 				}
 			}
 			if (breakLoop)

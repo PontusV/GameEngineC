@@ -126,7 +126,7 @@ void HorizontalLayoutGroup::expandWidth(std::vector<LayoutElementData>& elements
 				else if (widthGoalDif > 0) {
 					e.size.x += widthGoalDif;
 					excessWidth -= widthGoalDif;
-					sortedLayoutElements.erase(iterator);
+					iterator = sortedLayoutElements.erase(iterator);
 				}
 			}
 			if (breakLoop)

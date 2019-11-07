@@ -23,14 +23,6 @@ Handle Component::getOwner() {
 	return owner;
 }
 
-void Component::destroy() {
-	destruct = true;
-}
-
-bool Component::isDestroyed() {
-	return destruct;
-}
-
 ComponentID Component::getComponentID() const {
 	return componentID;
 }
@@ -38,14 +30,12 @@ ComponentID Component::getComponentID() const {
 Component::Component(const Component& other) {
 	owner = other.owner;
 	componentID = other.componentID;
-	destruct = other.destruct;
 	uniqueIDContainer.useID(componentID);
 }
 
 Component& Component::operator=(const Component& other) {
 	owner = other.owner;
 	componentID = other.componentID;
-	destruct = other.destruct;
 	uniqueIDContainer.useID(componentID);
 	return *this;
 }

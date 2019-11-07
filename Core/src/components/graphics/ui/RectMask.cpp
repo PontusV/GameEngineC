@@ -37,7 +37,7 @@ void RectMask::onChildRemoved(EntityHandle entity) {
 			bool removed = false;
 			for (auto it = childSprites.begin(); it != childSprites.end(); it++) {
 				if (it->getComponent()->getComponentID() == sprite->getComponentID()) {
-					childSprites.erase(it);
+					it = childSprites.erase(it);
 					removed = true;
 					break;
 				}

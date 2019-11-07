@@ -29,7 +29,6 @@ namespace Core {
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts& ... components);
 		void destroyEntity(Entity entity);
-		void destroyEntity(Entity entity, bool chained);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
 		template <typename T>
@@ -65,9 +64,6 @@ namespace Core {
 		bool removeEntityName(Entity entity);
 
 	private:
-		void removeEntity(Entity entity);
-		void removeEntity(Entity entity, Archetype* archetype);
-
 		void removeArchetype(Archetype* archetype);
 		Archetype* createArchetype(std::vector<IComponentTypeInfo> types);
 		template<typename... Ts>

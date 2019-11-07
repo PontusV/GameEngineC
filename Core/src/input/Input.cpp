@@ -300,7 +300,7 @@ void Input::onKeyEvent(const KeyEvent& event) {
 		}
 		else {
 			// Removes invalid callback
-			callbacks.erase(iterator);
+			iterator = callbacks.erase(iterator);
 		}
 	}
 }
