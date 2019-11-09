@@ -37,7 +37,7 @@ namespace Core {
 		void addComponentToTarget();
 		void removeComponentFromTarget(ComponentTypeID typeID);
 
-		void collapse(EntityHandle contentHandle);
+		void collapse(EntityHandle contentHandle, EntityHandle iconHandle);
 
 	private:
 		void createEntries();

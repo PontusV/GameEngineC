@@ -13,6 +13,7 @@
 #include "components/input/CheckBox.h"
 #include "components/graphics/ui/DropDownScroll.h"
 #include "maths/Vector2.h"
+#include "maths/MatrixTransform.h"
 #include "components/entity/ChildManager.h"
 #include "components/entity/ParentEntity.h"
 #include "ReflectionPolymorph.generated.h"
@@ -169,7 +170,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
 		EntityHandle collapsibleIcon = createEntity(entityName + "_Collapsible_Icon",
 			Image("resources/images/ui/arrow.png", figureShader),
-			RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
+			RectTransform(0, 0, 12, 12, rect->getZ() + 0.11f, Alignment::CENTER, maths::radians(90))
 		);
 		LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
 		collapsibleLayout->setFlexibleSizeEnabled(true);
@@ -193,7 +194,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		}
 
 		Button* collapsibleButton = collapsibleIcon.addComponent(Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255))));
-		collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, collapsibleContent);
+		collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, collapsibleContent, collapsibleIcon);
 
 		return propValueField;
 	}
@@ -202,6 +203,7 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		fieldLayout->spacing = 10;
 		fieldLayout->shrinkableChildHeight = false;
 		fieldLayout->shrinkableChildWidth = false;
+		fieldLayout->childAlignment = Alignment::LEFT;
 	}
 	PropertyEditor* editor = propValueField.addComponent(PropertyEditor(value, rootProp, instanceHandle));
 	// -------------- Prop Value Field (Display & Input) --------------
@@ -352,7 +354,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	EntityHandle collapsibleIcon = createEntity(entryName + "_Collapsible_Icon",
 		collapsibleLayout,
 		Image("resources/images/ui/arrow.png", figureShader),
-		RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
+		RectTransform(0, 0, 12, 12, rect->getZ() + 0.11f, Alignment::CENTER, maths::radians(90))
 	);
 	collapsibleIcon.setParent(labelField);
 	LayoutElement labelLayout = LayoutElement();
@@ -409,7 +411,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	}
 	entryContent.setParent(entry);
 	Button* collapsibleButton = collapsibleIcon.addComponent(Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255))));
-	collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, entryContent);
+	collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, entryContent, collapsibleIcon);
 
 	// End of Entry content
 	targetComponentList.push_back(entry);
@@ -498,9 +500,17 @@ void Inspector::removeComponentFromTarget(ComponentTypeID typeID) {
 	currentTarget.removeComponent(typeID);
 }
 
-void Inspector::collapse(EntityHandle contentHandle) {
-	if (contentHandle.isActive())
-		contentHandle.deactivate();
-	else
-		contentHandle.activate();
+void Inspector::collapse(EntityHandle contentHandle, EntityHandle iconHandle) {
+	if (contentHandle.isActive()) {
+		if (RectTransform* rect = iconHandle.getComponent<RectTransform>()) {
+			contentHandle.deactivate();
+			rect->setLocalRotation(0);
+		}
+	}
+	else {
+		if (RectTransform * rect = iconHandle.getComponent<RectTransform>()) {
+			contentHandle.activate();
+			rect->setLocalRotation(maths::radians(90));
+		}
+	}
 }

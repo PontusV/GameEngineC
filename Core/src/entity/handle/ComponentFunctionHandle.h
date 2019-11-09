@@ -38,13 +38,14 @@ namespace Core {
 	template<typename T, typename R, typename... Args>
 	class ComponentFunctionHandleWrapper : public IComponentFunctionHandleImpl<> {
 	private:
-		typedef R(T::* FunctionPtr)(Args...);
+		typedef R(T::*FunctionPtr)(Args...);
 	public:
 		ComponentFunctionHandleWrapper(ComponentHandle component, FunctionPtr ptr, Args... args) : component(component), functionPtr(ptr), args(std::make_tuple(args...)) {}
 		void invoke() {
 			T* componentPtr = (T*)component.getComponent();
-			if (componentPtr) // If the handle is still valid
-				(componentPtr->*functionPtr)(std::get<Args>(args)...);
+			if (componentPtr) { // If the handle is still valid
+				std::apply(functionPtr, std::tuple_cat(std::make_tuple(*componentPtr), args));
+			}
 		}
 		bool isValid() {
 			return component.isValid();

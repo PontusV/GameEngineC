@@ -16,7 +16,7 @@ namespace Core {
 		Transform();
 		virtual ~Transform();
 
-		void rotate(float degrees);
+		void rotate(float radians);
 		void moveX(float value);
 		void moveY(float value);
 
@@ -37,6 +37,8 @@ namespace Core {
 		const Vector2 getPosition() const;
 		const float& getZ() const;
 		
+		/* Sets the rotation in local space. */
+		void setLocalRotation(float radians);
 		/* Sets the position in local space. */
 		void setLocalPosition(Vector2 pos);
 		/* Sets local x coord */

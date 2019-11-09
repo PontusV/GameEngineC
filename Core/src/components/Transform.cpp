@@ -18,14 +18,8 @@ Transform::~Transform() {
 
 // ----------------------- Getters and Setters -----------------------------------------
 
-void Transform::rotate(float degrees) {
-	float radians = maths::radians(degrees);
-	rotation += radians;
-	if (rotation > RADIANS_MAX)
-		rotation -= RADIANS_MAX;
-	else if (rotation < 0)
-		rotation += RADIANS_MAX;
-	changed = true;
+void Transform::rotate(float radians) {
+	setLocalRotation(rotation + radians);
 }
 
 void Transform::moveX(float value) {
@@ -35,6 +29,15 @@ void Transform::moveX(float value) {
 
 void Transform::moveY(float value) {
 	position.y += value;
+	changed = true;
+}
+
+void Transform::setLocalRotation(float radians) {
+	rotation = radians;
+	while (rotation > RADIANS_MAX)
+		rotation -= RADIANS_MAX;
+	while (rotation < 0)
+		rotation += RADIANS_MAX;
 	changed = true;
 }
 
