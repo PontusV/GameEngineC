@@ -100,6 +100,9 @@ namespace Core {
 		/* Moves the Entity to another location. */
 		void move(std::size_t fromIndex, std::size_t toIndex);
 
+		/* Calls the destructor on all components and invalidates the Entity at the given index. */
+		void clear(std::size_t index);
+
 	private:
 		std::size_t MAX_SIZE; // Size of entries
 		std::size_t BUFFER_SIZE;

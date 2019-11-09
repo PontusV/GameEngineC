@@ -6,7 +6,9 @@ bool ReflectedObjectHandle::isValid() {
 }
 
 void* ReflectedObjectHandle::get() {
-	return reinterpret_cast<void*>(reinterpret_cast<char*>(handle.getComponent()) + offset);
+	if (Component* component = handle.getComponent())
+		return reinterpret_cast<void*>(reinterpret_cast<char*>(handle.getComponent()) + offset);
+	return nullptr;
 }
 
 std::size_t ReflectedObjectHandle::getTypeID() const {

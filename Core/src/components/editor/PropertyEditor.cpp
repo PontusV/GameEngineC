@@ -23,6 +23,10 @@ void setValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHand
 template<typename T>
 T getValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle) {
 	void* instance = instanceHandle.get();
+	if (instance == nullptr) {
+		std::cout << "PropertyEditor::getValue::WARN Could not find the value" << std::endl;
+		return T();
+	}
 	std::size_t typeID = instanceHandle.getTypeID();
 	if (valueID.isArrayElement) {
 		return Mirror::polyGetArrayElementValue<T>(valueID.prop, valueID.arrayIndex, instance, typeID);

@@ -396,7 +396,7 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 
 	// End of Entry content
 	targetComponentList.push_back(entry);
-	targetComponents.push_back(component->getTypeID());
+	targetComponents.push_back(component->getType().typeID);
 
 	// Clear prevSelectable & Complete chain
 	for (Selectable* selectable : owner.getScene()->getComponentsFromQueue<Selectable>(prevSelectable.getEntity())) {
@@ -468,7 +468,7 @@ void Inspector::lateUpdate(float deltaTime) {
 	}
 	else {
 		for (std::size_t i = 0; i < components.size(); i++) {
-			if (components[i]->getTypeID() != targetComponents[i]) {
+			if (components[i]->getType().typeID != targetComponents[i]) {
 				refresh();
 				break;
 			}

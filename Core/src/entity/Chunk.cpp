@@ -41,30 +41,33 @@ Chunk::~Chunk() {
 	delete[] buffer;
 }
 
+void Chunk::clear(std::size_t index) {
+	getEntity(index).setID(0); // Makes the back entry invalid
+	// Call component destructors (destroy object without releasing memory from buffer)
+	for (Component* component : getComponents(index)) {
+		component->~Component();
+	}
+}
+
 void Chunk::remove(Entity entity) {
 	int index = getIndex(entity);
 	remove(index);
 }
 
 void Chunk::remove(std::size_t index) {
-	// Call component destructors (destroy object without releasing memory from buffer)
-	for (Component* component : getComponents(index)) {
-		component->~Component();
-	}
+	clear(index);
 	if (isActive(index)) { // Active
-		if (index < size - 1) { // Only swap if index isnt back of active chunk
-			swap(index, size - 1);
+		if (index < size - 1) {
+			move(size - 1, index);
 		}
 		size--;
-		getEntity(size).setID(0); // Makes the back entry invalid
 	}
 	else { // Inactive
 		std::size_t backIndex = MAX_SIZE - inactiveSize;
-		if (backIndex < index) { // Only swap if index isnt back of inactive chunk
-			swap(index, backIndex);
+		if (backIndex < index) {
+			move(backIndex, index);
 		}
 		inactiveSize--;
-		getEntity(backIndex).setID(0); // Makes the back entry invalid
 	}
 }
 
@@ -116,6 +119,7 @@ void Chunk::move(std::size_t fromIndex, std::size_t toIndex) {
 
 	for (std::size_t i = 0; i < types.size(); i++) {
 		Mirror::memcpy(lComponents[i], iComponents[i], types[i].typeID);
+		iComponents[i]->~Component();
 	}
 
 	getEntity(toIndex) = getEntity(fromIndex);
@@ -123,14 +127,21 @@ void Chunk::move(std::size_t fromIndex, std::size_t toIndex) {
 }
 
 void Chunk::swap(std::size_t index, std::size_t otherIndex) {
+	if (index == otherIndex) return;
 	std::vector<Component*> iComponents = getComponents(index);
 	std::vector<Component*> lComponents = getComponents(otherIndex);
 
 	for (std::size_t i = 0; i < types.size(); i++) {
 		char* temp = new char[types[i].size];
 		Mirror::memcpy(temp, iComponents[i], types[i].typeID);
+		iComponents[i]->~Component();
+
 		Mirror::memcpy(iComponents[i], lComponents[i], types[i].typeID);
+		lComponents[i]->~Component();
+
 		Mirror::memcpy(lComponents[i], temp, types[i].typeID);
+		((Component*)temp)->~Component();
+
 		delete[] temp;
 	}
 
