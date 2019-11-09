@@ -267,7 +267,7 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 
 	// Create Field
 	VerticalLayoutGroup fieldLayout = VerticalLayoutGroup();
-	fieldLayout.spacing = 5;
+	fieldLayout.spacing = 15;
 	fieldLayout.paddingTop = 5;
 	fieldLayout.paddingBottom = 5;
 	fieldLayout.paddingRight = 5;
