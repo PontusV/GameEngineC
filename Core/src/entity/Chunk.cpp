@@ -97,8 +97,6 @@ bool Chunk::deactivate(std::size_t index) {
 	}
 	size--;
 	inactiveSize++;
-	std::cout << isFull() << std::endl;
-	std::cout << id << " moving " << getEntity(index).getID() << " from " << size << " to " << MAX_SIZE - inactiveSize << std::endl;
 	move(size, MAX_SIZE - inactiveSize);
 	return true;
 }
