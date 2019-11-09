@@ -79,7 +79,7 @@ bool Chunk::activate(std::size_t index) {
 	if (backIndex < index) { // Swaps to back of the inactives
 		swap(index, backIndex);
 	}
-	swap(size, backIndex);
+	move(backIndex, size);
 	size++;
 	inactiveSize--;
 	return true;
@@ -97,7 +97,9 @@ bool Chunk::deactivate(std::size_t index) {
 	}
 	size--;
 	inactiveSize++;
-	swap(size, MAX_SIZE - inactiveSize);
+	std::cout << isFull() << std::endl;
+	std::cout << id << " moving " << getEntity(index).getID() << " from " << size << " to " << MAX_SIZE - inactiveSize << std::endl;
+	move(size, MAX_SIZE - inactiveSize);
 	return true;
 }
 
@@ -107,6 +109,19 @@ bool Chunk::isActive(Entity entity) {
 
 bool Chunk::isActive(std::size_t index) {
 	return index < size;
+}
+
+void Chunk::move(std::size_t fromIndex, std::size_t toIndex) {
+	if (fromIndex == toIndex) return;
+	std::vector<Component*> iComponents = getComponents(fromIndex);
+	std::vector<Component*> lComponents = getComponents(toIndex);
+
+	for (std::size_t i = 0; i < types.size(); i++) {
+		Mirror::memcpy(lComponents[i], iComponents[i], types[i].typeID);
+	}
+
+	getEntity(toIndex) = getEntity(fromIndex);
+	getEntity(fromIndex).setID(0);
 }
 
 void Chunk::swap(std::size_t index, std::size_t otherIndex) {
@@ -244,14 +259,7 @@ std::size_t Chunk::addInactive(Entity entity) {
 std::size_t Chunk::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive) {
 	std::size_t index = inactive ? addInactive(entity) : add(entity);
 
-	std::size_t i = 0;
 	for (ComponentDataBlock& src : sources) {
-		/*if (char* dest = getComponentBeginPtr(src.typeID)) {
-			std::memcpy(&dest[stride * index], src.ptr, src.size);
-		} else {
-			Component* component = (Component*)src.ptr;
-			component->destroy();
-		}*/
 		if (char* dest = getComponentBeginPtr(src.typeID)) {
 			Mirror::memcpy(&dest[stride * index], src.ptr, src.typeID);
 		}
@@ -272,7 +280,7 @@ bool Chunk::contains(Entity entity) {
 }
 
 bool Chunk::isFull() {
-	return size >= (MAX_SIZE - inactiveSize);
+	return (size + inactiveSize) >= MAX_SIZE;
 }
 
 bool Chunk::isEmpty() {

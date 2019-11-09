@@ -97,6 +97,8 @@ namespace Core {
 
 		/* Swaps the location of the Entities in the specified indices. Throws exception if invalid indices. */
 		void swap(std::size_t index, std::size_t otherIndex);
+		/* Moves the Entity to another location. */
+		void move(std::size_t fromIndex, std::size_t toIndex);
 
 	private:
 		std::size_t MAX_SIZE; // Size of entries

@@ -137,6 +137,7 @@ bool Scene::deactivate(Handle entity) {
 			deactivate(entity.getChild(i));
 		}
 		// Deactivates self
+		if (!entity.refresh()) return false;
 		if (auto chunk = entity.getLocation().chunk.lock()) {
 			if (chunk->deactivate(entity.getLocation().index)) {
 				// Disables all behaviours
