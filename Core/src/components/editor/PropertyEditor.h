@@ -21,7 +21,7 @@ namespace Core {
 		~PropertyEditor() {}
 
 		void start() override;
-		void update(float deltaTime) override;
+		void lateUpdate(float deltaTime) override;
 
 		void onTextSubmit(std::wstring value);
 		void onBoolSubmit(bool value);

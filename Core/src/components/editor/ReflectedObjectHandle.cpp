@@ -18,6 +18,7 @@ std::size_t ReflectedObjectHandle::getTypeID() const {
 Component* ReflectedObjectHandle::getRoot() {
 	return handle.getComponent();
 }
+
 std::size_t ReflectedObjectHandle::getRootPropTypeID() {
 	return handle.getComponent()->getType().typeID;
 }

@@ -24,7 +24,7 @@ template<typename T>
 T getValue(const PropertyValueID& valueID, ReflectedObjectHandle instanceHandle) {
 	void* instance = instanceHandle.get();
 	if (instance == nullptr) {
-		std::cout << "PropertyEditor::getValue::WARN Could not find the value" << std::endl;
+		//std::cout << "PropertyEditor::getValue::WARN Could not find the value" << std::endl;
 		return T();
 	}
 	std::size_t typeID = instanceHandle.getTypeID();
@@ -47,7 +47,7 @@ void PropertyEditor::start() {
 	}
 }
 
-void PropertyEditor::update(float deltaTime) {
+void PropertyEditor::lateUpdate(float deltaTime) {
 	// Update Property values
 	if (currentPropertyUpdateTime <= 0) {
 		std::wstring value = propertyValueToString(valueID, instanceHandle);

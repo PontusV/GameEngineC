@@ -160,17 +160,15 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	propLabel.setParent(propLabelField);
 
 	if (propTypeID) {
-		VerticalLayoutGroup* fieldLayout = propValueField.addComponent<VerticalLayoutGroup>();
-		fieldLayout->spacing = 3;
-		fieldLayout->shrinkableChildHeight = false;
-		fieldLayout->shrinkableChildWidth = false;
+		VerticalLayoutGroup fieldLayout = VerticalLayoutGroup();
+		fieldLayout.spacing = 3;
+		fieldLayout.shrinkableChildHeight = false;
+		fieldLayout.shrinkableChildWidth = false;
+		propValueField.addComponent(fieldLayout);
 
 		Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
-		Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
-		//collapsibleButton.onLeftClick = ;
 		EntityHandle collapsibleIcon = createEntity(entityName + "_Collapsible_Icon",
 			Image("resources/images/ui/arrow.png", figureShader),
-			collapsibleButton,
 			RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
 		);
 		LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
@@ -181,12 +179,21 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 		collapsibleIcon.setParent(propLabelField);
 		collapsibleIcon.setSiblingIndexQueued(0);
 
+		EntityHandle collapsibleContent = createEntity(entityName + "_Collapsible_Content",
+			fieldLayout,
+			RectTransform(0, 0, 0, 0, 0, Alignment::TOP_LEFT)
+		);
+		collapsibleContent.setParent(propValueField);
+
 		void* propInstance = getInstanceOfValue(instance, typeID, value);
 		Mirror::Class classType = Mirror::getType(propType.name);
 		for (std::size_t i = 0; i < classType.properties.size(); i++) {
 			EntityHandle propField = createPropertyField(entityName + "_Property_" + std::to_string(i), classType.properties[i], root, value.prop, propInstance, propTypeID);
-			propField.setParent(propValueField);
+			propField.setParent(collapsibleContent);
 		}
+
+		Button* collapsibleButton = collapsibleIcon.addComponent(Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255))));
+		collapsibleButton->onLeftClick = Core::bind(this, &Inspector::collapse, collapsibleContent);
 
 		return propValueField;
 	}
@@ -201,48 +208,54 @@ EntityHandle Inspector::createPropertyValueField(std::string label, PropertyValu
 	std::wstring propValue = PropertyEditor::propertyValueToString(value, instanceHandle);
 	// Value Display & Input
 	if (propType.isNumber()) {
+		InputField inputFieldComponent = InputField();
+		inputFieldComponent.setText(propValue);
+		if (propType.isDecimal())
+			inputFieldComponent.contentType = InputField::ContentType::Decimal;
+		else
+			inputFieldComponent.contentType = InputField::ContentType::Integer;
+		inputFieldComponent.onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		EntityHandle inputField = createEntity(entityName + "_InputField",
+			inputFieldComponent,
 			RectSprite(Color(255, 255, 255)),
 			RectMask(),
 			RectTransform(0, 0, 100, 16, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
-		InputField* inputFieldComponent = inputField.addComponent<InputField>();
-		inputFieldComponent->setText(propValue);
-		if (propType.isDecimal())
-			inputFieldComponent->contentType = InputField::ContentType::Decimal;
-		else
-			inputFieldComponent->contentType = InputField::ContentType::Integer;
-		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
 		setNextSelectable(inputField);
 	}
 	else if (propType.isString() || propType.isWideString()) {
+		InputField inputFieldComponent = InputField();
+		inputFieldComponent.setText(propValue);
+		inputFieldComponent.contentType = InputField::ContentType::Standard;
+		inputFieldComponent.onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		EntityHandle inputField = createEntity(entityName + "_InputField",
+			inputFieldComponent,
 			RectSprite(Color(255, 255, 255)),
 			RectMask(),
 			RectTransform(0, 0, 250, 16, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
-		InputField* inputFieldComponent = inputField.addComponent<InputField>();
-		inputFieldComponent->setText(propValue);
-		inputFieldComponent->contentType = InputField::ContentType::Standard;
-		inputFieldComponent->onChange = Core::bind(editor, &PropertyEditor::onTextSubmit);
 		inputField.setParent(propValueField);
 		setNextSelectable(inputField);
 	}
 	else if (propType.isBool()) {
+		CheckBox checkBox = CheckBox();
+		checkBox.setToggle(propValue == L"true");
+		checkBox.onToggle = Core::bind(editor, &PropertyEditor::onBoolSubmit);
 		EntityHandle propValueDisplay = createEntity(entityName + "_Value",
+			checkBox,
 			RectTransform(0, 0, 20, 20, rect->getZ() + 0.3f, Alignment::TOP_LEFT)
 		);
-		CheckBox* checkBox = propValueDisplay.addComponent<CheckBox>();
-		checkBox->setToggle(propValue == L"true");
-		checkBox->onToggle = Core::bind(editor, &PropertyEditor::onBoolSubmit);
 		propValueDisplay.setParent(propValueField);
 	}
 	else {
-		EntityHandle propValueDisplay = createEntity(entityName + "_Value");
-		RectTransform* propValueTextRect = propValueDisplay.addComponent(RectTransform(0, 0, 0, 0, rect->getZ() + 0.3f, Alignment::LEFT));
-		Text* propValueText = propValueDisplay.addComponent(Text(propValue, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255)));
-		propValueTextRect->setSize(propValueText->getSize());
+		Text propValueText = Text(propValue, "resources/fonts/segoeui.ttf", 15, Color(255, 255, 255));
+		Vector2 textSize = propValueText.getSize();
+		RectTransform propValueTextRect = RectTransform(0, 0, textSize.x, textSize.y, rect->getZ() + 0.3f, Alignment::LEFT);
+		EntityHandle propValueDisplay = createEntity(entityName + "_Value",
+			propValueTextRect,
+			propValueText
+		);
 		propValueDisplay.setParent(propValueField);
 	}
 	// -------------- End of Content --------------
@@ -253,17 +266,16 @@ EntityHandle Inspector::createPropertyField(std::string name, Mirror::Property& 
 	RectTransform* rect = owner.getComponent<RectTransform>();
 
 	// Create Field
+	VerticalLayoutGroup fieldLayout = VerticalLayoutGroup();
+	fieldLayout.spacing = 5;
+	fieldLayout.paddingTop = 5;
+	fieldLayout.paddingBottom = 5;
+	fieldLayout.paddingRight = 5;
+	fieldLayout.paddingLeft = component == instance ? 5 : 10;
 	EntityHandle propField = createEntity(name,
-		//Border(1, Color(255,255,255,125)),
-		//RectSprite(Color(40, 40, 40, 255)),
+		fieldLayout,
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
-	VerticalLayoutGroup* fieldLayout = propField.addComponent<VerticalLayoutGroup>();
-	fieldLayout->spacing = 5;
-	fieldLayout->paddingTop = 5;
-	fieldLayout->paddingBottom = 5;
-	fieldLayout->paddingRight = 5;
-	fieldLayout->paddingLeft = component == instance ? 5 : 10;
 
 	// Create Field Body
 	if (Mirror::isArrayType(prop.type)) {
@@ -293,98 +305,103 @@ void Inspector::addComponentEntry(Component* component, std::size_t id) {
 	std::string entryName = "Inspector_Component_" + std::to_string(id);
 
 	// Entry
+	VerticalLayoutGroup group = VerticalLayoutGroup();
+	group.paddingTop = 1;
+	group.paddingLeft = 1;
+	group.paddingRight = 1;
+	group.paddingBottom = 1;
+	group.spacing = 1;
+	group.childForceExpandHeight = false;
+	group.childForceExpandWidth = true;
+	group.shrinkableChildHeight = false;
+	group.shrinkableChildWidth = true;
 	EntityHandle entry = createEntity(entryName,
+		group,
 		RectSprite(Color(55, 55, 55)),
 		RectTransform(0, 0, 0, 0, rect->getZ() + 0.09f, Alignment::TOP_LEFT)
 	);
-	VerticalLayoutGroup* group = entry.addComponent<VerticalLayoutGroup>();
-	group->paddingTop = 1;
-	group->paddingLeft = 1;
-	group->paddingRight = 1;
-	group->paddingBottom = 1;
-	group->spacing = 1;
-	group->childForceExpandHeight = false;
-	group->childForceExpandWidth = true;
-	group->shrinkableChildHeight = false;
-	group->shrinkableChildWidth = true;
 	entry.setParent(owner);
 
 	// Entry Label Field
+	LayoutElement labelFieldLayout = LayoutElement();
+	labelFieldLayout.setMinSizeEnabled(true);
+	labelFieldLayout.setMinSize(Vector2(0, 24));
+	labelFieldLayout.setFlexibleSizeEnabled(true);
+	labelFieldLayout.setFlexibleSize(Vector2(1, 0));
+	HorizontalLayoutGroup labelLayoutGroup = HorizontalLayoutGroup();
+	labelLayoutGroup.childForceExpandWidth = true;
+	labelLayoutGroup.shrinkableChildWidth = true;
+	labelLayoutGroup.paddingLeft = 5;
+	labelLayoutGroup.paddingRight = 2;
+	labelLayoutGroup.spacing = 5;
+	labelLayoutGroup.childAlignment = Alignment::LEFT;
 	EntityHandle labelField = createEntity(entryName + "_LabelField",
+		labelFieldLayout,
+		labelLayoutGroup,
 		RectSprite(Color(40, 40, 40)),
 		RectTransform(0, 0, 0, 24, rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
-	LayoutElement* labelFieldLayout = labelField.addComponent<LayoutElement>();
-	labelFieldLayout->setMinSizeEnabled(true);
-	labelFieldLayout->setMinSize(Vector2(0, 24));
-	labelFieldLayout->setFlexibleSizeEnabled(true);
-	labelFieldLayout->setFlexibleSize(Vector2(1, 0));
-	HorizontalLayoutGroup* labelLayoutGroup = labelField.addComponent<HorizontalLayoutGroup>();
-	labelLayoutGroup->childForceExpandWidth = true;
-	labelLayoutGroup->shrinkableChildWidth = true;
-	labelLayoutGroup->paddingLeft = 5;
-	labelLayoutGroup->paddingRight = 2;
-	labelLayoutGroup->spacing = 5;
-	labelLayoutGroup->childAlignment = Alignment::LEFT;
 	labelField.setParent(entry);
 
 	Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
-	//Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
-	//collapsibleButton.onLeftClick = ;
+	LayoutElement collapsibleLayout = LayoutElement();
+	collapsibleLayout.setFlexibleSizeEnabled(true);
+	collapsibleLayout.setFlexibleSize(Vector2(0, 0));
+	collapsibleLayout.setMinSizeEnabled(true);
+	collapsibleLayout.setMinSize(Vector2(10, 10));
 	EntityHandle collapsibleIcon = createEntity(entryName + "_Collapsible_Icon",
+		collapsibleLayout,
 		Image("resources/images/ui/arrow.png", figureShader),
-		//collapsibleButton,
 		RectTransform(0, 0, 10, 10, rect->getZ() + 0.11f, Alignment::CENTER)
 	);
-	LayoutElement* collapsibleLayout = collapsibleIcon.addComponent<LayoutElement>();
-	collapsibleLayout->setFlexibleSizeEnabled(true);
-	collapsibleLayout->setFlexibleSize(Vector2(0, 0));
-	collapsibleLayout->setMinSizeEnabled(true);
-	collapsibleLayout->setMinSize(Vector2(10, 10));
 	collapsibleIcon.setParent(labelField);
+	LayoutElement labelLayout = LayoutElement();
+	labelLayout.setFlexibleSizeEnabled(true);
+	labelLayout.setFlexibleSize(Vector2(1.0f, 0));
 	EntityHandle label = createEntity(entryName + "_Label",
+		labelLayout,
 		Text(type.name, "resources/fonts/segoeui.ttf", 16, Color(255, 255, 255)),
 		RectTransform(0, 12, 0, 24, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-	LayoutElement* labelLayout = label.addComponent<LayoutElement>();
-	labelLayout->setFlexibleSizeEnabled(true);
-	labelLayout->setFlexibleSize(Vector2(1.0f, 0));
 	label.setParent(labelField);
+	RectButton removeButton = RectButton();
+	removeButton.colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
+	removeButton.colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);
+	removeButton.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(200, 0, 0);
+	removeButton.onLeftClick = Core::bind(this, &Inspector::removeComponentFromTarget, (ComponentTypeID)component->getType().typeID);
+	LayoutElement removeButtonLayout = LayoutElement();
+	removeButtonLayout.setFlexibleSizeEnabled(true);
+	removeButtonLayout.setFlexibleSize(Vector2(0, 0));
+	removeButtonLayout.setMinSizeEnabled(true);
+	removeButtonLayout.setMinSize(Vector2(20, 20));
 	EntityHandle removeButtonEntity = createEntity(entryName + "_RemoveButton",
+		removeButton,
+		removeButtonLayout,
 		RectSprite(Color(255, 40, 40)),
 		RectTransform(0, 0, 20, 20, rect->getZ() + 0.2f, Alignment::TOP_LEFT)
 	);
+	removeButtonEntity.setParent(labelField);
 	EntityHandle removeButtonCross = createEntity(entryName + "_RemoveButton_Cross",
 		Image("resources/images/ui/cross.png"),
 		RectTransform(10, 10, 10, 10, rect->getZ() + 0.201f, Alignment::CENTER)
 	);
 	removeButtonCross.setParent(removeButtonEntity);
-	RectButton* removeButton = removeButtonEntity.addComponent<RectButton>();
-	removeButton->colors[RectButton::ButtonState::DEFAULT] = Color(255, 50, 50);
-	removeButton->colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 100, 100);
-	removeButton->colors[RectButton::ButtonState::PRESSED_DOWN] = Color(200, 0, 0);
-	removeButton->onLeftClick = Core::bind(this, &Inspector::removeComponentFromTarget, (ComponentTypeID)component->getType().typeID);
-	LayoutElement* removeButtonLayout = removeButtonEntity.addComponent<LayoutElement>();
-	removeButtonLayout->setFlexibleSizeEnabled(true);
-	removeButtonLayout->setFlexibleSize(Vector2(0, 0));
-	removeButtonLayout->setMinSizeEnabled(true);
-	removeButtonLayout->setMinSize(Vector2(20, 20));
-	removeButtonEntity.setParent(labelField);
 
 	// Entry content
+	VerticalLayoutGroup contentGroup = VerticalLayoutGroup();
+	contentGroup.paddingTop = 5;
+	contentGroup.paddingLeft = 5;
+	contentGroup.paddingRight = 5;
+	contentGroup.paddingBottom = 5;
+	contentGroup.spacing = 5;
+	contentGroup.childForceExpandHeight = false;
+	contentGroup.childForceExpandWidth = false;
+	contentGroup.shrinkableChildHeight = false;
+	contentGroup.shrinkableChildWidth = false;
 	EntityHandle entryContent = createEntity(entryName + "_Content",
+		contentGroup,
 		RectTransform(0,0,0,0,rect->getZ() + 0.1f, Alignment::TOP_LEFT)
 	);
-	VerticalLayoutGroup* contentGroup = entryContent.addComponent<VerticalLayoutGroup>();
-	contentGroup->paddingTop = 5;
-	contentGroup->paddingLeft = 5;
-	contentGroup->paddingRight = 5;
-	contentGroup->paddingBottom = 5;
-	contentGroup->spacing = 5;
-	contentGroup->childForceExpandHeight = false;
-	contentGroup->childForceExpandWidth = false;
-	contentGroup->shrinkableChildHeight = false;
-	contentGroup->shrinkableChildWidth = false;
 	// Property field
 	for (std::size_t i = 0; i < type.properties.size(); i++) {
 		EntityHandle propField = createPropertyField(entryName + "_Property_" + std::to_string(i), type.properties[i], component, type.properties[i], component, component->getType().typeID);
@@ -412,8 +429,14 @@ void Inspector::createEntries() {
 	for (Component* component : getInspectableComponents(currentTarget)) {
 		addComponentEntry(component, i++);
 	}
+	LayoutElement layoutElement = LayoutElement();
+	layoutElement.setMinSize(Vector2(200, 50));
+	layoutElement.setMinSizeEnabled(true);
+	layoutElement.setFlexibleSize(Vector2(1, 0));
+	layoutElement.setFlexibleSizeEnabled(true);
 	// Add an 'Add Component' button
 	EntityHandle addComponentButton = createEntity("Inspector_Add_Component_Button",
+		layoutElement,
 		Text("Add Component", "resources/fonts/segoeui.ttf", 14, Color(255, 255, 255, 255)),
 		RectTransform(0, 0, 200, 50, owner.getComponent<RectTransform>()->getZ() + 0.1f)
 	);
@@ -426,11 +449,6 @@ void Inspector::createEntries() {
 	dropDown->borderColor = Color(255, 255, 255, 255);
 	dropDown->borderSize = 1;
 	dropDown->boxPaddingY = 5;
-	LayoutElement* layoutElement = addComponentButton.addComponent<LayoutElement>();
-	layoutElement->setMinSize(Vector2(200, 50));
-	layoutElement->setMinSizeEnabled(true);
-	layoutElement->setFlexibleSize(Vector2(1, 0));
-	layoutElement->setFlexibleSizeEnabled(true);
 	std::vector<ComponentTypeID> filter;
 	for (Component* component : currentTarget.getComponents()) {
 		filter.push_back(component->getType().typeID);
