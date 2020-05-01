@@ -1,9 +1,9 @@
 #ifndef SCENE_MANAGER_H
 #define SCENE_MANAGER_H
-#include "components/engine/ObjectData.h"
 #include <string>
 #include <map>
 #include <memory>
+#include <vector>
 namespace Core {
 	class EntityManager;
 	class Scene;
@@ -17,7 +17,7 @@ namespace Core {
 		void clear();
 
 		/* Creates a new Scene and loads it */
-		ScenePtr createScene(std::string name, ObjectType type);
+		ScenePtr createScene(std::string name);
 		/* Retrieves a Scene by name */
 		ScenePtr getScene(std::string name);
 		/* Retrieves all loaded Scenes */

@@ -1,10 +1,12 @@
 #include "HierarchyView.h"
 #include "components/RectTransform.h"
-#include "components/graphics/ui/VerticalLayoutGroup.h"
-#include "components/graphics/ui/HorizontalLayoutGroup.h"
-#include "components/graphics/ui/LayoutElement.h"
+#include "components/ui/input/Button.h"
+#include "components/ui/input/RectButton.h"
+#include "components/ui/layout/VerticalLayoutGroup.h"
+#include "components/ui/layout/HorizontalLayoutGroup.h"
+#include "components/ui/layout/LayoutElement.h"
+#include "components/graphics/Image.h"
 #include "components/graphics/Text.h"
-#include "components/graphics/ui/RectButton.h"
 #include "components/graphics/RectSprite.h"
 #include "components/entity/ChildManager.h"
 #include "HierarchySceneMover.h"
@@ -13,6 +15,8 @@
 #include "EditorPanel.h"
 #include "input/Input.h"
 #include "scene/SceneManager.h"
+#include "engine/ResourceManager.h"
+#include "maths/MatrixTransform.h"
 #include <algorithm>
 using namespace Core;
 
@@ -95,12 +99,12 @@ std::vector<HierarchyEntry> HierarchyView::getAllEntities() {
 void HierarchyView::target(EntityHandle entity) {
 	auto it = listMap.find(currentTarget.getEntity());
 	if (it != listMap.end()) {
-		it->second.highlight.getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
+		it->second.getChild(0).getComponent<RectSprite>()->setColor(Color(0, 0, 0, 0));
 	}
 	currentTarget = entity;
 	it = listMap.find(currentTarget.getEntity());
 	if (it != listMap.end()) {
-		it->second.highlight.getComponent<RectSprite>()->setColor(highlightColor);
+		it->second.getChild(0).getComponent<RectSprite>()->setColor(highlightColor);
 	}
 }
 
@@ -113,14 +117,16 @@ void HierarchyView::onDestroyEntityClick(EntityHandle entity) {
 }
 
 void HierarchyView::clearList() {
-	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
-		destroyEntity(it->second);
+	for (auto& entry : sceneMap) {
+		destroyEntity(entry.second);
 	}
 	sceneMap.clear();
+	sceneContentMap.clear();
 	for (auto& entry : listMap) {
-		destroyEntity(entry.second.entry);
+		destroyEntity(entry.second);
 	}
 	listMap.clear();
+	contentMap.clear();
 	list.clear();
 }
 
@@ -134,7 +140,7 @@ EntityHandle HierarchyView::createOrderRect(std::string name, EntityHandle entit
 
 void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect) {
 	EntityHandle& entity = entry.entity;
-	EntityHandle parent = entry.parent.isValid() ? listMap[entry.parent.getEntity()].entry : sceneMap.at(entity.getScene()->getName());
+	EntityHandle parent = entry.parent.isValid() ? contentMap[entry.parent.getEntity()] : sceneContentMap.at(entity.getScene()->getName());
 	std::size_t depth = entry.depth + 1;
 	std::size_t& order = entry.order;
 
@@ -153,37 +159,51 @@ void HierarchyView::createEntityEntry(HierarchyEntry& entry, RectTransform* rect
 		layoutGroup,
 		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-
+	entryHandle.setParent(parent);
+	EntityHandle entryLine = createEntity(entityName + "_Line",
+		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
+		RectTransform(0, 0, 0, ENTITY_ENTRY_HEIGHT, rect->getZ() + 0.1f, Alignment::LEFT)
+	);
+	entryLine.setParent(entryHandle);
 	RectButton button = RectButton();
 	button.colors[RectButton::ButtonState::DEFAULT] = Color(255, 255, 255, 0);
 	button.colors[RectButton::ButtonState::HOVER_OVER] = Color(255, 255, 255, 80);
 	button.colors[RectButton::ButtonState::PRESSED_DOWN] = Color(0, 0, 0, 80);
 	button.onLeftClick = Core::bind(this, &HierarchyView::onTargetEntityClick, entity);
 	button.onRightClick = Core::bind(this, &HierarchyView::onDestroyEntityClick, entity);
-	EntityHandle highlightHandle = createEntity(entityName + "_Background",
-		layoutGroup,
-		RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, entity == currentTarget ? highlightColor.a : 0)),
-		RectTransform(0, 0, 0, ENTITY_ENTRY_HEIGHT, rect->getZ() + 0.01f, Alignment::LEFT)
-	);
-	EntityHandle buttonEntity = createEntity(entityName + "_Button",
+	EntityHandle buttonEntity = createEntity(entityName + "_Button", // TODO: Force expand width. Use RectTransform Anchors? Check Unity Engine https://docs.unity3d.com/ScriptReference/RectTransform.html
 		button,
 		RectSprite(),
 		HierarchyEntityMover(ComponentHandle(this), entity),
 		RectTransform(0, 0, 0, ENTITY_ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
+	buttonEntity.setParent(entryLine);
+	Shader figureShader = ResourceManager::getInstance().loadShader("resources/shaders/figure");
+	Button collapsibleButton = Button(Image("resources/images/ui/arrow.png", figureShader, Color(150, 150, 150)), Image("resources/images/ui/arrow.png", figureShader, Color(0, 0, 0)), Image("resources/images/ui/arrow.png", figureShader, Color(255, 255, 255)));
+	//collapsibleButton.onLeftClick = Core::bind(this, &Inspector::collapse, collapsibleContent, collapsibleIcon);
+	EntityHandle collapsibleIcon = createEntity(entityName + "_Collapsible_Icon",
+		collapsibleButton,
+		Image("resources/images/ui/arrow.png", figureShader),
+		RectTransform(depth * 20, 0, 12, 12, rect->getZ() + 0.21f, Alignment::CENTER, maths::radians(90))
+	);
+	collapsibleIcon.setParent(entryLine);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
-		RectTransform((depth) * 20, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
+		RectTransform(depth * 20 + 10, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
-	highlightHandle.setParent(entryHandle);
 	label.setParent(buttonEntity);
-	buttonEntity.setParent(highlightHandle);
-	entryHandle.setParent(parent);
 
 	// Order Rects
 	createOrderRect(entityName, entry.entity, order, rect).setParent(entryHandle);
 
-	listMap[entity.getEntity()] = { entryHandle, highlightHandle };
+	EntityHandle contentHandle = createEntity(entityName + "_Content",
+		layoutGroup,
+		RectTransform(0, 0, 0, 0, 0, Alignment::TOP_LEFT)
+	);
+	contentHandle.setParent(entryHandle);
+
+	listMap[entity.getEntity()] = entryHandle;
+	contentMap[entity.getEntity()] = contentHandle;
 	std::size_t index = 0;
 
 	// Sort new entry
@@ -214,23 +234,29 @@ void HierarchyView::createSceneEntry(std::string name, Scene* scene, RectTransfo
 		layoutGroup,
 		RectTransform(0, 0, width, 0, rect->getZ() + 0.1f, Alignment::LEFT)
 	);
-
+	entryHandle.setParent(owner);
 	EntityHandle header = createEntity(entityName + "_Header",
 		HierarchySceneMover(ComponentHandle(this), scene),
 		RectSprite(Color(200, 200, 200, 255)),
 		RectTransform(0, 0, width, SCENE_ENTRY_HEIGHT, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
+	header.setParent(entryHandle);
 	EntityHandle label = createEntity(entityName + "_Label",
 		text,
 		RectTransform(5, 0, width, text.getSize().y, rect->getZ() + 0.2f, Alignment::LEFT)
 	);
-	header.setParent(entryHandle);
 	label.setParent(header);
-	entryHandle.setParent(owner);
 	// Order Rect
 	createOrderRect(entityName, EntityHandle(Entity(Entity::INVALID_ID), scene), 0, rect).setParent(entryHandle);
 
+	EntityHandle contentHandle = createEntity(entityName + "_Content",
+		layoutGroup,
+		RectTransform(0, 0, 0, 0, 0, Alignment::TOP_LEFT)
+	);
+	contentHandle.setParent(entryHandle);
+
 	sceneMap.insert(std::make_pair(name, entryHandle));
+	sceneContentMap.insert(std::make_pair(name, contentHandle));
 }
 
 std::vector<HierarchyEntry>::iterator contains(std::vector<HierarchyEntry>& entities, const Entity& entity) {
@@ -287,6 +313,9 @@ void HierarchyView::refresh() {
 			destroyEntity(entry);
 			auto rootMapIt = rootMap.find(sceneIt->first);
 			rootMap.erase(rootMapIt);
+			destroyEntity(sceneIt->second);
+			sceneMap.erase(sceneIt);
+			sceneContentMap.erase(sceneIt->first);
 		}
 	}
 	// Add new scenes
@@ -321,8 +350,9 @@ void HierarchyView::refresh() {
 					std::cout << "HierarchyView::refresh::ERROR The Scene does not exist in the rootMap.";
 				}
 			}
-			destroyEntity(listMap[it->entity.getEntity()].entry);
+			destroyEntity(listMap[it->entity.getEntity()]);
 			listMap.erase(it->entity.getEntity());
+			contentMap.erase(it->entity.getEntity());
 			it = list.erase(it);
 		}
 	}
@@ -366,14 +396,14 @@ void HierarchyView::updateOrder() {
 			if (!entityEntry.isValid())
 				std::cout << "HierarchyView::UpdateOrder::ERROR Entity does not have any Entry" << std::endl;
 			else if (entityEntry.hasParent())
-				entityEntry.setSiblingIndex(entry.order + 2);
+				entityEntry.setSiblingIndex(entry.order);
 			else std::cout << entityEntry.getEntityName() << std::endl;
 		}
 
 		// Force update layout
-		auto listMapIt = listMap.find(entity);
-		if (listMapIt != listMap.end()) {
-			if (LayoutGroup* layout = listMapIt->second.entry.getComponent<LayoutGroup>()) {
+		auto contentMapIt = contentMap.find(entity);
+		if (contentMapIt != contentMap.end()) {
+			if (LayoutGroup* layout = contentMapIt->second.getComponent<LayoutGroup>()) {
 				layout->setDirty();
 			}
 		}
@@ -394,5 +424,5 @@ EntityHandle HierarchyView::getEntryHandle(const Entity& entity) {
 	auto entryIt = listMap.find(entity);
 	if (entryIt == listMap.end())
 		return EntityHandle();
-	return entryIt->second.entry;
+	return entryIt->second;
 }

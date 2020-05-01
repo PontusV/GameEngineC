@@ -23,7 +23,7 @@ void DragAndResize::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 			const Vector2& mousePosition = input->getMousePosition();
 			Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
 			// Convert to World Space if owner is a World Object
-			if (owner.getObjectType() == ObjectType::World) mousePos = camera->getWorldToScreenMatrix() * mousePos;
+			if (transform->isInWorldSpace()) mousePos = camera->getWorldToScreenMatrix() * mousePos;
 			mouseOffset = mousePos - transform->getRectOffset();
 			// Left
 			if (left && mouseOffset.x <= edgeSize) {
@@ -50,7 +50,7 @@ void DragAndResize::onMouseDrag(float mouseX, float mouseY) {
 		const Vector2& mousePosition = input->getMousePosition();
 		Vector2 mousePos = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition;
 		// Convert to World Space if owner is a World Object
-		if (owner.getObjectType() == ObjectType::World) mousePos = camera->getWorldToScreenMatrix() * mousePos;
+		if (transform->isInWorldSpace()) mousePos = camera->getWorldToScreenMatrix() * mousePos;
 		Vector2 move = mousePos - transform->getRectOffset() - mouseOffset;
 
 		if (draggingLeft) {

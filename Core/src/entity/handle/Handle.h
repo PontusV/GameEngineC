@@ -5,7 +5,6 @@
 #include "entity/HideFlags.h"
 #include "entity/EntityLocation.h"
 #include "entity/component/ComponentTypeInfo.h"
-#include "scene/ObjectType.h"
 #include <vector>
 
 typedef std::size_t ComponentTypeID;
@@ -98,8 +97,6 @@ namespace Core {
 		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
 		template<typename T>
 		std::vector<T*> getComponentsDownwards(bool includeInactive = false);
-
-		ObjectType getObjectType();
 
 		std::string getEntityName();
 		HideFlags getEntityHideFlags();

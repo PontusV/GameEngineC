@@ -1,6 +1,6 @@
 #ifndef SCROLL_BAR_H
 #define SCROLL_BAR_H
-#include "UIBehaviour.h"
+#include "components/ui/UIBehaviour.h"
 #include "graphics/data/Color.h"
 #include "maths/Vector2.h"
 #include "ScrollBar.generated.h"

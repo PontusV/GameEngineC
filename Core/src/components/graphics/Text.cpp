@@ -64,7 +64,7 @@ void Text::createText() {
 
 		for (CharTexture2D& c : textTextures) {
 			// Create new Transform for Character Sprite
-			RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform->getZ() + 0.00001f, Alignment::TOP_LEFT, 0.0f, 1.0f);
+			RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform->getZ() + 0.00001f, Alignment::TOP_LEFT, 0.0f, 1.0f, transform->getSpace());
 			// Set world model matrix of new text sprite
 			spriteTransform.updateLocalToWorldMatrix(localToWorldMatrix);
 			spriteTransform.updateLocalModelMatrix();

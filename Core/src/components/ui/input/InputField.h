@@ -1,7 +1,7 @@
 #ifndef INPUT_FIELD_H
 #define INPUT_FIELD_H
 
-#include "components/input/Selectable.h"
+#include "components/ui/input/Selectable.h"
 #include "graphics/data/Color.h"
 #include "entity/handle/ComponentFunctionHandle.h"
 #include "maths/Vector2.h"

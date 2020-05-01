@@ -1,9 +1,9 @@
 #include "DropDownScroll.h"
 #include "components/graphics/RectSprite.h"
 #include "RectButton.h"
-#include "ScrollRect.h"
+#include "components/ui/ScrollRect.h"
 #include "ScrollBar.h"
-#include "RectMask.h"
+#include "components/ui/RectMask.h"
 #include "maths/MatrixTransform.h"
 using namespace Core;
 

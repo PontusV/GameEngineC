@@ -1,9 +1,9 @@
 #ifndef USER_INTERFACE_SYSTEM_H
 #define USER_INTERFACE_SYSTEM_H
 #include "entity/component/ComponentGroup.h"
-#include "components/graphics/ui/LayoutGroup.h"
-#include "components/graphics/ui/ContentSizeFitter.h"
-#include "components/graphics/ui/UIBehaviour.h"
+#include "components/ui/layout/LayoutGroup.h"
+#include "components/ui/layout/ContentSizeFitter.h"
+#include "components/ui/UIBehaviour.h"
 namespace Core {
 	class UISystem {
 	public:

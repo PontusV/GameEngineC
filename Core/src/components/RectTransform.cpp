@@ -1,10 +1,10 @@
 #include "RectTransform.h"
-#include "components/graphics/ui/UIBehaviour.h"
+#include "components/ui/UIBehaviour.h"
 #include "maths/MatrixTransform.h"
 
 using namespace Core;
 
-RectTransform::RectTransform(float x, float y, float width, float height, float z, Anchor pivot, float rotation, float scale) : Transform(x, y, z, rotation, scale), size(width, height), pivot(pivot) {
+RectTransform::RectTransform(float x, float y, float width, float height, float z, Anchor pivot, float rotation, float scale, TransformSpace space) : Transform(x, y, z, rotation, scale, space), size(width, height), pivot(pivot) {
 }
 
 RectTransform::RectTransform() {

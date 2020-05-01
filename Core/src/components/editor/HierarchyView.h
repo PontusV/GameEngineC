@@ -18,11 +18,6 @@ namespace Core {
 		std::size_t depth;
 	};
 
-	struct EntryHandle {
-		EntityHandle entry;
-		EntityHandle highlight;
-	};
-
 	class RectTransform;
 	class Scene;
 
@@ -61,9 +56,11 @@ namespace Core {
 		Color highlightColor = Color(50, 50, 150, 255);
 
 		std::vector<HierarchyEntry> list;
-		std::map<Entity, EntryHandle> listMap;
-		std::map<std::string, std::vector<Entity>> rootMap;
 		std::map<std::string, EntityHandle> sceneMap;
+		std::map<std::string, EntityHandle> sceneContentMap; // Parent Entity, Content EntityHandle
+		std::map<Entity, EntityHandle> listMap;
+		std::map<Entity, EntityHandle> contentMap; // Parent Entity, Content EntityHandle
+		std::map<std::string, std::vector<Entity>> rootMap;
 		std::map<Entity, std::size_t> dirtyOrderMap;
 
 		ComponentHandle editor;

@@ -2,7 +2,7 @@
 #include "components/graphics/RectSprite.h"
 #include "components/RectTransform.h"
 #include "input/Input.h"
-#include "ScrollRect.h"
+#include "components/ui/ScrollRect.h"
 using namespace Core;
 
 ScrollBar::ScrollBar(EntityHandle target) : target(target) {

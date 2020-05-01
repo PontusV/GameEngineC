@@ -48,9 +48,9 @@ void LayoutController::refresh() {
 	dirty = false;
 }
 
-void LayoutController::setDirty() {
-	for (LayoutController* controller : owner.getParent().getComponents<LayoutController>()) {
-		controller->setDirty();
+void LayoutController::setDirty(bool chain) {
+	for (LayoutController* controller : owner.getComponentsInParents<LayoutController>()) {
+		controller->setDirty(false);
 	}
 	dirty = true;
 	dirtySize = true;

@@ -11,7 +11,7 @@
 using namespace Core;
 
 
-Scene::Scene(EntityManager* entityManager, std::string name, ObjectType type) : manager(entityManager), name(name), type(type), isAwake(false) {
+Scene::Scene(EntityManager* entityManager, std::string name) : manager(entityManager), name(name), isAwake(false) {
 }
 
 Scene::~Scene() {
@@ -196,7 +196,7 @@ void Scene::awakeEntity(Handle entity) {
 	}
 }
 
-void Scene::awakeComponent(Handle entity, ComponentTypeID componentID) {
+void Scene::awakeComponent(Handle entity, ComponentID componentID) {
 	// Awake script
 	for (Behaviour* script : entity.getComponents<Behaviour>()) {
 		if (script->getComponentID() == componentID) {
@@ -295,6 +295,10 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 	}
 
 	if (parent.getID() != Entity::INVALID_ID) {
+		// Check if parent is deactivated
+		if (!parentHandle.isActive() && entityHandle.isActive()) {
+			entityHandle.deactivate();
+		}
 		// Add ChildManager to new parent if none already exists
 		ChildManager* childManager = parentHandle.getComponent<ChildManager>();
 		if (!childManager) {
@@ -384,10 +388,6 @@ void Scene::clear() {
 
 EntityManager* Scene::getEntityManager() {
 	return manager;
-}
-
-ObjectType Scene::getType() {
-	return type;
 }
 
 /* Save to outstream */

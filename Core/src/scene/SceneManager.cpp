@@ -34,9 +34,6 @@ void SceneManager::saveScene(ScenePtr scene, const char* fileName) { //To be add
 	// Scene name
 	std::string name = scene->getName();
 	file.write(name.c_str(), sizeof(char) * (name.size() + 1));
-	// Scene type
-	std::size_t sceneType = static_cast<std::size_t>(scene->getType());
-	file.write((char*)& sceneType, sizeof(sceneType));
 	// Scene
 	scene->serialize(file);
 	file.close();
@@ -54,12 +51,8 @@ ScenePtr SceneManager::loadScene(const char* fileName) { //To be added: file loc
 	// Scene name
 	std::string name;
 	std::getline(file, name, '\0');
-	// Scene type
-	std::size_t sceneType;
-	file.read((char*)&sceneType, sizeof(sceneType));
-	ObjectType type = static_cast<ObjectType>(sceneType);
 	// Scene
-	ScenePtr scene = std::make_shared<Scene>(entityManager, name, type);
+	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
 	scene->deserialize(file);
 	file.close();
 	scene->awake();
@@ -67,8 +60,8 @@ ScenePtr SceneManager::loadScene(const char* fileName) { //To be added: file loc
 	return scene;
 }
 
-ScenePtr SceneManager::createScene(std::string name, ObjectType type) {
-	ScenePtr scene = std::make_shared<Scene>(entityManager, name, type);
+ScenePtr SceneManager::createScene(std::string name) {
+	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
 	sceneMap[name] = scene;
 	return scene;
 }

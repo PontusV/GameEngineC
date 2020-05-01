@@ -3,16 +3,16 @@
 
 #include "scene/Scene.h"
 #include "components/RectTransform.h"
-#include "components/graphics/ui/DropDown.h"
-#include "components/graphics/ui/Button.h"
-#include "components/graphics/ui/WindowAnchor.h"
+#include "components/ui/input/DropDown.h"
+#include "components/ui/input/Button.h"
+#include "components/ui/WindowAnchor.h"
 #include "components/MouseDrag.h"
-#include "components/graphics/ui/LayoutElement.h"
-#include "components/graphics/ui/HorizontalLayoutGroup.h"
-#include "components/graphics/ui/VerticalLayoutGroup.h"
-#include "components/graphics/ui/WindowScale.h"
-#include "components/DragAndResize.h"
-#include "components/graphics/ui/RectButton.h"
+#include "components/ui/layout/LayoutElement.h"
+#include "components/ui/layout/HorizontalLayoutGroup.h"
+#include "components/ui/layout/VerticalLayoutGroup.h"
+#include "components/ui/WindowScale.h"
+#include "components/ui/input/DragAndResize.h"
+#include "components/ui/input/RectButton.h"
 #include "components/editor/EditorPanel.h"
 
 #include "maths/Vector2.h"
@@ -40,8 +40,8 @@ int LevelEditor::initiate() {
 	window.setBackgroundColor(Vector3(0.1f, 0.1f, 0.1f));
 
 	// Create Level Editor
-	ScenePtr sceneUI = engine.getSceneManager().createScene("Level_Editor", ObjectType::UI);
-	ScenePtr sceneWorld = engine.getSceneManager().createScene("World", ObjectType::World);
+	ScenePtr sceneUI = engine.getSceneManager().createScene("Level_Editor");
+	ScenePtr sceneWorld = engine.getSceneManager().createScene("World");
 	unsigned char editorSortingLayer = 0;
 	// ------------------------------------------------------Menu bar----------------------------------------------------------
 	EntityHandle menuBar = sceneUI->createEntity("Menu_Bar",

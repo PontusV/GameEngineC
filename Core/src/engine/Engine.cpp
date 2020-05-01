@@ -4,7 +4,7 @@
 #include "scene/Scene.h"
 #include "graphics/Window.h"
 #include "graphics/renderer/Renderer2D.h"
-#include "components/graphics/ui/WindowAnchor.h"
+#include "components/ui/WindowAnchor.h"
 #include "components/graphics/Text.h"
 
 #include <iostream>
@@ -105,7 +105,7 @@ void Engine::terminate() {
 /* Starts the gameloop. */
 int Engine::initiate() {
 	// Create Empty Debug Scene
-	debugScene = sceneManager.createScene("Debug", ObjectType::UI);
+	debugScene = sceneManager.createScene("Debug");
 
 	// Initialize systems
 	// Graphics
@@ -134,7 +134,7 @@ int Engine::start() {
 	EntityHandle fpsDisplay = debugScene->createEntity("FPS_Display",
 		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255)),
 		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
-		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT)
+		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT, 0.0f, 1.0f, TransformSpace::Screen)
 	);
 	debugScene->awake();
 

@@ -1,6 +1,6 @@
 #include "PropertyEditor.h"
-#include "components/input/InputField.h"
-#include "components/input/CheckBox.h"
+#include "components/ui/input/InputField.h"
+#include "components/ui/input/CheckBox.h"
 #include "maths/Vector2.h"
 #include "ReflectionPolymorph.generated.h"
 using namespace Core;

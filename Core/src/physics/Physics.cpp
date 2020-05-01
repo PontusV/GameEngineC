@@ -1,7 +1,7 @@
 #include "Physics.h"
 #include "components/Behaviour.h"
 #include "components/graphics/Text.h"
-#include "components/graphics/ui/ScrollRect.h"
+#include "components/ui/ScrollRect.h"
 #include "maths/MatrixTransform.h"
 #include "maths/Matrix4.h"
 using namespace Core;

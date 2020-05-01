@@ -5,9 +5,7 @@
 
 #include "components/graphics/Sprite.h"
 #include "components/RectTransform.h"
-#include "components/input/InputField.h"
-#include "components/engine/GameObjectData.h"
-#include "components/engine/UIObjectData.h"
+#include "components/ui/input/InputField.h"
 #include "entity/component/ComponentGroup.h"
 #include "entity/component/ComponentArray.h"
 
@@ -143,8 +141,7 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		ComponentGroup<Sprite, RectTransform, GameObjectData> spriteGroup;
-		ComponentGroup<Sprite, RectTransform, UIObjectData> spriteGroupUI;
+		ComponentGroup<Sprite, RectTransform> spriteGroup;
 
 	private:
 		Vector2 mousePosition;		// Mouse position in screen space

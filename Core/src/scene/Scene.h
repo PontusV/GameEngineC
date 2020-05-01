@@ -5,10 +5,8 @@
 #include "entity/EntityManager.h"
 #include "entity/Entity.h"
 #include "entity/handle/Handle.h"
-#include "components/engine/ObjectData.h"
-#include "components/engine/GameObjectData.h"
-#include "components/engine/UIObjectData.h"
 #include "utils/FunctionCaller.h"
+#include "entity/component/Component.h"
 #include <string>
 #include <vector>
 #include <deque>
@@ -17,7 +15,7 @@ namespace Core {
 	/* Contains a collection of entities. */
 	class Scene : public Serializable {
 	public:
-		Scene(EntityManager* entityManager, std::string name, ObjectType type);
+		Scene(EntityManager* entityManager, std::string name);
 		~Scene();
 
 		const std::vector<Handle>& getAllEntities() const;
@@ -73,7 +71,6 @@ namespace Core {
 		Handle getEntityHandle(std::string name);
 
 		EntityManager* getEntityManager();
-		ObjectType getType();
 		/* Calls all the functions in queue and clears it. */
 		void processQueue();
 		/* Retrieves component from queued createEntity and addComponent */
@@ -106,7 +103,6 @@ namespace Core {
 		std::map<Entity, std::vector<int>> entityQueueMap;
 
 	private:
-		const ObjectType type;
 		std::vector<Handle> entities;		// A list of entities contained by this scene
 		EntityManager* manager;				// Manages the Entities in this Scene
 		bool isAwake;
@@ -122,14 +118,7 @@ namespace Core {
 	template <typename... Ts>
 	Handle Scene::addEntity(Entity entity, Ts&... components) {
 		EntityLocation location;
-		if (type == ObjectType::World) {
-			GameObjectData component(this);
-			location = manager->addEntity(entity, component, components...);
-		}
-		else {
-			UIObjectData component(this);
-			location = manager->addEntity(entity, component, components...);
-		}
+		location = manager->addEntity(entity, components...);
 
 		Handle owner = Handle(entity, this);
 		owner.updateLocation(location);

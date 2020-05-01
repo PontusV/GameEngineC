@@ -20,7 +20,7 @@ void MouseDrag::onMouseButtonPressedAsButton(int buttoncode, int mods) {
 		if (transform) {
 			Vector2 mousePosition = input->getMousePosition();
 			// Convert to World Space if owner is a World Object
-			if (owner.getObjectType() == ObjectType::World) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
+			if (transform->isInWorldSpace()) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
 			// Offset from top left vertex of the RectTransform
 			Vector2 mouseOffset = transform->getWorldToLocalMatrix() * maths::inverse(transform->getLocalModelMatrix()) * mousePosition - transform->getRectOffset();
 			if (mouseOffset.x > padding && mouseOffset.x < transform->getSize().x - padding &&
@@ -42,7 +42,7 @@ void MouseDrag::onMouseDrag(float mouseX, float mouseY) {
 		if (transform) {
 			Vector2 mousePosition = input->getMousePosition();
 			// Convert to World Space if owner is a World Object
-			if (owner.getObjectType() == ObjectType::World) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
+			if (transform->isInWorldSpace()) mousePosition = camera->getWorldToScreenMatrix() * mousePosition;
 			transform->setPosition(mousePosition + offset);
 		}
 	}

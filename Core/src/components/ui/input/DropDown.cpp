@@ -7,7 +7,7 @@
 #include "maths/MatrixTransform.h"
 
 #include "components/RectTransform.h"
-#include "components/graphics/ui/RectButton.h"
+#include "components/ui/input/RectButton.h"
 #include "components/graphics/Text.h"
 #include "input/Input.h"
 

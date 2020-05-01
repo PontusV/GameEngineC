@@ -3,14 +3,13 @@
 #include "HierarchyView.h"
 #include "components/graphics/Text.h"
 #include "components/graphics/RectSprite.h"
-#include "components/graphics/ui/RectButton.h"
-#include "components/graphics/ui/LayoutElement.h"
-#include "components/graphics/ui/HorizontalLayoutGroup.h"
-#include "components/graphics/ui/VerticalLayoutGroup.h"
-#include "components/graphics/ui/ScrollRect.h"
-#include "components/graphics/ui/ScrollBar.h"
-#include "components/graphics/ui/RectMask.h"
-#include "components/engine/ObjectData.h"
+#include "components/ui/input/RectButton.h"
+#include "components/ui/layout/LayoutElement.h"
+#include "components/ui/layout/HorizontalLayoutGroup.h"
+#include "components/ui/layout/VerticalLayoutGroup.h"
+#include "components/ui/ScrollRect.h"
+#include "components/ui/input/ScrollBar.h"
+#include "components/ui/RectMask.h"
 #include "scene/Scene.h"
 #include "input/Input.h"
 #include <GLFW/glfw3.h>
@@ -23,7 +22,7 @@ EditorPanel::~EditorPanel() {}
 
 
 void EditorPanel::start() {
-	Scene* sceneUI = owner.getComponent<ObjectData>()->getScene();
+	Scene* sceneUI = owner.getScene();
 	// ----------------------------------------------------Inspector-----------------------------------------------------------------
 	int textPadding = 5;
 	int backgroundPadding = 3;

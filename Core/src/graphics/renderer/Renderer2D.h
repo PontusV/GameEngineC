@@ -32,19 +32,23 @@ namespace Core {
 		/* Render text. Submits text to a batchRenderer2D. */
 		void submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& sortingLayer);
 
-		/* Draws everything submitted to this renderer since the last render() call. */
+		/* Draws everything submitted to this renderer since the last render call. */
 		void render(float deltaTime);
 
 		/* Updates the size of the area to be rendered. Resizes the Frame Buffer Object(FBO). */
 		void updateSize(unsigned int width, unsigned int height);
 
 	private:
-		/* Draws and clears batch renderer. */
-		void flush();
+		/* Draws and clears the whole batch renderer. */
+		void flushAll();
+
+		/* Draws and clears batch renderer. The specified index defines which renderables in the Renderable buffer to render. */
+		void flush(std::size_t startIndex, std::size_t endIndex);
 
 	private:
 		Renderable2D renderableBuffer[MAX_RENDERABLES];
 		std::size_t renderablesSize = 0;
+		std::size_t screenRenderablesSize = 0;
 
 		BatchRenderer2D	batch;
 		PostProcessor postProcessor;

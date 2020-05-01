@@ -6,7 +6,7 @@
 #include "entity/EntityManager.h"
 #include "entity/component/Component.h"
 #include "components/Behaviour.h"
-#include "components/input/Selectable.h"
+#include "components/ui/input/Selectable.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>
@@ -372,37 +372,11 @@ bool contains(const std::vector<Entity>& list, const Entity& value) {
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreList) {
 	std::size_t spriteGroupSize = spriteGroup.size();
-	std::size_t spriteGroupUISize = spriteGroupUI.size();
 	HitDetectData currentHit;
-	
-	// --------------------------------- UI -------------------------------------
-	for (std::size_t i = 0; i < spriteGroupUISize; i++) {
-		Entity&			entity		= spriteGroupUI.getEntity(i);
-		Sprite&			sprite		= spriteGroupUI.get<Sprite>(i);
-		RectTransform&	transform	= spriteGroupUI.get<RectTransform>(i);
-
-		if (contains(ignoreList, entity)) continue;
-		if (transform.getZ() < currentHit.sortingOrder) continue;
-
-		// Add rectangles in view of window
-		Window& window = engine->getGraphics().getWindow();
-		std::array<Vector2, 4> vertices = transform.getVertices();
-
-		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
-			// Simple hit detection
-			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
-				currentHit.index = i;
-				currentHit.sortingOrder = transform.getZ();
-			}
-		}
-	}
-	if (currentHit.index < spriteGroupUISize) {
-		Entity entity = spriteGroupUI.getEntity(currentHit.index);
-		Scene* scene = spriteGroupUI.get<UIObjectData>(currentHit.index).getScene();
-		return EntityHandle(entity, scene);
-	}
 
 	// --------------------------------- World -------------------------------------
+	Camera& camera = engine->getGraphics().getCamera();
+	Window& window = engine->getGraphics().getWindow();
 	for (std::size_t i = 0; i < spriteGroupSize; i++) {
 		Entity&			entity		= spriteGroup.getEntity(i);
 		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
@@ -412,9 +386,7 @@ EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreL
 		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window
-		Window& window = engine->getGraphics().getWindow();
-		Camera& camera = engine->getGraphics().getCamera();
-		std::array<Vector2, 4> vertices = transform.getVertices(camera.getViewMatrix());
+		std::array<Vector2, 4> vertices = transform.isInWorldSpace() ? transform.getVertices(camera.getViewMatrix()) : transform.getVertices();
 
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
@@ -427,7 +399,7 @@ EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreL
 
 	if (currentHit.index < spriteGroupSize) {
 		Entity entity = spriteGroup.getEntity(currentHit.index);
-		Scene* scene = spriteGroup.get<GameObjectData>(currentHit.index).getScene();
+		Scene* scene = spriteGroup.get<RectTransform>(currentHit.index).getOwner().getScene(); // TODO: Find a prettier way to do this?
 		return EntityHandle(entity, scene);
 	}
 

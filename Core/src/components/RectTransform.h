@@ -28,7 +28,7 @@ namespace Core {
 	CLASS() RectTransform : public Transform {
 		GENERATED_BODY()
 	public:
-		RectTransform(float x, float y, float width, float height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f);
+		RectTransform(float x, float y, float width, float height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f, TransformSpace space = TransformSpace::World);
 		RectTransform();
 		~RectTransform();
 
@@ -49,7 +49,7 @@ namespace Core {
 		Vector2 getLocalVertex(std::size_t index) const;
 		/* Returns the vertices in world space. */
 		std::array<Vector2, 4> getVertices() const;
-		/* Returns the vertices in world space. */
+		/* Returns the vertices in world space. Multiplies the vertices with the given matrix. */
 		std::array<Vector2, 4> getVertices(const Matrix4& matrix) const;
 		/* Returns the vertex in world space. */
 		Vector2 getVertex(std::size_t index) const;

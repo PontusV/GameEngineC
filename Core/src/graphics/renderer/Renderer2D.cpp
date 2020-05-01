@@ -2,6 +2,7 @@
 #include "engine/ResourceManager.h"
 #include "BatchConfig.h"
 #include "maths/MatrixTransform.h"
+#include "graphics/Camera.h"
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
@@ -16,20 +17,20 @@ Renderer2D::~Renderer2D() {
 }
 
 void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& sortingLayer) {
-	if (renderablesSize >= MAX_RENDERABLES) {
+	if (renderablesSize + screenRenderablesSize >= MAX_RENDERABLES) {
 		// TODO: Add warning to increase MAX_RENDERABLES
 		return;
 	}
 
 	std::vector<Vector2> clipMaskVertices;
-	clipMaskVertices.reserve(masks.size()*4);
 	for (const std::array<Vector2, 4>& vertices : masks) {
 		for (std::size_t i = 0; i < 4; i++) {
 			clipMaskVertices.push_back(vertices[i]);
 		}
 	}
 
-	Renderable2D& renderable = renderableBuffer[renderablesSize];
+	const TransformSpace& space = transform.getSpace();
+	Renderable2D& renderable = renderableBuffer[space == TransformSpace::Screen ? MAX_RENDERABLES - screenRenderablesSize - 1 : renderablesSize];
 	renderable.textureID = texture.ID;
 
 	auto vertices = transform.getVertices();
@@ -46,22 +47,38 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 
 	renderable.clipMaskVertices = clipMaskVertices;
 
-	renderablesSize++;
+	if (space == TransformSpace::Screen) {
+		screenRenderablesSize++;
+	}
+	else {
+		renderablesSize++;
+	}
 }
 
 void Renderer2D::render(float deltaTime) {
 	//postProcessor.begin();
-	flush();
+	flushAll();
 	//postProcessor.end();
 	//postProcessor.render(deltaTime);
 }
 
-void Renderer2D::flush() {
-	if (renderablesSize == 0)
-		return;
+void Renderer2D::flushAll() {
+	if (renderablesSize > 0) {
+		ResourceManager::getInstance().updateShaderViewMatrix(camera->getViewMatrix());
+		flush(0, renderablesSize - 1);
+	}
+	renderablesSize = 0;
+	if (screenRenderablesSize > 0) {
+		Matrix4 viewMatrixScreen(1.0f);
+		ResourceManager::getInstance().updateShaderViewMatrix(viewMatrixScreen);
+		flush(MAX_RENDERABLES - screenRenderablesSize, MAX_RENDERABLES - 1);
+	}
+	screenRenderablesSize = 0;
+}
 
+void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 	// Sort list of renderable copies
-	std::sort(std::begin(renderableBuffer), &renderableBuffer[renderablesSize], [](Renderable2D& l, Renderable2D& r) {
+	std::sort(&renderableBuffer[startIndex], &renderableBuffer[endIndex], [](Renderable2D& l, Renderable2D& r) {
 
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
@@ -97,10 +114,10 @@ void Renderer2D::flush() {
 		if (r.clipMaskVertices.size() < vertexAmount) return false;
 
 		return false; // They are equal
-	});
+		});
 
 	bool batchBegun = false;
-	for (std::size_t i = 0; i < renderablesSize; i++) {
+	for (std::size_t i = startIndex; i <= endIndex; i++) {
 		Renderable2D& renderable = renderableBuffer[i];
 		ConstBatchConfig config(renderable.textureID, renderable.shaderID, renderable.clipMaskVertices);
 
@@ -124,8 +141,6 @@ void Renderer2D::flush() {
 	//End sumbit and flush
 	batch.end();
 	batch.flush();
-
-	renderablesSize = 0;
 }
 
 void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& sortingLayer) {

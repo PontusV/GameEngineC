@@ -1,6 +1,6 @@
 #ifndef LAYOUT_CONTROLLER_H
 #define LAYOUT_CONTROLLER_H
-#include "UIBehaviour.h"
+#include "components/ui/UIBehaviour.h"
 #include "ILayoutElement.h"
 #include "maths/Vector2.h"
 #include "LayoutController.generated.h"
@@ -38,7 +38,7 @@ namespace Core {
 		/* Updates layout and sets dirty to false. */
 		void refresh();
 		/* Marks all parents and self for layout update. */
-		void setDirty();
+		void setDirty(bool chain = true);
 		bool isDirty();
 		bool isDirtySize();
 

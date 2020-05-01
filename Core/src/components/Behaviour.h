@@ -3,7 +3,6 @@
 
 #include "entity/component/Component.h"
 #include "entity/handle/EntityHandle.h"
-#include "components/engine/ObjectData.h"
 #include "scene/Scene.h"
 #include "Behaviour.generated.h"
 
@@ -100,7 +99,7 @@ namespace Core {
 
 	template<typename... Ts>
 	EntityHandle Behaviour::createEntity(std::string name, Ts... components) {
-		Scene* scene = owner.getComponent<ObjectData>()->getScene();
+		Scene* scene = owner.getScene();
 		return scene->createEntityQueued(name, components...);
 	}
 }

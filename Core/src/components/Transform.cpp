@@ -7,10 +7,10 @@ static float RADIANS_MAX = M_PI * 2;
 using namespace Core;
 
 
-Transform::Transform(float x, float y, float z, float rotation, float scale) : position(x, y), z(z), rotation(rotation), scale(scale) {
+Transform::Transform(float x, float y, float z, float rotation, float scale, TransformSpace space) : position(x, y), z(z), rotation(rotation), scale(scale), space(space) {
 }
 
-Transform::Transform() : position(0, 0), z(0), rotation(0.0f), scale(1.0f) {
+Transform::Transform() : position(0, 0), z(0), rotation(0.0f), scale(1.0f), space(TransformSpace::World) {
 }
 
 Transform::~Transform() {
@@ -70,6 +70,10 @@ void Transform::setLocalY(float value) {
 	changed = true;
 }
 
+void Transform::setSpace(TransformSpace space) {
+	changed = true;
+}
+
 void Transform::updateLocalToWorldMatrix(const Matrix4& model) {
 	localToWorldMatrix = model;
 	worldToLocalMatrix = maths::inverse(localToWorldMatrix);
@@ -110,6 +114,18 @@ const Vector2& Transform::getLocalPosition() const {
 
 const Vector2 Transform::getPosition() const {
 	return localToWorldMatrix * position;
+}
+
+const TransformSpace& Transform::getSpace() const {
+	return space;
+}
+
+bool Transform::isInWorldSpace() {
+	return space == TransformSpace::World;
+}
+
+bool Transform::isInScreenSpace() {
+	return space == TransformSpace::Screen;
 }
 
 const float& Transform::getZ() const {

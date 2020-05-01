@@ -98,7 +98,7 @@ void ResourceManager::updateShaders(const Matrix4& projection) {
 	}
 }
 
-void ResourceManager::updateCameraViewMatrix(const Matrix4& viewMatrix) {
+void ResourceManager::updateShaderViewMatrix(const Matrix4& viewMatrix) {
 	//this->projection = projection;
 	for (auto it = shaders.begin(); it != shaders.end(); ++it) {
 		it->second.setMatrix4("model", viewMatrix, true);

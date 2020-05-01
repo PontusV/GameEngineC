@@ -92,13 +92,6 @@ void Handle::clear() {
 	scene = nullptr;
 }
 
-ObjectType Handle::getObjectType() {
-	if (ObjectData* objectData = getComponent<ObjectData>()) {
-		return objectData->getLayer();
-	}
-	return ObjectType::Invalid;
-}
-
 bool Handle::isValid() {
 	/*if (auto chunk = locationData.chunk.lock()) {
 		return chunk->getEntity(locationData.index) == entity;
