@@ -6,6 +6,7 @@
 #include "graphics/Graphics.h"
 #include "physics/Physics.h"
 #include "input/Input.h"
+#include "ui/GUISystem.h"
 #include "BehaviourManager.h"
 #include <memory>
 
@@ -17,10 +18,14 @@ namespace Core {
 		Engine();
 		~Engine();
 
-		// Game loop
-		int initiate();
+		int initiate(bool skipCallbacks = false);
+		/* Starts the game loop */
 		int start();
+		/* Runs one tick of the game. Handles input, updates systems and renders */
+		void tick(float deltaTime);
 		void terminate();
+
+		void resizeViewport(unsigned int width, unsigned int height);
 
 		// Systems
 		Input& getInput();
@@ -29,6 +34,7 @@ namespace Core {
 		EntityManager& getEntityManager();
 		SceneManager& getSceneManager();
 		BehaviourManager& getBehaviourManager();
+		GUISystem& getGUISystem();
 
 	private:
 		// Game loop
@@ -43,6 +49,7 @@ namespace Core {
 		Graphics graphics;
 		Input input;
 		Physics physics;
+		GUISystem guiSystem;
 
 		BehaviourManager behaviourManager;
 	};

@@ -22,22 +22,28 @@ using namespace Core;
 #include "entity/component/ComponentRegistry.h"
 static bool registered = Core::ComponentRegistry::registerComponentTypes();
 
-// -------------------------------Callbacks----------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-
+void Engine::resizeViewport(unsigned int width, unsigned int height) {
 	// Viewport
 	glViewport(0, 0, width, height);
 	// Updates projection matrix of all shaders
 	Matrix4 projection = maths::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::getInstance().updateShaders(projection);
 	// Resize draw area
-	engine->getGraphics().getRenderer().updateSize(width, height);
+	graphics.getRenderer().updateSize(width, height);
 	// Notify UIBehaviours
-	engine->getGraphics().getUISystem().onWindowResize();
+	guiSystem.onWindowResize(); // TODO: onViewportResize?
 }
 
+// -------------------------------Callbacks----------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+	engine->resizeViewport(width, height);
+}
+
+static void glfw_error_callback(int error, const char* description) {
+	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
 
 
 // ------------------------------- Input callbacks -----------------------------------
@@ -102,10 +108,9 @@ void Engine::terminate() {
 	running = false;
 }
 
-/* Starts the gameloop. */
-int Engine::initiate() {
-	// Create Empty Debug Scene
-	debugScene = sceneManager.createScene("Debug");
+/* Prepares for the gameloop. */
+int Engine::initiate(bool skipCallbacks) {
+	glfwSetErrorCallback(glfw_error_callback);
 
 	// Initialize systems
 	// Graphics
@@ -114,29 +119,26 @@ int Engine::initiate() {
 	Window& window = graphics.getWindow();
 	// Physics
 	// Input
-	glfwSetWindowUserPointer(window.getWindow(), this);
-	glfwSetKeyCallback(window.getWindow(), keyCallback);
-	glfwSetCharCallback(window.getWindow(), characterCallback);
-	glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
-	glfwSetMouseButtonCallback(window.getWindow(), mouseButtonCallback);
-	glfwSetScrollCallback(window.getWindow(), scrollCallback);
 	// End of system initialization
+
+	//Callbacks
+	if (!skipCallbacks) {
+		// Input
+		glfwSetWindowUserPointer(window.getWindow(), this);
+		glfwSetKeyCallback(window.getWindow(), keyCallback);
+		glfwSetCharCallback(window.getWindow(), characterCallback);
+		glfwSetCursorPosCallback(window.getWindow(), cursorPositionCallback);
+		glfwSetMouseButtonCallback(window.getWindow(), mouseButtonCallback);
+		glfwSetScrollCallback(window.getWindow(), scrollCallback);
+		// Graphics
+		glfwSetFramebufferSizeCallback(window.getWindow(), framebuffer_size_callback);
+	}
 
 	return 0;
 }
+
 int Engine::start() {
 	Window& window = graphics.getWindow();
-
-	//Callbacks
-	glfwSetFramebufferSizeCallback(window.getWindow(), framebuffer_size_callback);
-
-	FpsCounter fpsCounter;
-	EntityHandle fpsDisplay = debugScene->createEntity("FPS_Display",
-		Text("Fps: 0", "resources/fonts/cambriab.ttf", 20, Color(255, 255, 255, 255)),
-		WindowAnchor(Alignment::BOTTOM_LEFT, 5, -10),
-		RectTransform(500, 5, 0, 0, 30, Alignment::BOTTOM_LEFT, 0.0f, 1.0f, TransformSpace::Screen)
-	);
-	debugScene->awake();
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
@@ -150,24 +152,9 @@ int Engine::start() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// Fps
-		fpsCounter.tick(deltaTime, fpsDisplay.getComponent<Text>());
+		tick(deltaTime);
 
-		// Poll events
-		glfwPollEvents();
-
-		// Update systems
-		sceneManager.update();
-		input.update(deltaTime);
-		behaviourManager.update(deltaTime);
-		graphics.update(deltaTime);
-		physics.update(deltaTime);
-
-		// Render
-		behaviourManager.onPreRender(deltaTime);
-		graphics.render(deltaTime);
-		behaviourManager.onPostRender(deltaTime);
-
+		window.update();
 
 		// 1ms sleep
 		Sleep(1);
@@ -175,6 +162,24 @@ int Engine::start() {
 
 	glfwTerminate();
 	return 0;
+}
+
+void Engine::tick(float deltaTime) {
+	// Poll events
+	glfwPollEvents();
+
+	// Update systems
+	sceneManager.update();
+	input.update(deltaTime);
+	behaviourManager.update(deltaTime);
+	guiSystem.update();
+	graphics.update(deltaTime);
+	physics.update(deltaTime);
+
+	// Render
+	behaviourManager.onPreRender(deltaTime);
+	graphics.render(deltaTime);
+	behaviourManager.onPostRender(deltaTime);
 }
 
 Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physics(), behaviourManager(this) {

@@ -355,12 +355,6 @@ bool Input::hasKeyboardFocus() {
 	return keyboardFocus.isValid();
 }
 
-struct HitDetectData {
-	HitDetectData() : index(-1), sortingOrder(0) {}
-	std::size_t index;
-	float sortingOrder;
-};
-
 /* Utility */
 bool contains(const std::vector<Entity>& list, const Entity& value) {
 	for (const Entity& entry : list) {
@@ -372,25 +366,61 @@ bool contains(const std::vector<Entity>& list, const Entity& value) {
 // -------------- HELPERS ------------------
 EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreList) {
 	std::size_t spriteGroupSize = spriteGroup.size();
-	HitDetectData currentHit;
+	std::size_t guiGroupSize = guiGroup.size();
 
-	// --------------------------------- World -------------------------------------
+	struct HitDetectData {
+		std::size_t index = -1;
+		float sortingOrder = 0;
+	} currentHit;
+
+	// TODO: Handle masks
+
 	Camera& camera = engine->getGraphics().getCamera();
 	Window& window = engine->getGraphics().getWindow();
-	for (std::size_t i = 0; i < spriteGroupSize; i++) {
-		Entity&			entity		= spriteGroup.getEntity(i);
-		Sprite&			sprite		= spriteGroup.get<Sprite>(i);
-		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
+	// --------------------------------- GUI -------------------------------------
+	for (std::size_t i = 0; i < guiGroupSize; i++) {
+		Entity&			entity		= guiGroup.getEntity(i);
+		CanvasRenderer&	renderer	= guiGroup.get<CanvasRenderer>(i);
+		RectTransform	transform	= guiGroup.get<RectTransform>(i);
 
+		if (!renderer.isEnabled()) continue;
 		if (contains(ignoreList, entity)) continue;
 		if (transform.getZ() < currentHit.sortingOrder) continue;
 
 		// Add rectangles in view of window
-		std::array<Vector2, 4> vertices = transform.isInWorldSpace() ? transform.getVertices(camera.getViewMatrix()) : transform.getVertices();
+		std::array<Vector2, 4> vertices = transform.getVertices();
 
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
-			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices) && maths::hitCheckCollection(mousePosition.x, mousePosition.y, sprite.getMasks())) {
+			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices)) {
+				currentHit.index = i;
+				currentHit.sortingOrder = transform.getZ();
+			}
+		}
+	}
+
+	if (currentHit.index < guiGroupSize) {
+		Entity entity = guiGroup.getEntity(currentHit.index);
+		Scene* scene = guiGroup.get<RectTransform>(currentHit.index).getOwner().getScene(); // TODO: Find a prettier way to do this?
+		return EntityHandle(entity, scene);
+	}
+
+	// --------------------------------- World -------------------------------------
+	for (std::size_t i = 0; i < spriteGroupSize; i++) {
+		Entity&			entity		= spriteGroup.getEntity(i);
+		SpriteRenderer&	renderer	= spriteGroup.get<SpriteRenderer>(i);
+		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
+
+		if (!renderer.isEnabled()) continue;
+		if (contains(ignoreList, entity)) continue;
+		if (transform.getZ() < currentHit.sortingOrder) continue;
+
+		// Add rectangles in view of window
+		std::array<Vector2, 4> vertices = transform.getVertices(camera.getViewMatrix());
+
+		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
+			// Simple hit detection
+			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices)) {
 				currentHit.index = i;
 				currentHit.sortingOrder = transform.getZ();
 			}

@@ -1,7 +1,6 @@
 #ifndef BATCH_CONFIG_H
 #define BATCH_CONFIG_H
 
-#include "maths/Vector2.h"
 #include <vector>
 #include <stdexcept>
 
@@ -10,11 +9,10 @@
 namespace Core {
 	class ConstBatchConfig {
 	public:
-		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID, const std::vector<Vector2>& clipMaskVertices) : textureID(textureID), shaderID(shaderID), clipMaskVertices(clipMaskVertices) {}
+		ConstBatchConfig(const unsigned int& textureID, const unsigned int& shaderID) : textureID(textureID), shaderID(shaderID) {}
 
-		const unsigned int&				textureID;
-		const unsigned int&				shaderID;
-		const std::vector<Vector2>&		clipMaskVertices;
+		const unsigned int&	textureID;
+		const unsigned int&	shaderID;
 	};
 
 	class BatchConfig {
@@ -36,7 +34,7 @@ namespace Core {
 		}
 
 		inline bool equal(const ConstBatchConfig& other) {
-			return (shaderID == other.shaderID && clipMaskVertices == other.clipMaskVertices);
+			return (shaderID == other.shaderID);
 		}
 
 		BatchConfig(const unsigned int& textureID = 0, const unsigned int& shaderID = 0) : shaderID(shaderID) {
@@ -45,7 +43,6 @@ namespace Core {
 		BatchConfig(const ConstBatchConfig& other) {
 			textureIDs.push_back(other.textureID);
 			shaderID = other.shaderID;
-			clipMaskVertices = other.clipMaskVertices;
 		}
 
 		inline std::size_t getTextureSlot(const unsigned int& id) {
@@ -57,7 +54,6 @@ namespace Core {
 		}
 
 		unsigned int				shaderID;
-		std::vector<Vector2>		clipMaskVertices;
 		std::vector<unsigned int>	textureIDs;
 	};
 }

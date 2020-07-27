@@ -2,13 +2,12 @@
 #include "engine/ResourceManager.h"
 #include "BatchConfig.h"
 #include "maths/MatrixTransform.h"
-#include "graphics/Camera.h"
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
 using namespace Core;
 
-Renderer2D::Renderer2D(Camera* camera, Window* window) : camera(camera), batch(window), postProcessor(window) {
+Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
 	batch.init();
 	textShaderID = ResourceManager::getInstance().loadShader("resources/shaders/text").ID;
 }
@@ -16,21 +15,13 @@ Renderer2D::Renderer2D(Camera* camera, Window* window) : camera(camera), batch(w
 Renderer2D::~Renderer2D() {
 }
 
-void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const std::vector<std::array<Vector2, 4>>& masks, const unsigned char& sortingLayer) {
-	if (renderablesSize + screenRenderablesSize >= MAX_RENDERABLES) {
+void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const unsigned char& sortingOrder) {
+	if (renderablesSize >= MAX_RENDERABLES) {
 		// TODO: Add warning to increase MAX_RENDERABLES
 		return;
 	}
 
-	std::vector<Vector2> clipMaskVertices;
-	for (const std::array<Vector2, 4>& vertices : masks) {
-		for (std::size_t i = 0; i < 4; i++) {
-			clipMaskVertices.push_back(vertices[i]);
-		}
-	}
-
-	const TransformSpace& space = transform.getSpace();
-	Renderable2D& renderable = renderableBuffer[space == TransformSpace::Screen ? MAX_RENDERABLES - screenRenderablesSize - 1 : renderablesSize];
+	Renderable2D& renderable = renderableBuffer[renderablesSize];
 	renderable.textureID = texture.ID;
 
 	auto vertices = transform.getVertices();
@@ -43,19 +34,12 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 	renderable.z = transform.getZ();
 	renderable.shaderID = shaderID;
 	renderable.color = color;
-	renderable.sortingLayer = sortingLayer;
-
-	renderable.clipMaskVertices = clipMaskVertices;
-
-	if (space == TransformSpace::Screen) {
-		screenRenderablesSize++;
-	}
-	else {
-		renderablesSize++;
-	}
+	renderable.sortingOrder = sortingOrder;
+	renderablesSize++;
 }
 
-void Renderer2D::render(float deltaTime) {
+void Renderer2D::render(float deltaTime, Matrix4 viewMatrix) {
+	ResourceManager::getInstance().updateShaderViewMatrix(viewMatrix);
 	//postProcessor.begin();
 	flushAll();
 	//postProcessor.end();
@@ -64,16 +48,9 @@ void Renderer2D::render(float deltaTime) {
 
 void Renderer2D::flushAll() {
 	if (renderablesSize > 0) {
-		ResourceManager::getInstance().updateShaderViewMatrix(camera->getViewMatrix());
 		flush(0, renderablesSize - 1);
 	}
 	renderablesSize = 0;
-	if (screenRenderablesSize > 0) {
-		Matrix4 viewMatrixScreen(1.0f);
-		ResourceManager::getInstance().updateShaderViewMatrix(viewMatrixScreen);
-		flush(MAX_RENDERABLES - screenRenderablesSize, MAX_RENDERABLES - 1);
-	}
-	screenRenderablesSize = 0;
 }
 
 void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
@@ -83,8 +60,8 @@ void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
 
-		if (l.sortingLayer < r.sortingLayer) return true;
-		if (r.sortingLayer < l.sortingLayer) return false;
+		if (l.sortingOrder < r.sortingOrder) return true;
+		if (r.sortingOrder < l.sortingOrder) return false;
 
 		if (l.shaderID > r.shaderID) return true;
 		if (r.shaderID > l.shaderID) return false;
@@ -92,34 +69,13 @@ void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 		if (l.textureID > r.textureID) return true;
 		if (r.textureID > l.textureID) return false;
 
-		// Clipping values
-		if (l.clipMaskVertices.size() == 0 && !r.clipMaskVertices.size() == 0) return false; // They are equal, no need to check the rest
-
-		if (l.clipMaskVertices.size() == 0 && r.clipMaskVertices.size() != 0) return true;
-		if (r.clipMaskVertices.size() == 0 && l.clipMaskVertices.size() != 0) return false;
-
-		// Stencil Buffer Clip Mask Vertices compare
-		std::size_t vertexAmount = std::min(l.clipMaskVertices.size(), r.clipMaskVertices.size());
-		for (std::size_t i = 0; i < vertexAmount; i++) {
-			Vector2 lVertex = l.clipMaskVertices[i];
-			Vector2 rVertex = r.clipMaskVertices[i];
-
-			if (lVertex.x < rVertex.x) return true;
-			if (rVertex.x < lVertex.x) return false;
-			if (lVertex.y < rVertex.y) return true;
-			if (rVertex.y < lVertex.y) return false;
-		}
-
-		if (l.clipMaskVertices.size() < vertexAmount) return true;
-		if (r.clipMaskVertices.size() < vertexAmount) return false;
-
 		return false; // They are equal
 		});
 
 	bool batchBegun = false;
 	for (std::size_t i = startIndex; i <= endIndex; i++) {
 		Renderable2D& renderable = renderableBuffer[i];
-		ConstBatchConfig config(renderable.textureID, renderable.shaderID, renderable.clipMaskVertices);
+		ConstBatchConfig config(renderable.textureID, renderable.shaderID);
 
 		if (!batch.hasRoom()) {
 			batch.end();
@@ -141,24 +97,6 @@ void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 	//End sumbit and flush
 	batch.end();
 	batch.flush();
-}
-
-void Renderer2D::submitText(const std::wstring& text, const RectTransform& transform, const Font& font, const Color& color, const std::vector<std::array<Vector2, 4>>& clipMaskVertices, const unsigned int& sortingLayer) {
-	TextData2D textData = ResourceManager::getInstance().createText(text, font);
-	std::vector<CharTexture2D>& textTextures = textData.textures;
-
-	// Calculate offset
-	Vector2 pivot = transform.getPivot();
-	float offsetX = textData.size.x * -pivot.x;
-	float offsetY = textData.size.y * -pivot.y + textData.size.y;
-
-	for (CharTexture2D& c : textTextures) {
-		// Create new Transform for Character Sprite
-		RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform.getZ(), Alignment::TOP_LEFT, 0.0f, 1.0f);
-		// Set world model matrix of new text sprite
-		spriteTransform.updateLocalToWorldMatrix(transform.getLocalToWorldMatrix() * transform.getLocalModelMatrix());
-		submit(c.texture, spriteTransform, textShaderID, color, clipMaskVertices, sortingLayer);
-	}
 }
 
 void Renderer2D::updateSize(unsigned int width, unsigned int height) {

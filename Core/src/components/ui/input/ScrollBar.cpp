@@ -19,7 +19,7 @@ void ScrollBar::start() {
 	EntityHandle ownerHandle = owner;
 	if (rect) {
 		// Background
-		ownerHandle.addComponent(RectSprite(backgroundColor));
+		ownerHandle.addComponent(RectSprite(0, backgroundColor));
 
 		// Handle
 		float handleWidth = 0;
@@ -31,7 +31,7 @@ void ScrollBar::start() {
 			handleHeight = rect->getSize().y - handlePadding * 2;
 		}
 		handle = createEntity(ownerHandle.getEntityName() + "_Handle",
-			RectSprite(handleColorDefault),
+			RectSprite(0, handleColorDefault),
 			RectTransform(0, 0, handleWidth, handleHeight, rect->getZ() + 0.01f, Alignment::TOP_LEFT)
 		);
 		handle.setParent(owner);

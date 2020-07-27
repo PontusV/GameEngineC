@@ -1,7 +1,6 @@
 #include "DropDown.h"
 #include "components/graphics/Image.h"
 #include "components/graphics/RectSprite.h"
-#include "components/graphics/Sprite.h"
 #include "graphics/data/Color.h"
 #include "maths/Vector2.h"
 #include "maths/MatrixTransform.h"
@@ -30,7 +29,7 @@ void DropDown::start() {
 		ownerHandle.addComponent(text);
 
 	if (!owner.hasComponent<RectSprite>())
-		ownerHandle.addComponent<RectSprite>(Color(80, 80, 80, 255));
+		ownerHandle.addComponent(RectSprite(0, Color(80, 80, 80, 255)));
 }
 
 void DropDown::onMouseButtonPressedAsButton(int buttoncode, int mods) {
@@ -61,7 +60,7 @@ void DropDown::onMouseButtonReleased(int buttoncode, int mods) {
 
 void DropDown::onHoverOver() {
 	if (isOpen) return;
-	Sprite* sprite = owner.getComponent<RectSprite>();
+	RectSprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {
 		sprite->setColor(Color(100, 100, 100, 255));
 	}
@@ -69,7 +68,7 @@ void DropDown::onHoverOver() {
 
 void DropDown::onHoverOut() {
 	if (isOpen) return;
-	Sprite* sprite = owner.getComponent<RectSprite>();
+	RectSprite* sprite = owner.getComponent<RectSprite>();
 	if (sprite) {
 		sprite->setColor(Color(80, 80, 80, 255));
 	}
@@ -85,7 +84,7 @@ void DropDown::open() {
 	Vector2 position = transform->getPosition() + transform->getRectOffset() + Vector2(0, size.y);
 	float z = transform->getZ()+1.0f;
 	menuBox = createEntity(owner.getEntityName() + "_DropDownBox",
-		RectSprite(Color(20, 20, 20, 255))
+		RectSprite(0, Color(20, 20, 20, 255))
 	);
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 
@@ -104,7 +103,7 @@ void DropDown::open() {
 		EntityHandle menuOption = createEntity(owner.getEntityName() + "_DropDownOption_" + std::to_string(i),
 			RectTransform((float)boxPaddingX, (float)boxPaddingY + yOffset, optionWidth, optionHeight, z + 0.1f, Alignment::TOP_LEFT),
 			button,
-			RectSprite({ 20,20,20,255 })
+			RectSprite(0, { 20,20,20,255 })
 		);
 		menuOption.setParent(menuBox);
 
@@ -116,7 +115,7 @@ void DropDown::open() {
 		float textPosX = textPaddingX + (optionWidth  - textPaddingX * 2) * textPivot.x;
 		float textPosY = textPaddingY + (optionHeight - textPaddingY * 2) * textPivot.y;
 		EntityHandle menuOptionText = createEntity(owner.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),
-			Text(label, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
+			Text(label, optionFont, optionTextColor),
 			RectTransform(textPosX, textPosY, 0, 0, z + 0.1f, textAlignment)
 		);
 		menuOptionText.setParent(menuOption);
@@ -130,14 +129,14 @@ void DropDown::open() {
 	if (border) {
 		// left, bottom, right
 		EntityHandle menuBoxBorder = createEntity(owner.getEntityName() + "_DropDownBox_Border",
-			RectSprite(borderColor),
+			RectSprite(0, borderColor),
 			RectTransform((float)-borderSize, 0.0f, boxWidth + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorder.setParent(menuBox);
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(owner.getEntityName() + "_DropDownBox_BorderTop",
-			RectSprite(borderColor),
+			RectSprite(0, borderColor),
 			RectTransform((float)size.x, (float)-borderSize, boxWidth - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorderTop.setParent(menuBox);

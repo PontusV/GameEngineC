@@ -3,7 +3,8 @@
 
 #define DOUBLE_CLICK_THRESHOLD 0.2f
 
-#include "components/graphics/Sprite.h"
+#include "components/graphics/SpriteRenderer.h"
+#include "components/graphics/CanvasRenderer.h"
 #include "components/RectTransform.h"
 #include "components/ui/input/InputField.h"
 #include "entity/component/ComponentGroup.h"
@@ -27,7 +28,7 @@ namespace Core {
 	class KeyListener;
 	class Selectable;
 
-	class InputModifierFlags { // Same as GLFW https://www.glfw.org/docs/latest/group__mods.html#ga14994d3196c290aaa347248e51740274
+	struct InputModifierFlags { // Same as GLFW https://www.glfw.org/docs/latest/group__mods.html#ga14994d3196c290aaa347248e51740274
 		static constexpr int CTRL		= 0x0001;
 		static constexpr int SHIFT		= 0x0002;
 		static constexpr int ALT		= 0x0004;
@@ -63,6 +64,7 @@ namespace Core {
 		Input(Engine* engine);
 		~Input();
 
+		/* Handles all input events */
 		void update(float deltaTime);
 		void addInputEvent(const InputEvent& event);
 
@@ -141,7 +143,8 @@ namespace Core {
 		std::vector<InputEvent> events;
 
 		// Interactable Component Groups
-		ComponentGroup<Sprite, RectTransform> spriteGroup;
+		ComponentGroup<SpriteRenderer, RectTransform> spriteGroup;
+		ComponentGroup<CanvasRenderer, RectTransform> guiGroup;
 
 	private:
 		Vector2 mousePosition;		// Mouse position in screen space

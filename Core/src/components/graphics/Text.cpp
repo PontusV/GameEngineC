@@ -1,13 +1,14 @@
 #include "Text.h"
 #include "engine/ResourceManager.h"
-#include "maths/MatrixTransform.h"
 
 using namespace Core;
 
 
-Text::Text(std::wstring text, const char* fontAddress, int fontSize, Color color, std::size_t sortingLayer) : Sprite(color, sortingLayer), font(fontAddress, fontSize), text(text) {
+Text::Text(std::wstring text, Font font, Color color)
+	: font(font), text(text), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color) {
 } // Constructor
-Text::Text(std::string text, const char* fontAddress, int fontSize, Color color, std::size_t sortingLayer) : Sprite(color, sortingLayer), font(fontAddress, fontSize), text(text.begin(), text.end()) {
+Text::Text(std::string text, Font font, Color color)
+	: font(font), text(text.begin(), text.end()), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color) {
 } // Constructor
 
 Text::Text() {
@@ -16,68 +17,34 @@ Text::Text() {
 Text::~Text() {
 } // Destructor
 
-const wchar_t* Text::getText() const {
-	return text.c_str();
+const std::wstring& Text::getText() const {
+	return text;
 }
 
 void Text::setText(std::wstring value) {
 	text = value;
-	refresh();
+	setDirty();
 }
 void Text::setText(std::string text) {
 	setText(std::wstring(text.begin(), text.end()));
-}
-
-Vector2 Text::getSize() {
-	return ResourceManager::getInstance().getTextSize(text, font);
 }
 
 const Font& Text::getFont() const {
 	return font;
 }
 
-void Text::updateTransforms() {
-	refresh();
+void Text::setDirty(bool value) {
+
+}
+bool Text::isDirty() const {
+	return dirty;
 }
 
-void Text::refresh() {
-	// Remove current
-	textSprites.clear();
-	textTransforms.clear();
-	// Create new
-	createText();
+void Text::update(std::vector<TextSprite> sprites) {
+	dirty = false;
+	this->sprites = sprites;
 }
 
-void Text::createText() {
-	if (text.empty()) return;
-
-	RectTransform* transform = owner.getComponent<RectTransform>();
-	if (transform) {
-		Matrix4 localToWorldMatrix = transform->getLocalToWorldMatrix() * transform->getLocalModelMatrix();
-		// Create text sprites
-		TextData2D textData = ResourceManager::getInstance().createText(text, font);
-		std::vector<CharTexture2D>& textTextures = textData.textures;
-		// Calculate offset
-		Vector2 pivot = transform->getPivot();
-		float offsetX = textData.size.x * -pivot.x;
-		float offsetY = textData.size.y * -pivot.y + textData.size.y;
-
-		for (CharTexture2D& c : textTextures) {
-			// Create new Transform for Character Sprite
-			RectTransform spriteTransform(offsetX + c.offset.x, offsetY + c.offset.y, c.texture.size.x, c.texture.size.y, transform->getZ() + 0.00001f, Alignment::TOP_LEFT, 0.0f, 1.0f, transform->getSpace());
-			// Set world model matrix of new text sprite
-			spriteTransform.updateLocalToWorldMatrix(localToWorldMatrix);
-			spriteTransform.updateLocalModelMatrix();
-
-			textSprites.push_back(c.texture);
-			textTransforms.push_back(spriteTransform);
-		}
-	}
-}
-
-const std::vector<Texture2D>& Text::getTextSprites() const {
-	return textSprites;
-}
-const std::vector<RectTransform>& Text::getTextTransforms() const {
-	return textTransforms;
+const std::vector<TextSprite>& Text::getSprites() const {
+	return sprites;
 }

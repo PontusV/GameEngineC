@@ -222,31 +222,10 @@ void BatchRenderer2D::flush() {
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-		if (config.clipMaskVertices.size() > 0) {
-			glStencilMask(0xFF);				// Enable stencil writes
-			glClear(GL_STENCIL_BUFFER_BIT);		// Clear old masks
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);	// Always draw
-
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // Disables drawing to color buffer
-			// Draw mask
-			glUseProgram(maskShaderID);
-			for (std::size_t i = 1; i <= segment.clipMaskCount; i++) {
-				std::size_t maskIndex = segment.startIndex - (6 * i);
-				if (maskIndex > 0)
-					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)(maskIndex * sizeof(GLushort)));
-			}
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);	// Enable drawing to color buffer
-
-			glStencilMask(0x00);				// Disable stencil writes
-			glStencilFunc(GL_LEQUAL, segment.clipMaskCount, 0xFF);	// Only draw on mask
-		}
 		glUseProgram(shaderID);
 
 		//Draw
 		glDrawElements(GL_TRIANGLES, segment.size, GL_UNSIGNED_SHORT, (void*)(segment.startIndex * sizeof(GLushort)));
-		if (config.clipMaskVertices.size() > 0) {
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);	// Always draw
-		}
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -263,14 +242,4 @@ void BatchRenderer2D::startNewSegment(BatchConfig config) {
 	segments.push_back(segment);
 	segmentBack = &segments.back();
 	this->config = &segmentBack->config;
-
-	// Add clip mask for segments
-	for (std::size_t i = 0; i < config.clipMaskVertices.size(); i += 4) {
-		submitMask(config.clipMaskVertices[i], config.clipMaskVertices[i+1], config.clipMaskVertices[i+2], config.clipMaskVertices[i+3]);
-
-		// Shift segment start (Puts this mask right before segment start)
-		segmentBack->startIndex += 6;
-		segmentBack->size -= 6;
-		segmentBack->clipMaskCount++;
-	}
 }

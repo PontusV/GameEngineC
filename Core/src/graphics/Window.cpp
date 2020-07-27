@@ -87,13 +87,11 @@ void Window::close() {
 }
 
 int Window::getWidth() {
-	getResolution();
-	return (int)resolution.x;
+	return (int)getResolution().x;
 }
 
 int Window::getHeight() {
-	getResolution();
-	return (int)resolution.y;
+	return (int)getResolution().y;
 }
 
 const Vector2& Window::getResolution() {

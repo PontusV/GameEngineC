@@ -28,17 +28,17 @@ void InputField::start() {
 		inputText.setParent(owner);
 
 		RectTransform* textRect = inputText.addComponent(RectTransform(rect->getSize().x / 2, rect->getSize().y / 2, 0, 0, rect->getZ() + 0.01f, Alignment::CENTER));
-		Text* textComponent = inputText.addComponent(Text(filterText(initText), "resources/fonts/segoeui.ttf", 15, Color(0, 0, 0)));
+		Text* textComponent = inputText.addComponent(Text(filterText(initText), Font("resources/fonts/segoeui.ttf", 15), Color(0, 0, 0)));
 
 		textMark = createEntity(ownerHandle.getEntityName() + "_Mark",
-			RectSprite(Color(markColor.r, markColor.g, markColor.b, 0)),
+			RectSprite(0, Color(markColor.r, markColor.g, markColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);
 		textMark.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideAndDontSave);
 		textMark.setParent(inputText);
 
 		textHighlight = createEntity(ownerHandle.getEntityName() + "_Highlight",
-			RectSprite(Color(highlightColor.r, highlightColor.g, highlightColor.b, 0)),
+			RectSprite(0, Color(highlightColor.r, highlightColor.g, highlightColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);
 		textHighlight.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideAndDontSave);
@@ -255,9 +255,10 @@ void InputField::deleteText() {
 	}
 }
 
-std::size_t InputField::getTextIndexAtPosition(const Vector2& position, RectTransform * textRect, Text * textComponent) {
-	Vector2 localPos = textRect->getWorldToLocalMatrix() * position - textRect->getLocalPosition().x + textComponent->getSize().x * textRect->getPivot().x;
-	TextData2D data = ResourceManager::getInstance().createText(textComponent->getText(), textComponent->getFont());
+std::size_t InputField::getTextIndexAtPosition(const Vector2& position, RectTransform* textRect, Text* textComponent) {
+	Vector2 textSize = ResourceManager::getInstance().getTextSize(textComponent->getText(), textComponent->getFont());
+	Vector2 localPos = textRect->getWorldToLocalMatrix() * position - textRect->getLocalPosition().x + textSize.x * textRect->getPivot().x;
+	TextData2D data = ResourceManager::getInstance().getTextData(textComponent->getText(), textComponent->getFont());
 	std::size_t index = 0;
 	for (const CharTexture2D& texture : data.textures) {
 		if (localPos.x <= texture.offset.x) return index;
@@ -266,19 +267,20 @@ std::size_t InputField::getTextIndexAtPosition(const Vector2& position, RectTran
 	return index; // Returns end of text
 }
 
-float InputField::getXPosOfTextIndex(std::size_t index, RectTransform * textRect, Text * textComponent) {
-	TextData2D data = ResourceManager::getInstance().createText(textComponent->getText(), textComponent->getFont());
+float InputField::getXPosOfTextIndex(std::size_t index, RectTransform* textRect, Text* textComponent) {
+	Vector2 textSize = ResourceManager::getInstance().getTextSize(textComponent->getText(), textComponent->getFont());
+	TextData2D data = ResourceManager::getInstance().getTextData(textComponent->getText(), textComponent->getFont());
 	std::size_t i = 0;
 	if (index < data.textures.size()) {
 		return data.textures[index].offset.x
-			- textComponent->getSize().x * textRect->getPivot().x;
+			- textSize.x * textRect->getPivot().x;
 	}
 	else if (index >= data.textures.size() && data.textures.size() > 0) {
 		return data.textures[data.textures.size() - 1].offset.x + data.textures[data.textures.size() - 1].texture.size.x
-			- textComponent->getSize().x * textRect->getPivot().x;
+			- textSize.x * textRect->getPivot().x;
 	}
 	else {
-		return -textComponent->getSize().x * textRect->getPivot().x;
+		return -textSize.x * textRect->getPivot().x;
 	}
 }
 
@@ -294,8 +296,9 @@ void InputField::updateTextHighlight() {
 	float endX = getXPosOfTextIndex(endIndex, textRect, textComponent);
 	// Assign new values to Highlight entity
 	RectTransform * hRect = textHighlight.getComponent<RectTransform>();
+	Vector2 textSize = ResourceManager::getInstance().getTextSize(textComponent->getText(), textComponent->getFont());
 	hRect->setLocalPosition(Vector2(startX, 0));
-	hRect->setSize(Vector2(endX - startX, textComponent->getSize().y + 4));
+	hRect->setSize(Vector2(endX - startX, textSize.y + 4));
 }
 
 void InputField::traverseLeft() {
@@ -330,8 +333,10 @@ std::size_t InputField::getSelectedEndIndex() {
 }
 
 void InputField::showMark() {
+	Text* textComponent = inputText.getComponent<Text>();
+	Vector2 textSize = ResourceManager::getInstance().getTextSize(textComponent->getText(), textComponent->getFont());
 	textMark.getComponent<RectSprite>()->setColor(markColor);
-	textMark.getComponent<RectTransform>()->setSize(Vector2(1, inputText.getComponent<Text>()->getSize().y + 4));
+	textMark.getComponent<RectTransform>()->setSize(Vector2(1, textSize.y + 4));
 	markIsHidden = false;
 }
 

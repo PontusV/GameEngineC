@@ -105,9 +105,6 @@
     <ClCompile Include="src\graphics\Graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\UISystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -168,21 +165,6 @@
     <ClCompile Include="src\components\Behaviour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\editor\EditorPanel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\HierarchyView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\Inspector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\PropertyEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\ReflectedObjectHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\entity\ChildManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -192,13 +174,7 @@
     <ClCompile Include="src\components\graphics\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\graphics\Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\graphics\Text.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\graphics\TexturedSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\entity\handle\ComponentFunctionHandle.cpp">
@@ -243,15 +219,6 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\editor\HierarchySceneMover.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\HierarchyEntityMover.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\editor\HierarchyOrderRect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\ui\input\CheckBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -259,9 +226,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\components\ui\input\Selectable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\ui\graphics\Border.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\components\ui\input\Button.cpp">
@@ -312,10 +276,34 @@
     <ClCompile Include="src\components\ui\ScrollRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\ui\RectMask.cpp">
+    <ClCompile Include="src\components\ui\input\DragAndResize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\ui\input\DragAndResize.cpp">
+    <ClCompile Include="src\components\graphics\Border.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\CanvasRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\Graphic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\SpriteRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\mask\Mask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\mask\RectMask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\mask\SpriteMask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\GUISystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -357,9 +345,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\UISystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Window.h">
@@ -455,36 +440,6 @@
     <ClInclude Include="src\components\Behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\editor\EditorPanel.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\EditorPanel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchyView.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchyView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\Inspector.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\Inspector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\PropertyEditor.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\PropertyEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\PropertyValueID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\ReflectedObjectHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\components\entity\ChildManager.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -506,9 +461,6 @@
     <ClInclude Include="src\components\graphics\Sprite.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\graphics\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\components\graphics\Text.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -516,9 +468,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\graphics\TexturedSprite.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\graphics\TexturedSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\entity\component\Component.generated.h">
@@ -602,16 +551,7 @@
     <ClInclude Include="src\entity\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchySceneMover.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchyEntityMover.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\scene\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\editor\HierarchyOrderRect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\entity\ComponentDataBlock.h">
@@ -633,12 +573,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\ui\input\Selectable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\ui\graphics\Border.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\ui\graphics\Border.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\ui\input\Button.generated.h">
@@ -743,13 +677,61 @@
     <ClInclude Include="src\components\ui\RectMask.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\ui\RectMask.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\components\ui\input\DragAndResize.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\ui\input\DragAndResize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Border.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Border.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\CanvasRenderer.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\CanvasRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Graphic.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Graphic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\SpriteRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Renderer.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\SpriteRenderer.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\Mask.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\Mask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\RectMask.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\RectMask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\SpriteMask.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\graphics\mask\SpriteMask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\GUISystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,17 +2,15 @@
 #define GRAPHICS_H
 
 #include "entity/Entity.h"
-#include "components/graphics/Image.h"
+#include "components/graphics/SpriteRenderer.h"
+#include "components/graphics/CanvasRenderer.h"
 #include "components/graphics/Text.h"
-#include "components/graphics/TexturedSprite.h"
-#include "components/RectTransform.h"
-#include "data/Texture2D.h"
+#include "components/graphics/Image.h"
 #include "components/graphics/RectSprite.h"
-#include "components/ui/graphics/Border.h"
+#include "components/graphics/Border.h"
+#include "components/RectTransform.h"
 
-#include "entity/component/ComponentArrayManager.h"
 #include "entity/component/ComponentGroup.h"
-#include "UISystem.h"
 
 #include "Window.h"
 #include "Camera.h"
@@ -27,29 +25,38 @@ namespace Core {
 		Graphics();
 		~Graphics();
 
+		/* Creates a new Window and initializes it. Stores the window in this instance. */
 		bool createWindow(const char* windowTitle, int width, int height);
 		bool initiate();
 		void update(float deltaTime);
+		/* Renders the world and the GUI */
 		void render(float deltaTime);
 
 		Window& getWindow();
 		Camera& getCamera();
 		Renderer2D& getRenderer();
-		UISystem& getUISystem();
 
 	private:
-		UISystem userInterfaceSystem; // TODO: Move to Engine as its own System
+		void renderWorld(float deltaTime);
+		void renderGUI(float deltaTime);
 
+		std::vector<TextSprite> createTextSprites(const Text& text, const RectTransform& transform) const;
+		std::vector<RectTransform> createBorder(const Border& border, const RectTransform& transform) const;
+
+	private:
 		Window window;
 		Camera camera;
 		Renderer2D* renderer;
 
 	private:
-		ComponentGroup<RectTransform, Image> renderableImages;
-		ComponentGroup<RectTransform, Text> renderableTexts;
-		ComponentGroup<RectTransform, RectSprite> renderableRects;
-		ComponentGroup<RectTransform, TexturedSprite> renderableTexturedSprites;
-		ComponentGroup<RectTransform, Border> renderableBorders;
+		ComponentGroup<RectTransform, Image, SpriteRenderer> renderableImages;
+		ComponentGroup<RectTransform, RectSprite, SpriteRenderer> renderableRects;
+		ComponentGroup<RectTransform, Text, SpriteRenderer> renderableTexts;
+		ComponentGroup<RectTransform, Border, SpriteRenderer> renderableBorders;
+		ComponentGroup<RectTransform, Image, CanvasRenderer> canvasImages;
+		ComponentGroup<RectTransform, RectSprite, CanvasRenderer> canvasRects;
+		ComponentGroup<RectTransform, Text, CanvasRenderer> canvasTexts;
+		ComponentGroup<RectTransform, Border, CanvasRenderer> canvasBorders;
 	};
 }
 #endif

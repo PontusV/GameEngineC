@@ -31,7 +31,7 @@ namespace Core {
 		/* @param shaderFileName the name of the shader file without any file extension. */
 		Shader loadShader(const std::string shaderFileName);
 		Texture2D loadTexture(const GLchar* file, Vector2 size = Vector2(0,0), Vector2 uvStartCoords = Vector2(0,0));
-		TextData2D createText(std::wstring text, Font font);
+		TextData2D getTextData(std::wstring text, Font font);
 		Vector2 getTextSize(std::wstring text, const Font& font);
 
 		// De-allocates all loaded resources
@@ -46,6 +46,7 @@ namespace Core {
 		void initShader(const Matrix4& projection);
 	private:
 		ResourceManager();
+
 
 		// Static  Loader functions
 		static Shader loadShaderFromFile(const GLchar* vShaderFile, const GLchar* fShaderFile);

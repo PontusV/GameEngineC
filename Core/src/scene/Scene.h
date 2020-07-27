@@ -104,7 +104,7 @@ namespace Core {
 
 	private:
 		std::vector<Handle> entities;		// A list of entities contained by this scene
-		EntityManager* manager;				// Manages the Entities in this Scene
+		EntityManager* manager;				// A pointer to the manager of the Entities in this Scene
 		bool isAwake;
 		std::string name;
 	};

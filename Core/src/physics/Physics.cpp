@@ -19,7 +19,7 @@ void onTransformChange(Transform& transform) {
 	EntityHandle owner = transform.getOwner();
 	// Updates text position
 	for (Text* text : owner.getComponents<Text>()) {
-		text->updateTransforms();
+		text->setDirty();
 	}
 }
 

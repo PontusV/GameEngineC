@@ -28,7 +28,7 @@ namespace Core {
 	CLASS() RectTransform : public Transform {
 		GENERATED_BODY()
 	public:
-		RectTransform(float x, float y, float width, float height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f, TransformSpace space = TransformSpace::World);
+		RectTransform(float x, float y, float width, float height, float z = 0.0f, Anchor pivot = Alignment::CENTER, float rotation = 0.0f, float scale = 1.0f);
 		RectTransform();
 		~RectTransform();
 
@@ -60,9 +60,9 @@ namespace Core {
 		void notifyResize();
 
 	private:
-		PROPERTY(Update=setToChanged())
+		PROPERTY(Update=setChanged())
 		Vector2 size;	// Size of the rect
-		PROPERTY(Update=setToChanged())
+		PROPERTY(Update=setChanged())
 		Vector2 pivot;	// The position the Entity scales and rotates around
 	};
 }

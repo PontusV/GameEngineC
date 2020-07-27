@@ -1,19 +1,19 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "TexturedSprite.h"
+#include "Graphic.h"
 #include "graphics/data/Texture2D.h"
-#include "graphics/data/Color.h"
 #include "graphics/data/Shader.h"
+#include "graphics/data/Color.h"
 #include <string>
 #include "Image.generated.h"
 
 namespace Core {
-	CLASS() Image : public TexturedSprite {
+	CLASS() Image : public Graphic {
 		GENERATED_BODY()
 	public:
-		Image(const char* fileName, Color color = {255,255,255,255}, std::size_t sortingLayer = 0);
-		Image(const char* fileName, Shader shader, Color color = {255,255,255,255}, std::size_t sortingLayer = 0);
+		Image(const char* fileName, Shader shader, Color color = { 255, 255, 255, 255 });
+		Image(const char* fileName, Color color = { 255, 255, 255, 255 });
 		Image();
 		~Image();
 
@@ -22,9 +22,13 @@ namespace Core {
 		void set(const char* fileName);
 		const char* getFileName() const;
 
+		const Texture2D& getTexture() const;
+
 	private:
 		PROPERTY(Category=ImagePath, Update=reload(true))
 		std::string fileName;
+		PROPERTY()
+		Texture2D texture;
 	};
 }
 #endif

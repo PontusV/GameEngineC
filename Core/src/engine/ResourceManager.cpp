@@ -59,7 +59,7 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, Vector2 size, Vector2
 	return texture;
 }
 
-TextData2D ResourceManager::createText(std::wstring text, Font font) {
+TextData2D ResourceManager::getTextData(std::wstring text, Font font) {
 	FontManager& manager = loadFontManager(font.getFileName(), font.getSize());
 	return manager.createText(text, font.getSize());
 }

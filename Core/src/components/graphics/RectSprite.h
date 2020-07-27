@@ -1,16 +1,20 @@
-#ifndef RECTANGLE_COMPONENT_H
-#define RECTANGLE_COMPONENT_H
+#ifndef RECT_SPRITE_H
+#define RECT_SPRITE_H
 
-#include "Sprite.h"
-#include "graphics/data/Color.h"
+#include "Graphic.h"
+
 #include "RectSprite.generated.h"
 
 namespace Core {
-	CLASS() RectSprite : public Sprite {
+	/* Untextured rect sprite */
+	CLASS() RectSprite : public Graphic {
 		GENERATED_BODY()
 	public:
-		RectSprite(Color color = {255,255,255,255}, std::size_t sortingLayer = 0);
+		RectSprite(std::size_t sortingOrder, Color color, Shader shader);
+		RectSprite(std::size_t sortingOrder, Color color);
+		RectSprite();
 		~RectSprite();
 	};
 }
+
 #endif

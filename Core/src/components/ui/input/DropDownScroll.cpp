@@ -3,7 +3,7 @@
 #include "RectButton.h"
 #include "components/ui/ScrollRect.h"
 #include "ScrollBar.h"
-#include "components/ui/RectMask.h"
+#include "components/graphics/mask/RectMask.h"
 #include "maths/MatrixTransform.h"
 using namespace Core;
 
@@ -26,7 +26,7 @@ void DropDownScroll::open() {
 	);
 	menuBox.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::DontSave);
 	EntityHandle menuBoxContent = createEntity(ownerHandle.getEntityName() + "_DropDownBox_Content",
-		RectSprite(Color(20, 20, 20, 255)),
+		RectSprite(0, Color(20, 20, 20, 255)),
 		RectMask(),
 		RectTransform(0, 0, boxWidth, boxHeight, z, Alignment::TOP_LEFT)
 	);
@@ -49,7 +49,7 @@ void DropDownScroll::open() {
 		EntityHandle menuOption = createEntity(ownerHandle.getEntityName() + "_DropDownOption_" + std::to_string(i),
 			RectTransform((float)boxPaddingX, (float)boxPaddingY + yOffset, optionWidth, optionHeight, z + 0.1f, Alignment::TOP_LEFT),
 			button,
-			RectSprite({ 20,20,20,255 })
+			RectSprite(0, { 20,20,20,255 })
 		);
 		menuOption.setParent(menuBoxContent);
 
@@ -61,7 +61,7 @@ void DropDownScroll::open() {
 		float textPosX = textPaddingX + (optionWidth - textPaddingX * 2) * textPivot.x;
 		float textPosY = textPaddingY + (optionHeight - textPaddingY * 2) * textPivot.y;
 		EntityHandle menuOptionText = createEntity(ownerHandle.getEntityName() + "_DropDownOption_Text_" + std::to_string(i),
-			Text(options[i].text, optionFont.getFileName(), optionFont.getSize(), optionTextColor),
+			Text(options[i].text, optionFont, optionTextColor),
 			RectTransform(textPosX, textPosY, 0, 0, z + 0.1f, textAlignment)
 		);
 		menuOptionText.setParent(menuOption);
@@ -73,14 +73,14 @@ void DropDownScroll::open() {
 	if (border) {
 		// left, bottom, right
 		EntityHandle menuBoxBorder = createEntity(ownerHandle.getEntityName() + "_DropDownBox_Border",
-			RectSprite(borderColor),
+			RectSprite(0, borderColor),
 			RectTransform((float)-borderSize, 0.0f, boxWidth + 20 + borderSize * 2, boxHeight + borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorder.setParent(menuBox);
 
 		// top
 		EntityHandle menuBoxBorderTop = createEntity(ownerHandle.getEntityName() + "_DropDownBox_BorderTop",
-			RectSprite(borderColor),
+			RectSprite(0, borderColor),
 			RectTransform(size.x, (float)-borderSize, boxWidth + 20 - size.x, borderSize, z - 0.01f, Alignment::TOP_LEFT)
 		);
 		menuBoxBorderTop.setParent(menuBox);
