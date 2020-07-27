@@ -1,5 +1,5 @@
-#ifndef POST_PROCESSOR_H
-#define POST_PROCESSOR_H
+#ifndef VIEW_PORT_H
+#define VIEW_PORT_H
 
 namespace Editor {
 

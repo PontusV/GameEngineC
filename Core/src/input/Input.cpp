@@ -392,7 +392,7 @@ EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreL
 
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
-			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices)) {
+			if (maths::hitCheck(x, y, vertices)) {
 				currentHit.index = i;
 				currentHit.sortingOrder = transform.getZ();
 			}
@@ -420,7 +420,7 @@ EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreL
 
 		if (maths::isInsideWindow(window.getWidth(), window.getHeight(), vertices)) {
 			// Simple hit detection
-			if (maths::hitCheck(mousePosition.x, mousePosition.y, vertices)) {
+			if (maths::hitCheck(x, y, vertices)) {
 				currentHit.index = i;
 				currentHit.sortingOrder = transform.getZ();
 			}

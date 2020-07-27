@@ -2,7 +2,8 @@
 #define EDITOR_H
 #include "engine/Engine.h"
 #include "input/KeyListener.h"
-#include "Viewport.h"
+#include "windows/GameView.h"
+#include "windows/Inspector.h"
 #include <string>
 
 namespace Editor {
@@ -18,7 +19,8 @@ namespace Editor {
 		void keyReleased(std::string buttonName);
 	private:
 		Core::Engine engine;
-		Viewport viewport;
+		GameView gameView;
+		Inspector inspector;
 		bool running = false;
 	};
 }

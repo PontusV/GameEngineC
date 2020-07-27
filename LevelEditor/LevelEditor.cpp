@@ -10,7 +10,7 @@
 using namespace Core;
 using namespace Editor;
 
-LevelEditor::LevelEditor() {
+LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView) {
 	engine.getInput().addKeyListener(this);
 }
 
@@ -26,6 +26,7 @@ int LevelEditor::initiate() {
 		return result;
 	}
 	Window& window = engine.getGraphics().getWindow();
+	window.setBackgroundColor(Vector3(0.15f, 0.15f, 0.15f));
 
 	// Example scene
 	ScenePtr sceneWorld = engine.getSceneManager().createScene("World");
@@ -33,6 +34,12 @@ int LevelEditor::initiate() {
 	EntityHandle object = sceneWorld->createEntity("Test_Object",
 		Image("resources/images/awesomeface.png"),
 		RectTransform(350, 350, 350, 350, 0.0f, Alignment::CENTER),
+		SpriteRenderer()
+	);
+
+	EntityHandle object2 = sceneWorld->createEntity("Test_Object_2",
+		Image("resources/images/awesomeface.png"),
+		RectTransform(100, 100, 200, 200, 0.0f, Alignment::CENTER),
 		SpriteRenderer()
 	);
 
@@ -52,7 +59,7 @@ int LevelEditor::initiate() {
 
 	// Window hints
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
-
+	
 	// Start editor loop
 	return start();
 }
@@ -87,9 +94,13 @@ int LevelEditor::start() {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable Docking
+
+	// Global imGui io settings
+	io.ConfigWindowsMoveFromTitleBarOnly = true; // Temp?
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -99,17 +110,13 @@ int LevelEditor::start() {
 	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 150");
 
-	// Our state
-	bool show_demo_window = true;
-	bool show_another_window = false;
-
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
 	GLfloat lastFrame = (GLfloat)glfwGetTime();
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-	ImVec2 viewportSize = ImVec2(1.0f, 1.0f);
-	viewport.initialize(viewportSize.x, viewportSize.y);
+	// Window initialization
+	gameView.initialize();
 
 	// Game loop
 	running = true;
@@ -124,61 +131,48 @@ int LevelEditor::start() {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
+		// imGui Windows
+		Vector2 windowSize = window.getResolution();
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y), ImGuiCond_Always);
+		ImGui::Begin("Main window", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		{
-			static float f = 0.0f;
-			static int counter = 0;
+		ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
+		ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
 
-			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)& clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Dummy file")) {}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Game Object"))
+			{
+				if (ImGui::MenuItem("Create new")) {
+					std::cout << "Create new game object WIP" << std::endl;
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
 		}
-
-		// 3. Show another simple window.
-		if (show_another_window)
-		{
-			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
-			ImGui::End();
-		}
-
-		// Viewport
-		ImGui::Begin("Scene window");
-
-		ImVec2 currentViewportSize = ImVec2(ImGui::GetWindowContentRegionMax().x - 10, ImGui::GetWindowContentRegionMax().y - 30);
-		if (viewportSize.x != currentViewportSize.x || viewportSize.y != currentViewportSize.y) {
-			viewportSize = currentViewportSize;
-			viewport.setSize(viewportSize.x, viewportSize.y);
-			engine.resizeViewport(viewportSize.x, viewportSize.y);
-		}
-
-		// Game tick
-		viewport.begin();
-		engine.tick(deltaTime);
-		viewport.end();
-
-		ImGui::GetWindowDrawList()->AddImage((ImTextureID)static_cast<uintptr_t>(viewport.getTextureID()), ImVec2(ImGui::GetCursorScreenPos()), ImVec2(ImGui::GetCursorScreenPos().x + viewportSize.x, ImGui::GetCursorScreenPos().y + viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
+		// Inspector window
+		ImGui::SetNextWindowDockID(dockspaceID, ImGuiCond_FirstUseEver);
+		inspector.tick();
+		// Game view window
+		gameView.tick(deltaTime);
+
 		ImGui::Render();
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT);
