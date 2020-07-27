@@ -126,6 +126,9 @@ int LevelEditor::start() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Poll events
+		glfwPollEvents();
+
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -172,6 +175,9 @@ int LevelEditor::start() {
 		inspector.tick();
 		// Game view window
 		gameView.tick(deltaTime);
+
+		// TODO: Hide after editor is finished
+		ImGui::ShowDemoWindow();
 
 		ImGui::Render();
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);

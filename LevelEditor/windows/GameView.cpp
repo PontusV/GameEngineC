@@ -28,7 +28,10 @@ void GameView::tick(float deltaTime) {
 
 	ImGui::Begin("Scene window");
 
-	ImVec2 currentViewportSize = ImVec2(ImGui::GetWindowContentRegionMax().x - 10, ImGui::GetWindowContentRegionMax().y - 30);
+	ImVec2 pMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y);
+	ImVec2 pMax = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMax().y);
+
+	ImVec2 currentViewportSize = ImVec2(pMax.x - pMin.x, pMax.y - pMin.y);
 	if (viewportSize.x != currentViewportSize.x || viewportSize.y != currentViewportSize.y) {
 		viewportSize = currentViewportSize;
 		viewport.setSize(viewportSize.x, viewportSize.y);
@@ -39,9 +42,6 @@ void GameView::tick(float deltaTime) {
 	viewport.begin();
 	engine->tick(deltaTime);
 	viewport.end();
-
-	ImVec2 pMin = ImGui::GetCursorScreenPos();
-	ImVec2 pMax = ImVec2(ImGui::GetCursorScreenPos().x + viewportSize.x, ImGui::GetCursorScreenPos().y + viewportSize.y);
 
 	// Grid background
 

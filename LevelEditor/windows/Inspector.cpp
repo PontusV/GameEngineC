@@ -15,17 +15,20 @@ void Inspector::tick() {
 
 	if (target.isValid()) {
 		ImGui::Text(target.getEntityName().c_str());
+		ImGui::BeginChild(target.getEntityName().c_str(), ImVec2(0, 0));
 
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.0f, 5.0f));
 		for (Component* component : target.getComponents()) {
 			Mirror::Class type = component->getType();
 
-			ImGui::Text(type.name.c_str());
-
-			for (Mirror::Property& prop : type.properties) {
-				ImGui::Text(prop.name.c_str());
+			if (ImGui::CollapsingHeader(type.name.c_str())) {
+				for (Mirror::Property& prop : type.properties) {
+					ImGui::Text(prop.name.c_str());
+				}
 			}
-
 		}
+		ImGui::PopStyleVar();
+		ImGui::EndChild();
 	}
 	else {
 		ImGui::Text("No target");

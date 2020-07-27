@@ -152,6 +152,9 @@ int Engine::start() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Poll events
+		glfwPollEvents();
+
 		tick(deltaTime);
 
 		window.update();
@@ -165,9 +168,6 @@ int Engine::start() {
 }
 
 void Engine::tick(float deltaTime) {
-	// Poll events
-	glfwPollEvents();
-
 	// Update systems
 	sceneManager.update();
 	input.update(deltaTime);
