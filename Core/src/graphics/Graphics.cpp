@@ -60,9 +60,6 @@ void Graphics::render(float deltaTime) {
 	// Updates Camera View Matrix
 	camera.updateViewMatrix();
 
-	// Clear, Draw & Update window
-	window.clear();
-
 	renderWorld(deltaTime);
 	renderer->render(deltaTime, camera.getViewMatrix());
 

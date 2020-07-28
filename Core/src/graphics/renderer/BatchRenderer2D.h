@@ -59,8 +59,6 @@ namespace Core {
 		void end();
 		void flush();
 
-		void submitMask(Vector2 vertex1, Vector2 vertex2, Vector2 vertex3, Vector2 vertex4);
-
 	private:
 		unsigned int maskShaderID;
 

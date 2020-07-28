@@ -2,6 +2,7 @@
 #define GAME_VIEW_H
 #include "entity/handle/EntityHandle.h"
 #include "Viewport.h"
+#include "GridRenderer.h"
 #include "imgui/imgui.h"
 
 namespace Core {
@@ -32,6 +33,7 @@ namespace Editor {
 
 		Core::Engine* engine;
 		Viewport viewport;
+		GridRenderer grid;
 	};
 }
 #endif

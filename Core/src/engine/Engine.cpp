@@ -155,6 +155,8 @@ int Engine::start() {
 		// Poll events
 		glfwPollEvents();
 
+		window.clear();
+
 		tick(deltaTime);
 
 		window.update();

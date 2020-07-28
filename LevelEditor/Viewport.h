@@ -20,13 +20,7 @@ namespace Editor {
 
 	private:
 		unsigned int textureID;
-
 		unsigned int FBO;
-		unsigned int RBO;
-		unsigned int VAO, VBO;
-
-		/* Initializes render data(VAO & VBO). */
-		void init();
 	};
 }
 #endif

@@ -99,6 +99,7 @@ void BatchRenderer2D::init() {
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, RENDERER_INDICES_SIZE * sizeof(GLushort), indices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // TODO??????
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -120,7 +121,7 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 
 	const Vector2*	vertices	= renderable.vertices;
 	const Vector2*	uvCoords	= renderable.uvCoords;
-	const Color&		color		= renderable.color;
+	const Color&	color		= renderable.color;
 
 	const float& textureSlot = renderable.textureID == 0 ? 0 : (float)config->getTextureSlot(renderable.textureID);
 
@@ -155,42 +156,6 @@ void BatchRenderer2D::submit(const Renderable2D& renderable) {
 	buffer[i].color = c;
 	buffer[i].texture = uvCoords[3];
 	buffer[i].textureID = textureSlot;
-	i++;
-
-	segmentBack->size += 6;
-	indexCount += 6;
-}
-
-void BatchRenderer2D::submitMask(Vector2 vertex1, Vector2 vertex2, Vector2 vertex3, Vector2 vertex4) {
-	if (!hasRoom())
-		throw std::length_error("Can not add anymore sprites to this batch!");
-
-	int r = 255;
-	int g = 255;
-	int b = 255;
-	int a = 255;
-	unsigned int c = a << 24 | b << 16 | g << 8 | r;
-
-	std::size_t& i = verticiesCount;
-
-	buffer[i].vertex = vertex1;
-	buffer[i].color = c;
-	buffer[i].textureID = 0;
-	i++;
-
-	buffer[i].vertex = vertex2;
-	buffer[i].color = c;
-	buffer[i].textureID = 0;
-	i++;
-
-	buffer[i].vertex = vertex3;
-	buffer[i].color = c;
-	buffer[i].textureID = 0;
-	i++;
-
-	buffer[i].vertex = vertex4;
-	buffer[i].color = c;
-	buffer[i].textureID = 0;
 	i++;
 
 	segmentBack->size += 6;

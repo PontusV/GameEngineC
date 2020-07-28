@@ -185,6 +185,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="LevelEditor.h" />
+    <ClInclude Include="GridRenderer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Viewport.h" />
@@ -203,6 +204,7 @@
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
       <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Fast</FloatingPointModel>
     </ClCompile>
+    <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="windows\GameView.cpp" />
     <ClCompile Include="windows\Inspector.cpp" />
