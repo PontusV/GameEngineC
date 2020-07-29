@@ -27,6 +27,7 @@ void GameView::initialize() {
 
 void GameView::tick(float deltaTime) {
 	Camera& camera = engine->getGraphics().getCamera();
+	Window& window = engine->getGraphics().getWindow();
 
 	ImGui::Begin("Scene window");
 
@@ -43,12 +44,10 @@ void GameView::tick(float deltaTime) {
 
 	// Game tick
 	viewport.begin();
-	engine->getGraphics().getWindow().clear();
+	window.clear();
 	grid.render(camera.getPosition().x, camera.getPosition().y);
 	engine->tick(deltaTime);
 	viewport.end();
-
-	// Grid background
 
 	// Scene
 	ImGui::GetWindowDrawList()->AddImage((ImTextureID)static_cast<uintptr_t>(viewport.getTextureID()), pMin, pMax, ImVec2(0, 1), ImVec2(1, 0));

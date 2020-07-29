@@ -5,10 +5,10 @@ using namespace Core;
 
 
 Text::Text(std::wstring text, Font font, Color color)
-	: font(font), text(text), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color) {
+	: font(font), text(text), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/text"), color) {
 } // Constructor
 Text::Text(std::string text, Font font, Color color)
-	: font(font), text(text.begin(), text.end()), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color) {
+	: font(font), text(text.begin(), text.end()), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/text"), color) {
 } // Constructor
 
 Text::Text() {
@@ -27,6 +27,7 @@ void Text::setText(std::wstring value) {
 }
 void Text::setText(std::string text) {
 	setText(std::wstring(text.begin(), text.end()));
+	setDirty();
 }
 
 const Font& Text::getFont() const {
@@ -34,7 +35,7 @@ const Font& Text::getFont() const {
 }
 
 void Text::setDirty(bool value) {
-
+	dirty = value;
 }
 bool Text::isDirty() const {
 	return dirty;

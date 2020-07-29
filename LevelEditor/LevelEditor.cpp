@@ -39,6 +39,7 @@ int LevelEditor::initiate() {
 
 	EntityHandle object2 = sceneWorld->createEntity("Test_Object_2",
 		Image("resources/images/awesomeface.png"),
+		Text(L"TEst едц", Font("resources/fonts/segoeui.ttf", 30), Color(255,255,255,255)),
 		RectTransform(100, 100, 200, 200, 0.0f, Alignment::CENTER),
 		SpriteRenderer()
 	);

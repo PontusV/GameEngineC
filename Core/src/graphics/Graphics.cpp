@@ -77,38 +77,38 @@ void Graphics::renderWorld(float deltaTime) {
 
 	// Rect Sprites
 	for (std::size_t i = 0; i < sizeRects; i++) {
-		const SpriteRenderer& renderProps = renderableRects.get<SpriteRenderer>(i);
-		const RectTransform& transform = renderableRects.get<RectTransform>(i);
-		const RectSprite& sprite = renderableRects.get<RectSprite>(i);
-		const Texture2D			texture = Texture2D();
-		const Color& color = sprite.getColor();
-		const Shader& shader = sprite.getShader();
-		unsigned char			sortingOrder = sprite.getSortingOrder();
+		const SpriteRenderer&	renderProps		= renderableRects.get<SpriteRenderer>(i);
+		const RectTransform&	transform		= renderableRects.get<RectTransform>(i);
+		const RectSprite&		sprite			= renderableRects.get<RectSprite>(i);
+		const Texture2D			texture			= Texture2D();
+		const Color&			color			= sprite.getColor();
+		const Shader&			shader			= sprite.getShader();
+		unsigned char			sortingOrder	= sprite.getSortingOrder();
 
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
 	// Image Sprites
 	for (std::size_t i = 0; i < sizeImages; i++) {
-		const SpriteRenderer& renderProps = renderableImages.get<SpriteRenderer>(i);
-		const RectTransform& transform = renderableImages.get<RectTransform>(i);
-		const Image& image = renderableImages.get<Image>(i);
-		const Texture2D& texture = image.getTexture();
-		const Color& color = image.getColor();
-		const Shader& shader = image.getShader();
-		unsigned char			sortingOrder = image.getSortingOrder();
+		const SpriteRenderer&	renderProps		= renderableImages.get<SpriteRenderer>(i);
+		const RectTransform&	transform		= renderableImages.get<RectTransform>(i);
+		const Image&			image			= renderableImages.get<Image>(i);
+		const Texture2D&		texture			= image.getTexture();
+		const Color&			color			= image.getColor();
+		const Shader&			shader			= image.getShader();
+		unsigned char			sortingOrder	= image.getSortingOrder();
 
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
 	// Text Sprites
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const SpriteRenderer& renderProps = renderableTexts.get<SpriteRenderer>(i);
-		const RectTransform& transform = renderableTexts.get<RectTransform>(i);
-		Text& text = renderableTexts.get<Text>(i);
-		const Color& color = text.getColor();
-		const Shader& shader = text.getShader();
-		unsigned char			sortingOrder = text.getSortingOrder();
+		const SpriteRenderer&	renderProps		= renderableTexts.get<SpriteRenderer>(i);
+		const RectTransform&	transform		= renderableTexts.get<RectTransform>(i);
+		Text&					text			= renderableTexts.get<Text>(i);
+		const Color&			color			= text.getColor();
+		const Shader&			shader			= text.getShader();
+		unsigned char			sortingOrder	= text.getSortingOrder();
 
 		if (text.isDirty()) {
 			std::vector<TextSprite> sprites = createTextSprites(text, transform);
@@ -122,12 +122,12 @@ void Graphics::renderWorld(float deltaTime) {
 
 	// Borders
 	for (std::size_t i = 0; i < sizeBorders; i++) {
-		const SpriteRenderer& renderProps = renderableBorders.get<SpriteRenderer>(i);
-		const Border& border = renderableBorders.get<Border>(i);
-		const RectTransform& transform = renderableBorders.get<RectTransform>(i);
-		const Texture2D			texture = Texture2D(); // No texture
-		const Color& color = border.getColor();
-		const unsigned char& sortingOrder = border.getSortingOrder();
+		const SpriteRenderer&	renderProps		= renderableBorders.get<SpriteRenderer>(i);
+		const Border&			border			= renderableBorders.get<Border>(i);
+		const RectTransform&	transform		= renderableBorders.get<RectTransform>(i);
+		const Texture2D			texture			= Texture2D(); // No texture
+		const Color&			color			= border.getColor();
+		const unsigned char&	sortingOrder	= border.getSortingOrder();
 
 		for (RectTransform& lineTransform : createBorder(border, transform)) {
 			renderer->submit(texture, lineTransform, spriteShader.ID, color, sortingOrder);
@@ -145,38 +145,38 @@ void Graphics::renderGUI(float deltaTime) {
 
 	// Rect Sprites
 	for (std::size_t i = 0; i < sizeRects; i++) {
-		const CanvasRenderer& renderProps = canvasRects.get<CanvasRenderer>(i);
-		const RectTransform& transform = canvasRects.get<RectTransform>(i);
-		const RectSprite& sprite = canvasRects.get<RectSprite>(i);
-		const Texture2D			texture = Texture2D();
-		const Color& color = sprite.getColor();
-		const Shader& shader = sprite.getShader();
-		unsigned char			sortingOrder = sprite.getSortingOrder();
+		const CanvasRenderer&	renderProps		= canvasRects.get<CanvasRenderer>(i);
+		const RectTransform&	transform		= canvasRects.get<RectTransform>(i);
+		const RectSprite&		sprite			= canvasRects.get<RectSprite>(i);
+		const Texture2D			texture			= Texture2D();
+		const Color&			color			= sprite.getColor();
+		const Shader&			shader			= sprite.getShader();
+		unsigned char			sortingOrder	= sprite.getSortingOrder();
 
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
 	// Image Sprites
 	for (std::size_t i = 0; i < sizeImages; i++) {
-		const CanvasRenderer& renderProps = canvasImages.get<CanvasRenderer>(i);
-		const RectTransform& transform = canvasImages.get<RectTransform>(i);
-		const Image& image = canvasImages.get<Image>(i);
-		const Texture2D& texture = image.getTexture();
-		const Color& color = image.getColor();
-		const Shader& shader = image.getShader();
-		unsigned char			sortingOrder = image.getSortingOrder();
+		const CanvasRenderer&	renderProps		= canvasImages.get<CanvasRenderer>(i);
+		const RectTransform&	transform		= canvasImages.get<RectTransform>(i);
+		const Image&			image			= canvasImages.get<Image>(i);
+		const Texture2D&		texture			= image.getTexture();
+		const Color&			color			= image.getColor();
+		const Shader&			shader			= image.getShader();
+		unsigned char			sortingOrder	= image.getSortingOrder();
 
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
 	// Text Sprites
 	for (std::size_t i = 0; i < sizeTexts; i++) {
-		const CanvasRenderer& renderProps = canvasTexts.get<CanvasRenderer>(i);
-		const RectTransform& transform = canvasTexts.get<RectTransform>(i);
-		Text& text = canvasTexts.get<Text>(i);
-		const Color& color = text.getColor();
-		const Shader& shader = text.getShader();
-		unsigned char			sortingOrder = text.getSortingOrder();
+		const CanvasRenderer&	renderProps		= canvasTexts.get<CanvasRenderer>(i);
+		const RectTransform&	transform		= canvasTexts.get<RectTransform>(i);
+		Text&					text			= canvasTexts.get<Text>(i);
+		const Color&			color			= text.getColor();
+		const Shader&			shader			= text.getShader();
+		unsigned char			sortingOrder	= text.getSortingOrder();
 
 		if (text.isDirty()) {
 			std::vector<TextSprite> sprites = createTextSprites(text, transform);
@@ -190,12 +190,12 @@ void Graphics::renderGUI(float deltaTime) {
 
 	// Borders
 	for (std::size_t i = 0; i < sizeBorders; i++) {
-		const CanvasRenderer& renderProps = canvasBorders.get<CanvasRenderer>(i);
-		const Border& border = canvasBorders.get<Border>(i);
-		const RectTransform& transform = canvasBorders.get<RectTransform>(i);
-		const Texture2D			texture = Texture2D(); // No texture
-		const Color& color = border.getColor();
-		const unsigned char& sortingOrder = border.getSortingOrder();
+		const CanvasRenderer&	renderProps		= canvasBorders.get<CanvasRenderer>(i);
+		const Border&			border			= canvasBorders.get<Border>(i);
+		const RectTransform&	transform		= canvasBorders.get<RectTransform>(i);
+		const Texture2D			texture			= Texture2D(); // No texture
+		const Color&			color			= border.getColor();
+		const unsigned char&	sortingOrder	= border.getSortingOrder();
 
 		for (RectTransform& lineTransform : createBorder(border, transform)) {
 			renderer->submit(texture, lineTransform, spriteShader.ID, color, sortingOrder);
