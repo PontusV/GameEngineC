@@ -10,7 +10,7 @@ namespace Core {
 	public:
 		virtual ~Renderer() = 0;
 
-		bool isEnabled();
+		bool isEnabled() const;
 		void enable();
 		void disable();
 

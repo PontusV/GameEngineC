@@ -18,7 +18,7 @@ namespace Core {
 		Scene(EntityManager* entityManager, std::string name);
 		~Scene();
 
-		const std::vector<Handle>& getAllEntities() const;
+		std::vector<Handle>& getAllEntities();
 		std::vector<Handle> getRootEntities();
 		std::string getName();
 

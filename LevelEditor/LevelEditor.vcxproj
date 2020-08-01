@@ -190,6 +190,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="windows\GameView.h" />
+    <ClInclude Include="windows\Hierarchy.h" />
     <ClInclude Include="windows\Inspector.h" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +208,7 @@
     <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="windows\GameView.cpp" />
+    <ClCompile Include="windows\Hierarchy.cpp" />
     <ClCompile Include="windows\Inspector.cpp" />
   </ItemGroup>
   <ItemGroup>

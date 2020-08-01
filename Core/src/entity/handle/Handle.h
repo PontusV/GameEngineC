@@ -20,8 +20,8 @@ namespace Core {
 		Handle(Entity entity, Scene* scene);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
-		bool operator==(const Handle& other);
-		bool operator!=(const Handle& other);
+		bool operator==(const Handle& other) const;
+		bool operator!=(const Handle& other) const;
 		/* Returns true if the given Entity is a child of the Entity this instance points to. */
 		bool isChild(Entity entity);
 		/* Returns true if the given Entity is a parent of the Entity this instance points to. */
@@ -123,6 +123,7 @@ namespace Core {
 	private:
 		EntityLocation locationData = EntityLocation();
 	};
+
 	template<typename T>
 	bool Handle::hasComponent() {
 		return hasComponent(typeof(T));

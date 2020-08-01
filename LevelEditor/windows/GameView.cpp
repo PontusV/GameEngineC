@@ -61,14 +61,16 @@ void GameView::tick(float deltaTime) {
 		ImGui::GetWindowDrawList()->AddRect(rectMin, ImVec2(rectMin.x + targetSize.x, rectMin.y + targetSize.y), IM_COL32_WHITE, 0.0f, ImDrawCornerFlags_None, 2.0f);
 	}
 
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pMin, pMax)) {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pMin, pMax) && ImGui::IsWindowHovered()) {
 		pressed = true;
 		ImVec2 mousePos = ImGui::GetMousePos();
 		Vector2 position = Vector2(mousePos.x - pMin.x, mousePos.y - pMin.y);
-		EntityHandle entity = engine->getInput().getEntityAtPos(position.x, position.y);
-		if (entity.isValid()) {
-			targetPressed = true;
-			target = entity; // New target
+		if (!ImGui::GetIO().KeyShift) {
+			EntityHandle entity = engine->getInput().getEntityAtPos(position.x, position.y);
+			if (entity.isValid()) {
+				targetPressed = true;
+				target = entity; // New target
+			}
 		}
 	}
 

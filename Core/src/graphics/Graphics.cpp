@@ -85,6 +85,7 @@ void Graphics::renderWorld(float deltaTime) {
 		const Shader&			shader			= sprite.getShader();
 		unsigned char			sortingOrder	= sprite.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
@@ -98,6 +99,7 @@ void Graphics::renderWorld(float deltaTime) {
 		const Shader&			shader			= image.getShader();
 		unsigned char			sortingOrder	= image.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
@@ -115,6 +117,7 @@ void Graphics::renderWorld(float deltaTime) {
 			text.update(sprites);
 		}
 
+		if (!renderProps.isEnabled()) continue;
 		for (const TextSprite& sprite : text.getSprites()) {
 			renderer->submit(sprite.texture, sprite.transform, shader.ID, color, sortingOrder);
 		}
@@ -129,6 +132,7 @@ void Graphics::renderWorld(float deltaTime) {
 		const Color&			color			= border.getColor();
 		const unsigned char&	sortingOrder	= border.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		for (RectTransform& lineTransform : createBorder(border, transform)) {
 			renderer->submit(texture, lineTransform, spriteShader.ID, color, sortingOrder);
 		}
@@ -153,6 +157,7 @@ void Graphics::renderGUI(float deltaTime) {
 		const Shader&			shader			= sprite.getShader();
 		unsigned char			sortingOrder	= sprite.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
@@ -166,6 +171,7 @@ void Graphics::renderGUI(float deltaTime) {
 		const Shader&			shader			= image.getShader();
 		unsigned char			sortingOrder	= image.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		renderer->submit(texture, transform, shader.ID, color, sortingOrder);
 	}
 
@@ -183,6 +189,7 @@ void Graphics::renderGUI(float deltaTime) {
 			text.update(sprites);
 		}
 
+		if (!renderProps.isEnabled()) continue;
 		for (const TextSprite& sprite : text.getSprites()) {
 			renderer->submit(sprite.texture, sprite.transform, shader.ID, color, sortingOrder);
 		}
@@ -197,6 +204,7 @@ void Graphics::renderGUI(float deltaTime) {
 		const Color&			color			= border.getColor();
 		const unsigned char&	sortingOrder	= border.getSortingOrder();
 
+		if (!renderProps.isEnabled()) continue;
 		for (RectTransform& lineTransform : createBorder(border, transform)) {
 			renderer->submit(texture, lineTransform, spriteShader.ID, color, sortingOrder);
 		}

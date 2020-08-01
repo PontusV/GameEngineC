@@ -10,7 +10,7 @@ namespace Editor {
 		Inspector(GameView* gameView);
 		~Inspector();
 
-		/* Renders imGui window */
+		/* Renders ImGui window */
 		void tick();
 
 	private:

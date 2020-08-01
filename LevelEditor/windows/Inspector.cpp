@@ -27,6 +27,40 @@ std::wstring utf8_decode(const std::string& str)
 	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
 	return wstrTo;
 }
+
+#include <commdlg.h>
+
+std::wstring getOpenFileName(const wchar_t* title, const wchar_t* filter, unsigned long filterCount) {
+
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	wchar_t f1[MAX_PATH] = { 0 };
+	ZeroMemory(&f1, sizeof(f1));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrTitle = title;
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = filterCount;
+	ofn.lpstrFile = (wchar_t*)f1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileName(&ofn)) {
+		return std::wstring(f1);
+	}
+	return std::wstring();
+}
+
+template <typename T>
+bool vectorIncludes(std::vector<T> vec, T value) {
+	for (const T& e : vec) {
+		if (e == value) return true;
+	}
+	return false;
+}
+
 //-------------
 
 Inspector::Inspector(GameView* gameView) : gameView(gameView) {}
@@ -45,14 +79,18 @@ void Inspector::tick() {
 		std::size_t i = 0;
 		for (Component* component : target.getComponents()) {
 			Mirror::Class type = component->getType();
+			if (type.hasAnnotation("hideInInspector")) return;
 
 			if (ImGui::CollapsingHeader(type.name.c_str())) {
 				for (Mirror::Property& prop : type.properties) {
+
 					void* ptr = Mirror::getPointer(prop, component, type.typeID);
 					std::string labelString = prop.name + "##" + std::to_string(i++);
 					const char* label = labelString.c_str();
 
-					if (prop.type.isNumber()) {
+					if (prop.type.isBool()) {
+						ImGui::Checkbox(label, (bool*)ptr);
+					} else if (prop.type.isNumber()) {
 						if (prop.type.isSignedNumber()) {
 							// Signed
 							if (prop.type.isChar()) {
@@ -66,7 +104,7 @@ void Inspector::tick() {
 									prop.type.name == "long double" ? ImGuiDataType_Double :
 									ImGuiDataType_Float;
 
-								if (ImGui::InputScalar(label, dataType, ptr, NULL))
+								if (ImGui::InputScalar(label, dataType, ptr, NULL, NULL, "%.1f"))
 									Mirror::onUpdate(component, type.typeID, prop);
 							}
 							else {
@@ -91,13 +129,30 @@ void Inspector::tick() {
 						}
 					}
 					else if (prop.type.isString()) {
-						std::string* value = static_cast<std::string*>(ptr);
-						char buffer[64];
-						strncpy_s(buffer, value->c_str(), value->size());
+						if (vectorIncludes<std::string>(prop.getAnnotationValue("Category"), "ImagePath")) {
+							std::string* value = static_cast<std::string*>(ptr);
+							char buffer[64];
+							strncpy_s(buffer, value->c_str(), value->size());
 
-						if (ImGui::InputText(label, buffer, 64)) {
-							*value = buffer;
-							Mirror::onUpdate(component, type.typeID, prop);
+							if (ImGui::InputText(label, buffer, 64)) {
+								*value = buffer;
+								Mirror::onUpdate(component, type.typeID, prop);
+							}
+							if (ImGui::Button("Select image")) {
+								std::wstring filePath = getOpenFileName(L"Select A File", L"Image Files\0*.png;*.jpg;*.psd;*.tga;*.bmp\0Any File\0*.*\0", 2);
+								*value = utf8_encode(filePath);
+								Mirror::onUpdate(component, type.typeID, prop);
+							}
+						}
+						else {
+							std::string* value = static_cast<std::string*>(ptr);
+							char buffer[64];
+							strncpy_s(buffer, value->c_str(), value->size());
+
+							if (ImGui::InputText(label, buffer, 64)) {
+								*value = buffer;
+								Mirror::onUpdate(component, type.typeID, prop);
+							}
 						}
 					}
 					else if (prop.type.isWideString()) {
@@ -114,7 +169,8 @@ void Inspector::tick() {
 					else if (prop.type.name == "Core::Vector2") {
 						Core::Vector2* value = static_cast<Core::Vector2*>(ptr);
 						float vec2f[2] = { value->x, value->y };
-						if (ImGui::InputFloat2(label, vec2f)) {
+						// TODO: Label x and y
+						if (ImGui::InputFloat2(label, vec2f, "%.1f")) {
 							value->x = vec2f[0];
 							value->y = vec2f[1];
 							Mirror::onUpdate(component, type.typeID, prop);
@@ -130,6 +186,22 @@ void Inspector::tick() {
 							value->a = color.w * 255.0f;
 							Mirror::onUpdate(component, type.typeID, prop);
 						}
+					}
+					else if (prop.type.name == "Core::Shader") {
+						/*std::string* value = static_cast<std::string*>(ptr);
+						char buffer[64];
+						strncpy_s(buffer, value->c_str(), value->size());
+
+						if (ImGui::InputText(label, buffer, 64)) {
+							*value = buffer;
+							Mirror::onUpdate(component, type.typeID, prop);
+						}
+						if (ImGui::Button("Select shader")) {
+							std::wstring filePath = getOpenFileName(L"Select A File", L"Image Files\0*.png;*.jpg;*.psd;*.tga;*.bmp\0Any File\0*.*\0", 2);
+							*value = utf8_encode(filePath);
+							Mirror::onUpdate(component, type.typeID, prop);
+						}*/
+						ImGui::Text(label);
 					}
 					else {
 						ImGui::Text(label);

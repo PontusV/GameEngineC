@@ -10,7 +10,7 @@
 using namespace Core;
 using namespace Editor;
 
-LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView) {
+LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager()) {
 	engine.getInput().addKeyListener(this);
 }
 
@@ -139,7 +139,7 @@ int LevelEditor::start() {
 		Vector2 windowSize = window.getResolution();
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y), ImGuiCond_Always);
-		ImGui::Begin("Main window", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::Begin("Editor", &running, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
 		ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
@@ -176,6 +176,8 @@ int LevelEditor::start() {
 		inspector.tick();
 		// Game view window
 		gameView.tick(deltaTime);
+		EntityHandle target = gameView.getTarget();
+		hierarchy.tick(target);
 
 		// TODO: Hide after editor is finished
 		ImGui::ShowDemoWindow();

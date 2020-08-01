@@ -34,3 +34,11 @@ const char* Image::getFileName() const {
 const Texture2D& Image::getTexture() const {
 	return texture;
 }
+
+bool Image::isDirty() const {
+	return dirty;
+}
+
+void Image::setDirty(bool value) {
+	dirty = value;
+}

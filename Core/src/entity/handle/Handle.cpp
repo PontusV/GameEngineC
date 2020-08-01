@@ -20,11 +20,11 @@ Handle::Handle() : entity(0) {
 Handle::~Handle() {
 }
 
-bool Handle::operator==(const Handle& other) {
+bool Handle::operator==(const Handle& other) const {
 	return entity == other.entity;
 }
 
-bool Handle::operator!=(const Handle& other) {
+bool Handle::operator!=(const Handle& other) const {
 	return !(*this == other);
 }
 

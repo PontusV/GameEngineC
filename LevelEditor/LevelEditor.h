@@ -4,6 +4,7 @@
 #include "input/KeyListener.h"
 #include "windows/GameView.h"
 #include "windows/Inspector.h"
+#include "windows/Hierarchy.h"
 #include <string>
 
 namespace Editor {
@@ -21,6 +22,7 @@ namespace Editor {
 		Core::Engine engine;
 		GameView gameView;
 		Inspector inspector;
+		Hierarchy hierarchy;
 		bool running = false;
 	};
 }

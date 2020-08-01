@@ -21,7 +21,7 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 		return;
 	}
 
-	Renderable2D& renderable = renderableBuffer[renderablesSize];
+	Renderable2D& renderable = renderableBuffer[renderablesSize++];
 	renderable.textureID = texture.ID;
 
 	auto vertices = transform.getVertices();
@@ -35,7 +35,6 @@ void Renderer2D::submit(const Texture2D& texture, const RectTransform& transform
 	renderable.shaderID = shaderID;
 	renderable.color = color;
 	renderable.sortingOrder = sortingOrder;
-	renderablesSize++;
 }
 
 void Renderer2D::render(float deltaTime, Matrix4 viewMatrix) {
@@ -48,7 +47,7 @@ void Renderer2D::render(float deltaTime, Matrix4 viewMatrix) {
 
 void Renderer2D::flushAll() {
 	if (renderablesSize > 0) {
-		flush(0, renderablesSize - 1);
+		flush(0, renderablesSize);
 	}
 	renderablesSize = 0;
 }
@@ -73,7 +72,7 @@ void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 		});
 
 	bool batchBegun = false;
-	for (std::size_t i = startIndex; i <= endIndex; i++) {
+	for (std::size_t i = startIndex; i < endIndex; i++) {
 		Renderable2D& renderable = renderableBuffer[i];
 		ConstBatchConfig config(renderable.textureID, renderable.shaderID);
 

@@ -24,11 +24,16 @@ namespace Core {
 
 		const Texture2D& getTexture() const;
 
+		bool isDirty() const;
+		void setDirty(bool value = true);
+
 	private:
 		PROPERTY(Category=ImagePath, Update=reload(true))
 		std::string fileName;
-		PROPERTY()
+
 		Texture2D texture;
+
+		bool dirty = false;
 	};
 }
 #endif

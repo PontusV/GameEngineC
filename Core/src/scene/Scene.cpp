@@ -22,7 +22,7 @@ std::string Scene::getName() {
 	return name;
 }
 
-const std::vector<Handle>& Scene::getAllEntities() const {
+std::vector<Handle>& Scene::getAllEntities() {
 	return entities;
 }
 

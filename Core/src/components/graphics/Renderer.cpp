@@ -10,7 +10,7 @@ Renderer::~Renderer() {
 } // Destructor
 
 
-bool Renderer::isEnabled() {
+bool Renderer::isEnabled() const {
 	return enabled;
 }
 
