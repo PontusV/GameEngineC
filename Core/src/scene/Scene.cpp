@@ -11,14 +11,14 @@
 using namespace Core;
 
 
-Scene::Scene(EntityManager* entityManager, std::string name) : manager(entityManager), name(name), isAwake(false) {
+Scene::Scene(EntityManager* entityManager, std::wstring name) : manager(entityManager), name(name), isAwake(false) {
 }
 
 Scene::~Scene() {
 	clear();
 }
 
-std::string Scene::getName() {
+std::wstring Scene::getName() {
 	return name;
 }
 

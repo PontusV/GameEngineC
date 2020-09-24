@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "entity/handle/Handle.h"
 #include "scene/SceneManager.h"
+#include "GameView.h"
 
 namespace Core {
 	class Scene;
@@ -14,7 +15,7 @@ namespace Editor {
 
 	class Hierarchy {
 	public:
-		Hierarchy(Core::SceneManager* sceneManager);
+		Hierarchy(Core::SceneManager* sceneManager, GameView* gameView);
 		~Hierarchy();
 
 		/* Renders ImGui window */
@@ -26,6 +27,7 @@ namespace Editor {
 		bool setRootIndex(Core::Scene* scene, const Core::Handle& handle, std::size_t index);
 	private:
 		Core::SceneManager* sceneManager;
+		GameView* gameView;
 		std::unordered_map<Core::ScenePtr, std::vector<Core::Handle>> sceneOrder;
 	};
 }

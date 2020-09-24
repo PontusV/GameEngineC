@@ -176,6 +176,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EditorSettings.h" />
+    <ClInclude Include="windows\FileView.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />
@@ -186,14 +188,19 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="LevelEditor.h" />
     <ClInclude Include="GridRenderer.h" />
+    <ClInclude Include="ProjectSettings.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="utils\file.h" />
+    <ClInclude Include="utils\string.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="windows\GameView.h" />
     <ClInclude Include="windows\Hierarchy.h" />
     <ClInclude Include="windows\Inspector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EditorSettings.cpp" />
+    <ClCompile Include="windows\FileView.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -206,6 +213,9 @@
       <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Fast</FloatingPointModel>
     </ClCompile>
     <ClCompile Include="GridRenderer.cpp" />
+    <ClCompile Include="ProjectSettings.cpp" />
+    <ClCompile Include="utils\file.cpp" />
+    <ClCompile Include="utils\string.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="windows\GameView.cpp" />
     <ClCompile Include="windows\Hierarchy.cpp" />

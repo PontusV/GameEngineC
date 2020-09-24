@@ -97,6 +97,15 @@ void GameView::tick(float deltaTime) {
 
 	ImGui::End();
 }
-EntityHandle GameView::getTarget() {
+EntityHandle& GameView::getTarget() {
 	return target;
+}
+
+void GameView::setTarget(Core::EntityHandle handle) {
+	target = handle;
+	targetPressed = false;
+}
+
+ImVec2 GameView::getViewportSize() const {
+	return viewportSize;
 }

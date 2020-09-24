@@ -22,7 +22,10 @@ namespace Editor {
 		/* Renders imGui window and updates the game */
 		void tick(float deltaTime);
 
-		Core::EntityHandle getTarget();
+		Core::EntityHandle& getTarget();
+		void setTarget(Core::EntityHandle handle);
+
+		ImVec2 getViewportSize() const;
 
 	private:
 		ImVec2 viewportSize = ImVec2(1.0f, 1.0f);

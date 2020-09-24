@@ -1,10 +1,13 @@
 #ifndef EDITOR_H
 #define EDITOR_H
+#include "EditorSettings.h"
+#include "ProjectSettings.h"
 #include "engine/Engine.h"
 #include "input/KeyListener.h"
 #include "windows/GameView.h"
 #include "windows/Inspector.h"
 #include "windows/Hierarchy.h"
+#include "windows/FileView.h"
 #include <string>
 
 namespace Editor {
@@ -15,14 +18,18 @@ namespace Editor {
 		int initiate();
 		/* Start the engine and rendering of the editor imgui */
 		int start();
+		void terminate();
 
 		void keyPressed(std::string buttonName);
 		void keyReleased(std::string buttonName);
 	private:
+		EditorSettings editorSettings;
+		ProjectSettings projectSettings;
 		Core::Engine engine;
 		GameView gameView;
 		Inspector inspector;
 		Hierarchy hierarchy;
+		FileView fileView;
 		bool running = false;
 	};
 }

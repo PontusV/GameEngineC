@@ -62,6 +62,7 @@ namespace Core {
 		Entity generateEntity(std::string name);
 		/* @return Returns true if the Entity had a name to remove. */
 		bool removeEntityName(Entity entity);
+		bool isEntityNameAvailable(std::string name);
 
 	private:
 		void removeArchetype(Archetype* archetype);

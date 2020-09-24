@@ -25,48 +25,57 @@ void SceneManager::update() {
 	}
 }
 
-void SceneManager::saveScene(ScenePtr scene, const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
+bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) { //To be added: file location of scene map (currently hard coded to the map Scenes)
 	std::ofstream file;
-	std::string sceneDir("Scenes/");
-	sceneDir.append(fileName);
-	file.open(sceneDir, std::ios::out | std::ios::binary | std::ios::trunc);
+	if (filePath) {
+		std::wcout << L"Saving scene to " << filePath << std::endl;
+		file.open(filePath, std::ios::out | std::ios::binary | std::ios::trunc);
+		scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
+	} else {
+		auto it = scenePathMap.find(scene->getName());
+		if (it == scenePathMap.end()) {
+			// Error: Path not stored
+			std::wcout << L"Failed to save scene. Missing file path to scene" << std::endl;
+			return false;
+		}
+		std::wcout << L"Saving scene to " << it->second << std::endl;
+		file.open(it->second.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+	}
 
-	// Scene name
-	std::string name = scene->getName();
-	file.write(name.c_str(), sizeof(char) * (name.size() + 1));
 	// Scene
 	scene->serialize(file);
 	file.close();
 
-	std::cout << "Saved scene to: " << sceneDir << "\n";
+	std::wcout << L"Successfully saved scene" << std::endl;
+	return true;
 }
 
-ScenePtr SceneManager::loadScene(const char* fileName) { //To be added: file location of scene map (currently hard coded to the map Scenes)
+ScenePtr SceneManager::loadScene(const wchar_t* filePath) { //To be added: file location of scene map (currently hard coded to the map Scenes)
 	std::ifstream file;
-	std::string sceneDir("sceneDir/");
-	sceneDir.append(fileName);
-	std::cout << "Loading Scene: " << sceneDir << "\n";
-	file.open(sceneDir, std::ios::in | std::ios::binary);
+	std::wstring path = std::wstring(filePath);
+	std::size_t nameStartIndex = path.find_last_of(L"\\");
+	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
 
-	// Scene name
-	std::string name;
-	std::getline(file, name, '\0');
+	std::wcout << L"Loading Scene: " << filePath << std::endl;
+	file.open(filePath, std::ios::in | std::ios::binary);
+
 	// Scene
-	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
+	ScenePtr scene = std::make_shared<Scene>(entityManager, fileName.substr(0, fileName.find_last_of(L".")));
 	scene->deserialize(file);
 	file.close();
 	scene->awake();
 
+	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
 	return scene;
 }
 
-ScenePtr SceneManager::createScene(std::string name) {
+ScenePtr SceneManager::createScene(std::wstring name) {
 	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
 	sceneMap[name] = scene;
 	return scene;
 }
 
-ScenePtr SceneManager::getScene(std::string name) {
+ScenePtr SceneManager::getScene(std::wstring name) {
 	return sceneMap[name];
 }
 
@@ -78,10 +87,14 @@ std::vector<ScenePtr> SceneManager::getAllScenes() {
 	return scenes;
 }
 
-std::vector<std::pair<std::string, ScenePtr>> SceneManager::getAllScenesAsPairs() {
-	std::vector<std::pair<std::string, ScenePtr>> scenes;
+std::vector<std::pair<std::wstring, ScenePtr>> SceneManager::getAllScenesAsPairs() {
+	std::vector<std::pair<std::wstring, ScenePtr>> scenes;
 	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
 		scenes.push_back(*it);
 	}
 	return scenes;
+}
+
+void SceneManager::setSceneFilePath(ScenePtr scene, const wchar_t* filePath) {
+	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
 }

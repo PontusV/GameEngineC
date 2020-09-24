@@ -1,6 +1,9 @@
 #include "Hierarchy.h"
 #include "scene/Scene.h"
 #include "entity/handle/Handle.h"
+#include "components/RectTransform.h"
+#include "maths/MatrixTransform.h"
+#include "utils/string.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -9,40 +12,55 @@
 using namespace Editor;
 using namespace Core;
 
-void entityNode(Handle& entity, Handle& target) {
+void entityNode(Handle& entity, Handle& target, GameView* gameView) {
 	std::string name = entity.getEntityName().c_str();
 	std::size_t childCount = entity.getChildCount();
 	bool selected = target.isValid() && entity == target;
-	if (childCount == 0) {
-		ImGui::Selectable(name.c_str(), &selected);
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
+	if (selected) {
+		flags |= ImGuiTreeNodeFlags_Selected;
 	}
-	bool nodeOpen = childCount == 0 ? false : ImGui::TreeNodeEx(name.c_str(), selected ? ImGuiTreeNodeFlags_Selected : 0);
+	if (childCount == 0) {
+		flags |= ImGuiTreeNodeFlags_Leaf;
+	}
+	bool nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags);
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+		gameView->setTarget(entity);
+	}
 	if (ImGui::BeginDragDropSource()) {
 		ImGui::SetDragDropPayload("HIERARCHY_ENTITY", &entity, sizeof(Handle));
 		ImGui::Text("%s", name.c_str());
 		ImGui::EndDragDropSource();
 	}
-	if (ImGui::BeginDragDropTarget())
-	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY"))
-		{
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 			IM_ASSERT(payload->DataSize == sizeof(Handle));
 			Handle* data = (Handle*)payload->Data;
 
-			data->setParent(entity);
+			if (!data->isChild(entity.getEntity())) {
+				data->setParent(entity);
+				if (RectTransform* rect = data->getComponent<RectTransform>()) {
+					if (RectTransform* targetRect = entity.getComponent<RectTransform>()) {
+						Vector2 position = rect->getPosition();
+						Vector2 newPosition = targetRect->getLocalToWorldMatrix() * targetRect->getLocalModelMatrix() * rect->getLocalPosition();
+						rect->moveX(position.x - newPosition.x);
+						rect->moveY(position.y - newPosition.y);
+					}
+				}
+			}
 		}
 		ImGui::EndDragDropTarget();
 	}
 	if (nodeOpen) {
-		for (std::size_t i = 0; i < entity.getChildCount(); i++) {
+		for (std::size_t i = 0; i < entity.getImmediateChildCount(); i++) {
 			Handle child = entity.getChild(i);
-			entityNode(child, target);
+			entityNode(child, target, gameView);
 		}
 		ImGui::TreePop();
 	}
 }
 
-Hierarchy::Hierarchy(Core::SceneManager* sceneManager) : sceneManager(sceneManager) {}
+Hierarchy::Hierarchy(Core::SceneManager* sceneManager, GameView* gameView) : sceneManager(sceneManager), gameView(gameView) {}
 Hierarchy::~Hierarchy() {}
 
 void Hierarchy::tick(Handle& target) {
@@ -50,19 +68,26 @@ void Hierarchy::tick(Handle& target) {
 	ImGui::Begin("Hierarchy");
 	for (auto& scenePair : sceneOrder) {
 		ScenePtr scene = scenePair.first;
-		bool nodeOpened = ImGui::TreeNode(scene->getName().c_str());
+		std::string sceneName = utf8_encode(scene->getName());
+		bool nodeOpened = ImGui::TreeNodeEx(sceneName.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 				IM_ASSERT(payload->DataSize == sizeof(Handle));
 				Handle* data = (Handle*)payload->Data;
 
 				data->removeParent();
+				if (RectTransform* rect = data->getComponent<RectTransform>()) {
+					Vector2 position = rect->getPosition();
+					Vector2 newPosition = rect->getLocalPosition();
+					rect->moveX(position.x - newPosition.x);
+					rect->moveY(position.y - newPosition.y);
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 		if (nodeOpened) {
 			for (Handle& entity : scene->getRootEntities()) {
-				entityNode(entity, target);
+				entityNode(entity, target, gameView);
 			}
 			ImGui::TreePop();
 		}

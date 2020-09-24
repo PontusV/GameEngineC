@@ -4,13 +4,21 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "utils/file.h"
+#include "utils/string.h"
+
+#include <fstream>
+#include <iostream>
+
 #include <GLFW/glfw3.h>
 #include <Windows.h>
 
 using namespace Core;
 using namespace Editor;
 
-LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager()) {
+constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
+
+LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager(), &gameView) {
 	engine.getInput().addKeyListener(this);
 }
 
@@ -20,6 +28,11 @@ LevelEditor::~LevelEditor() {
 
 
 int LevelEditor::initiate() {
+	// Load settings
+	if (!editorSettings.load()) {
+		std::cout << "Failed to load Editor settings" << std::endl;
+	}
+
 	// Initiate engine
 	int result = engine.initiate(true);
 	if (result != 0) {
@@ -27,25 +40,6 @@ int LevelEditor::initiate() {
 	}
 	Window& window = engine.getGraphics().getWindow();
 	window.setBackgroundColor(Vector3(0.15f, 0.15f, 0.15f));
-
-	// Example scene
-	ScenePtr sceneWorld = engine.getSceneManager().createScene("World");
-
-	EntityHandle object = sceneWorld->createEntity("Test_Object",
-		Image("resources/images/awesomeface.png"),
-		RectTransform(350, 350, 350, 350, 0.0f, Alignment::CENTER),
-		SpriteRenderer()
-	);
-
-	EntityHandle object2 = sceneWorld->createEntity("Test_Object_2",
-		Image("resources/images/awesomeface.png"),
-		Text(L"TEst едц", Font("resources/fonts/segoeui.ttf", 30), Color(255,255,255,255)),
-		RectTransform(100, 100, 200, 200, 0.0f, Alignment::CENTER),
-		SpriteRenderer()
-	);
-
-	// Level created, calling awake
-	sceneWorld->awake();
 
 	// Keybinds
 	Input& input = engine.getInput();
@@ -60,6 +54,15 @@ int LevelEditor::initiate() {
 
 	// Window hints
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
+
+	// Loading recent project
+	std::wstring recentProjectPath = editorSettings.getRecentProjectPaths()[0];
+
+	std::size_t seperator = recentProjectPath.find_last_of(L"\\") + 1;
+	std::wstring path = recentProjectPath.substr(0, seperator);
+	std::wstring name = recentProjectPath.substr(seperator);
+
+	projectSettings = ProjectSettings::load(name, path.c_str());
 	
 	// Start editor loop
 	return start();
@@ -144,10 +147,56 @@ int LevelEditor::start() {
 		ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
 
+		// Note: OpenPopup does not work inside BeginMenuBar
+		bool open_create_entity_popup = false;
+		bool open_create_project_popup = false;
+		bool open_create_scene_popup = false;
+
+		std::vector<ScenePtr> loadedScenes = engine.getSceneManager().getAllScenes();
+
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Dummy file")) {}
+				if (ImGui::BeginMenu("New")) {
+					if (ImGui::MenuItem("New Project")) {
+						open_create_project_popup = true;
+					}
+					if (ImGui::MenuItem("New Scene", nullptr, nullptr, projectSettings.isLoaded())) {
+						open_create_scene_popup = true;
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Open")) {
+					if (ImGui::MenuItem("Open Project")) {
+						std::wstring filePath = getOpenFileName(L"Select A File", L"All Project Files\0*.proj;\0", 1);
+
+						if (!filePath.empty()) {
+							std::size_t seperator = filePath.find_last_of(L"\\") + 1;
+							std::wstring path = filePath.substr(0, seperator);
+							std::wstring name = filePath.substr(seperator);
+
+							projectSettings = ProjectSettings::load(name.substr(0, name.find_last_of(L".")), path.c_str());
+							editorSettings.pushRecentProjectPath(projectSettings.getFilePath());
+						}
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::MenuItem("Save Project", "Ctrl + S", nullptr, projectSettings.isLoaded())) {
+					projectSettings.save();
+				}
+				if (ImGui::MenuItem("Save Scene", "Ctrl + S", nullptr, projectSettings.isLoaded() && loadedScenes.size() > 0)) {
+					// Saving all loaded scenes
+					for (ScenePtr scene : loadedScenes) {
+						engine.getSceneManager().saveScene(scene);
+					}
+					projectSettings.save();
+				}
+				if (ImGui::MenuItem("Build", nullptr, nullptr, projectSettings.isLoaded())) {
+					// TODO: Build game
+				}
+				if (ImGui::MenuItem("Exit", "Alt + F4")) {
+					terminate();
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))
@@ -163,14 +212,131 @@ int LevelEditor::start() {
 			if (ImGui::BeginMenu("Game Object"))
 			{
 				if (ImGui::MenuItem("Create new")) {
-					std::cout << "Create new game object WIP" << std::endl;
+					open_create_entity_popup = true;
 				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
 		}
 
+		static std::wstring dirPath = L"";
+		static bool chooseDirPath = false;
+
+		if (open_create_scene_popup) {
+			std::wstring path = getSaveFileName(L"Choose scene location", L"Scene\0*.scene;\0", 1, projectSettings.getPath().c_str());
+			if (!path.empty()) {
+				if (!path.ends_with(SCENE_FILE_TYPE)) {
+					path.append(SCENE_FILE_TYPE);
+				}
+				std::size_t nameStartIndex = path.find_last_of(L"\\");
+				std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
+				ScenePtr scene = engine.getSceneManager().createScene(fileName.substr(0, fileName.find_last_of(L".")));
+				engine.getSceneManager().saveScene(scene, path.c_str());
+				scene->awake();
+				projectSettings.save();
+			}
+		}
+
+		if (open_create_project_popup) {
+			ImGui::OpenPopup("create_project_popup");
+			chooseDirPath = true;
+		}
+
+		if (ImGui::BeginPopupModal("create_project_popup", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static std::string errorMessage = "";
+			if (!errorMessage.empty()) {
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
+			}
+			static char buffer[64] = "";
+			if (ImGui::Button("Choose directory")) {
+				chooseDirPath = true;
+			}
+			ImGui::Text(utf8_encode(dirPath).append("\\").append(buffer).c_str());
+			ImGui::InputText("Project name", buffer, 64);
+
+			if (ImGui::Button("Create", ImVec2(120, 0))) {
+				std::wstring name = utf8_decode(buffer);
+				std::wstring path = dirPath;
+
+				ProjectSettings newProject = ProjectSettings::create(name, path.append(L"\\").append(name).c_str());
+				if (!newProject.getPath().empty()) {
+					projectSettings = newProject;
+					errorMessage = "";
+					dirPath = L"";
+					memset(buffer, 0, 64);
+					ImGui::CloseCurrentPopup();
+
+					editorSettings.pushRecentProjectPath(newProject.getFilePath());
+				}
+				else {
+					errorMessage = "Failed to create new project!";
+				}
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				errorMessage = "";
+				dirPath = L"";
+				ImGui::CloseCurrentPopup();
+			}
+			if (chooseDirPath) {
+				dirPath = getOpenFolderName(L"Choose project location");
+				chooseDirPath = false;
+				if (dirPath.empty()) {
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndPopup();
+		}
+
+		if (open_create_entity_popup)
+			ImGui::OpenPopup("create_entity_popup");
+
+		if (ImGui::BeginPopupModal("create_entity_popup", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static std::string errorMessage = "";
+			if (!errorMessage.empty()) {
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
+			}
+			static char buffer[64] = "";
+			ImGui::InputText("Name", buffer, 64);
+
+			if (ImGui::Button("Create", ImVec2(120, 0))) {
+				std::string name = std::string(buffer);
+				if (engine.getEntityManager().isEntityNameAvailable(name)) {
+					Core::Scene* scene = gameView.getTarget().getScene();
+					if (scene == nullptr) {
+						std::vector<ScenePtr> scenes = engine.getSceneManager().getAllScenes();
+						if (!scenes.empty()) {
+							scene = scenes[0].get();
+						}
+					}
+					if (scene) {
+						Core::Vector2 pos = engine.getGraphics().getCamera().getPosition();
+						ImVec2 viewportSize = gameView.getViewportSize();
+						EntityHandle handle = scene->createEntity(name,
+							Image("resources/images/awesomeface.png"),
+							RectTransform(pos.x + viewportSize.x/2, pos.y + viewportSize.y / 2, 350, 350, 0.0f, Alignment::CENTER),
+							SpriteRenderer()
+						);
+					}
+					errorMessage = "";
+					memset(buffer, 0, 64);
+					ImGui::CloseCurrentPopup();
+				}
+				else {
+					errorMessage = "Name is already taken!";
+				}
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				errorMessage = "";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
 		ImGui::End();
+
 		// Inspector window
 		ImGui::SetNextWindowDockID(dockspaceID, ImGuiCond_FirstUseEver);
 		inspector.tick();
@@ -178,6 +344,8 @@ int LevelEditor::start() {
 		gameView.tick(deltaTime);
 		EntityHandle target = gameView.getTarget();
 		hierarchy.tick(target);
+		// File view window
+		fileView.tick();
 
 		// TODO: Hide after editor is finished
 		ImGui::ShowDemoWindow();
@@ -200,4 +368,9 @@ int LevelEditor::start() {
 
 	glfwTerminate();
 	return 0;
+}
+
+void LevelEditor::terminate() {
+	// TODO: Check for unsaved changes
+	running = false;
 }

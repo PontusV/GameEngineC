@@ -3,12 +3,13 @@
 
 using namespace Core;
 
+bool EntityManager::isEntityNameAvailable(std::string name) {
+	return entityNameMap.find(name) == entityNameMap.end();
+}
 
 Entity EntityManager::generateEntity(std::string name) {
 	Entity entity(entityIDCounter++);
-	// Check if name is already taken
-	auto it = entityNameMap.find(name);
-	if (it != entityNameMap.end()) {
+	if (!isEntityNameAvailable(name)) {
 		std::cout << "Entity with the name " << name << " already exists!\n";
 		throw std::invalid_argument("Entity with given name already exist!");
 	}
