@@ -1,6 +1,7 @@
 #ifndef VECTOR_2_H
 #define VECTOR_2_H
 #include <cstddef>
+#include <stdexcept>
 namespace Core {
 	class Vector2 {
 	public:
@@ -22,6 +23,9 @@ namespace Core {
 		const float& operator[](std::size_t index) const;
 		float& operator[](std::size_t index);
 		Vector2 operator*(const float& scalar) const;
+
+		void serialize(std::ostream& os) const;
+		void deserialize(std::istream& is);
 	public:
 		float x;
 		float y;

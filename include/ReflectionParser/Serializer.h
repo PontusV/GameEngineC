@@ -36,24 +36,24 @@ namespace Mirror {
 
 	// Literal type
 	template<typename T>
-	static std::enable_if_t<std::is_literal_type<T>::value && !std::is_array<T>::value, void> serialize(const T& value, std::ostream& os) {
+	static std::enable_if_t<std::is_arithmetic<T>::value && !std::is_array<T>::value, void> serialize(const T& value, std::ostream& os) {
 		os.write((char*)&value, sizeof(T));
 	}
 
 	// Array of literal types
 	template<typename T>
-	static std::enable_if_t<std::is_literal_type<T>::value && std::is_array<T>::value, void> serialize(const T& value, std::ostream& os) {
+	static std::enable_if_t<std::is_arithmetic<T>::value && std::is_array<T>::value, void> serialize(const T& value, std::ostream& os) {
 		os.write((char*)&value, sizeof(T));
 	}
 
 	// Non literal type, assumed to be Reflected
 	template<typename T>
-	static std::enable_if_t<!std::is_literal_type<T>::value && is_serializeable<T>::value, void> serialize(const T& value, std::ostream& os) {
+	static std::enable_if_t<!std::is_arithmetic<T>::value && is_serializeable<T>::value, void> serialize(const T& value, std::ostream& os) {
 		value.serialize(os);
 	}
 
 	template<typename T>
-	static std::enable_if_t<!std::is_literal_type<T>::value && !is_serializeable<T>::value, void> serialize(const T& value, std::ostream& os) {
+	static std::enable_if_t<!std::is_arithmetic<T>::value && !is_serializeable<T>::value, void> serialize(const T& value, std::ostream& os) {
 		throw std::invalid_argument("You need to implement \"void serialize(std::ostream&) const\" for this class!");
 	}
 
@@ -80,24 +80,24 @@ namespace Mirror {
 	//---------------------------------------DESERIALIZE-----------------------------------------------
 	// Literal type
 	template<typename T>
-	static std::enable_if_t<std::is_literal_type<T>::value && !std::is_array<T>::value, void> deserialize(T& value, std::istream& is) {
+	static std::enable_if_t<std::is_arithmetic<T>::value && !std::is_array<T>::value, void> deserialize(T& value, std::istream& is) {
 		is.read((char*)&value, sizeof(T));
 	}
 
 	// Array of literal types
 	template<typename T>
-	static std::enable_if_t<std::is_literal_type<T>::value && std::is_array<T>::value, void> deserialize(T& value, std::istream& is) {
+	static std::enable_if_t<std::is_arithmetic<T>::value && std::is_array<T>::value, void> deserialize(T& value, std::istream& is) {
 		is.read((char*)& value, sizeof(T));
 	}
 
 	// Non literal type, assumed to be Reflected
 	template<typename T>
-	static std::enable_if_t<!std::is_literal_type<T>::value && is_deserializeable<T>::value, void> deserialize(T& value, std::istream& is) {
+	static std::enable_if_t<!std::is_arithmetic<T>::value && is_deserializeable<T>::value, void> deserialize(T& value, std::istream& is) {
 		value.deserialize(is);
 	}
 
 	template<typename T>
-	static std::enable_if_t<!std::is_literal_type<T>::value && !is_deserializeable<T>::value, void> deserialize(T& value, std::istream& is) {
+	static std::enable_if_t<!std::is_arithmetic<T>::value && !is_deserializeable<T>::value, void> deserialize(T& value, std::istream& is) {
 		throw std::invalid_argument("You need to implement \"void deserialize(std::istream&)\" for this class!");
 	}
 

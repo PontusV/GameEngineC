@@ -18,7 +18,7 @@ using namespace Editor;
 
 constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
 
-LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager(), &gameView) {
+LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager(), &gameView), fileView(this) {
 	engine.getInput().addKeyListener(this);
 }
 
@@ -57,12 +57,7 @@ int LevelEditor::initiate() {
 
 	// Loading recent project
 	std::wstring recentProjectPath = editorSettings.getRecentProjectPaths()[0];
-
-	std::size_t seperator = recentProjectPath.find_last_of(L"\\") + 1;
-	std::wstring path = recentProjectPath.substr(0, seperator);
-	std::wstring name = recentProjectPath.substr(seperator);
-
-	projectSettings = ProjectSettings::load(name, path.c_str());
+	openProject(recentProjectPath);
 	
 	// Start editor loop
 	return start();
@@ -139,11 +134,11 @@ int LevelEditor::start() {
 		ImGui::NewFrame();
 
 		// imGui Windows
+		//ImGuiStyle::ScaleAllSizes(2.0f);
 		Vector2 windowSize = window.getResolution();
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y), ImGuiCond_Always);
 		ImGui::Begin("Editor", &running, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
-
 		ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
 
@@ -171,12 +166,7 @@ int LevelEditor::start() {
 						std::wstring filePath = getOpenFileName(L"Select A File", L"All Project Files\0*.proj;\0", 1);
 
 						if (!filePath.empty()) {
-							std::size_t seperator = filePath.find_last_of(L"\\") + 1;
-							std::wstring path = filePath.substr(0, seperator);
-							std::wstring name = filePath.substr(seperator);
-
-							projectSettings = ProjectSettings::load(name.substr(0, name.find_last_of(L".")), path.c_str());
-							editorSettings.pushRecentProjectPath(projectSettings.getFilePath());
+							openProject(filePath);
 						}
 					}
 					ImGui::EndMenu();
@@ -261,6 +251,7 @@ int LevelEditor::start() {
 				ProjectSettings newProject = ProjectSettings::create(name, path.append(L"\\").append(name).c_str());
 				if (!newProject.getPath().empty()) {
 					projectSettings = newProject;
+					fileView.setSourcePath(path);
 					errorMessage = "";
 					dirPath = L"";
 					memset(buffer, 0, 64);
@@ -373,4 +364,17 @@ int LevelEditor::start() {
 void LevelEditor::terminate() {
 	// TODO: Check for unsaved changes
 	running = false;
+}
+
+void LevelEditor::openProject(std::wstring path) {
+	std::size_t seperator = path.find_last_of(L"\\");
+	std::wstring fileName = path.substr(seperator + 1);
+	std::wstring dirPath = path.substr(0, seperator);
+	projectSettings = ProjectSettings::load(fileName.substr(0, fileName.find_last_of(L".")), dirPath.c_str());
+	editorSettings.pushRecentProjectPath(path);
+	fileView.setSourcePath(dirPath);
+}
+
+void LevelEditor::openScene(std::wstring path) {
+	engine.getSceneManager().loadScene(path.c_str());
 }

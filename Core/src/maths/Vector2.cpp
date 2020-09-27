@@ -1,6 +1,7 @@
 #include "Vector2.h"
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 using namespace Core;
 
 
@@ -59,4 +60,14 @@ float& Vector2::operator[](std::size_t index) {
 
 Vector2 Vector2::operator*(const float& value) const {
 	return Vector2(x * value, y * value);
+}
+
+void Vector2::serialize(std::ostream& os) const {
+	os.write((char*)&x, sizeof(x));
+	os.write((char*)&y, sizeof(y));
+}
+
+void Vector2::deserialize(std::istream& is) {
+	is.read((char*)&x, sizeof(x));
+	is.read((char*)&y, sizeof(y));
 }

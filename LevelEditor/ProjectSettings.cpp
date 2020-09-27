@@ -46,7 +46,13 @@ ProjectSettings ProjectSettings::load(std::wstring name, const wchar_t* path) {
 }
 
 void ProjectSettings::save() {
-	write(getFilePath().c_str());
+	std::wcout << L"Saving project to " << getFilePath() << std::endl;
+	if (write(getFilePath().c_str())) {
+		std::cout << "Saved project successfully" << std::endl;
+	}
+	else {
+		std::cout << "Failed to save project" << std::endl;
+	}
 }
 
 bool ProjectSettings::isLoaded() {
@@ -57,9 +63,8 @@ std::wstring ProjectSettings::getName() {
 	return name;
 }
 std::wstring ProjectSettings::getPath() {
-	return path;
+	return path.ends_with(L"\\") ? path.substr(0, path.size() - 1) : path;
 }
 std::wstring ProjectSettings::getFilePath() {
-	std::wstring filePath = path;
-	return filePath.append(name).append(L".proj");
+	return getPath().append(L"\\").append(name).append(L".proj");
 }

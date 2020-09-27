@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "engine/ResourceManager.h"
 #include <glad/glad.h>
 #include <vector>
 
@@ -138,4 +139,39 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
 			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
+}
+
+void Shader::setSourcePaths(const char* vertexPath, const char* fragmentPath) {
+	this->vertexPath = vertexPath;
+	this->fragmentPath = fragmentPath;
+}
+
+void Shader::serialize(std::ostream& os) const {
+	std::size_t vertexSize = vertexPath.size();
+	os.write((char*)&vertexSize, sizeof(vertexSize));
+	os.write(vertexPath.c_str(), vertexPath.size());
+
+	std::size_t fragmentSize = fragmentPath.size();
+	os.write((char*)&fragmentSize, sizeof(fragmentSize));
+	os.write(fragmentPath.c_str(), fragmentPath.size());
+}
+
+void Shader::deserialize(std::istream& is) {
+	std::size_t vertexSize = vertexPath.size();
+	is.read((char*)&vertexSize, sizeof(vertexSize));
+	vertexPath.resize(vertexSize);
+	is.read(&vertexPath[0], vertexSize);
+
+	std::size_t fragmentSize = fragmentPath.size();
+	is.read((char*)&fragmentSize, sizeof(fragmentSize));
+	fragmentPath.resize(fragmentSize);
+	is.read(&fragmentPath[0], fragmentSize);
+
+	Shader shader = ResourceManager::getInstance().loadShader(vertexPath.substr(0, vertexPath.find_last_of(".")));
+	this->ID = shader.ID;
+
+	//std::cout << "Vertex: " << vertexSource << std::endl;
+	//std::cout << "Fragment: " << fragmentSource << std::endl;
+
+	//compile(vertexSource.c_str(), fragmentSource.c_str());
 }

@@ -59,6 +59,14 @@ std::wstring* EditorSettings::getRecentProjectPaths() {
 }
 
 void EditorSettings::pushRecentProjectPath(std::wstring path) {
+	bool exists = false;
+	for (std::wstring recentPath : recentProjectPaths) {
+		if (path == recentPath) {
+			exists = true;
+			return;
+		}
+	}
+	if (exists) return;
 	for (std::size_t i = 1; i < EDITOR_RECENT_PROJECT_COUNT; i++) {
 		recentProjectPaths[i] = recentProjectPaths[i - 1];
 	}

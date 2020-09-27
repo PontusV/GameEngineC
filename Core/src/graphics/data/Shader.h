@@ -8,6 +8,8 @@
 #include "maths/Vector4.h"
 #include "maths/Matrix4.h"
 
+#include "utils/Serializable.h"
+
 #include <string>
 #include <iostream>
 
@@ -19,8 +21,7 @@ typedef unsigned char	GLboolean;
 typedef int				GLint;
 
 namespace Core {
-	class Shader
-	{
+	class Shader : public Serializable {
 	public:
 		// the program ID
 		GLuint ID = 0;
@@ -45,9 +46,17 @@ namespace Core {
 		bool operator==(const Shader& other) {
 			return ID == other.ID;
 		}
+
+		void setSourcePaths(const char* vertexPath, const char* fragmentPath);
+
+		void serialize(std::ostream& os) const override;
+		void deserialize(std::istream& is) override;
 	private:
 		void initSamples(unsigned char sampleCount);
 		void checkCompileErrors(unsigned int shader, std::string type);
+	private:
+		std::string vertexPath;
+		std::string fragmentPath;
 	};
 }
 

@@ -144,6 +144,7 @@ Shader ResourceManager::loadShaderFromFile(const GLchar* vertexPath, const GLcha
 	// 2. Now create shader object from source code
 	Shader shader;
 	shader.compile(vShaderCode, fShaderCode);
+	shader.setSourcePaths(vertexPath, fragmentPath);
 	return shader;
 }
 

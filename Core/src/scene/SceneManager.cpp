@@ -50,21 +50,27 @@ bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) { //To be 
 	return true;
 }
 
-ScenePtr SceneManager::loadScene(const wchar_t* filePath) { //To be added: file location of scene map (currently hard coded to the map Scenes)
+ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	std::ifstream file;
 	std::wstring path = std::wstring(filePath);
 	std::size_t nameStartIndex = path.find_last_of(L"\\");
 	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
+	std::wstring sceneName = fileName.substr(0, fileName.find_last_of(L"."));
+	auto it = sceneMap.find(sceneName);
+	if (it != sceneMap.end()) {
+		return it->second;
+	}
 
 	std::wcout << L"Loading Scene: " << filePath << std::endl;
 	file.open(filePath, std::ios::in | std::ios::binary);
 
 	// Scene
-	ScenePtr scene = std::make_shared<Scene>(entityManager, fileName.substr(0, fileName.find_last_of(L".")));
+	ScenePtr scene = std::make_shared<Scene>(entityManager, sceneName);
 	scene->deserialize(file);
 	file.close();
 	scene->awake();
 
+	sceneMap[sceneName] = scene;
 	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
 	return scene;
 }
