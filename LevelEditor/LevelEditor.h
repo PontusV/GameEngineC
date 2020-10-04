@@ -8,6 +8,7 @@
 #include "windows/Inspector.h"
 #include "windows/Hierarchy.h"
 #include "windows/FileView.h"
+#include "scene/SceneManager.h"
 #include <string>
 
 namespace Editor {
@@ -25,6 +26,7 @@ namespace Editor {
 
 		void openProject(std::wstring path);
 		void openScene(std::wstring path);
+		void closeScene(Core::ScenePtr scene);
 	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;

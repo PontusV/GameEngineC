@@ -380,10 +380,13 @@ void Scene::clear() {
 		functionQueue.pop_front();
 	}
 	// Destroys all Entities
-	for (Handle& entity : entities) {
-		destroyEntity(entity.getEntity());
+	while (!entities.empty()) {
+		auto it = entities.begin();
+		Handle& handle = *it;
+
+		manager->destroyEntity(handle.getEntity());
+		entities.erase(it);
 	}
-	entities.clear();
 }
 
 EntityManager* Scene::getEntityManager() {

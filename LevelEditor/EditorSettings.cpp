@@ -19,13 +19,13 @@ EditorSettings::~EditorSettings() {
 /* Saves Editor settings to file */
 bool EditorSettings::save() {
 	std::ofstream file;
-	file.open(utf8_encode(getApplicationDirectoryPath()).append("\\").append(EDITOR_SETTINGS_FILE_NAME), std::ios::out | std::ios::trunc);
+	file.open(Core::utf8_encode(getApplicationDirectoryPath()).append("\\").append(EDITOR_SETTINGS_FILE_NAME), std::ios::out | std::ios::trunc);
 	if (!file.is_open()) return false;
 
 	// SAVE
 	file << EDITOR_RECENT_PROJECT_COUNT << '\0';
 	for (std::size_t i = 0; i < EDITOR_RECENT_PROJECT_COUNT; i++) {
-		file << utf8_encode(recentProjectPaths[i]).c_str();
+		file << Core::utf8_encode(recentProjectPaths[i]).c_str();
 	}
 
 	file.close();
@@ -34,7 +34,7 @@ bool EditorSettings::save() {
 /* Loads Editor settings file */
 bool EditorSettings::load() {
 	std::ifstream file;
-	file.open(utf8_encode(getApplicationDirectoryPath()).append("\\").append(EDITOR_SETTINGS_FILE_NAME), std::ios::in);
+	file.open(Core::utf8_encode(getApplicationDirectoryPath()).append("\\").append(EDITOR_SETTINGS_FILE_NAME), std::ios::in);
 	if (!file.is_open()) return false;
 
 	// LOAD
@@ -47,7 +47,7 @@ bool EditorSettings::load() {
 	for (std::size_t i = 0; i < recentCount; i++) {
 		std::string path;
 		std::getline(file, path, '\0');
-		recentProjectPaths[i] = utf8_decode(path);
+		recentProjectPaths[i] = Core::utf8_decode(path);
 	}
 
 	file.close();

@@ -1,9 +1,9 @@
 #include "string.h"
 #include <Windows.h>
-#include <string>
+
 
 // Convert a wide Unicode string to an UTF8 string
-std::string utf8_encode(const std::wstring& wstr)
+std::string Core::utf8_encode(const std::wstring& wstr)
 {
 	if (wstr.empty()) return std::string();
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
@@ -13,7 +13,7 @@ std::string utf8_encode(const std::wstring& wstr)
 }
 
 // Convert an UTF8 string to a wide Unicode String
-std::wstring utf8_decode(const std::string& str)
+std::wstring Core::utf8_decode(const std::string& str)
 {
 	if (str.empty()) return std::wstring();
 	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);

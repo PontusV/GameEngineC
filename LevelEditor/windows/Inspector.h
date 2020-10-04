@@ -1,8 +1,11 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
-#include "GameView.h"
+#include "entity/Entity.h"
+#include <string>
 
 namespace Editor {
+
+	class GameView;
 
 	/* The game view window */
 	class Inspector {
@@ -15,6 +18,9 @@ namespace Editor {
 
 	private:
 		GameView* gameView;
+		Core::Entity prevTarget = Core::Entity(0);
+		bool renameActive = false;
+		std::string renameValue;
 	};
 }
 #endif

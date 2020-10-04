@@ -290,6 +290,7 @@
     <ClCompile Include="src\utils\Clipboard.cpp" />
     <ClCompile Include="src\utils\FunctionCaller.cpp" />
     <ClCompile Include="src\utils\Serializable.cpp" />
+    <ClCompile Include="src\utils\string.cpp" />
     <ClCompile Include="src\utils\UIDContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -432,6 +433,7 @@
     <ClInclude Include="src\utils\Clipboard.h" />
     <ClInclude Include="src\utils\FunctionCaller.h" />
     <ClInclude Include="src\utils\Serializable.h" />
+    <ClInclude Include="src\utils\string.h" />
     <ClInclude Include="src\utils\UIDContainer.h" />
     <ClInclude Include="src\ReflectionMacros.h" />
     <ClInclude Include="src\engine\stb_image.h" />

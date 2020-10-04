@@ -3,6 +3,17 @@
 
 using namespace Core;
 
+
+bool EntityManager::renameEntity(Entity entity, std::string name) {
+	if (!isEntityNameAvailable(name)) {
+		std::cout << "Failed to rename Entity. Entity with the name " << name << " already exists!\n";
+		return false;
+	}
+	removeEntityName(entity);
+	entityNameMap[name] = entity;
+	return true;
+}
+
 bool EntityManager::isEntityNameAvailable(std::string name) {
 	return entityNameMap.find(name) == entityNameMap.end();
 }

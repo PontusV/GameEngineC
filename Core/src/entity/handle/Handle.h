@@ -99,6 +99,7 @@ namespace Core {
 		std::vector<T*> getComponentsDownwards(bool includeInactive = false);
 
 		std::string getEntityName();
+		bool renameEntity(std::string name);
 		HideFlags getEntityHideFlags();
 		void setEntityHideFlags(HideFlags hideFlags);
 		

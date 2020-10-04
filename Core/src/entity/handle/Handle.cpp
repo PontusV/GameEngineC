@@ -252,8 +252,16 @@ std::string Handle::getEntityName() {
 	if (refresh()) {
 		return scene->getEntityManager()->getEntityName(entity);
 	}
-	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!";
+	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!" << std::endl;
 	return "Invalid";
+}
+
+bool Handle::renameEntity(std::string name) {
+	if (refresh()) {
+		return scene->getEntityManager()->renameEntity(entity, name);
+	}
+	std::cout << "EntityHandle::renameEntity::ERROR Invalid Handle!" << std::endl;
+	return false;
 }
 
 HideFlags Handle::getEntityHideFlags() {

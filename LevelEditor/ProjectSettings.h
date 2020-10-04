@@ -11,9 +11,9 @@ namespace Editor {
 		/* Saves the current settings */
 		void save();
 		/* Creates a new project settings file. Note: Overwrites any file with same name at specified path */
-		static ProjectSettings create(std::wstring name, const wchar_t* path);
+		static ProjectSettings create(const wchar_t* name, const wchar_t* path);
 		/* Loads a new project settings file */
-		static ProjectSettings load(std::wstring name, const wchar_t* path);
+		static ProjectSettings load(const wchar_t* name, const wchar_t* path);
 
 		bool isLoaded();
 

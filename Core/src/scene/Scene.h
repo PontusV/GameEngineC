@@ -85,8 +85,8 @@ namespace Core {
 		/* Destroys all Entities contained by this Scene. */
 		void clear();
 		// Serializable
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
+		void serialize(std::ostream& os) const override;
+		void deserialize(std::istream& is) override;
 
 	private:
 		void onEntityCreated(Entity entity); // Used by queue

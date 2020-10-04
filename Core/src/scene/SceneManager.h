@@ -28,6 +28,8 @@ namespace Core {
 		bool saveScene(ScenePtr scene, const wchar_t* filePath = nullptr);
 		/* Loads scene from file */
 		ScenePtr loadScene(const wchar_t* filePath);
+		/* Unloads scene */
+		bool unloadScene(std::wstring name);
 
 		void setSceneFilePath(ScenePtr scene, const wchar_t* filePath);
 

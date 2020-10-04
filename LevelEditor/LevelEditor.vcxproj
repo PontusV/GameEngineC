@@ -192,7 +192,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utils\file.h" />
-    <ClInclude Include="utils\string.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="windows\GameView.h" />
     <ClInclude Include="windows\Hierarchy.h" />
@@ -215,7 +214,6 @@
     <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="ProjectSettings.cpp" />
     <ClCompile Include="utils\file.cpp" />
-    <ClCompile Include="utils\string.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="windows\GameView.cpp" />
     <ClCompile Include="windows\Hierarchy.cpp" />

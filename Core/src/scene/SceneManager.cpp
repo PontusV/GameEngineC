@@ -16,6 +16,7 @@ void SceneManager::clear() {
 		it->second->clear();
 	}
 	sceneMap.clear();
+	scenePathMap.clear();
 }
 
 
@@ -73,6 +74,25 @@ ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	sceneMap[sceneName] = scene;
 	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
 	return scene;
+}
+
+bool SceneManager::unloadScene(std::wstring name) {
+	std::wcout << L"Unloading Scene: " << name << std::endl;
+	auto sceneIt = sceneMap.find(name);
+	if (sceneIt == sceneMap.end()) {
+		std::wcout << L"Failed to unload scene. Scene name not found in sceneMap" << std::endl;
+		return false;
+	}
+	ScenePtr scene = sceneIt->second;
+	scene->clear();
+	sceneMap.erase(sceneIt);
+	auto scenePathIt = scenePathMap.find(name);
+	if (scenePathIt == scenePathMap.end()) {
+		std::wcout << L"Failed to unload scene. Scene name not found in scenePathMap" << std::endl;
+		return false;
+	}
+	scenePathMap.erase(scenePathIt);
+	return true;
 }
 
 ScenePtr SceneManager::createScene(std::wstring name) {

@@ -9,6 +9,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "LevelEditor.h"
+
 using namespace Editor;
 using namespace Core;
 
@@ -60,16 +62,21 @@ void entityNode(Handle& entity, Handle& target, GameView* gameView) {
 	}
 }
 
-Hierarchy::Hierarchy(Core::SceneManager* sceneManager, GameView* gameView) : sceneManager(sceneManager), gameView(gameView) {}
+Hierarchy::Hierarchy(LevelEditor* editor, Core::SceneManager* sceneManager, GameView* gameView) : editor(editor), sceneManager(sceneManager), gameView(gameView) {}
 Hierarchy::~Hierarchy() {}
 
 void Hierarchy::tick(Handle& target) {
 	update(); // TODO: Update every 0.1 sec
 	ImGui::Begin("Hierarchy");
 	for (auto& scenePair : sceneOrder) {
+		bool openPopup = false;
 		ScenePtr scene = scenePair.first;
 		std::string sceneName = utf8_encode(scene->getName());
+		std::string scenePopupId = std::string("scene_popup_").append(sceneName);
 		bool nodeOpened = ImGui::TreeNodeEx(sceneName.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+			openPopup = true;
+		}
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 				IM_ASSERT(payload->DataSize == sizeof(Handle));
@@ -86,10 +93,23 @@ void Hierarchy::tick(Handle& target) {
 			ImGui::EndDragDropTarget();
 		}
 		if (nodeOpened) {
-			for (Handle& entity : scene->getRootEntities()) {
+			for (Handle& entity : scenePair.second) {
 				entityNode(entity, target, gameView);
 			}
 			ImGui::TreePop();
+		}
+		if (openPopup) {
+			ImGui::OpenPopup(scenePopupId.c_str());
+		}
+		if (ImGui::BeginPopup(scenePopupId.c_str())) {
+			if (ImGui::Selectable("New Entity", false)) {
+				ImGui::OpenPopup("create_entity_popup"); // TODO: Target this scene
+			}
+			if (ImGui::Selectable("Save and Close", false)) {
+				sceneManager->saveScene(scene);
+				editor->closeScene(scene);
+			}
+			ImGui::EndPopup();
 		}
 	}
 	ImGui::End();
@@ -151,7 +171,7 @@ void eraseRemovedScenes(const std::vector<ScenePtr>& scenes, std::unordered_map<
 			}
 		}
 		if (!found)
-			sceneOrder.erase(it);
+			it = sceneOrder.erase(it);
 		else
 			it++;
 	}
@@ -167,7 +187,7 @@ std::vector<Handle> getNewEntities(const std::vector<Handle>& currEntities, cons
 				break;
 			}
 		}
-		if (found) {
+		if (!found) {
 			newEntities.push_back(current);
 		}
 	}

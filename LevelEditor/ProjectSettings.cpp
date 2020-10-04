@@ -26,7 +26,7 @@ bool ProjectSettings::write(const wchar_t* path) {
 	return true;
 }
 
-ProjectSettings ProjectSettings::create(std::wstring name, const wchar_t* path) {
+ProjectSettings ProjectSettings::create(const wchar_t* name, const wchar_t* path) {
 	ProjectSettings settings;
 	if (!std::filesystem::create_directory(path)) {
 		return settings;
@@ -37,7 +37,7 @@ ProjectSettings ProjectSettings::create(std::wstring name, const wchar_t* path) 
 	return settings;
 }
 
-ProjectSettings ProjectSettings::load(std::wstring name, const wchar_t* path) {
+ProjectSettings ProjectSettings::load(const wchar_t* name, const wchar_t* path) {
 	ProjectSettings settings;
 	settings.name = name;
 	settings.path = path;

@@ -18,7 +18,7 @@ using namespace Editor;
 
 constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
 
-LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(&engine.getSceneManager(), &gameView), fileView(this) {
+LevelEditor::LevelEditor() : gameView(&engine), inspector(&gameView), hierarchy(this, &engine.getSceneManager(), &gameView), fileView(this) {
 	engine.getInput().addKeyListener(this);
 }
 
@@ -248,7 +248,7 @@ int LevelEditor::start() {
 				std::wstring name = utf8_decode(buffer);
 				std::wstring path = dirPath;
 
-				ProjectSettings newProject = ProjectSettings::create(name, path.append(L"\\").append(name).c_str());
+				ProjectSettings newProject = ProjectSettings::create(name.c_str(), path.c_str());
 				if (!newProject.getPath().empty()) {
 					projectSettings = newProject;
 					fileView.setSourcePath(path);
@@ -370,11 +370,19 @@ void LevelEditor::openProject(std::wstring path) {
 	std::size_t seperator = path.find_last_of(L"\\");
 	std::wstring fileName = path.substr(seperator + 1);
 	std::wstring dirPath = path.substr(0, seperator);
-	projectSettings = ProjectSettings::load(fileName.substr(0, fileName.find_last_of(L".")), dirPath.c_str());
+	projectSettings = ProjectSettings::load(fileName.substr(0, fileName.find_last_of(L".")).c_str(), dirPath.c_str());
 	editorSettings.pushRecentProjectPath(path);
 	fileView.setSourcePath(dirPath);
 }
 
 void LevelEditor::openScene(std::wstring path) {
 	engine.getSceneManager().loadScene(path.c_str());
+}
+
+void LevelEditor::closeScene(ScenePtr scene) {
+	engine.getSceneManager().unloadScene(scene->getName());
+	EntityHandle& target = gameView.getTarget();
+	if (target.getScene() == scene.get()) {
+		target.clear();
+	}
 }

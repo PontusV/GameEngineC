@@ -1,5 +1,6 @@
 #include "InputField.h"
 #include "input/Input.h"
+#include "utils/string.h"
 #include "components/graphics/Text.h"
 #include "components/RectTransform.h"
 #include "components/graphics/RectSprite.h"
@@ -81,17 +82,17 @@ void InputField::update(float deltaTime) {
 	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_C)) {
 		std::wstring copy = getHighlightedText();
 		if (!copy.empty())
-			Clipboard::copy(copy);
+			Clipboard::setDataAsText(utf8_encode(copy));
 	}
 	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_V)) {
-		std::wstring paste = Clipboard::paste();
+		std::wstring paste = utf8_decode(Clipboard::getDataAsText());
 		std::wcout << paste << std::endl;
 		write(paste);
 	}
 	else if (input->getKeyDown(GLFW_KEY_LEFT_CONTROL) && input->getKeyPressed(GLFW_KEY_X)) {
 		std::wstring copy = getHighlightedText();
 		if (!copy.empty()) {
-			Clipboard::copy(copy);
+			Clipboard::setDataAsText(utf8_encode(copy));
 			deleteHighlightedText();
 		}
 	}

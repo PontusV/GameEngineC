@@ -1,4 +1,5 @@
 #include "Inspector.h"
+#include "GameView.h"
 #include "imgui/imgui.h"
 #include "ReflectionPolymorph.generated.h"
 #include "utils/file.h"
@@ -222,19 +223,44 @@ typename std::enable_if_t<!std::is_base_of<Component, T>::value || !std::is_defa
 
 void Inspector::tick() {
 	EntityHandle& target = gameView->getTarget();
+	if (target.getEntity() != prevTarget) { // On target change
+		renameActive = false;
+	}
+	prevTarget = target.getEntity();
 
 	ImGui::Begin("Inspector");
 
 	if (target.refresh()) {
-		ImGui::Text(target.getEntityName().c_str());
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 0, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0, 0, 1));
-		if (ImGui::Button("Delete")) {
-			ImGui::OpenPopup("Delete_target_entity");
+		if (renameActive) {
+			std::string* value = &renameValue;
+			char buffer[64];
+			strncpy_s(buffer, value->c_str(), value->size());
+
+			if (ImGui::InputText("##Inspector_Rename_Field", buffer, 64, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				renameActive = false;
+				target.renameEntity(buffer);
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel")) {
+				renameActive = false;
+			}
 		}
-		ImGui::PopStyleColor(3);
+		else {
+			ImGui::Text(target.getEntityName().c_str());
+			ImGui::SameLine();
+			if (ImGui::Button("Rename")) {
+				renameActive = true;
+				renameValue = target.getEntityName();
+			}
+			ImGui::SameLine();
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 0, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0, 0, 1));
+			if (ImGui::Button("Delete")) {
+				ImGui::OpenPopup("Delete_target_entity");
+			}
+			ImGui::PopStyleColor(3);
+		}
 		if (ImGui::BeginPopupModal("Delete_target_entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::Text("Are you sure you want to delete %s?\n\n", target.getEntityName().c_str());
 			ImGui::Separator();
