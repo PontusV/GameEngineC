@@ -71,7 +71,12 @@ void FileView::renderDirectory(std::vector<FileEntry> entries) {
 
 		if (ImGui::BeginDragDropSource()) {
 			ImGui::SetDragDropPayload("DIRECTORY_ENTRY", NULL, 0);
-			ImGui::Text("%s", fileName.c_str());
+			if (selectedEntries.size() == 1) {
+				ImGui::Text("%s", fileName.c_str());
+			}
+			else {
+				ImGui::Text("%s", "Multiple files...");
+			}
 			ImGui::EndDragDropSource();
 		}
 		if (ImGui::BeginDragDropTarget()) {
@@ -208,14 +213,6 @@ void FileView::renderDirectory(std::vector<FileEntry> entries) {
 			}
 			ImGui::EndPopup();
 		}
-	}
-
-	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-		isMousePressed = false;
-		selectedLastMousePress = false;
-	}
-	else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-		isMousePressed = true;
 	}
 }
 
@@ -388,6 +385,13 @@ void FileView::tick() {
 		refresh();
 	}
 	renderDirectory(sourceFileEntries);
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+		isMousePressed = false;
+		selectedLastMousePress = false;
+	}
+	else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+		isMousePressed = true;
+	}
 	processPaste();
 	ImGui::End();
 }
