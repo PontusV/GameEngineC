@@ -240,8 +240,8 @@ void Inspector::tick() {
 				renameActive = false;
 				target.renameEntity(buffer);
 			}
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel")) {
+			ImGui::SetKeyboardFocusHere(0);
+			if (!ImGui::IsItemHovered() && ImGui::IsAnyMouseDown()) {
 				renameActive = false;
 			}
 		}

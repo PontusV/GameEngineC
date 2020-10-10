@@ -386,3 +386,7 @@ void LevelEditor::closeScene(ScenePtr scene) {
 		target.clear();
 	}
 }
+
+std::wstring LevelEditor::getProjectName() {
+	return projectSettings.getName();
+}

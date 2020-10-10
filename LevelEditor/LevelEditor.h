@@ -24,6 +24,8 @@ namespace Editor {
 		void keyPressed(std::string buttonName);
 		void keyReleased(std::string buttonName);
 
+		std::wstring getProjectName();
+
 		void openProject(std::wstring path);
 		void openScene(std::wstring path);
 		void closeScene(Core::ScenePtr scene);

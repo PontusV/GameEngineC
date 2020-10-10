@@ -29,6 +29,7 @@ void GameView::tick(float deltaTime) {
 	Camera& camera = engine->getGraphics().getCamera();
 	Window& window = engine->getGraphics().getWindow();
 
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("Scene window");
 
 	ImVec2 pMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y);
@@ -96,6 +97,7 @@ void GameView::tick(float deltaTime) {
 	}
 
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 EntityHandle& GameView::getTarget() {
 	return target;

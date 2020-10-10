@@ -6,6 +6,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "utils/string.h"
+#include "utils/file.h"
 #include "utils/Clipboard.h"
 #include "LevelEditor.h"
 
@@ -24,48 +25,74 @@ std::string getDirFromPath(std::string path) {
 	return path.substr(0, path.find_last_of("\\"));
 }
 
-void FileView::renderDirectory(std::vector<FileEntry> entries) {
-	for (const FileEntry& entryData : entries) {
+void FileView::openFile(const std::filesystem::directory_entry& entry) {
+	std::string filePath = Core::utf8_encode(entry.path().wstring());
+	std::string fileName = getFileNameFromPath(filePath);
+	if (fileName.ends_with(".proj")) {
+		editor->openProject(entry.path().wstring());
+	}
+	else if (fileName.ends_with(".scene")) {
+		editor->openScene(entry.path().wstring());
+	}
+}
+
+void FileView::renderDirectory(std::vector<FileEntry>& entries) {
+	for (FileEntry& entryData : entries) {
 		const std::filesystem::directory_entry& entry = entryData.entry;
 		std::string filePath = Core::utf8_encode(entry.path().wstring());
 		std::string fileName = getFileNameFromPath(filePath);
 		std::string dirPath = getDirFromPath(filePath);
 
-		bool renameCurrentActive = renameActive && renameFilePath == filePath;
+		bool& renameActive = entryData.renameActive;
+		if (renameNextFrame && renameFilePath == filePath) renameActive = true;
 		std::string treeNodeId = std::string("##").append(filePath);
-		std::string treeNodeLabel = renameCurrentActive ? "" : fileName;
-		std::string popupId = std::string(filePath).append("_popup");
+		std::string treeNodeLabel = renameActive ? "" : fileName;
 
-		bool disableRename = false;
-		bool openPopup = false;
-		bool openDeleteModal = false;
-		bool selected = isSelected(entry);
+		bool selected = entryData.selected;
+		bool windowFocused = ImGui::IsWindowFocused();
 
-		ImGuiTreeNodeFlags flags = selected ? ImGuiTreeNodeFlags_Selected : 0;
+		ImGuiTreeNodeFlags flags = renameActive ? 0 : ImGuiTreeNodeFlags_SpanFullWidth; // TODO: Overlap the input text instead of reducing width
+		if (selected) flags |= ImGuiTreeNodeFlags_Selected;
 		flags |= entry.is_directory() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
 
-		if (renameCurrentActive) ImGui::AlignTextToFramePadding();
+		if (renameActive) ImGui::AlignTextToFramePadding();
+		if (!windowFocused) {
+			ImVec4 color = ImVec4(1, 1, 1, 0.15f);
+			ImGui::PushStyleColor(ImGuiCol_Header, color);
+		}
 		bool isOpen = ImGui::TreeNodeEx(treeNodeId.c_str(), flags, treeNodeLabel.c_str());
-
-		bool isClicked = !selectedLastMousePress && isMousePressed && selected && ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) || !selected && ImGui::IsItemClicked(ImGuiMouseButton_Left);
-
-		if (isClicked && !ImGui::GetIO().KeyCtrl) { // Select new
-			selectedLastMousePress = true;
-			deselectAll();
-			select(entry);
+		if (!windowFocused) {
+			ImGui::PopStyleColor();
 		}
-		else if (isClicked && selected) { // Select new
+		entryData.opened = isOpen;
+
+		bool isClicked = !renameActive && (!selectedLastMousePress && isMousePressed && selected && ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) || !selected && ImGui::IsItemClicked(ImGuiMouseButton_Left));
+
+		if (isClicked) {
 			selectedLastMousePress = true;
-			deselect(entry);
-		}
-		else if (isClicked) { // Select new
-			selectedLastMousePress = true;
-			select(entry);
+			if (ImGui::GetIO().KeyShift) {
+				deselectAll();
+				shiftSelect(entryData);
+				if (ImGui::GetIO().KeyCtrl) clickTarget = entry;
+			}
+			else if (ImGui::GetIO().KeyCtrl && selected) {
+				deselect(entryData);
+			}
+			else if (ImGui::GetIO().KeyCtrl) {
+				select(entryData);
+				clickTarget = entry;
+			}
+			else {
+				deselectAll();
+				select(entryData);
+				clickTarget = entry;
+			}
 		}
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && !ImGui::GetIO().KeyCtrl && !ImGui::GetIO().KeyShift) {
+			projectSelected = false;
 			if (!selected) {
 				deselectAll();
-				select(entry);
+				select(entryData);
 			}
 		}
 
@@ -95,7 +122,7 @@ void FileView::renderDirectory(std::vector<FileEntry> entries) {
 			ImGui::EndDragDropTarget();
 		}
 
-		if (renameCurrentActive) {
+		if (renameActive) {
 			ImGui::SameLine();
 			std::string* value = &fileName;
 			char buffer[64];
@@ -114,104 +141,25 @@ void FileView::renderDirectory(std::vector<FileEntry> entries) {
 				}
 				refreshNextFrame = true;
 			}
+			ImGui::SetKeyboardFocusHere(0);
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsItemHovered()) {
-				disableRename = true;
+				renameActive = false;
 			}
 		}
 		else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-			openPopup = true;
+			openItemPopup = true;
 		}
 		if (entry.is_directory()) {
 			if (isOpen) {
 				renderDirectory(entryData.children);
 			}
 		}
-		else {
-			if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-				if (fileName.ends_with(".proj")) {
-					editor->openProject(entry.path().wstring());
-				}
-				else if (fileName.ends_with(".scene")) {
-					editor->openScene(entry.path().wstring());
-				}
-			}
+		else if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+			// Note: Disabled for now
+			//openFile(entry);
 		}
 		if (isOpen) {
 			ImGui::TreePop();
-		}
-
-		if (openPopup) {
-			ImGui::OpenPopup(popupId.c_str());
-		}
-		if (ImGui::BeginPopup(popupId.c_str())) {
-			bool selectedDir = selectedEntries.size() == 1 && selectedEntries[0].is_directory();
-			// OPTIONAL TODO: Add file -> Scene, other resources
-			if (ImGui::Selectable("Cut")) {
-				cut();
-			}
-			if (ImGui::Selectable("Copy")) {
-				copy();
-			}
-			if (selectedDir) {
-				if (ImGui::Selectable("Paste")) {
-					paste();
-				}
-			}
-			if (ImGui::Selectable("Delete")) {
-				openDeleteModal = true;
-			}
-			if (ImGui::Selectable("Rename", false, selectedEntries.size() == 1 ? 0 : ImGuiSelectableFlags_Disabled)) {
-				renameActive = true;
-				renameFilePath = filePath;
-			}
-			ImGui::EndPopup();
-		}
-
-		if (disableRename) {
-			renameActive = false;
-		}
-		std::string deleteModalId = std::string("Delete item##").append(filePath);
-		if (openDeleteModal || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete))) {
-			ImGui::OpenPopup(deleteModalId.c_str());
-		}
-		if (ImGui::BeginPopupModal(deleteModalId.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			static std::string errorMessage = "";
-			if (!errorMessage.empty()) {
-				ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
-			}
-			if (selectedEntries.size() == 1) {
-				ImGui::Text(std::string("Are you sure you want to delete '").append(getFileNameFromPath(Core::utf8_encode(selectedEntries[0].path().wstring()))).append("'?").c_str());
-			}
-			else {
-				ImGui::Text("Are you sure you want to delete the selected items?");
-			}
-
-			if (ImGui::Button("Confirm", ImVec2(120, 0))) {
-				errorMessage = "";
-				for (const std::filesystem::directory_entry& selectedEntry : selectedEntries) {
-					std::string selectedPath = Core::utf8_encode(selectedEntry.path().wstring());
-					int result = std::filesystem::remove_all(selectedEntry.path());
-					if (result > 0) {
-						std::cout << "Succesfully deleted: " << selectedPath << std::endl;
-					}
-					else {
-						std::cout << "Failed to delete: " << selectedPath << std::endl;
-						errorMessage = std::string("Failed to remove file: ").append(selectedPath);
-						break;
-					}
-				}
-				refreshNextFrame = true;
-				if (errorMessage.empty()) {
-					ImGui::CloseCurrentPopup();
-				}
-			}
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-				errorMessage = "";
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
 		}
 	}
 }
@@ -226,13 +174,13 @@ std::vector<std::wstring> getEntryPathsFromDirectory(std::wstring dirPath) {
 }
 
 void FileView::processPaste() {
-	if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_C))) {
+	if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_C)) && ImGui::IsWindowFocused()) {
 		copy();
 	}
-	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_X))) {
+	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_X)) && ImGui::IsWindowFocused()) {
 		cut();
 	}
-	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_V))) {
+	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_V)) && ImGui::IsWindowFocused()) {
 		paste();
 	}
 	if (pasteOpenError) {
@@ -384,7 +332,173 @@ void FileView::tick() {
 	if (ImGui::Button("Refresh") || refreshNextFrame) {
 		refresh();
 	}
-	renderDirectory(sourceFileEntries);
+	std::wstring projectName = editor->getProjectName();
+	if (!projectName.empty()) {
+		ImGuiTreeNodeFlags rootProjectFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
+		if (projectSelected) rootProjectFlags |= ImGuiTreeNodeFlags_Selected;
+		bool windowFocused = ImGui::IsWindowFocused();
+		if (!windowFocused) {
+			ImVec4 color = ImVec4(1, 1, 1, 0.15f);
+			ImGui::PushStyleColor(ImGuiCol_Header, color);
+		}
+		bool isOpen = ImGui::TreeNodeEx(Core::utf8_encode(projectName).c_str(), rootProjectFlags); // TODO: Project Icon
+		if (!windowFocused) {
+			ImGui::PopStyleColor();
+		}
+		bool isClicked = !selectedLastMousePress && isMousePressed && projectSelected && ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) || !projectSelected && ImGui::IsItemClicked(ImGuiMouseButton_Left);
+		if (isClicked && !ImGui::GetIO().KeyCtrl) {
+			selectedLastMousePress = true;
+			deselectAll();
+			projectSelected = true;
+		}
+		else if (isClicked && projectSelected) {
+			selectedLastMousePress = true;
+			projectSelected = false;
+		}
+		else if (isClicked) {
+			selectedLastMousePress = true;
+			projectSelected = true;
+		}
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && !ImGui::GetIO().KeyCtrl && !ImGui::GetIO().KeyShift) {
+			if (!projectSelected) {
+				deselectAll();
+				projectSelected = true;
+			}
+		}
+		//
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+			ImGui::OpenPopup("Project_popup_menu");
+		}
+		if (ImGui::BeginPopup("Project_popup_menu")) {
+			bool selectedDir = selectedEntries.size() == 1 && selectedEntries[0].is_directory();
+			if (ImGui::BeginMenu("Add")) {
+				if (ImGui::MenuItem("New Item...")) {
+					std::cout << "Work in progress" << std::endl;
+					// TODO: Open Modal for creating new item in Editor
+					refreshNextFrame = true;
+				}
+				if (ImGui::MenuItem("New Folder")) {
+					createDirectory(sourcePath);
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::MenuItem("Paste", nullptr, nullptr, selectedEntries.size() == 0)) {
+				paste();
+			}
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("DIRECTORY_ENTRY")) {
+				std::size_t startIndex = pasteQueue.size();
+				pasteQueue.resize(pasteQueue.size() + selectedEntries.size());
+				for (std::size_t i = 0; i < selectedEntries.size(); i++) {
+					PasteEntry& newEntry = pasteQueue[startIndex + i];
+					std::wstring srcPath = selectedEntries[i].path().wstring();
+					std::wstring fileName = srcPath.substr(srcPath.find_last_of(L"\\") + 1);
+					newEntry.sourcePath = srcPath;
+					newEntry.destPath = std::wstring(sourcePath).append(L"\\").append(fileName);
+					newEntry.move = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		openItemPopup = false;
+		openDeleteItemPopup = false;
+		if (isOpen) {
+			renderDirectory(sourceFileEntries);
+			ImGui::TreePop();
+		}
+		renameNextFrame = false;
+		if (openItemPopup) {
+			ImGui::OpenPopup("Item popup menu");
+		}
+		if (ImGui::BeginPopup("Item popup menu")) {
+			bool selectedDir = selectedEntries.size() == 1 && selectedEntries[0].is_directory();
+			if (selectedDir) {
+				if (ImGui::BeginMenu("Add")) {
+					if (ImGui::MenuItem("New Item...")) {
+						std::cout << "Work in progress" << std::endl;
+						// TODO: Open Modal for creating new item in Editor
+						refreshNextFrame = true;
+					}
+					if (ImGui::MenuItem("New Folder")) {
+						createDirectory(selectedEntries[0].path().wstring());
+					}
+					ImGui::EndMenu();
+				}
+			}
+			else {
+				if (ImGui::MenuItem("Open") && selectedEntries.size() == 1) {
+					openFile(selectedEntries[0]);
+				}
+			}
+			if (ImGui::MenuItem("Cut", "CTRL+X")) {
+				cut();
+			}
+			if (ImGui::MenuItem("Copy", "CTRL+C")) {
+				copy();
+			}
+			if (selectedDir) {
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {
+					paste();
+				}
+			}
+			if (ImGui::MenuItem("Delete", "Del")) {
+				openDeleteItemPopup = true;
+			}
+			bool disableRename = selectedEntries.size() != 1;
+			if (disableRename) ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disableRename);
+			if (ImGui::MenuItem("Rename", "F2")) {
+				rename(selectedEntries[0]);
+			}
+			ImGui::PopItemFlag();
+			if (disableRename) ImGui::PopStyleColor();
+			ImGui::EndPopup();
+		}
+		if (openDeleteItemPopup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)) && windowFocused && selectedEntries.size() > 0) {
+			ImGui::OpenPopup("Delete item(s)");
+		}
+		if (ImGui::BeginPopupModal("Delete item(s)", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static std::string errorMessage = "";
+			if (!errorMessage.empty()) {
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
+			}
+			if (selectedEntries.size() == 1) {
+				ImGui::Text(std::string("Are you sure you want to delete '").append(getFileNameFromPath(Core::utf8_encode(selectedEntries[0].path().wstring()))).append("'?").c_str());
+			}
+			else {
+				ImGui::Text("Are you sure you want to delete the selected items?");
+			}
+
+			if (ImGui::Button("Confirm", ImVec2(120, 0))) {
+				errorMessage = "";
+				for (const std::filesystem::directory_entry& selectedEntry : selectedEntries) {
+					std::string selectedPath = Core::utf8_encode(selectedEntry.path().wstring());
+					int result = std::filesystem::remove_all(selectedEntry.path());
+					if (result > 0) {
+						std::cout << "Succesfully deleted: " << selectedPath << std::endl;
+					}
+					else {
+						std::cout << "Failed to delete: " << selectedPath << std::endl;
+						errorMessage = std::string("Failed to remove file: ").append(selectedPath);
+						break;
+					}
+				}
+				refreshNextFrame = true;
+				if (errorMessage.empty()) {
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				errorMessage = "";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+	}
 	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
 		isMousePressed = false;
 		selectedLastMousePress = false;
@@ -430,28 +544,82 @@ void FileView::refresh() {
 	sourceFileEntries = getFileEntries(sourcePath);
 }
 
-void FileView::select(std::filesystem::directory_entry filePath) {
-	if (isSelected(filePath)) return;
-	selectedEntries.push_back(filePath);
+FileEntry* findFileEntry(std::vector<FileEntry>& entries, const std::filesystem::directory_entry& entry) {
+	for (FileEntry& item : entries) {
+		if (item.entry == entry) return &item;
+		FileEntry* ptr = findFileEntry(item.children, entry);
+		if (ptr) return ptr;
+
+	}
+	return nullptr;
 }
-bool FileView::deselect(std::filesystem::directory_entry filePath) {
-	for (auto it = selectedEntries.begin(); it < selectedEntries.end(); it++) {
-		if (*it == filePath) {
-			selectedEntries.erase(it);
-			return true;
+
+bool FileView::rename(std::filesystem::directory_entry& entry) {
+	if (FileEntry* ptr = findFileEntry(sourceFileEntries, entry)) {
+		ptr->renameActive = true;
+		return true;
+	}
+	return false;
+}
+
+void FileView::select(FileEntry& item) {
+	if (!item.selected) {
+		selectedEntries.push_back(item.entry);
+	}
+	item.selected = true;
+}
+bool FileView::deselect(FileEntry& entry) {
+	if (!entry.selected) return false;
+	entry.selected = false;
+	auto it = selectedEntries.begin();
+	while (it != selectedEntries.end()) {
+		if (*it == entry.entry) {
+			it = selectedEntries.erase(it);
+			break;
+		}
+		else {
+			it++;
+		}
+	}
+	return true;
+}
+void deselectEntries(std::vector<FileEntry>& entries) {
+	for (FileEntry& entry : entries) {
+		entry.selected = false;
+		deselectEntries(entry.children);
+	}
+}
+void FileView::deselectAll() {
+	projectSelected = false;
+	deselectEntries(sourceFileEntries);
+	selectedEntries.clear();
+}
+
+bool FileView::shiftSelectImpl(std::vector<FileEntry>& entries, FileEntry& other, bool& found) {
+	for (FileEntry& item : entries) {
+		bool newFound = item.entry == other.entry || item.entry == clickTarget;
+		if (found) {
+			select(item);
+			if (newFound) {
+				return true;
+			}
+		}
+		else if (newFound) {
+			found = true;
+			select(item);
+		}
+		if (item.entry.is_directory() && item.opened) {
+			if (shiftSelectImpl(item.children, other, found)) {
+				return true;
+			}
 		}
 	}
 	return false;
 }
-void FileView::deselectAll() {
-	selectedEntries.clear();
-}
 
-bool FileView::isSelected(const std::filesystem::directory_entry& filePath) const {
-	for (const std::filesystem::directory_entry& path : selectedEntries) {
-		if (path == filePath) return true;
-	}
-	return false;
+void FileView::shiftSelect(FileEntry& other) {
+	bool found = false;
+	shiftSelectImpl(sourceFileEntries, other, found);
 }
 
 void FileView::cut() {
@@ -472,8 +640,9 @@ void FileView::copy() {
 }
 
 void FileView::paste() {
+	if (selectedEntries.size() == 1 && projectSelected || selectedEntries.size() == 0 && !projectSelected) return;
 	bool isFromCut = clipboardCutSequenceNumber == Core::Clipboard::getSequenceNumber();
-	std::wstring destination = selectedEntries[0].path().wstring();
+	std::wstring destination = projectSelected ? sourcePath : selectedEntries[0].path().wstring();
 	std::vector<std::wstring> sourcePaths = Core::Clipboard::getDataAsFiles();
 	std::size_t startIndex = pasteQueue.size();
 	pasteQueue.resize(pasteQueue.size() + sourcePaths.size());
@@ -486,5 +655,25 @@ void FileView::paste() {
 	}
 	if (isFromCut) {
 		Core::Clipboard::clear();
+	}
+}
+
+void FileView::createDirectory(std::wstring path) {
+	std::wstring srcDir = path.append(L"\\");
+	std::wstring newDirectoryName = L"NewFolder";
+	std::size_t dirIndex = 0;
+	while (std::filesystem::exists(srcDir + newDirectoryName)) {
+		if (dirIndex++ == 0)
+			newDirectoryName.append(std::to_wstring(dirIndex));
+		else
+			newDirectoryName = newDirectoryName.substr(0, newDirectoryName.length() - 1).append(std::to_wstring(dirIndex));
+	}
+	if (std::filesystem::create_directory(srcDir + newDirectoryName)) {
+		refreshNextFrame = true;
+		renameNextFrame = true;
+		renameFilePath = Core::utf8_encode(srcDir + newDirectoryName);
+	}
+	else {
+		// TODO: Show error
 	}
 }

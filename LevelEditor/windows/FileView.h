@@ -14,6 +14,9 @@ namespace Editor {
 	struct FileEntry {
 		std::filesystem::directory_entry entry;
 		std::vector<FileEntry> children;
+		bool selected = false;
+		bool renameActive = false;
+		bool opened = false;
 	};
 
 	struct PasteEntry {
@@ -35,38 +38,49 @@ namespace Editor {
 		/* Updates files to show current files */
 		void refresh();
 		
-		void select(std::filesystem::directory_entry filePath);
+		void select(FileEntry& entry);
+		/* Selects all items between clickTarget and entry */
+		void shiftSelect(FileEntry& entry);
 		/* Returns true if deselect was successful */
-		bool deselect(std::filesystem::directory_entry filePath);
+		bool deselect(FileEntry& entry);
 		void deselectAll();
-		bool isSelected(const std::filesystem::directory_entry& filePath) const;
+
+		void openFile(const std::filesystem::directory_entry& entry);
+		bool rename(std::filesystem::directory_entry& entry);
 
 		void setSourcePath(std::wstring path);
 
 	private:
-		void renderDirectory(std::vector<FileEntry> entries);
+		void renderDirectory(std::vector<FileEntry>& entries);
 		void processPaste();
 
 		void cut();
 		void copy();
 		void paste();
 
+		void createDirectory(std::wstring path);
+		bool shiftSelectImpl(std::vector<FileEntry>& entries, FileEntry& other, bool& found);
 	private:
 		LevelEditor* editor;
 		std::wstring sourcePath; // Path to the project directory
 		std::vector<FileEntry> sourceFileEntries;
 		std::vector<std::filesystem::directory_entry> selectedEntries;
+		bool projectSelected = false;
 		unsigned long clipboardCutSequenceNumber = -1;
 		bool isMousePressed = false; // Used to only listen to 1 tick of ImGui::IsMouseReleased
 		bool selectedLastMousePress = false;
+
+		bool openItemPopup = false;
+		bool openDeleteItemPopup = false;
 
 		bool pasteOpenError = false;
 		std::string pasteErrorMessage;
 		bool pasteOpenOverwrite = false;
 		std::deque<PasteEntry> pasteQueue;
 
+		std::filesystem::directory_entry clickTarget; // The entry of the last clicked item
 		bool refreshNextFrame = false;
-		bool renameActive = false;
+		bool renameNextFrame = false;
 		std::string renameFilePath;
 	};
 }
