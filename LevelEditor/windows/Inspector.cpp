@@ -93,6 +93,24 @@ void renderComponent(Component* component, std::size_t index) {
 						Mirror::onUpdate(component, type.typeID, prop);
 					}
 				}
+				else if (vectorIncludes<std::string>(prop.getAnnotationValue("Category"), "ShaderPath")) {
+					std::string* value = static_cast<std::string*>(ptr);
+					char buffer[64];
+					strncpy_s(buffer, value->c_str(), value->size());
+
+					if (ImGui::InputText(label, buffer, 64)) {
+						*value = buffer;
+						Mirror::onUpdate(component, type.typeID, prop);
+					}
+					if (ImGui::Button("Select shader")) {
+						std::wstring filePath = getOpenFileName(L"Select A File", L"Shader Files\0*.vert;*.frag\0Any File\0*.*\0", 2);
+						if (!filePath.empty()) {
+							std::string newValue = utf8_encode(filePath);
+							*value = newValue.substr(0, newValue.find_last_of("."));
+							Mirror::onUpdate(component, type.typeID, prop);
+						}
+					}
+				}
 				else {
 					std::string* value = static_cast<std::string*>(ptr);
 					char buffer[64];

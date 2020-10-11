@@ -20,18 +20,22 @@ namespace Core {
 		void setShader(Shader value);
 		const Shader& getShader() const;
 
+		void reloadShader(bool force = false);
+
 		void setSortingOrder(std::size_t value);
 		const std::size_t& getSortingOrder() const;
 	protected:
+		Graphic(std::size_t sortingOrder, const char* shaderPath, Color color);
 		Graphic(std::size_t sortingOrder, Shader shader, Color color);
 		Graphic();
 	private:
+		PROPERTY(Category=ShaderPath, Update=reloadShader(true))
+		std::string shaderPath;
 		PROPERTY()
 		Color color;
 		PROPERTY()
-		Shader shader;
-		PROPERTY()
 		std::size_t sortingOrder;
+		Shader shader;
 	};
 }
 

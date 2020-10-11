@@ -44,6 +44,9 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 		std::string dirPath = getDirFromPath(filePath);
 
 		bool& renameActive = entryData.renameActive;
+		if (renameActive && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))) {
+			renameActive = false;
+		}
 		if (renameNextFrame && renameFilePath == filePath) renameActive = true;
 		std::string treeNodeId = std::string("##").append(filePath);
 		std::string treeNodeLabel = renameActive ? "" : fileName;
@@ -65,6 +68,15 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 			ImGui::PopStyleColor();
 		}
 		entryData.opened = isOpen;
+		// Imgui navigation select when focus changes
+		if (ImGui::IsItemFocused() && prevFocusedEntry != entry) {
+			prevFocusedEntry = entry;
+			if (!ImGui::GetIO().KeyShift) {
+				deselectAll();
+				clickTarget = entry;
+			}
+			select(entryData);
+		}
 
 		bool isClicked = !renameActive && (!selectedLastMousePress && isMousePressed && selected && ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) || !selected && ImGui::IsItemClicked(ImGuiMouseButton_Left));
 
@@ -133,10 +145,7 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 				std::wstring oldFileName = Core::utf8_decode(std::string(dirPath).append("\\").append(fileName));
 				std::wstring newFileName = Core::utf8_decode(std::string(dirPath).append("\\").append(buffer));
 				int result = _wrename(oldFileName.c_str(), newFileName.c_str());
-				if (result == 0) {
-					std::wcout << L"Item successfully renamed from '" << oldFileName << L"' to '" << newFileName << L"'" << std::endl;
-				}
-				else {
+				if (result != 0) {
 					std::wcout << L"Item failed to rename from '" << oldFileName << L"' to '" << newFileName << L"'" << std::endl;
 				}
 				refreshNextFrame = true;
@@ -146,7 +155,7 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 				renameActive = false;
 			}
 		}
-		else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+		else if (ImGui::IsItemClicked(ImGuiMouseButton_Right) || ImGui::IsItemFocused() && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 			openItemPopup = true;
 		}
 		if (entry.is_directory()) {
@@ -404,6 +413,10 @@ void FileView::tick() {
 		}
 		openItemPopup = false;
 		openDeleteItemPopup = false;
+		bool disableRename = selectedEntries.size() != 1;
+		if (!disableRename && ImGui::IsKeyPressed(291)) { // F2 key
+			rename(selectedEntries[0]);
+		}
 		if (isOpen) {
 			renderDirectory(sourceFileEntries);
 			ImGui::TreePop();
@@ -446,7 +459,6 @@ void FileView::tick() {
 			if (ImGui::MenuItem("Delete", "Del")) {
 				openDeleteItemPopup = true;
 			}
-			bool disableRename = selectedEntries.size() != 1;
 			if (disableRename) ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disableRename);
 			if (ImGui::MenuItem("Rename", "F2")) {
@@ -476,10 +488,7 @@ void FileView::tick() {
 				for (const std::filesystem::directory_entry& selectedEntry : selectedEntries) {
 					std::string selectedPath = Core::utf8_encode(selectedEntry.path().wstring());
 					int result = std::filesystem::remove_all(selectedEntry.path());
-					if (result > 0) {
-						std::cout << "Succesfully deleted: " << selectedPath << std::endl;
-					}
-					else {
+					if (result == 0) {
 						std::cout << "Failed to delete: " << selectedPath << std::endl;
 						errorMessage = std::string("Failed to remove file: ").append(selectedPath);
 						break;
@@ -540,7 +549,6 @@ std::vector<FileEntry> getFileEntries(std::wstring dirPath) {
 void FileView::refresh() {
 	deselectAll();
 	refreshNextFrame = false;
-	std::wcout << L"refresh " << sourcePath << std::endl;
 	sourceFileEntries = getFileEntries(sourcePath);
 }
 
@@ -676,4 +684,12 @@ void FileView::createDirectory(std::wstring path) {
 	else {
 		// TODO: Show error
 	}
+}
+
+bool FileView::isDirectorySelected() {
+	return selectedEntries.size() == 1 && selectedEntries[0].is_directory();
+}
+
+std::size_t FileView::getSelectCount() {
+	return selectedEntries.size();
 }

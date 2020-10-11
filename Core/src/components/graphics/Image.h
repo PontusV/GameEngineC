@@ -12,7 +12,7 @@ namespace Core {
 	CLASS() Image : public Graphic {
 		GENERATED_BODY()
 	public:
-		Image(const char* fileName, Shader shader, Color color = { 255, 255, 255, 255 });
+		Image(const char* fileName, const char* shaderPath, Color color = { 255, 255, 255, 255 });
 		Image(const char* fileName, Color color = { 255, 255, 255, 255 });
 		Image();
 		~Image();

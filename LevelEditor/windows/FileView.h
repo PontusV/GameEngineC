@@ -37,6 +37,13 @@ namespace Editor {
 
 		/* Updates files to show current files */
 		void refresh();
+
+		bool isDirectorySelected();
+		std::size_t getSelectCount();
+
+		void cut();
+		void copy();
+		void paste();
 		
 		void select(FileEntry& entry);
 		/* Selects all items between clickTarget and entry */
@@ -54,10 +61,6 @@ namespace Editor {
 		void renderDirectory(std::vector<FileEntry>& entries);
 		void processPaste();
 
-		void cut();
-		void copy();
-		void paste();
-
 		void createDirectory(std::wstring path);
 		bool shiftSelectImpl(std::vector<FileEntry>& entries, FileEntry& other, bool& found);
 	private:
@@ -69,6 +72,7 @@ namespace Editor {
 		unsigned long clipboardCutSequenceNumber = -1;
 		bool isMousePressed = false; // Used to only listen to 1 tick of ImGui::IsMouseReleased
 		bool selectedLastMousePress = false;
+		std::filesystem::directory_entry prevFocusedEntry; // The entry that was focused previous frame
 
 		bool openItemPopup = false;
 		bool openDeleteItemPopup = false;

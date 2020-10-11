@@ -3,11 +3,11 @@
 
 using namespace Core;
 
-Image::Image(const char* fileName, Shader shader, Color color)
-	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, shader, color) {
+Image::Image(const char* fileName, const char* shaderPath, Color color)
+	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, shaderPath, color) {
 } // Constructor
 Image::Image(const char* fileName, Color color)
-	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color) {
+	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, "resources/shaders/sprite", color) {
 } // Constructor
 
 Image::Image() {
@@ -17,7 +17,7 @@ Image::~Image() {
 } // Destructor
 
 void Image::reload(bool force) {
-	if (texture.ID == 0 || force) {
+	if (!fileName.empty() && texture.ID == 0 || force) {
 		texture = ResourceManager::getInstance().loadTexture(fileName.c_str());
 	}
 }

@@ -171,10 +171,10 @@ int LevelEditor::start() {
 					}
 					ImGui::EndMenu();
 				}
-				if (ImGui::MenuItem("Save Project", "Ctrl + S", nullptr, projectSettings.isLoaded())) {
+				if (ImGui::MenuItem("Save Project", "Ctrl+S", nullptr, projectSettings.isLoaded())) { // TODO: Keybind
 					projectSettings.save();
 				}
-				if (ImGui::MenuItem("Save Scene", "Ctrl + S", nullptr, projectSettings.isLoaded() && loadedScenes.size() > 0)) {
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, projectSettings.isLoaded() && loadedScenes.size() > 0)) { // TODO: Keybind
 					// Saving all loaded scenes
 					for (ScenePtr scene : loadedScenes) {
 						engine.getSceneManager().saveScene(scene);
@@ -184,7 +184,7 @@ int LevelEditor::start() {
 				if (ImGui::MenuItem("Build", nullptr, nullptr, projectSettings.isLoaded())) {
 					// TODO: Build game
 				}
-				if (ImGui::MenuItem("Exit", "Alt + F4")) {
+				if (ImGui::MenuItem("Exit", "Alt+F4")) {
 					terminate();
 				}
 				ImGui::EndMenu();
@@ -194,9 +194,15 @@ int LevelEditor::start() {
 				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
 				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
 				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {
+					fileView.cut();
+				}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {
+					fileView.copy();
+				}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {
+					fileView.paste();
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Game Object"))

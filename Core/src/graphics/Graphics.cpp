@@ -74,11 +74,6 @@ void Graphics::renderWorld(float deltaTime) {
 	std::size_t sizeTexts = renderableTexts.size();
 	std::size_t sizeBorders = renderableBorders.size();
 	// TODO: Submit Renderables IF they are inside the window.
-	// TODO: REMOVE after onUpdate has been added for after deserialize
-	for (std::size_t i = 0; i < sizeImages; i++) {
-		Image& image = renderableImages.get<Image>(i);
-		image.reload();
-	}
 
 	// Rect Sprites
 	for (std::size_t i = 0; i < sizeRects; i++) {
