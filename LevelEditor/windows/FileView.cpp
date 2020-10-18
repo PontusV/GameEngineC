@@ -10,6 +10,8 @@
 #include "utils/Clipboard.h"
 #include "LevelEditor.h"
 
+#include <GLFW/glfw3.h>
+
 #include <tuple>
 
 using namespace Editor;
@@ -414,7 +416,7 @@ void FileView::tick() {
 		openItemPopup = false;
 		openDeleteItemPopup = false;
 		bool disableRename = selectedEntries.size() != 1;
-		if (!disableRename && ImGui::IsKeyPressed(291)) { // F2 key
+		if (!disableRename && ImGui::IsKeyPressed(GLFW_KEY_F2)) { // F2 key
 			rename(selectedEntries[0]);
 		}
 		if (isOpen) {

@@ -149,6 +149,13 @@ int LevelEditor::start() {
 
 		std::vector<ScenePtr> loadedScenes = engine.getSceneManager().getAllScenes();
 
+		if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			for (ScenePtr scene : loadedScenes) {
+				engine.getSceneManager().saveScene(scene);
+			}
+			projectSettings.save();
+		}
+
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File"))
 			{
