@@ -3,6 +3,7 @@
 
 #define DOUBLE_CLICK_THRESHOLD 0.2f
 
+#include <Core/Input.h>
 #include "components/graphics/SpriteRenderer.h"
 #include "components/graphics/CanvasRenderer.h"
 #include "components/RectTransform.h"
@@ -20,11 +21,14 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <chrono>
 
 struct GLFWwindow;
 
 namespace Core {
 	class Engine;
+	class BehaviourManager;
+	class Graphics;
 	class KeyListener;
 	class Selectable;
 
@@ -59,7 +63,7 @@ namespace Core {
 		}
 	};
 
-	class Input {
+	class Input: public IInput {
 	public:
 		Input(Engine* engine);
 		~Input();
@@ -106,8 +110,12 @@ namespace Core {
 		EntityHandle getHoverTarget();
 		EntityHandle getLastLeftClicked();
 
-		/* Gets the Entity at the front as the given position in screen space. */
-		EntityHandle getEntityAtPos(float x, float y, std::vector<Entity> ignoreList = std::vector<Entity>());
+		/* Gets the Handle of the Entity at the front at the given position in screen space. */
+		EntityHandle getEntityHandleAtPos(float x, float y, std::vector<Entity> ignoreList = std::vector<Entity>());
+		/* Gets the Entity at the front at the given position in screen space. */
+		Entity getEntityAtPos(float x, float y);
+		/* DO NOT USE. Used by DLL interface. Creates a new Handle allocated in heap memory. Note: has to be explicitly released to free memory */
+		IEntityHandle* createEntityHandleAtPos(float x, float y) override;
 	private:
 		void processInputEvent(const InputEvent& event, EntityHandle& target);
 
@@ -122,7 +130,8 @@ namespace Core {
 		void typeText(unsigned int codepoint);
 
 	private:
-		Engine* engine;
+		BehaviourManager& behaviourManager;
+		Graphics& graphics;
 
 		// Keyboard
 		std::vector<KeyListener*> keyListeners;
@@ -153,7 +162,7 @@ namespace Core {
 		EntityHandle lastLeftClickTarget;
 		EntityHandle lastMiddleClickTarget;
 		EntityHandle lastRightClickTarget;
-		float timeSinceLastClick;
+		std::chrono::time_point<std::chrono::system_clock> timeSinceLastClick;
 		bool leftMouseButtonPressed;
 	};
 }

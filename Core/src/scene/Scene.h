@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <Core/Scene.h>
 #include "utils/Serializable.h"
 #include "entity/EntityManager.h"
 #include "entity/Entity.h"
@@ -13,25 +14,33 @@
 
 namespace Core {
 	/* Contains a collection of entities. */
-	class Scene : public Serializable {
+	class Scene : public IScene, public Serializable {
 	public:
 		Scene(EntityManager* entityManager, std::wstring name);
 		~Scene();
 
 		std::vector<Handle>& getAllEntities();
+		/* Returns the number of entities attached to this scene. */
+		std::size_t getAllEntitiesCount();
+		/* Used by DLL interface. Returns all entities */
+		void getAllIEntities(IEntityHandle** out, std::size_t count) override;
 		std::vector<Handle> getRootEntities();
-		std::wstring getName();
+		const wchar_t* getName();
 
+		/* Used by DLL interface. Creates a new Entity in the Scene and adds it to the EntityManager. */
+		Entity createEmptyEntity(const char* name) override;
 		/* Creates a new Entity in the Scene and adds it to the EntityManager. */
 		template <typename... Ts>
 		Handle createEntity(std::string name, Ts... components);
+		/* Adds the given Entity to the Scene and adds it to the EntityManager. */
 		template <typename... Ts>
 		Handle addEntity(Entity entity, Ts&... components);
 		/* Removes the Entity from the Scene and EntityManager. Returns true if successful */
 		bool destroyEntity(Entity entity);
-		template <typename T>
 		/* Adds the component to the Entity. Awakes the component if the Scene is awake. */
+		template <typename T>
 		void addComponent(Entity entity, T& component);
+		void addComponent(Entity entity, ComponentTypeID componentTypeID);
 		/* Removes the component from the Entity. */
 		template<typename T>
 		void removeComponent(Entity entity);
@@ -43,12 +52,14 @@ namespace Core {
 		/* Returns temporary pointer to the added component. This pointer will be invalid next frame. */
 		template<typename T>
 		T* addComponentQueued(Entity entity, T& component);
+		/* Adds a component of given component type id next frame. */
+		void addComponentQueued(Entity entity, ComponentTypeID componentTypeID);
 		template<typename T>
 		void removeComponentQueued(Entity entity);
 		void removeComponentQueued(Entity entity, ComponentTypeID componentTypeID);
-		void setParentQueued(Handle entity, Handle parent);
+		void setParentQueued(Handle entity, Handle parent, bool keepPosition = false);
 
-		void setParent(Handle entity, Handle parent);
+		void setParent(Handle entity, Handle parent, bool keepPosition = false);
 		Handle getParent(Entity entity) const;
 		Handle getChild(Entity entity, int index) const;
 		std::size_t getImmediateChildCount(Entity entity) const;
@@ -88,6 +99,8 @@ namespace Core {
 		void serialize(std::ostream& os) const override;
 		void deserialize(std::istream& is) override;
 
+		/* Used by Editor. Returns true if entities vector has changed since last call. */
+		bool hasEntitiesChanged();
 	private:
 		void onEntityCreated(Entity entity); // Used by queue
 		void onEntityCreated(Handle entity);
@@ -103,10 +116,11 @@ namespace Core {
 		std::map<Entity, std::vector<int>> entityQueueMap;
 
 	private:
-		std::vector<Handle> entities;		// A list of entities contained by this scene
+		std::vector<Handle> entities;		// A list of entities contained by this Scene
 		EntityManager* manager;				// A pointer to the manager of the Entities in this Scene
-		bool isAwake;
-		std::wstring name;
+		bool isAwake;						// Shows if entities have been awakened and if they will be immediately awakened upon creation
+		std::wstring name;					// Name of this Scene
+		void* prevEntitiesPtr = nullptr;	// Used by hasEntitiesChanged to determine if entities vector has been changed
 	};
 
 	template <typename... Ts>

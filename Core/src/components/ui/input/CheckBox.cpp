@@ -18,7 +18,7 @@ void CheckBox::showTick() {
 	if (rect) {
 		Vector2 position = rect->getRectOffset();
 		hideTick(); // Make sure tick is destroyed
-		tick = createEntity(owner.getEntityName() + "_Tick",
+		tick = createEntity(std::string(owner.getEntityName()) + "_Tick",
 			Image("resources/images/ui/CheckBox-tick.png", "resources/shaders/figure", Color(0, 0, 0, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ() + 0.0002f, Alignment::TOP_LEFT)
 		);
@@ -39,13 +39,13 @@ void CheckBox::start() {
 		if (toggle) showTick();
 		Vector2 position = rect->getRectOffset();
 		// Create graphics
-		background = createEntity(owner.getEntityName() + "_Background",
+		background = createEntity(std::string(owner.getEntityName()) + "_Background",
 			Image("resources/images/ui/CheckBox-background.png", "resources/shaders/figure", Color(255, 255, 255, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ(), Alignment::TOP_LEFT)
 		);
 		background.setParent(owner);
 		background.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
-		border = createEntity(owner.getEntityName() + "_Border",
+		border = createEntity(std::string(owner.getEntityName()) + "_Border",
 			Image("resources/images/ui/CheckBox-border.png", "resources/shaders/figure", Color(0, 0, 0, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001f, Alignment::TOP_LEFT)
 		);

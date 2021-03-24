@@ -1,10 +1,11 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 #include <cstddef>
+#include <Core/dllexport.h>
 
 namespace Core {
 	/* An object with an ID. An entity may be linked with one or more components. */
-	class Entity {
+	extern "C" class DLLEXPORT Entity {
 	public:
 		static constexpr std::size_t INVALID_ID = 0;
 

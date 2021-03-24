@@ -79,7 +79,7 @@ namespace Core {
 				}
 
 			}
-			std::cout << "ComponentArray::get::ERROR Index out of range. size: " << size() << ", typeID: " << T::getTypeID() << std::endl;
+			std::cout << "ComponentArray::get::ERROR Index out of range. size: " << size() << ", typeID: " << T::getClassTypeID() << std::endl;
 			throw std::out_of_range("ComponentArray::get::ERROR Index out of range.");
 		}
 

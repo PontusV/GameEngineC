@@ -58,7 +58,7 @@ void GUISystem::update() {
 			bool add = true;
 			for (auto it = dirtyRoots.begin(); it != dirtyRoots.end();) {
 				EntityHandle& root = *it;
-				if (root.isParent(groupEntity.getEntity()) || root == groupEntity) {
+				if (root.isParent(groupEntity.getEntity()) || root.getEntity() == groupEntity.getEntity()) {
 					it = dirtyRoots.erase(it);
 					continue;
 				}

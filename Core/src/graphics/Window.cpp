@@ -3,6 +3,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <cstring>
 #include "maths/MatrixTransform.h"
 using namespace Core;
 
@@ -57,6 +58,7 @@ bool Window::init() {
 	glStencilMask(0x00); // Disable stencil writes
 	// End of config
 
+	initialized = true;
 	active = true;
 	return true;
 }
@@ -67,11 +69,17 @@ void Window::clear() const {
 }
 
 void Window::update() const {
-	glfwSwapBuffers(window);
+	if (initialized)
+		glfwSwapBuffers(window);
 }
 
 bool Window::isActive() const {
-	return active && !glfwWindowShouldClose(window);
+	return active && initialized && !glfwWindowShouldClose(window);
+}
+
+
+void Window::setBackgroundColor(float r, float g, float b) {
+	backgroundColor = Vector3(r, g, b);
 }
 
 void Window::setBackgroundColor(Vector3 color) {
@@ -80,6 +88,10 @@ void Window::setBackgroundColor(Vector3 color) {
 
 GLFWwindow* Window::getWindow() {
 	return window;
+}
+
+GLADloadproc Window::getGLADloadproc() {
+	return (GLADloadproc)glfwGetProcAddress;
 }
 
 void Window::close() {
@@ -95,14 +107,44 @@ int Window::getHeight() {
 }
 
 const Vector2& Window::getResolution() {
-	int width = 0;
-	int height = 0;
-	glfwGetWindowSize(window, &width, &height);
-	resolution = Vector2(width, height);
+	if (initialized) {
+		int width = 0;
+		int height = 0;
+		glfwGetWindowSize(window, &width, &height);
+		resolution = Vector2(width, height);
+		return resolution;
+	}
 	return resolution;
 }
 
 Matrix4 Window::getProjectionMatrix() {
 	getResolution();
 	return maths::ortho(0.0f, static_cast<GLfloat>(resolution.x), static_cast<GLfloat>(resolution.y), 0.0f, -1.0f, 1.0f);
+}
+
+void Window::getProjectionMatrixData(float out[16]) {
+	getResolution();
+	Matrix4 matrix = getProjectionMatrix();
+	std::memcpy(out, matrix.getDataPtr(), 16 * sizeof(float));
+}
+
+void Window::setActive(bool value) {
+	active = value;
+}
+
+bool Window::getActive() {
+	return active;
+}
+
+void Window::setResolution(float width, float height) {
+	resolution = Vector2(width, height);
+}
+
+bool Window::initGLAD(GLADloadproc glfwGetProcAddress) {
+	if (!gladLoadGLLoader(glfwGetProcAddress))
+	{
+		std::cout << "Engine failed to initialize GLAD" << std::endl;
+		return false;
+	}
+	return true;
 }

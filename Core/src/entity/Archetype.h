@@ -27,6 +27,7 @@ namespace Core {
 
 		template<typename T>
 		void setComponent(Entity entity, T& component);
+		void setComponent(Entity entity, ComponentTypeID componentTypeID);
 		template<typename T>
 		T* getComponent(Entity entity);
 		/* Returns first match. */

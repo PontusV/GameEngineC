@@ -19,7 +19,6 @@ ResourceManager::~ResourceManager() {
 }
 
 Shader ResourceManager::loadShader(const std::string shaderFileName) {
-
 	std::string vShaderFile = shaderFileName + ".vert";
 	std::string fShaderFile = shaderFileName + ".frag";
 

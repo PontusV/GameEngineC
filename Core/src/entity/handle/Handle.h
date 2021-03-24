@@ -1,6 +1,7 @@
 #ifndef HANDLE_H
 #define HANDLE_H
 
+#include <Core/EntityHandle.h>
 #include "entity/Entity.h"
 #include "entity/HideFlags.h"
 #include "entity/EntityLocation.h"
@@ -15,11 +16,13 @@ namespace Core {
 	class Component;
 
 	/* A handle for Entities */
-	class Handle {
+	class Handle: public IEntityHandle {
 	public:
 		Handle(Entity entity, Scene* scene);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
+
+		void release() override { delete this; }
 		bool operator==(const Handle& other) const;
 		bool operator!=(const Handle& other) const;
 		/* Returns true if the given Entity is a child of the Entity this instance points to. */
@@ -37,6 +40,7 @@ namespace Core {
 
 		const Entity& getEntity() const;
 		Scene* getScene() const;
+		IScene* getIScene() const;
 
 		/* Checks if pointed towards a valid Entity ID. */
 		bool isValid();
@@ -55,9 +59,24 @@ namespace Core {
 		/* Returns the number of parents above in the hierarchy. */
 		std::size_t getDepth();
 
+		void addComponent(ComponentTypeID componentTypeID);
+		void removeComponent(ComponentTypeID componentTypeID);
+
 		template<typename T>
 		bool hasComponent();
 		bool hasComponent(ComponentType type);
+		bool hasComponent(ComponentTypeID typeID);
+
+		/* Returns the number of components attached to the Entity */
+		std::size_t getComponentCount();
+		/* Returns the number of components attached to the Entity, matching the given ComponentTypeID */
+		std::size_t getComponentCount(ComponentTypeID typeID);
+		/* Used by DLL interface. */
+		IComponent* getIComponent(ComponentTypeID typeID) override;
+		/* Used by DLL interface. */
+		void getIComponents(IComponent** out, std::size_t count) override;
+		/* Used by DLL interface. */
+		void getIComponents(ComponentTypeID typeID, IComponent** out, std::size_t count) override;
 
 		template<typename T>
 		T* getComponent();
@@ -67,6 +86,7 @@ namespace Core {
 		template<typename T>
 		std::vector<T*> getComponents();
 		std::vector<Component*> getComponents(ComponentType type);
+		std::vector<Component*> getComponents(ComponentTypeID typeID);
 
 		template<typename T>
 		T* getComponentInChildren(bool includeInactive = false);
@@ -98,17 +118,19 @@ namespace Core {
 		template<typename T>
 		std::vector<T*> getComponentsDownwards(bool includeInactive = false);
 
-		std::string getEntityName();
-		bool renameEntity(std::string name);
+		const char* getEntityName();
+		bool renameEntity(const char* name);
 		HideFlags getEntityHideFlags();
 		void setEntityHideFlags(HideFlags hideFlags);
 		
 		bool hasParent();
-		void setParent(const Entity& entity);
-		void setParent(Handle entity);
-		void removeParent();
+		void setParent(const Entity& entity, bool keepPosition = false);
+		void setParent(Handle entity, bool keepPosition = false);
+		void removeParent(bool keepPosition = false);
 		Handle getParent();
 		Handle getChild(std::size_t index);
+		Entity getParentEntity();
+		Entity getChildEntity(std::size_t index);
 		std::size_t getImmediateChildCount();
 		std::size_t getChildCount();
 

@@ -35,7 +35,7 @@ bool Graphics::createWindow(const char* windowTitle, int screenWidth, int screen
 }
 
 bool Graphics::initiate() {
-	if (!window.isActive()) {
+	if (!window.getActive()) {
 		std::cout << "There is no active window!\n";
 		return false;
 	}
@@ -300,4 +300,12 @@ std::vector<RectTransform> Graphics::createBorder(const Border& border, const Re
 	}
 
 	return borderLines;
+}
+
+IWindow* Graphics::getWindowInterface() {
+	return &getWindow();
+}
+
+ICamera* Graphics::getCameraInterface() {
+	return &getCamera();
 }

@@ -15,10 +15,10 @@ using namespace Core;
 const float Input::SELECT_NEXT_DELAY = 0.05f; // The delay before selecting next
 const float Input::INITIAL_SELECT_NEXT_DELAY = 0.5f; // The initial delay before repeating selectNext
 
-Input::Input(Engine* engine) : engine(engine) {
+Input::Input(Engine* engine) : behaviourManager(engine->getBehaviourManager()), graphics(engine->getGraphics()) {
 	mouseMoved = true;
 	leftMouseButtonPressed = false;
-	timeSinceLastClick = 0.0f;
+	timeSinceLastClick = std::chrono::system_clock::now();
 }
 
 Input::~Input() {
@@ -36,7 +36,7 @@ void Input::update(float deltaTime) {
 		}
 	}
 
-	EntityHandle target = getEntityAtPos(mousePosition.x, mousePosition.y);
+	EntityHandle target = getEntityHandleAtPos(mousePosition.x, mousePosition.y);
 	// Mouse Hover
 	if (target != hoverTarget) {
 		// Hover out
@@ -47,7 +47,7 @@ void Input::update(float deltaTime) {
 			// Hover out - parents
 			Handle parent = hoverTarget.getParent();
 			while (parent.refresh()) {
-				if (parent == target) break;
+				if (parent.getEntity() == target.getEntity()) break;
 				for (Behaviour* script : parent.getComponents<Behaviour>()) {
 					script->onHoverOut();
 				}
@@ -62,7 +62,7 @@ void Input::update(float deltaTime) {
 			// Hover over - parents
 			Handle parent = target.getParent();
 			while (parent.refresh()) {
-				if (parent == hoverTarget) break;
+				if (parent.getEntity() == hoverTarget.getEntity()) break;
 				for (Behaviour* script : parent.getComponents<Behaviour>()) {
 					script->onHoverOver();
 				}
@@ -128,11 +128,10 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 	case INPUT_EVENT_MOUSEBUTTON:
 		if (event.mouseButton.buttoncode == GLFW_MOUSE_BUTTON_LEFT) {
 			if (event.mouseButton.action == GLFW_PRESS) {
-				float clickTime = (float)glfwGetTime() - timeSinceLastClick;
-
+				float clickTime = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timeSinceLastClick).count()) / 1000;
 				lastLeftClickTarget = target;
 				leftMouseButtonPressed = true;
-				timeSinceLastClick = (float)glfwGetTime();
+				timeSinceLastClick = std::chrono::system_clock::now();
 
 				select(target);
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
@@ -143,7 +142,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 						script->onDoubleClick();
 					}
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
@@ -155,7 +154,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 					}
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++){
 					scriptArray[i].onMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT, event.mouseButton.mods);
 				}
@@ -167,7 +166,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
@@ -178,7 +177,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 					}
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT, event.mouseButton.mods);
 				}
@@ -190,7 +189,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 				for (Behaviour* script : target.getComponentsUpwards<Behaviour>()) {
 					script->onMouseButtonPressedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
@@ -201,7 +200,7 @@ void Input::processInputEvent(const InputEvent& event, EntityHandle& target) {
 						script->onMouseButtonReleasedAsButton(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 					}
 				}
-				ComponentArray<Behaviour>& scriptArray = engine->getBehaviourManager().getAllScripts();
+				ComponentArray<Behaviour>& scriptArray = behaviourManager.getAllScripts();
 				for (std::size_t i = 0; i < scriptArray.size(); i++) {
 					scriptArray[i].onMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE, event.mouseButton.mods);
 				}
@@ -364,7 +363,7 @@ bool contains(const std::vector<Entity>& list, const Entity& value) {
 }
 
 // -------------- HELPERS ------------------
-EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreList) {
+EntityHandle Input::getEntityHandleAtPos(float x, float y, std::vector<Entity> ignoreList) {
 	std::size_t spriteGroupSize = spriteGroup.size();
 	std::size_t guiGroupSize = guiGroup.size();
 
@@ -375,8 +374,8 @@ EntityHandle Input::getEntityAtPos(float x, float y, std::vector<Entity> ignoreL
 
 	// TODO: Handle masks
 
-	Camera& camera = engine->getGraphics().getCamera();
-	Window& window = engine->getGraphics().getWindow();
+	Camera& camera = graphics.getCamera();
+	Window& window = graphics.getWindow();
 	// --------------------------------- GUI -------------------------------------
 	for (std::size_t i = 0; i < guiGroupSize; i++) {
 		Entity&			entity		= guiGroup.getEntity(i);
@@ -457,4 +456,18 @@ const Vector2& Input::getMousePosition() const {
 
 EntityHandle Input::getLastLeftClicked() {
 	return lastLeftClickTarget;
+}
+
+Entity Input::getEntityAtPos(float x, float y) {
+	EntityHandle handle = getEntityHandleAtPos(x, y);
+	return handle.getEntity();
+}
+
+IEntityHandle* Input::createEntityHandleAtPos(float x, float y) {
+	EntityHandle handle = getEntityHandleAtPos(x, y);
+	IEntityHandle* ptr = new Handle(handle);
+	if (ptr->isValid()) {
+		return ptr;
+	}
+	return nullptr;
 }

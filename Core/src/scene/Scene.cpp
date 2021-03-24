@@ -5,6 +5,7 @@
 #include "components/entity/ChildManager.h"
 #include "components/Transform.h"
 #include "components/Behaviour.h"
+#include "maths/MatrixTransform.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -18,12 +19,30 @@ Scene::~Scene() {
 	clear();
 }
 
-std::wstring Scene::getName() {
-	return name;
+
+Entity Scene::createEmptyEntity(const char* name) {
+	Entity entity = manager->generateEntity(name);
+	addEntity(entity);
+	return entity;
+}
+
+const wchar_t* Scene::getName() {
+	return name.c_str();
+}
+
+std::size_t Scene::getAllEntitiesCount() {
+	return entities.size();
 }
 
 std::vector<Handle>& Scene::getAllEntities() {
 	return entities;
+}
+
+void Scene::getAllIEntities(IEntityHandle** out, std::size_t count) {
+	std::size_t size = std::min(count, entities.size());
+	for (std::size_t i = 0; i < size; i++) {
+		out[i] = static_cast<IEntityHandle*>(&entities[i]);
+	}
 }
 
 std::vector<Handle> Scene::getRootEntities() {
@@ -100,8 +119,22 @@ void Scene::removeComponent(Entity entity, ComponentTypeID componentTypeID) {
 	onEntityChanged(handle);
 }
 
+void Scene::addComponent(Entity entity, ComponentTypeID componentTypeID) {
+	EntityLocation location = manager->addComponent(entity, componentTypeID);
+	Handle handle = getEntityHandle(entity);
+	handle.updateLocation(location);
+	prepEntity(handle);
+	Component* component = handle.getComponent(componentTypeID);
+	if (isAwake) awakeComponent(getEntityHandle(entity), component->getComponentID());
+	onEntityChanged(handle);
+}
+
 void Scene::removeComponentQueued(Entity entity, ComponentTypeID componentTypeID) {
 	functionQueue.push_back(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::removeComponent, *this, entity, componentTypeID));
+}
+
+void Scene::addComponentQueued(Entity entity, ComponentTypeID componentTypeID) {
+	functionQueue.push_back(new FunctionCaller<void, Scene, Entity, ComponentTypeID>(&Scene::addComponent, *this, entity, componentTypeID));
 }
 
 bool Scene::activate(Handle entity) {
@@ -265,11 +298,11 @@ void Scene::destroyEntityQueued(Entity entity) {
 	functionQueue.push_back(new FunctionCaller<bool, Scene, Entity>(&Scene::destroyEntity, *this, entity));
 }
 
-void Scene::setParentQueued(Handle entity, Handle parent) {
-	functionQueue.push_back(new FunctionCaller<void, Scene, Handle, Handle>(&Scene::setParent, *this, entity, parent));
+void Scene::setParentQueued(Handle entity, Handle parent, bool keepPosition) {
+	functionQueue.push_back(new FunctionCaller<void, Scene, Handle, Handle, bool>(&Scene::setParent, *this, entity, parent, keepPosition));
 }
 
-void Scene::setParent(Handle entityHandle, Handle parentHandle) {
+void Scene::setParent(Handle entityHandle, Handle parentHandle, bool keepPosition) {
 	if (entityHandle == parentHandle) {
 		std::cout << "Cannot make an Entity a parent/child of itself!"  << std::endl;
 		throw std::invalid_argument("Cannot make an Entity a parent/child of itself!");
@@ -325,7 +358,22 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle) {
 	else if (manager->hasComponent<ParentEntity>(entity)) {
 		removeComponent<ParentEntity>(entity);
 	}
+	prevEntitiesPtr = nullptr; // Makes next call to hasEntitiesChanged return true. Ugly but it does the trick
 	if (Transform* transform = entityHandle.getComponent<Transform>()) {
+		if (parent.getID() != Entity::INVALID_ID) {
+			if (Transform* parentTransform = parentHandle.getComponent<Transform>()) {
+				Vector2 position = transform->getPosition();
+				Vector2 newPosition = parentTransform->getLocalToWorldMatrix() * parentTransform->getLocalModelMatrix() * transform->getLocalPosition();
+				transform->moveX(position.x - newPosition.x);
+				transform->moveY(position.y - newPosition.y);
+			}
+		}
+		else {
+			Vector2 position = transform->getPosition();
+			Vector2 newPosition = transform->getLocalPosition();
+			transform->moveX(position.x - newPosition.x);
+			transform->moveY(position.y - newPosition.y);
+		}
 		transform->setChanged();
 	}
 }
@@ -387,6 +435,12 @@ void Scene::clear() {
 		manager->destroyEntity(handle.getEntity());
 		entities.erase(it);
 	}
+}
+
+bool Scene::hasEntitiesChanged() {
+	bool hasChanged = prevEntitiesPtr != &entities[0];
+	prevEntitiesPtr = &entities[0];
+	return hasChanged;
 }
 
 EntityManager* Scene::getEntityManager() {

@@ -8,8 +8,6 @@
 #include "maths/Vector4.h"
 #include "maths/Matrix4.h"
 
-#include "utils/Serializable.h"
-
 #include <string>
 #include <iostream>
 

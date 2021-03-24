@@ -1,6 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <Core/Engine.h>
 #include "entity/EntityManager.h"
 #include "scene/SceneManager.h"
 #include "graphics/Graphics.h"
@@ -13,19 +14,31 @@
 struct SDL_Renderer;
 
 namespace Core {
-	class Engine {
+	class Engine : public IEngine {
 	public:
 		Engine();
 		~Engine();
 
-		int initiate(bool skipCallbacks = false);
+		/* Initializes the engine and all systems in preparation of start */
+		int initiate(bool skipGLFW = false);
 		/* Starts the game loop */
 		int start();
 		/* Runs one tick of the game. Handles input, updates systems and renders */
 		void tick(float deltaTime);
+		/* Stops the game loop and terminates glfw */
 		void terminate();
+		/* Used by DLL interface. Deletes this instance */
+		void release() override;
 
 		void resizeViewport(unsigned int width, unsigned int height);
+
+		// GLFW Callbacks
+		void framebufferSizeCallback(int width, int height);
+		void keyCallback(int key, int scancode, int action, int mods);
+		void characterCallback(unsigned int codepoint);
+		void cursorPositionCallback(double xpos, double ypos);
+		void mouseButtonCallback(int button, int action, int mods);
+		void scrollCallback(double xoffset, double yoffset);
 
 		// Systems
 		Input& getInput();
@@ -36,6 +49,10 @@ namespace Core {
 		BehaviourManager& getBehaviourManager();
 		GUISystem& getGUISystem();
 
+		IInput* getInputInterface() override;
+		IGraphics* getGraphicsInterface() override;
+		ISceneManager* getSceneManagerInterface() override;
+		IEntityManager* getEntityManagerInterface() override;
 	private:
 		// Game loop
 		bool running = false;

@@ -1,4 +1,5 @@
 #include "ComponentType.h"
+#include "ReflectionPolymorph.generated.h"
 using namespace Core;
 
 bool operator==(const ComponentType& left, const ComponentType& right) {
@@ -30,4 +31,10 @@ bool operator==(const ComponentTypeID& left, const ComponentType& right) {
 			return true;
 	}
 	return false;
+}
+
+
+ComponentType::ComponentType(ComponentTypeID typeID) {
+	idList = Mirror::polyGetDerivedTypeIDs(typeID);
+	idList.insert(idList.begin(), typeID);
 }

@@ -7,7 +7,7 @@
 
 namespace Core {
 
-	CLASS() GridLayoutGroup : public LayoutController {
+	CLASS(Abstract) GridLayoutGroup : public LayoutController {
 		GENERATED_BODY()
 	public:
 		GridLayoutGroup();

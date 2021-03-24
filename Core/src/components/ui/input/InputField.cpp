@@ -25,20 +25,20 @@ void InputField::start() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle ownerHandle = owner;
 	if (rect) {
-		inputText = createEntity(ownerHandle.getEntityName() + "_Text");
+		inputText = createEntity(std::string(ownerHandle.getEntityName()) + "_Text");
 		inputText.setParent(owner);
 
 		RectTransform* textRect = inputText.addComponent(RectTransform(rect->getSize().x / 2, rect->getSize().y / 2, 0, 0, rect->getZ() + 0.01f, Alignment::CENTER));
 		Text* textComponent = inputText.addComponent(Text(filterText(initText), Font("resources/fonts/segoeui.ttf", 15), Color(0, 0, 0)));
 
-		textMark = createEntity(ownerHandle.getEntityName() + "_Mark",
+		textMark = createEntity(std::string(ownerHandle.getEntityName()) + "_Mark",
 			RectSprite(0, Color(markColor.r, markColor.g, markColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);
 		textMark.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideAndDontSave);
 		textMark.setParent(inputText);
 
-		textHighlight = createEntity(ownerHandle.getEntityName() + "_Highlight",
+		textHighlight = createEntity(std::string(ownerHandle.getEntityName()) + "_Highlight",
 			RectSprite(0, Color(highlightColor.r, highlightColor.g, highlightColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);

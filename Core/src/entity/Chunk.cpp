@@ -208,6 +208,22 @@ std::vector<Component*> Chunk::getComponents(std::size_t index, ComponentType co
 	return components;
 }
 
+std::vector<Component*> Chunk::getComponents(Entity entity, ComponentTypeID componentTypeID) {
+	std::size_t index = getIndex(entity);
+	return getComponents(index, componentTypeID);
+}
+
+std::vector<Component*> Chunk::getComponents(std::size_t index, ComponentTypeID componentTypeID) {
+	std::vector<Component*> components;
+
+	for (ComponentDataArrayInfo& info : types) {
+		if (componentTypeID == info.typeID)
+			components.push_back(getComponent(index, info));
+	}
+
+	return components;
+}
+
 std::vector<ComponentDataBlock> Chunk::getComponentDataBlocks(Entity entity) {
 	int index = getIndex(entity);
 	std::vector<ComponentDataBlock> blocks;
@@ -320,4 +336,34 @@ std::size_t Chunk::getIndex(Entity entity) {
 
 std::size_t Chunk::getStride() {
 	return stride;
+}
+
+std::size_t Chunk::getComponentCount() {
+	return types.size();
+}
+
+std::size_t Chunk::getComponentCount(ComponentTypeID componentTypeID) {
+	std::size_t count = 0;
+	for (ComponentDataArrayInfo& info : types) {
+		if (componentTypeID == info.typeID)
+			count++;
+	}
+	return count;
+}
+
+void Chunk::setComponent(Entity entity, ComponentTypeID componentTypeID) {
+	std::size_t index = getIndex(entity);
+	setComponent(index, componentTypeID);
+}
+
+void Chunk::setComponent(std::size_t index, ComponentTypeID componentTypeID) {
+	char* componentBeginPtr = getComponentBeginPtr(componentTypeID);
+	if (componentBeginPtr) {
+		void* dest = &componentBeginPtr[index * stride];
+		// Creates the component at the specified location
+		Component* newComponent = Mirror::createInstance<Component>(componentTypeID, dest);
+	}
+	else {
+		throw std::invalid_argument("Chunk::setComponent invalid component type! It does not exist in this chunk.");
+	}
 }

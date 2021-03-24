@@ -1,11 +1,12 @@
 #include "EntityManager.h"
 #include "component/Component.h"
+#include "ReflectionPolymorph.generated.h"
 
 using namespace Core;
 
 
 bool EntityManager::renameEntity(Entity entity, std::string name) {
-	if (!isEntityNameAvailable(name)) {
+	if (!isEntityNameAvailable(name.c_str())) {
 		std::cout << "Failed to rename Entity. Entity with the name " << name << " already exists!\n";
 		return false;
 	}
@@ -14,13 +15,13 @@ bool EntityManager::renameEntity(Entity entity, std::string name) {
 	return true;
 }
 
-bool EntityManager::isEntityNameAvailable(std::string name) {
+bool EntityManager::isEntityNameAvailable(const char* name) {
 	return entityNameMap.find(name) == entityNameMap.end();
 }
 
 Entity EntityManager::generateEntity(std::string name) {
 	Entity entity(entityIDCounter++);
-	if (!isEntityNameAvailable(name)) {
+	if (!isEntityNameAvailable(name.c_str())) {
 		std::cout << "Entity with the name " << name << " already exists!\n";
 		throw std::invalid_argument("Entity with given name already exist!");
 	}
@@ -40,15 +41,15 @@ Entity EntityManager::getEntity(std::string entityName) {
 	return entity;
 }
 
-std::string EntityManager::getEntityName(Entity entity) {
+const char* EntityManager::getEntityName(Entity entity) {
 	auto it = entityNameMap.begin();
 	while (it != entityNameMap.end()) {
-		if (it->second == entity) return it->first;
+		if (it->second == entity) return it->first.c_str();
 		it++;
 	}
 	auto it2 = entityMap.find(entity);
 	if (it2 != entityMap.end()) {
-		return std::string("Queued_For_Destruction");
+		return "Queued_For_Destruction";
 	}
 	std::cout << "EntityManager::getEntityName::ERROR There is no such entity stored in this Level!" << std::endl;
 	throw std::invalid_argument("EntityManager::getEntityName::ERROR There is no such entity stored in this Level!");
@@ -120,6 +121,19 @@ EntityLocation EntityManager::removeComponent(Entity entity, ComponentTypeID typ
 	srcTypes.erase(it);
 	Archetype* dest = getArchetype(srcTypes);
 	return moveEntity(entity, src, dest);
+}
+
+
+EntityLocation EntityManager::addComponent(Entity entity, ComponentTypeID typeID) {
+	Archetype* src = entityMap.at(entity);
+	std::vector<IComponentTypeInfo> destTypes = src->getTypes();
+	destTypes.push_back(IComponentTypeInfo(ComponentType(typeID), Mirror::getName(typeID), Mirror::getSize(typeID)));
+
+	Archetype* dest = getArchetype(destTypes);
+	EntityLocation location = moveEntity(entity, src, dest);
+
+	dest->setComponent(entity, typeID);
+	return location;
 }
 
 Component* EntityManager::getComponent(Entity entity, ComponentType type) {

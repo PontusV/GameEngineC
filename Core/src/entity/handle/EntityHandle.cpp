@@ -24,7 +24,3 @@ bool EntityHandle::operator==(const EntityHandle& other) const {
 bool EntityHandle::operator!=(const EntityHandle& other) const {
 	return !(*this == other);
 }
-
-void EntityHandle::removeComponent(ComponentTypeID componentTypeID) {
-	scene->removeComponentQueued(entity, componentTypeID);
-}

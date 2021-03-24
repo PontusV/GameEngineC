@@ -5,6 +5,7 @@
 
 #include "components/entity/ParentEntity.h"
 #include "components/entity/ChildManager.h"
+#include "ReflectionPolymorph.generated.h"
 
 #include <algorithm>
 
@@ -33,6 +34,10 @@ const Entity& Handle::getEntity() const {
 }
 
 Scene* Handle::getScene() const {
+	return scene;
+}
+
+IScene* Handle::getIScene() const {
 	return scene;
 }
 
@@ -164,6 +169,10 @@ bool Handle::hasComponent(ComponentType type) {
 	return getComponent(type) != nullptr; // Faster than EntityManager::hasComponent
 }
 
+bool Handle::hasComponent(ComponentTypeID typeID) {
+	return getComponent(typeID) != nullptr; // Faster than EntityManager::hasComponent
+}
+
 Component* Handle::getComponent(ComponentTypeID typeID) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
@@ -184,6 +193,14 @@ std::vector<Component*> Handle::getComponents(ComponentType type) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index, type);
+	}
+	return std::vector<Component*>(); // Empty
+}
+
+std::vector<Component*> Handle::getComponents(ComponentTypeID typeID) {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock())
+			return chunk->getComponents(locationData.index, typeID);
 	}
 	return std::vector<Component*>(); // Empty
 }
@@ -248,7 +265,7 @@ std::vector<Component*> Handle::getComponentsDownwards(bool includeInactive) {
 	return components;
 }
 
-std::string Handle::getEntityName() {
+const char* Handle::getEntityName() {
 	if (refresh()) {
 		return scene->getEntityManager()->getEntityName(entity);
 	}
@@ -256,7 +273,7 @@ std::string Handle::getEntityName() {
 	return "Invalid";
 }
 
-bool Handle::renameEntity(std::string name) {
+bool Handle::renameEntity(const char* name) {
 	if (refresh()) {
 		return scene->getEntityManager()->renameEntity(entity, name);
 	}
@@ -279,17 +296,17 @@ void Handle::setEntityHideFlags(HideFlags hideFlags) {
 	return scene->getEntityManager()->setEntityHideFlags(entity, hideFlags);
 }
 
-void Handle::setParent(const Entity& entity) {
+void Handle::setParent(const Entity& entity, bool keepPosition) {
 	Handle parent = scene->getEntityHandle(entity);
-	setParent(parent);
+	setParent(parent, keepPosition);
 }
 
-void Handle::setParent(Handle entity) {
-	scene->setParentQueued(*this, entity);
+void Handle::setParent(Handle entity, bool keepPosition) {
+	scene->setParentQueued(*this, entity, keepPosition);
 }
 
-void Handle::removeParent() {
-	scene->setParentQueued(*this, Handle(Entity(0), scene));
+void Handle::removeParent(bool keepPosition) {
+	scene->setParentQueued(*this, Handle(Entity(0), scene), keepPosition);
 }
 
 Handle Handle::getParent() {
@@ -324,6 +341,15 @@ Handle Handle::getChild(std::size_t index) {
 	}
 	return Handle();
 }
+
+Entity Handle::getParentEntity() {
+	return getParent().getEntity();
+}
+
+Entity Handle::getChildEntity(std::size_t index) {
+	return getChild(index).getEntity();
+}
+
 std::size_t Handle::getImmediateChildCount() {
 	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
 	if (childManager) {
@@ -339,4 +365,50 @@ std::size_t Handle::getChildCount() {
 		childCount += getChild(i).getChildCount();
 	}
 	return childCount;
+}
+
+void Handle::addComponent(ComponentTypeID componentTypeID) {
+	scene->addComponentQueued(entity, componentTypeID);
+}
+
+void Handle::removeComponent(ComponentTypeID componentTypeID) {
+	scene->removeComponentQueued(entity, componentTypeID);
+}
+
+std::size_t Handle::getComponentCount() {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock()) {
+			return chunk->getComponentCount();
+		}
+	}
+	return 0;
+}
+
+std::size_t Handle::getComponentCount(ComponentTypeID typeID) {
+	if (refresh()) {
+		if (auto chunk = locationData.chunk.lock()) {
+			return chunk->getComponentCount(typeID);
+		}
+	}
+	return 0;
+}
+
+IComponent* Handle::getIComponent(ComponentTypeID typeID) {
+	return static_cast<IComponent*>(getComponent(typeID));
+}
+
+void Handle::getIComponents(IComponent** out, std::size_t count) {
+	std::vector<Component*> components = getComponents();
+	std::size_t size = std::min(count, components.size());
+	for (std::size_t i = 0; i < size; i++) {
+		out[i] = static_cast<IComponent*>(components[i]);
+	}
+}
+
+void Handle::getIComponents(ComponentTypeID typeID, IComponent** out, std::size_t count) {
+	std::vector<Component*> components = getComponents(typeID);
+	std::size_t size = std::min(count, components.size());
+	for (std::size_t i = 0; i < size; i++) {
+		out[i] = static_cast<IComponent*>(components[i]);
+	}
 }

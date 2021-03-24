@@ -14,6 +14,7 @@ namespace Core {
 		EntityHandle();
 		~EntityHandle();
 
+		void release() override { delete this; }
 		/* Adds the component at the end of the frame. Returns a temporary pointer to the component (it will become invalid after the end of the frame)*/
 		template<typename T, class... Args>
 		T* addComponent(Args&&... args);
@@ -23,7 +24,6 @@ namespace Core {
 		/* Removes the component of type T at the end of the frame. */
 		template<typename T>
 		void removeComponent();
-		void removeComponent(ComponentTypeID componentTypeID);
 
 		bool operator==(const EntityHandle& other) const;
 		bool operator!=(const EntityHandle& other) const;

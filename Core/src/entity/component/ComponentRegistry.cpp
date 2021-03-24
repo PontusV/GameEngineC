@@ -17,7 +17,7 @@ template<typename T> typename std::enable_if_t<std::is_abstract<T>::value || !st
 //--------------------------------------------Get Matching Component Types----------------------------------------------------------------
 template<typename T>
 std::vector<ComponentTypeID> getMatchingComponentTypeList() {
-	ComponentTypeID typeID = T::getTypeID();
+	constexpr ComponentTypeID typeID = T::getClassTypeID();
 	std::vector<ComponentTypeID> derivedTypeIDs = Mirror::polyGetDerivedTypeIDs(typeID);
 	derivedTypeIDs.insert(derivedTypeIDs.begin(), typeID);
 	return derivedTypeIDs;
@@ -37,7 +37,7 @@ typename std::enable_if_t<std::is_base_of<Component, T>::value || std::is_same<C
 	std::vector<ComponentTypeID> matchList = getMatchingComponentTypeList<T>();
 
 	// Set Component Type Info values
-	ComponentTypeInfo<T>::setTypeID(T::getTypeID());
+	ComponentTypeInfo<T>::setTypeID(T::getClassTypeID());
 	ComponentTypeInfo<T>::setMatchingTypeIDs(matchList);
 	registerToLoader<T>();
 	//ComponentTypeInfo<T>::print(); // Debug information

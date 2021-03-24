@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../include/ReflectionParser;$(ProjectDir)../Core/src;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../include/ReflectionParser;$(ProjectDir)../Core/include;$(ProjectDir)</AdditionalIncludeDirectories>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../include/ReflectionParser;$(ProjectDir)../Core/src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../include/ReflectionParser;$(ProjectDir)../Core/include;</AdditionalIncludeDirectories>
       <SupportJustMyCode>false</SupportJustMyCode>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -159,65 +159,74 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include/ReflectionParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)../include;$(ProjectDir)../Core/include;$(ProjectDir)src%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OmitFramePointers>false</OmitFramePointers>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>G:\Projects\ProjectGE\x64\Release;G:\Projects\ProjectGE\libs\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Core.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="EditorSettings.h" />
-    <ClInclude Include="windows\FileView.h" />
-    <ClInclude Include="imgui\imconfig.h" />
-    <ClInclude Include="imgui\imgui.h" />
-    <ClInclude Include="imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="imgui\imgui_internal.h" />
-    <ClInclude Include="imgui\imstb_rectpack.h" />
-    <ClInclude Include="imgui\imstb_textedit.h" />
-    <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="LevelEditor.h" />
-    <ClInclude Include="GridRenderer.h" />
-    <ClInclude Include="ProjectSettings.h" />
+    <ClInclude Include="src\EditorSettings.h" />
+    <ClInclude Include="src\ResourceManager.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\utils\Clipboard.h" />
+    <ClInclude Include="src\utils\string.h" />
+    <ClInclude Include="src\windows\FileView.h" />
+    <ClInclude Include="src\imgui\imconfig.h" />
+    <ClInclude Include="src\imgui\imgui.h" />
+    <ClInclude Include="src\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="src\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\imgui\imgui_internal.h" />
+    <ClInclude Include="src\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\LevelEditor.h" />
+    <ClInclude Include="src\GridRenderer.h" />
+    <ClInclude Include="src\ProjectSettings.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="utils\file.h" />
-    <ClInclude Include="Viewport.h" />
-    <ClInclude Include="windows\GameView.h" />
-    <ClInclude Include="windows\Hierarchy.h" />
-    <ClInclude Include="windows\Inspector.h" />
+    <ClInclude Include="src\utils\file.h" />
+    <ClInclude Include="src\Viewport.h" />
+    <ClInclude Include="src\windows\GameView.h" />
+    <ClInclude Include="src\windows\Hierarchy.h" />
+    <ClInclude Include="src\windows\Inspector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EditorSettings.cpp" />
-    <ClCompile Include="windows\FileView.cpp" />
-    <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
-    <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="LevelEditor.cpp" />
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="src\EditorSettings.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\utils\Clipboard.cpp" />
+    <ClCompile Include="src\utils\string.cpp" />
+    <ClCompile Include="src\windows\FileView.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\LevelEditor.cpp" />
+    <ClCompile Include="src\main.cpp">
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
       <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Fast</FloatingPointModel>
     </ClCompile>
-    <ClCompile Include="GridRenderer.cpp" />
-    <ClCompile Include="ProjectSettings.cpp" />
-    <ClCompile Include="utils\file.cpp" />
-    <ClCompile Include="Viewport.cpp" />
-    <ClCompile Include="windows\GameView.cpp" />
-    <ClCompile Include="windows\Hierarchy.cpp" />
-    <ClCompile Include="windows\Inspector.cpp" />
+    <ClCompile Include="src\GridRenderer.cpp" />
+    <ClCompile Include="src\ProjectSettings.cpp" />
+    <ClCompile Include="src\utils\file.cpp" />
+    <ClCompile Include="src\Viewport.cpp" />
+    <ClCompile Include="src\windows\GameView.cpp" />
+    <ClCompile Include="src\windows\Hierarchy.cpp" />
+    <ClCompile Include="src\windows\Inspector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelEditor.rc" />

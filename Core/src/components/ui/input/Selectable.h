@@ -9,7 +9,7 @@ namespace Core {
 	CLASS() Selectable : public Behaviour {
 		GENERATED_BODY()
 	public:
-		virtual ~Selectable();
+		virtual ~Selectable() = 0;
 
 		void select();
 		void deselect();

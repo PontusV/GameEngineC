@@ -1,3 +1,15 @@
 ﻿  Running reflection parser
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(128,5): error MSB3073: The command "C:\Users\Pontus\Documents\GitHub\GameEngineC\Core\exe\ReflectionParser.exe C:\Users\Pontus\Documents\GitHub\GameEngineC\Core\
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(128,5): error MSB3073: :VCEnd" exited with code -1073741515.
+  Parser initializing!
+  Target: G:\Projects\ProjectGE\Core\src
+  Parse starting!
+  Parse successful!
+cl : command line warning D9002: ignoring unknown option '/arch:SSE'
+  Reflection.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+     Creating library G:\Projects\ProjectGE\x64\Release\Core.lib and object G:\Projects\ProjectGE\x64\Release\Core.exp
+  Generating code
+  2 of 8543 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    61 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Core.vcxproj -> G:\Projects\ProjectGE\x64\Release\Core.dll

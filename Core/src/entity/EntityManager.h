@@ -1,6 +1,7 @@
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
+#include <Core/EntityManager.h>
 #include "Archetype.h"
 #include "entity/Entity.h"
 #include "EntityLocation.h"
@@ -17,17 +18,20 @@ namespace Core {
 
 	class Component; // Forward declare
 
-	class EntityManager {
+	class EntityManager : public IEntityManager {
 	public:
 		EntityManager() : entityIDCounter(1) {}
 		~EntityManager() {
 			clear();
 		}
 
+		/* Creates a new Entity and adds it to the EntityManager. Note: Should only be used by Scene unless Entity does not want to be attached to a Scene. */
 		template <typename... Ts>
 		Entity createEntity(std::string name, Ts&... components);
+		/* Adds the Entity to the EntityManager. Note: Should only be used by Scene unless Entity does not want to be attached to a Scene. */
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts& ... components);
+		/* Destroys and removes the Entity from the EntityManager. Note: Should only be used by Scene if the Entity is attached to a Scene. */
 		void destroyEntity(Entity entity);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */
@@ -38,10 +42,11 @@ namespace Core {
 		/* Attaches the component to the Entity. */
 		template <typename T>
 		EntityLocation addComponent(Entity entity, T& component);
+		EntityLocation addComponent(Entity entity, ComponentTypeID typeID);
 		/* If the Entity has a component of type T it is removed/destroyed. It does not removed components deriving from T. The destructor of the component is called and it is removed from the Entity. */
 		template <typename T>
 		EntityLocation removeComponent(Entity entity);
-		EntityLocation removeComponent(Entity entity, ComponentTypeID type);
+		EntityLocation removeComponent(Entity entity, ComponentTypeID typeID);
 		template <typename T>
 		bool hasComponent(Entity entity);
 		bool hasComponent(Entity entity, ComponentType type);
@@ -52,7 +57,7 @@ namespace Core {
 		std::vector<IComponentTypeInfo> getComponentTypes(Entity entity);
 
 		Entity getEntity(std::string entityName);
-		std::string getEntityName(Entity entity);
+		const char* getEntityName(Entity entity);
 		HideFlags getEntityHideFlags(Entity entity);
 		void setEntityHideFlags(Entity entity, HideFlags hideFlags);
 		EntityLocation getLocation(Entity entity);
@@ -62,7 +67,7 @@ namespace Core {
 		Entity generateEntity(std::string name);
 		/* @return Returns true if the Entity had a name to remove. */
 		bool removeEntityName(Entity entity);
-		bool isEntityNameAvailable(std::string name);
+		bool isEntityNameAvailable(const char* name);
 		bool renameEntity(Entity entity, std::string name);
 
 	private:

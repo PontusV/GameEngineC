@@ -46,6 +46,8 @@ namespace Core {
 		void setComponent(Entity entity, T& component);
 		template<typename T>
 		void setComponent(std::size_t index, T& component);
+		void setComponent(Entity entity, ComponentTypeID componentTypeID);
+		void setComponent(std::size_t index, ComponentTypeID componentTypeID);
 		/* Returns first match. */
 		template<typename T>
 		T* getComponent(Entity entity);
@@ -60,6 +62,10 @@ namespace Core {
 		std::vector<Component*> getComponents(Entity entity, ComponentType componentType);
 		/* Returns all components attached to entity at index, who match with componentType. */
 		std::vector<Component*> getComponents(std::size_t index, ComponentType componentType);
+		/* Returns all components attached to entity, who match with componentTypeID. */
+		std::vector<Component*> getComponents(Entity entity, ComponentTypeID componentTypeID);
+		/* Returns all components attached to entity at index, who match with componentTypeID. */
+		std::vector<Component*> getComponents(std::size_t index, ComponentTypeID componentTypeID);
 		/* Returns all components attached to entity. */
 		std::vector<Component*> getComponents(Entity entity);
 		Entity* getEntityPtr(Entity entity);
@@ -67,6 +73,10 @@ namespace Core {
 		/* Returns start of component array containing the exact type from template. */
 		template <typename T>
 		char* getComponentBeginPtr();
+		/* Returns number of components attached to the contained entities */
+		std::size_t getComponentCount();
+		/* Returns number of components attached to the contained entities, matching the componentTypeID */
+		std::size_t getComponentCount(ComponentTypeID componentTypeID);
 		/* Returns info about all ComponentDataArrays matching the ComponentType */
 		std::vector<ComponentDataArrayInfo> getComponentArrayInfo(ComponentType type);
 

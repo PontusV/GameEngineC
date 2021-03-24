@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include <Core/Graphics.h>
 #include "entity/Entity.h"
 #include "components/graphics/SpriteRenderer.h"
 #include "components/graphics/CanvasRenderer.h"
@@ -20,7 +21,7 @@ namespace Core {
 	class Renderer2D;
 
 	/* Manages the window, renderer and UISystem */
-	class Graphics {
+	class Graphics: public IGraphics {
 	public:
 		Graphics();
 		~Graphics();
@@ -35,6 +36,9 @@ namespace Core {
 		Window& getWindow();
 		Camera& getCamera();
 		Renderer2D& getRenderer();
+
+		IWindow* getWindowInterface() override;
+		ICamera* getCameraInterface() override;
 
 	private:
 		void renderWorld(float deltaTime);

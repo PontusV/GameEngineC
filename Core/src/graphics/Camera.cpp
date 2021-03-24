@@ -17,6 +17,18 @@ const Vector2& Camera::getPosition() {
 	return position;
 }
 
+float Camera::getX() {
+	return position.x;
+}
+
+float Camera::getY() {
+	return position.y;
+}
+
+void Camera::setPosition(float x, float y) {
+	position = Vector2(x, y);
+}
+
 void Camera::setPosition(Vector2 vec) {
 	position = vec;
 }

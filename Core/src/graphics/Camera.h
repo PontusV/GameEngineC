@@ -1,11 +1,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+#include <Core/Camera.h>
 #include "maths/Vector2.h"
 #include "maths/Matrix4.h"
 namespace Core {
 	class Window;
 
-	class Camera {
+	class Camera: public ICamera {
 	public:
 		Camera(Window* window);
 		~Camera();
@@ -14,6 +15,9 @@ namespace Core {
 		const Matrix4& getViewMatrix() const;
 		void updateViewMatrix();
 
+		float getX();
+		float getY();
+		void setPosition(float x, float y);
 		void setPosition(Vector2 vec);
 		void moveX(float value);
 		void moveY(float value);

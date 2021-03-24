@@ -1,9 +1,11 @@
 Core/Debug/*
 Core/Release/*
+Core/x64/*
 LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/x64/*
 LevelEditor/resources/*
+x64/*
 *.generated.h
 Debug/*
 Release/*

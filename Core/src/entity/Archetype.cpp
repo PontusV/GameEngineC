@@ -144,3 +144,7 @@ void Archetype::removeChunk(std::size_t index) {
 	ComponentArrayManager::getInstance().chunkRemoved(chunks[index]->getID());
 	chunks.erase(chunks.begin() + index);
 }
+
+void Archetype::setComponent(Entity entity, ComponentTypeID componentTypeID) {
+	getContainer(entity)->setComponent(entity, componentTypeID);
+}

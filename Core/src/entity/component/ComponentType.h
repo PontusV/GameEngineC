@@ -13,6 +13,7 @@ namespace Core {
 	public:
 		ComponentType(std::vector<ComponentTypeID> idList) : idList(idList) {
 		}
+		ComponentType(ComponentTypeID typeID);
 		ComponentType() {
 		}
 		~ComponentType() {}
