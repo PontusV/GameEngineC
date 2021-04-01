@@ -5,25 +5,25 @@
 #include "GridRenderer.h"
 #include "imgui/imgui.h"
 
-namespace Core {
-	class IEngine;
-}
 
 namespace Editor {
+	class LevelEditor;
 
 	/* The game view window */
 	class GameView {
 	public:
-		GameView(Core::IEngine* engine);
+		GameView(LevelEditor* engineDLL);
 		~GameView();
 
-		void initialize();
+		void initialize(ImVec2 viewportSize);
 
 		/* Renders imGui window and updates the game */
 		void tick(float deltaTime);
 
 		Core::IEntityHandle* getTarget();
 		void setTarget(Core::IEntityHandle* handle);
+		/* Releases allocated memory by Engine DLL and assigns the pointer of target a value of nullptr */
+		void releaseTarget();
 
 		ImVec2 getViewportSize() const;
 
@@ -34,7 +34,7 @@ namespace Editor {
 		bool targetPressed = false;
 		Core::IEntityHandle* target;
 
-		Core::IEngine* engine;
+		LevelEditor* editor;
 		Viewport viewport;
 		GridRenderer grid;
 	};

@@ -33,7 +33,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -46,7 +46,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)../include</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -176,8 +176,8 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>$(ProjectDir)parser\ReflectionParser.exe $(ProjectDir)src -I$(ProjectDir)src</Command>
-      <Message>Running Reflection Parser</Message>
+      <Command>$(ProjectDir)parser\ReflectionParser.exe $(ProjectDir)src --include-directory $(ProjectDir)include --include-directory $(ProjectDir)src</Command>
+      <Message>Running reflection parser</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -212,7 +212,7 @@
       <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../libs\win32;$(ProjectDir)../libs;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../libs/win64;$(ProjectDir)../libs;</AdditionalLibraryDirectories>
     </Lib>
     <Lib>
       <SubSystem>Console</SubSystem>
@@ -228,7 +228,6 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="include\Core\Core.cpp" />
-    <ClCompile Include="include\Core\Reflection.cpp" />
     <ClCompile Include="src\components\graphics\Border.cpp" />
     <ClCompile Include="src\components\graphics\CanvasRenderer.cpp" />
     <ClCompile Include="src\components\graphics\Graphic.cpp" />
@@ -314,14 +313,14 @@
     <ClInclude Include="include\Core\Camera.h" />
     <ClInclude Include="include\Core\Component.h" />
     <ClInclude Include="include\Core\Core.h" />
+    <ClInclude Include="include\Core\dllexport.h" />
     <ClInclude Include="include\Core\Engine.h" />
-    <ClInclude Include="include\Core\HideFlags.h" />
-    <ClInclude Include="include\Core\IEntity.h" />
     <ClInclude Include="include\Core\EntityHandle.h" />
     <ClInclude Include="include\Core\EntityManager.h" />
     <ClInclude Include="include\Core\Graphics.h" />
+    <ClInclude Include="include\Core\HideFlags.h" />
+    <ClInclude Include="include\Core\IEntity.h" />
     <ClInclude Include="include\Core\Input.h" />
-    <ClInclude Include="include\Core\Reflection.h" />
     <ClInclude Include="include\Core\Scene.h" />
     <ClInclude Include="include\Core\SceneManager.h" />
     <ClInclude Include="include\Core\Window.h" />
@@ -393,7 +392,6 @@
     <ClInclude Include="src\components\ui\input\CheckBox.h" />
     <ClInclude Include="src\components\ui\input\InputField.generated.h" />
     <ClInclude Include="src\components\ui\input\InputField.h" />
-    <ClInclude Include="include\Core\dllexport.h" />
     <ClInclude Include="src\engine\FpsCounter.h" />
     <ClInclude Include="src\components\graphics\RectSprite.generated.h" />
     <ClInclude Include="src\components\graphics\RectSprite.h" />
@@ -429,7 +427,6 @@
     <ClInclude Include="src\entity\handle\Handle.h" />
     <ClInclude Include="src\entity\HideFlags.h" />
     <ClInclude Include="src\graphics\Camera.h" />
-    <ClInclude Include="src\graphics\data\Color.generated.h" />
     <ClInclude Include="src\graphics\data\Color.h" />
     <ClInclude Include="src\graphics\data\Shader.h" />
     <ClInclude Include="src\graphics\data\Texture2D.h" />

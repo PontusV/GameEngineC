@@ -1,5 +1,5 @@
-#include "Component.h"
 #include "ComponentRegistry.h"
+#include "Component.h"
 #include "ComponentLoader.h"
 #include "ComponentType.h"
 #include "ComponentTypeInfo.h"

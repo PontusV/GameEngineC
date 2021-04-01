@@ -18,7 +18,7 @@ namespace Core {
 		Handle getParent();
 
 	private:
-		PROPERTY()
+		//PROPERTY()
 		Handle parent;
 	};
 }

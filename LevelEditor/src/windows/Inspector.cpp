@@ -1,8 +1,9 @@
 #include "Inspector.h"
 #include "GameView.h"
+#include "EngineDLL.h"
 #include "imgui/imgui.h"
+#include <Core/Core.h>
 #include <Core/Component.h>
-#include <Core/Reflection.h>
 #include <Core/Scene.h>
 #include "utils/file.h"
 #include "utils/string.h"
@@ -23,13 +24,13 @@ bool vectorIncludes(std::vector<T> vec, T value) {
 
 //-------------
 
-Inspector::Inspector(GameView* gameView) : gameView(gameView) {}
+Inspector::Inspector(EngineDLL* engineDLL, GameView* gameView) : engineDLL(engineDLL), gameView(gameView) {}
 Inspector::~Inspector() {}
 
-std::vector<Core::ReflectedPropertyData> getProperties(std::size_t typeID, void* instance) {
-	std::size_t count = Core::getPropertiesCount(typeID);
+std::vector<Core::ReflectedPropertyData> getProperties(DLLInterface* dllInterface, std::size_t typeID, void* instance) {
+	std::size_t count = dllInterface->getPropertiesCount(typeID);
 	std::vector<Core::ReflectedPropertyData> properties(count);
-	Core::getProperties(typeID, instance, &properties[0], count);
+	dllInterface->getProperties(typeID, instance, &properties[0], count);
 	return properties;
 }
 
@@ -40,16 +41,16 @@ std::vector<IComponent*> getComponents(IEntityHandle* target) {
 	return components;
 }
 
-void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t index) {
+void renderComponent(DLLInterface* dllInterface, IEntityHandle* entity, IComponent* component, std::size_t index) {
 	std::size_t typeID = component->getTypeID();
-	if (Core::hasAnnotation(typeID, "hideInInspector")) return;
+	if (dllInterface->hasAnnotation(typeID, "hideInInspector")) return;
 	char typeName[256];
-	Core::getTypeName(typeID, typeName, 256);
+	dllInterface->getTypeName(typeID, typeName, 256);
 
 	bool closable_group = true;
 	if (ImGui::CollapsingHeader(typeName, &closable_group, ImGuiTreeNodeFlags_DefaultOpen)) {
 		ImGui::Indent();
-		for (Core::ReflectedPropertyData& prop : getProperties(typeID, component)) {
+		for (Core::ReflectedPropertyData& prop : getProperties(dllInterface, typeID, component)) {
 			std::string labelString = std::string(prop.name) + "##" + std::to_string(index);
 			const char* label = labelString.c_str();
 
@@ -66,17 +67,17 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 					ImGuiDataType_Float;
 
 				if (ImGui::InputScalar(label, dataType, ptr, NULL, NULL, "%.1f"))
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SIGNED_CHAR) {
 				void* ptr = prop.fieldBuffer[0].dataPtr;
 				if (ImGui::InputScalar("char", ImGuiDataType_S8, ptr, NULL, NULL, "%d"))
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SIGNED_NUMBER) {
 				void* ptr = prop.fieldBuffer[0].dataPtr;
 				if (ImGui::InputScalar("int", ImGuiDataType_S32, ptr, NULL, NULL, "%d"))
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				//ImGui::InputScalar("input s16", ImGuiDataType_S16, &s16_v, inputs_step ? &s16_one : NULL, NULL, "%d");
 				//ImGui::InputScalar("input u16", ImGuiDataType_U16, &u16_v, inputs_step ? &u16_one : NULL, NULL, "%u");
 				//ImGui::InputScalar("input s64", ImGuiDataType_S64, &s64_v, inputs_step ? &s64_one : NULL);
@@ -85,12 +86,12 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 			else if (prop.renderer == InspectorFieldRenderType::UNSIGNED_CHAR) {
 				void* ptr = prop.fieldBuffer[0].dataPtr;
 				if (ImGui::InputScalar(label, ImGuiDataType_U8, ptr, NULL, NULL, "%d"))
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 			}
 			else if (prop.renderer == InspectorFieldRenderType::UNSIGNED_NUMBER) {
 				void* ptr = prop.fieldBuffer[0].dataPtr;
 				if (ImGui::InputScalar(label, ImGuiDataType_U32, ptr, NULL, NULL, "%d"))
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 			}
 			else if (prop.renderer == InspectorFieldRenderType::STRING) {
 				void* ptr = prop.fieldBuffer[0].dataPtr;
@@ -100,7 +101,7 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 
 				if (ImGui::InputText(label, buffer, 64)) {
 					*value = buffer;
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::WIDE_STRING) {
@@ -112,7 +113,7 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 
 				if (ImGui::InputText(label, buffer, 64)) {
 					*value = utf8_decode(buffer);
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::IMAGE_PATH) {
@@ -123,12 +124,12 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 
 				if (ImGui::InputText(label, buffer, 64)) {
 					*value = buffer;
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 				if (ImGui::Button("Select image")) {
 					std::wstring filePath = getOpenFileName(L"Select A File", L"Image Files\0*.png;*.jpg;*.psd;*.tga;*.bmp\0Any File\0*.*\0", 2);
 					*value = utf8_encode(filePath);
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SHADER_PATH) {
@@ -139,14 +140,14 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 
 				if (ImGui::InputText(label, buffer, 64)) {
 					*value = buffer;
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 				if (ImGui::Button("Select shader")) {
 					std::wstring filePath = getOpenFileName(L"Select A File", L"Shader Files\0*.vert;*.frag\0Any File\0*.*\0", 2);
 					if (!filePath.empty()) {
 						std::string newValue = utf8_encode(filePath);
 						*value = newValue.substr(0, newValue.find_last_of("."));
-						Core::onUpdate(component, typeID, prop.index);
+						dllInterface->onUpdate(component, typeID, prop.index);
 					}
 				}
 			}
@@ -158,7 +159,7 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 				if (ImGui::InputFloat2(label, vec2f, "%.1f")) {
 					*xPtr = vec2f[0];
 					*yPtr = vec2f[1];
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::COLOR) {
@@ -172,7 +173,7 @@ void renderComponent(IEntityHandle* entity, IComponent* component, std::size_t i
 					*gPtr = color.y * 255.0f;
 					*bPtr = color.z * 255.0f;
 					*aPtr = color.w * 255.0f;
-					Core::onUpdate(component, typeID, prop.index);
+					dllInterface->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else {
@@ -211,10 +212,10 @@ bool contains(const std::vector<T>& vec, const T& value) {
 	return false;
 }
 
-bool filterComponentType(const std::vector<ComponentTypeID>& filter, const ComponentTypeID& typeID) {
-	std::size_t count = Core::getDerivedTypeIDsCount(typeID);
+bool filterComponentType(DLLInterface* dllInterface, const std::vector<ComponentTypeID>& filter, const ComponentTypeID& typeID) {
+	std::size_t count = dllInterface->getDerivedTypeIDsCount(typeID);
 	std::vector<ComponentTypeID> derivedTypeIDs(count);
-	Core::getDerivedTypeIDs(typeID, &derivedTypeIDs[0], count);
+	dllInterface->getDerivedTypeIDs(typeID, &derivedTypeIDs[0], count);
 	for (const ComponentTypeID& filterID : filter) {
 		if (typeID == filterID || contains(derivedTypeIDs, filterID)) {
 			return true;
@@ -223,16 +224,16 @@ bool filterComponentType(const std::vector<ComponentTypeID>& filter, const Compo
 	return false;
 }
 
-void renderComponentCombo(IEntityHandle* target) { // TODO: Get list of all types (typeID, name)
+void renderComponentCombo(DLLInterface* dllInterface, IEntityHandle* target) { // TODO: Get list of all types (typeID, name)
 	std::vector<ComponentTypeID> filter;
 	for (IComponent* component : getComponents(target)) {
 		filter.push_back(component->getTypeID());
 	}
-	std::size_t count = Core::getAllReflectedTypesCount();
+	std::size_t count = dllInterface->getAllReflectedTypesCount();
 	std::vector<ReflectedTypeData> types(count);
-	Core::getAllReflectedTypes(&types[0], count);
+	dllInterface->getAllReflectedTypes(&types[0], count);
 	for (ReflectedTypeData& type : types) {
-		if (!filterComponentType(filter, type.typeID)) {
+		if (!filterComponentType(dllInterface, filter, type.typeID)) {
 			if (ImGui::Selectable(type.typeName, false)) {
 				target->addComponent(type.typeID);
 			}
@@ -241,15 +242,16 @@ void renderComponentCombo(IEntityHandle* target) { // TODO: Get list of all type
 }
 
 void Inspector::tick() {
+	DLLInterface* dllInterface = engineDLL->getInterface();
 	IEntityHandle* target = gameView->getTarget();
-	if (target->getEntity() != prevTarget) { // On target change
+	if (target && target->getEntity() != prevTarget) { // On target change
 		renameActive = false;
 	}
-	prevTarget = target->getEntity();
+	prevTarget = target ? target->getEntity() : Entity(0);
 
 	ImGui::Begin("Inspector");
 
-	if (target->refresh()) {
+	if (dllInterface && target && target->refresh()) {
 		if (renameActive) {
 			std::string* value = &renameValue;
 			char buffer[64];
@@ -302,12 +304,12 @@ void Inspector::tick() {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.0f, 5.0f));
 		std::size_t i = 0;
 		for (IComponent* component : getComponents(target)) {
-			renderComponent(target, component, i++);
+			renderComponent(dllInterface, target, component, i++);
 		}
 		if (ImGui::Button("Add component", ImVec2(ImGui::GetContentRegionAvailWidth(), 30)))
 			ImGui::OpenPopup("add_component_popup");
 		if (ImGui::BeginPopup("add_component_popup")) {
-			renderComponentCombo(target); // TODO: Get list of all types (typeID, name)
+			renderComponentCombo(dllInterface, target); // TODO: Get list of all types (typeID, name)
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();

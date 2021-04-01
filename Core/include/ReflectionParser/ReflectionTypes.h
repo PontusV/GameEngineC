@@ -48,6 +48,7 @@ namespace Mirror {
 
 	struct Type {
 		std::string name;
+		std::size_t size;
 	};
 
 	struct VariableType : public Type {
@@ -304,7 +305,7 @@ namespace Mirror {
 		Class(unsigned int typeID) : typeID(typeID) {}
 	public:
 		const unsigned int typeID;
-		bool isAbstract;
+		bool isAbstract = false;
 	};
 }
 

@@ -6,11 +6,12 @@
 namespace Editor {
 
 	class GameView;
+	class EngineDLL;
 
 	/* The game view window */
 	class Inspector {
 	public:
-		Inspector(GameView* gameView);
+		Inspector(EngineDLL* engineDLL, GameView* gameView);
 		~Inspector();
 
 		/* Renders ImGui window */
@@ -18,6 +19,8 @@ namespace Editor {
 
 	private:
 		GameView* gameView;
+		EngineDLL* engineDLL;
+
 		Core::Entity prevTarget = Core::Entity(0);
 		bool renameActive = false;
 		std::string renameValue;

@@ -1,6 +1,9 @@
 Core/Debug/*
 Core/Release/*
 Core/x64/*
+Game/Debug/*
+Game/Release/*
+Game/x64/*
 LevelEditor/Debug/*
 LevelEditor/Release/*
 LevelEditor/x64/*

@@ -4,12 +4,353 @@
   Parse starting!
   Parse successful!
 cl : command line warning D9002: ignoring unknown option '/arch:SSE'
-  Reflection.cpp
+  glad.c
+cl : command line warning D9002: ignoring unknown option '/arch:SSE'
+  Core.cpp
 G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-     Creating library G:\Projects\ProjectGE\x64\Release\Core.lib and object G:\Projects\ProjectGE\x64\Release\Core.exp
-  Generating code
-  2 of 8543 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    61 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  Core.vcxproj -> G:\Projects\ProjectGE\x64\Release\Core.dll
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Border.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  CanvasRenderer.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Graphic.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Mask.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  RectMask.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  SpriteMask.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Renderer.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  SpriteRenderer.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  DragAndResize.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Behaviour.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ChildManager.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ParentEntity.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Image.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Text.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Button.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ContentSizeFitter.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  DropDown.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(104,81): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(104,68): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(126,71): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(126,61): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(133,81): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(133,53): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(140,72): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(214,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\entity\handle\EntityHandle.h(42): message : see reference to function template instantiation 'T *Core::Scene::addComponentQueued<T>(Core::Entity,T &)' being compiled
+          with
+          [
+              T=Core::Text
+          ]
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(29): message : see reference to function template instantiation 'T *Core::EntityHandle::addComponent<Core::Text>(T)' being compiled
+          with
+          [
+              T=Core::Text
+          ]
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(194,2): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\components\Behaviour.h(101): message : see reference to function template instantiation 'Core::Handle Core::Scene::createEntityQueued<Core::RectSprite>(std::string,Core::RectSprite &)' being compiled
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDown.cpp(88): message : see reference to function template instantiation 'Core::EntityHandle Core::Behaviour::createEntity<Core::RectSprite>(std::string,Core::RectSprite)' being compiled
+  DropDownScroll.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(25,56): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(25,50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(31,33): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(31,23): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(34,27): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(35,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(50,81): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(50,68): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(77,86): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(77,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(84,70): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(92,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(92,17): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(194,2): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\components\Behaviour.h(101): message : see reference to function template instantiation 'Core::Handle Core::Scene::createEntityQueued<Core::RectTransform>(std::string,Core::RectTransform &)' being compiled
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(26): message : see reference to function template instantiation 'Core::EntityHandle Core::Behaviour::createEntity<Core::RectTransform>(std::string,Core::RectTransform)' being compiled
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(214,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\entity\handle\EntityHandle.h(34): message : see reference to function template instantiation 'T *Core::Scene::addComponentQueued<T>(Core::Entity,T &)' being compiled
+          with
+          [
+              T=Core::ScrollRect
+          ]
+G:\Projects\ProjectGE\Core\src\components\ui\input\DropDownScroll.cpp(33): message : see reference to function template instantiation 'T *Core::EntityHandle::addComponent<Core::ScrollRect,>(void)' being compiled
+          with
+          [
+              T=Core::ScrollRect
+          ]
+  GridLayoutGroup.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Compiling...
+  HorizontalLayoutGroup.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  LayoutController.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  LayoutElement.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  LayoutGroup.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  RectButton.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ScrollBar.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(214,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\entity\handle\EntityHandle.h(42): message : see reference to function template instantiation 'T *Core::Scene::addComponentQueued<T>(Core::Entity,T &)' being compiled
+          with
+          [
+              T=Core::RectSprite
+          ]
+G:\Projects\ProjectGE\Core\src\components\ui\input\ScrollBar.cpp(22): message : see reference to function template instantiation 'T *Core::EntityHandle::addComponent<Core::RectSprite>(T)' being compiled
+          with
+          [
+              T=Core::RectSprite
+          ]
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(194,2): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\components\Behaviour.h(101): message : see reference to function template instantiation 'Core::Handle Core::Scene::createEntityQueued<Core::RectSprite,Core::RectTransform>(std::string,Core::RectSprite &,Core::RectTransform &)' being compiled
+G:\Projects\ProjectGE\Core\src\components\ui\input\ScrollBar.cpp(36): message : see reference to function template instantiation 'Core::EntityHandle Core::Behaviour::createEntity<Core::RectSprite,Core::RectTransform>(std::string,Core::RectSprite,Core::RectTransform)' being compiled
+  ScrollRect.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  UIBehaviour.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  VerticalLayoutGroup.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  WindowScale.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  CheckBox.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(194,2): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\components\Behaviour.h(101): message : see reference to function template instantiation 'Core::Handle Core::Scene::createEntityQueued<Core::Image,Core::RectTransform>(std::string,Core::Image &,Core::RectTransform &)' being compiled
+G:\Projects\ProjectGE\Core\src\components\ui\input\CheckBox.cpp(24): message : see reference to function template instantiation 'Core::EntityHandle Core::Behaviour::createEntity<Core::Image,Core::RectTransform>(std::string,Core::Image,Core::RectTransform)' being compiled
+  InputField.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(194,2): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\components\Behaviour.h(101): message : see reference to function template instantiation 'Core::Handle Core::Scene::createEntityQueued<>(std::string)' being compiled
+G:\Projects\ProjectGE\Core\src\components\ui\input\InputField.cpp(28): message : see reference to function template instantiation 'Core::EntityHandle Core::Behaviour::createEntity<>(std::string)' being compiled
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(214,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\entity\handle\EntityHandle.h(42): message : see reference to function template instantiation 'T *Core::Scene::addComponentQueued<T>(Core::Entity,T &)' being compiled
+          with
+          [
+              T=Core::RectTransform
+          ]
+G:\Projects\ProjectGE\Core\src\components\ui\input\InputField.cpp(31): message : see reference to function template instantiation 'T *Core::EntityHandle::addComponent<Core::RectTransform>(T)' being compiled
+          with
+          [
+              T=Core::RectTransform
+          ]
+  FpsCounter.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  RectSprite.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Selectable.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  WindowAnchor.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  MouseDrag.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  RectTransform.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Transform.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  BehaviourManager.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Compiling...
+  Engine.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  ResourceManager.cpp
+  Archetype.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Chunk.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\entity\Chunk.cpp(53,30): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\entity\Chunk.cpp(163,30): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\entity\Chunk.cpp(228,30): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Component.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ComponentLoader.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ComponentRegistry.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.h(214,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+G:\Projects\ProjectGE\Core\src\entity\handle\EntityHandle.h(42): message : see reference to function template instantiation 'T *Core::Scene::addComponentQueued<T>(Core::Entity,T &)' being compiled
+          with
+          [
+              T=Core::ChildManager
+          ]
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentLoader.h(71): message : see reference to function template instantiation 'T *Core::EntityHandle::addComponent<T>(T)' being compiled
+          with
+          [
+              T=Core::ChildManager
+          ]
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentLoader.h(48): message : see reference to function template instantiation 'void Core::ComponentLoader::addComponentFromFile_impl<T>(std::istream &,Core::EntityHandle &)' being compiled
+          with
+          [
+              T=Core::ChildManager
+          ]
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentRegistry.cpp(13): message : see reference to function template instantiation 'void Core::ComponentLoader::registerComponent<T>(void)' being compiled
+          with
+          [
+              T=Core::ChildManager
+          ]
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentRegistry.cpp(35): message : see reference to function template instantiation 'void registerToLoader<T>(void)' being compiled
+          with
+          [
+              T=Core::ChildManager
+          ]
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentRegistry.cpp(35): message : see reference to function template instantiation 'void registerComponentTypes_impl<Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>(Mirror::TypeList<Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>)' being compiled
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentRegistry.cpp(35): message : see reference to function template instantiation 'void registerComponentTypes_impl<Core::Behaviour,Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>(Mirror::TypeList<Core::Behaviour,Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>)' being compiled
+G:\Projects\ProjectGE\Core\src\entity\component\ComponentRegistry.cpp(57): message : see reference to function template instantiation 'void registerComponentTypes_impl<Core::Component,Core::Behaviour,Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>(Mirror::TypeList<Core::Component,Core::Behaviour,Core::ChildManager,Core::ParentEntity,Core::Graphic,Core::Border,Core::Renderer,Core::CanvasRenderer,Core::Image,Core::Mask,Core::RectMask,Core::SpriteMask,Core::RectSprite,Core::SpriteRenderer,Core::Transform,Core::RectTransform,Core::Text,Core::MouseDrag,Core::Button,Core::CheckBox,Core::DragAndResize,Core::DropDown,Core::DropDownScroll,Core::Selectable,Core::InputField,Core::RectButton,Core::UIBehaviour,Core::ScrollBar,Core::LayoutController,Core::ContentSizeFitter,Core::GridLayoutGroup,Core::LayoutGroup,Core::HorizontalLayoutGroup,Core::LayoutElement,Core::VerticalLayoutGroup,Core::ScrollRect,Core::WindowAnchor,Core::WindowScale>)' being compiled
+  ComponentType.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Entity.cpp
+  EntityManager.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ComponentFunctionHandle.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ComponentHandle.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  EntityHandle.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Handle.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Camera.cpp
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Color.cpp
+  Shader.cpp
+  Texture2D.cpp
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(22,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(23,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(25,12): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(27,58): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(44,61): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\data\Texture2D.cpp(44,53): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
+  Font.cpp
+  FontManager.cpp
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(32,6): warning C4267: 'argument': conversion from 'size_t' to 'FT_ULong', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(33,20): warning C4477: 'fprintf' : format string '%c' requires an argument of type 'int', but variadic argument 1 has type 'size_t'
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(63,6): warning C4267: 'argument': conversion from 'size_t' to 'FT_ULong', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(64,20): warning C4477: 'fprintf' : format string '%c' requires an argument of type 'int', but variadic argument 1 has type 'size_t'
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(128,54): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\font\FontManager.cpp(129,54): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  Compiling...
+  Graphics.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(86,58): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(100,57): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(113,56): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(133,63): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(158,58): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(172,57): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(185,56): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(205,63): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned char', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(288,20): warning C4244: '=': conversion from 'const size_t' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\Graphics.cpp(291,20): warning C4244: '=': conversion from 'const size_t' to 'float', possible loss of data
+  BatchRenderer2D.cpp
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\renderer\BatchRenderer2D.cpp(182,35): warning C4267: 'argument': conversion from 'size_t' to 'GLenum', possible loss of data
+G:\Projects\ProjectGE\Core\src\graphics\renderer\BatchRenderer2D.cpp(193,111): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  PostProcessor.cpp
+  Renderer2D.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Window.cpp
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Input.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  KeyListener.cpp
+  Matrix4.cpp
+  Vector2.cpp
+  Vector3.cpp
+  Vector4.cpp
+  Physics.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Scene.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+G:\Projects\ProjectGE\Core\src\scene\Scene.cpp(204,30): warning C4018: '<': signed/unsigned mismatch
+G:\Projects\ProjectGE\Core\src\scene\Scene.cpp(482,39): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  SceneManager.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  GUISystem.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Bounds.cpp
+G:\Projects\ProjectGE\Core\include\Core\EntityHandle.h(14,1): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\maths\MatrixTransform.h(27,19): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Clipboard.cpp
+G:\Projects\ProjectGE\Core\src\utils\Clipboard.cpp(12,50): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+G:\Projects\ProjectGE\Core\src\utils\Clipboard.cpp(43,66): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+  FunctionCaller.cpp
+  Serializable.cpp
+  string.cpp
+  Compiling...
+  UIDContainer.cpp
+user32.lib(USER32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
+gdi32.lib(GDI32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
+shell32.lib(SHELL32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
+freetype.lib(freetype.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
+  Core.vcxproj -> G:\Projects\ProjectGE\x64\Release\Core.lib

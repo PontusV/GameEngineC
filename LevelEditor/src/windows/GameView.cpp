@@ -1,4 +1,5 @@
 #include "GameView.h"
+#include "LevelEditor.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -7,15 +8,13 @@
 #include <Core/Camera.h>
 #include <Core/Window.h>
 #include <Core/Engine.h>
-//#include "maths/MatrixTransform.h"		// TODO: DLL
-//#include "maths/Vector2.h"				// TODO: DLL
-//#include "components/RectTransform.h"	// TODO: DLL
+#include <GLFW/glfw3.h>
 
 using namespace Core;
 using namespace Editor;
 
 
-GameView::GameView(IEngine* engine) : engine(engine), target(Core::createEntityHandle(nullptr, Entity(0))) {
+GameView::GameView(LevelEditor* editor) : editor(editor), target(nullptr) {
 }
 
 GameView::~GameView() {
@@ -23,22 +22,35 @@ GameView::~GameView() {
 		target->release();
 }
 
-void GameView::initialize() {
-	viewportSize = ImVec2(1.0f, 1.0f);
+void GameView::initialize(ImVec2 viewportSize) {
 	viewport.initialize(viewportSize.x, viewportSize.y);
-
 	grid.initialize(viewportSize.x, viewportSize.y, 100);
 }
 
 void GameView::tick(float deltaTime) {
-	ICamera* camera = engine->getGraphicsInterface()->getCameraInterface();
-	IWindow* window = engine->getGraphicsInterface()->getWindowInterface();
-
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("Scene window");
 
 	ImVec2 pMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y);
 	ImVec2 pMax = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMax().y);
+
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	DLLInterface* dllInterface = engineDLL->getInterface();
+	if (!dllInterface) {
+		viewport.begin();
+		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		grid.render(0, 0);
+		viewport.end();
+
+		ImGui::GetWindowDrawList()->AddImage((ImTextureID)static_cast<uintptr_t>(viewport.getTextureID()), pMin, pMax, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::End();
+		ImGui::PopStyleVar();
+		return;
+	}
+	IEngine* engine = editor->getEngine();
+	ICamera* camera = engine->getGraphicsInterface()->getCameraInterface();
+	IWindow* window = engine->getGraphicsInterface()->getWindowInterface();
 
 	ImVec2 currentViewportSize = ImVec2(pMax.x - pMin.x, pMax.y - pMin.y);
 	if (viewportSize.x != currentViewportSize.x || viewportSize.y != currentViewportSize.y) {
@@ -59,9 +71,9 @@ void GameView::tick(float deltaTime) {
 	ImGui::GetWindowDrawList()->AddImage((ImTextureID)static_cast<uintptr_t>(viewport.getTextureID()), pMin, pMax, ImVec2(0, 1), ImVec2(1, 0));
 
 	// Target rect
-	if (Core::hasTransform(target)) {
-		Core::Vec2 targetSize = Core::getSize(target);
-		Core::Vec2 minPosition = Core::getMinRectScreenPosition(camera, target);
+	if (target && dllInterface->hasTransform(target)) {
+		Core::Vec2 targetSize = dllInterface->getSize(target);
+		Core::Vec2 minPosition = dllInterface->getMinRectScreenPosition(camera, target);
 		ImVec2 rectMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x + minPosition.x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y + minPosition.y);
 		ImGui::GetWindowDrawList()->AddRect(rectMin, ImVec2(rectMin.x + targetSize.x, rectMin.y + targetSize.y), IM_COL32_WHITE, 0.0f, ImDrawCornerFlags_None, 2.0f);
 	}
@@ -74,7 +86,7 @@ void GameView::tick(float deltaTime) {
 			IEntityHandle* entity = engine->getInputInterface()->createEntityHandleAtPos(position.x, position.y);
 			if (entity) {
 				targetPressed = true;
-				target->release();
+				releaseTarget();
 				target = entity; // New target
 			}
 		}
@@ -89,11 +101,11 @@ void GameView::tick(float deltaTime) {
 		ImVec2 dragDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 		ImGui::ResetMouseDragDelta();
 
-		if (targetPressed && target->isValid()) {
-			Core::Vec2 position = Core::getLocalPosition(target);
+		if (targetPressed && target && target->isValid()) {
+			Core::Vec2 position = dllInterface->getLocalPosition(target);
 			position.x += dragDelta.x;
 			position.y += dragDelta.y;
-			Core::setLocalPosition(target, position);
+			dllInterface->setLocalPosition(target, position);
 		}
 		else {
 			camera->moveX(-dragDelta.x);
@@ -109,11 +121,24 @@ IEntityHandle* GameView::getTarget() {
 }
 
 void GameView::setTarget(Core::IEntityHandle* handle) {
-	target->release();
-	target = Core::createEntityHandle(handle->getIScene(), handle->getEntity());
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	auto dllInterface = engineDLL->getInterface();
+	if (!dllInterface) {
+		std::cout << "Failed to set target because no Engine DLL was loaded" << std::endl;
+		return;
+	}
+	releaseTarget();
+	target = dllInterface->createEntityHandle(handle->getIScene(), handle->getEntity());
 	targetPressed = false;
 }
 
 ImVec2 GameView::getViewportSize() const {
 	return viewportSize;
+}
+
+void GameView::releaseTarget() {
+	if (target) {
+		target->release();
+	}
+	target = nullptr;
 }

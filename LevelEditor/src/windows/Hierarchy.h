@@ -3,13 +3,13 @@
 
 #include <vector>
 #include <unordered_map>
-#include <Core/EntityHandle.h>
-#include <Core/SceneManager.h>
 #include <Core/Scene.h>
 #include "GameView.h"
 
 namespace Core {
 	class IScene;
+	class IEntityHandle;
+	class ISceneManager;
 }
 
 namespace Editor {
@@ -25,13 +25,17 @@ namespace Editor {
 
 	class Hierarchy {
 	public:
-		Hierarchy(LevelEditor* editor, Core::ISceneManager* sceneManager, GameView* gameView);
+		Hierarchy(LevelEditor* editor, GameView* gameView);
 		~Hierarchy();
 
 		/* Renders ImGui window */
 		void tick(Core::IEntityHandle* target);
 		/* Updates scene and root orders */
 		void update();
+		/* Initializes for the currently loaded Engine DLL */
+		void initiate();
+		/* Removes all currently added scenes */
+		void clear();
 
 		void onSceneAdded(Core::IScene* scene);
 		void onSceneRemoved(Core::IScene* scene);
@@ -41,7 +45,6 @@ namespace Editor {
 		bool setRootIndex(Core::IScene* scene, Core::IEntityHandle* handle, std::size_t index);
 	private:
 		LevelEditor* editor;
-		Core::ISceneManager* sceneManager;
 		GameView* gameView;
 		std::unordered_map<Core::IScene*, std::vector<EntityHierarchy>> sceneOrder;
 	};

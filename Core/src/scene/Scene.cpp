@@ -464,7 +464,7 @@ void Scene::serialize(std::ostream& os) const {
 		os.write((char*)&componentAmount, sizeof(std::size_t));		// Component amount
 
 		for (std::size_t i = 0; i < components.size(); i++) {		// Loop through Components
-			std::string typeName = componentTypeInfoVec[i].name;
+			std::string typeName = componentTypeInfoVec[i].name; // TODO: Use SerializationID instead
 			os.write(typeName.c_str(), typeName.size() + 1);		// Component Type name
 			components[i]->serialize(os);	// Component Data
 			//os.write((char*)&components[i], componentTypeInfoVec[i].size);	// Component Data
@@ -535,7 +535,7 @@ void Scene::deserialize(std::istream& is) {
 		is.read((char*)&componentAmount, sizeof(std::size_t));			// Component amount
 
 		for (std::size_t ii = 0; ii < componentAmount; ii++) {			// Loop through Components
-			std::string typeName;
+			std::string typeName; // TODO: Use SerializationID instead
 			std::getline(is, typeName, '\0');							// Component Type name
 			ComponentLoader::addComponentFromFile(is, typeName, object);// Component Data
 		}

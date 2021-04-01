@@ -1,14 +1,17 @@
 #include "Hierarchy.h"
-#include <iostream>
-#include <Core/Core.h>
-#include <Core/Scene.h>
 #include "utils/string.h"
+#include "LevelEditor.h"
+#include <iostream>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include "LevelEditor.h"
+#include <Core/Core.h>
+#include <Core/Scene.h>
+#include <Core/EntityHandle.h>
+#include <Core/SceneManager.h>
+
 
 using namespace Editor;
 using namespace Core;
@@ -42,7 +45,7 @@ void entityNode(EntityHierarchy& entry, IEntityHandle* target, GameView* gameVie
 	IEntityHandle* entity = entry.entity;
 	std::string name = entity->getEntityName();
 	std::size_t childCount = entity->getChildCount();
-	bool selected = target->isValid() && entity == target;
+	bool selected = target && target->isValid() && entity == target;
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
 	if (selected) {
 		flags |= ImGuiTreeNodeFlags_Selected;
@@ -81,15 +84,13 @@ void entityNode(EntityHierarchy& entry, IEntityHandle* target, GameView* gameVie
 	}
 }
 
-Hierarchy::Hierarchy(LevelEditor* editor, Core::ISceneManager* sceneManager, GameView* gameView) : editor(editor), sceneManager(sceneManager), gameView(gameView) {
-	sceneManager->setCallbackPtr(this);
-	sceneManager->setSceneAddedCallback(sceneAddedCallback);
-	sceneManager->setSceneRemovedCallback(sceneRemovedCallback);
+Hierarchy::Hierarchy(LevelEditor* editor, GameView* gameView) : editor(editor), gameView(gameView) {
 }
 Hierarchy::~Hierarchy() {}
 
 void Hierarchy::tick(IEntityHandle* target) {
-	update(); // TODO: Update every 0.1 sec
+	IEngine* engine = editor->getEngine();
+	update();
 	ImGui::Begin("Hierarchy");
 	for (auto& scenePair : sceneOrder) {
 		bool openPopup = false;
@@ -125,7 +126,9 @@ void Hierarchy::tick(IEntityHandle* target) {
 				ImGui::OpenPopup("create_entity_popup"); // TODO: WIP. CURRENTLY DOES NOT WORK. Target this scene
 			}
 			if (ImGui::Selectable("Save and Close", false)) {
-				sceneManager->saveScene(scene);
+				if (engine) {
+					engine->getSceneManagerInterface()->saveScene(scene);
+				}
 				editor->closeScene(scene);
 			}
 			ImGui::EndPopup();
@@ -263,40 +266,15 @@ std::vector<EntityHierarchy> getCurrentHierarchy(IScene* scene) {
 }
 
 void Hierarchy::update() {
-	// Check for scene changes
-	for (auto it = sceneOrder.begin(); it != sceneOrder.end(); it++) {
-		if (it->first->hasEntitiesChanged()) {
-			onSceneChanged(it);
+	IEngine* engine = editor->getEngine();
+	if (engine) {
+		// Check for scene changes
+		for (auto it = sceneOrder.begin(); it != sceneOrder.end(); it++) {
+			if (it->first->hasEntitiesChanged()) {
+				onSceneChanged(it);
+			}
 		}
 	}
-	/*
-	std::size_t sceneCount = sceneManager->getAllScenesCount();
-	std::vector<IScene*> scenes(sceneCount);
-	sceneManager->getAllIScenes(&scenes[0], sceneCount);
-
-	sceneOrder.clear();
-	for (IScene* scene : scenes) {
-		sceneOrder.insert(std::pair(scene, getCurrentHierarchy(scene)));
-	}
-
-	// Remove scenes
-	eraseRemovedScenes(scenes, sceneOrder);
-
-	// Entity
-	for (auto sceneIt = sceneOrder.begin(); sceneIt != sceneOrder.end(); sceneIt++) {
-		std::vector<IEntityHandle*>& prevEntities = sceneIt->second;
-		std::vector<IEntityHandle*> currEntities = getRootEntities(sceneIt->first);
-
-		eraseRemovedEntities(currEntities, prevEntities);
-
-		std::vector<IEntityHandle*> newEntities = getNewEntities(currEntities, prevEntities);
-		prevEntities.insert(prevEntities.end(), newEntities.begin(), newEntities.end());
-	}
-
-	// Add scenes
-	for (IScene* scene : getNewScenes(scenes, sceneOrder)) {
-		sceneOrder.insert(std::pair(scene, getRootEntities(scene)));
-	}*/
 }
 
 void Hierarchy::onSceneAdded(IScene* scene) {
@@ -312,4 +290,18 @@ void Hierarchy::onSceneRemoved(IScene* scene) {
 
 void Hierarchy::onSceneChanged(std::unordered_map<Core::IScene*, std::vector<EntityHierarchy>>::iterator& iterator) {
 	iterator->second = getCurrentHierarchy(iterator->first);
+}
+
+void Hierarchy::initiate() {
+	IEngine* engine = editor->getEngine();
+	if (engine) {
+		ISceneManager* sceneManager = engine->getSceneManagerInterface();
+		sceneManager->setCallbackPtr(this);
+		sceneManager->setSceneAddedCallback(sceneAddedCallback);
+		sceneManager->setSceneRemovedCallback(sceneRemovedCallback);
+	}
+}
+
+void Hierarchy::clear() {
+	sceneOrder.clear();
 }
