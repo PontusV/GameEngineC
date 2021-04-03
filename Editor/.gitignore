@@ -1,0 +1,12 @@
+LevelEditor/Debug/*
+LevelEditor/Release/*
+LevelEditor/x64/*
+LevelEditor/libs/win64/Core.lib
+x64/*
+Debug/*
+Release/*
+*.generated.h
+*.db
+*.ipch
+.vs/*
+gimp/*
