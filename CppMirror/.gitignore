@@ -1,0 +1,13 @@
+ReflectionExample/Debug/*
+ReflectionExample/Release/*
+ReflectionParser/Debug/*
+ReflectionParser/Release/*
+ReflectionExample/x64/*
+ReflectionParser/x64/*
+Debug/*
+Release/*
+.vs/*
+ReflectionExample/.vs/*
+ReflectionParser/.vs/*
+*.vcxproj.filters
+*.vcxproj.user
