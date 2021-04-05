@@ -15,7 +15,6 @@ Window::Window() : active(false) {
 }
 
 Window::~Window() {
-	glfwTerminate();
 }
 
 /* Destroys current window if there is any. Creates new one with the given parameters. */
@@ -32,7 +31,6 @@ bool Window::init() {
 
 	window = glfwCreateWindow((int)resolution.x, (int)resolution.y, title, NULL, NULL);
 	if (!window) {
-		glfwTerminate();
 		std::cout << "Failed to create GLFW window!" << std::endl;
 		return false;
 	}

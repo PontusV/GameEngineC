@@ -462,12 +462,3 @@ Entity Input::getEntityAtPos(float x, float y) {
 	EntityHandle handle = getEntityHandleAtPos(x, y);
 	return handle.getEntity();
 }
-
-IEntityHandle* Input::createEntityHandleAtPos(float x, float y) {
-	EntityHandle handle = getEntityHandleAtPos(x, y);
-	IEntityHandle* ptr = new Handle(handle);
-	if (ptr->isValid()) {
-		return ptr;
-	}
-	return nullptr;
-}

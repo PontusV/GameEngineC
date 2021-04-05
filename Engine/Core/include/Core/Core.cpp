@@ -1,98 +1,31 @@
 #include "Core.h"
+#include "entity/Entity.h"
 #include "engine/Engine.h"
+#include "components/graphics/Image.h"
+#include "components/graphics/SpriteRenderer.h"
 #include "components/RectTransform.h"
-#include "components/Transform.h"
-#include "entity/handle/Handle.h"
-#include "graphics/Camera.h"
+#include "components/entity/ParentEntity.h"
+#include "components/entity/ChildManager.h"
+#include "ReflectionPolymorph.generated.h"
+
+#include <algorithm>
 #include "maths/MatrixTransform.h"
+#include "utils/string.h"
 using namespace Core;
 
-
-IEngine* DLLInterface::createEngine() {
-	return new Engine();
-}
-
-void DLLInterface::createTemplateEntity(IScene* scene, const char* name, float x, float y, float width, float height) {
-	static_cast<Scene*>(scene)->createEntity(name,
-		Image("resources/images/awesomeface.png"),
-		RectTransform(x, y, width, height, 0.0f, Alignment::CENTER),
-		SpriteRenderer()
-	);
-}
-
-IEntityHandle* DLLInterface::createEntityHandle(IScene* scene, Entity entity) {
-	return new Handle(entity, static_cast<Scene*>(scene));
-}
-
-bool DLLInterface::hasTransform(IEntityHandle* entity) {
-	return static_cast<Handle*>(entity)->hasComponent<Transform>();
-}
-
-Vec2 DLLInterface::getMinRectScreenPosition(ICamera* camera, IEntityHandle* entity) {
-	RectTransform* transform = static_cast<Handle*>(entity)->getComponent<RectTransform>();
-	if (!transform) return Vec2{ 0, 0 };
-	const Vector2& targetSize = transform->getSize();
-	Vector2 position = static_cast<Camera*>(camera)->getViewMatrix() * transform->getPosition();
-	Vector2 minPosition = Vector2(position.x + transform->getRectOffset().x, position.y + transform->getRectOffset().y);
-	return Vec2{ minPosition.x, minPosition.y };
-}
-
-Vec2 DLLInterface::getPosition(IEntityHandle* entity) {
-	Transform* transform = static_cast<Handle*>(entity)->getComponent<Transform>();
-	if (!transform) return Vec2{ 0, 0 };
-	const Vector2& pos = transform->getPosition();
-	return Vec2{ pos.x, pos.y };
-}
-
-Vec2 DLLInterface::getLocalPosition(IEntityHandle* entity) {
-	Transform* transform = static_cast<Handle*>(entity)->getComponent<Transform>();
-	if (!transform) return Vec2{ 0, 0 };
-	const Vector2& pos = transform->getLocalPosition();
-	return Vec2{ pos.x, pos.y };
-}
-
-Vec2 DLLInterface::getSize(IEntityHandle* entity) {
-	RectTransform* transform = static_cast<Handle*>(entity)->getComponent<RectTransform>();
-	if (!transform) return Vec2{ 0, 0 };
-	const Vector2& size = transform->getSize();
-	return Vec2{size.x, size.y};
-}
-
-bool DLLInterface::setPosition(IEntityHandle* entity, Vec2 position) {
-	Transform* transform = static_cast<Handle*>(entity)->getComponent<Transform>();
-	if (!transform) return false;
-	transform->setPosition(Vector2(position.x, position.y));
-	return true;
-}
-
-bool DLLInterface::setLocalPosition(IEntityHandle* entity, Vec2 position) {
-	Transform* transform = static_cast<Handle*>(entity)->getComponent<Transform>();
-	if (!transform) return false;
-	transform->setLocalPosition(Vector2(position.x, position.y));
-	return true;
-}
-
-bool DLLInterface::setSize(IEntityHandle* entity, Vec2 size) {
-	RectTransform* transform = static_cast<Handle*>(entity)->getComponent<RectTransform>();
-	if (!transform) return false;
-	transform->setSize(Vector2(size.x, size.y));
-	return true;
-}
-
-// ------------------------------------- REFLECTION -------------------------------------
-
-#include <ReflectionParser/ReflectionTypes.h>
-#include "ReflectionPolymorph.generated.h"
-#include <cstring>
-#include <algorithm>
-
-
+// Utils
 template<typename T>
 bool vectorIncludes(const std::vector<T>& vec, T value) {
 	for (const T& e : vec) {
 		if (e == value) return true;
 	}
 	return false;
+}
+
+void copyString(const std::string& src, char* dest, std::size_t destSize) {
+	std::size_t size = std::min(src.size(), destSize - 1);
+	strncpy_s(dest, destSize, src.c_str(), size);
+	dest[size] = '\0';
 }
 
 InspectorFieldRenderType getRendererFromProp(const Mirror::Property& prop) {
@@ -133,112 +66,498 @@ InspectorFieldRenderType getRendererFromProp(const Mirror::Property& prop) {
 	}
 	return InspectorFieldRenderType::NONE;
 }
-
-void copyString(const std::string& src, char* dest, std::size_t destSize) {
-	std::size_t size = std::min(src.size(), destSize - 1);
-	strncpy_s(dest, destSize, src.c_str(), size);
-	dest[size] = '\0';
-}
-
-ReflectedPropertyData convertPropertyData(const Mirror::Property& prop, std::size_t index, void* instance, std::size_t typeID) {
-	ReflectedPropertyData data;
-	data.index = index;
-	copyString(prop.name, data.name, 256);
-	copyString(prop.type.name, data.typeName, 256);
-	data.id = 0; // WIP
-
-	data.renderer = getRendererFromProp(prop);
-
-	if (data.renderer == InspectorFieldRenderType::VECTOR2) {
+PropertyFieldData getFieldDataFromProp(const Mirror::Property& prop, void* instance, TypeID typeID) {
+	PropertyFieldData data;
+	auto renderer = getRendererFromProp(prop);
+	if (renderer == InspectorFieldRenderType::VECTOR2) {
 		Vector2* vec = static_cast<Vector2*>(Mirror::getPointer(prop, instance, typeID));
-		data.fieldCount = 2;
-		data.fieldBuffer[0].dataPtr = &vec->x;
-		data.fieldBuffer[1].dataPtr = &vec->y;
+		data.count = 2;
+		data.ptrBuffer[0] = &vec->x;
+		data.ptrBuffer[1] = &vec->y;
 	}
-	else if (data.renderer == InspectorFieldRenderType::COLOR) {
+	else if (renderer == InspectorFieldRenderType::COLOR) {
 		Color* color = static_cast<Color*>(Mirror::getPointer(prop, instance, typeID));
-		data.fieldCount = 4;
-		data.fieldBuffer[0].dataPtr = &color->r;
-		data.fieldBuffer[1].dataPtr = &color->g;
-		data.fieldBuffer[2].dataPtr = &color->b;
-		data.fieldBuffer[3].dataPtr = &color->a;
+		data.count = 4;
+		data.ptrBuffer[0] = &color->r;
+		data.ptrBuffer[1] = &color->g;
+		data.ptrBuffer[2] = &color->b;
+		data.ptrBuffer[3] = &color->a;
 	}
-	else if (data.renderer == InspectorFieldRenderType::FONT) {
+	else if (renderer == InspectorFieldRenderType::FONT) {
 		Font* font = static_cast<Font*>(Mirror::getPointer(prop, instance, typeID));
-		data.fieldCount = 2;
-		data.fieldBuffer[0].dataPtr = &font->fileName;
-		data.fieldBuffer[1].dataPtr = &font->size;
+		data.count = 2;
+		data.ptrBuffer[0] = &font->fileName;
+		data.ptrBuffer[1] = &font->size;
 	}
 	else {
 		Vector2* vec = static_cast<Vector2*>(Mirror::getPointer(prop, instance, typeID));
-		data.fieldCount = 1;
-		data.fieldBuffer[0].dataPtr = Mirror::getPointer(prop, instance, typeID);
+		data.count = 1;
+		data.ptrBuffer[0] = Mirror::getPointer(prop, instance, typeID);
 	}
 	return data;
 }
+// End of Utils
 
-void DLLInterface::onUpdate(IComponent* component, std::size_t typeID, std::size_t propIndex) {
-	Mirror::Class type = Mirror::getType(typeID);
-	Mirror::onUpdate(component, typeID, type.properties[propIndex]);
+Engine* createEngine() {
+	return new Engine();
 }
 
-/*void* Core::getPointer(IComponent* component, std::size_t typeID, std::size_t propIndex) {
-	Mirror::Class type = Mirror::getType(typeID);
-	return Mirror::getPointer(type.properties[propIndex], component, typeID);
-}*/
-
-void DLLInterface::getTypeName(std::size_t typeID, char* out, std::size_t size) {
-	copyString(Mirror::getName(typeID), out, size);
+void releaseEngine(Engine* ptr) {
+	delete ptr;
 }
 
-std::size_t DLLInterface::getPropertiesCount(std::size_t typeID) {
-	Mirror::Class type = Mirror::getType(typeID);
-	return type.properties.size();
+bool createTemplateEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name, float x, float y, float width, float height) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	scene->createEntity(name,
+		Image("resources/images/awesomeface.png"),
+		RectTransform(x, y, width, height, 0.0f, Alignment::CENTER),
+		SpriteRenderer()
+	);
+	return true;
 }
 
-void DLLInterface::getProperties(std::size_t typeID, void* instance, ReflectedPropertyData* out, std::size_t count) {
-	Mirror::Class type = Mirror::getType(typeID);
-	std::size_t size = std::min(count, type.properties.size());
-	for (std::size_t i = 0; i < size; i++) {
-		out[i] = convertPropertyData(type.properties[i], i, instance, typeID);
+bool engineInit(Core::Engine* engine, GLADloadproc ptr, int screenWidth, int screenHeight) {
+	Window& window = engine->getGraphics().getWindow();
+	window.setActive(true);
+	window.setResolution(screenWidth, screenHeight);
+	window.setBackgroundColor(0.15f, 0.15f, 0.15f);
+	window.initGLAD(ptr);
+
+	int result = engine->initiate(true);
+	if (result != 0) { // Failed to initiate the engine
+		return false;
 	}
+	return true;
 }
 
-bool DLLInterface::hasAnnotation(std::size_t typeID, const char* annotation) {
+void engineTick(Core::Engine* engine, float deltaTime) {
+	engine->tick(deltaTime);
+}
+
+void getCameraPosition(Core::Engine* engine, float* out) {
+	Camera& camera = engine->getGraphics().getCamera();
+	Vector2 vec = camera.getPosition();
+	out[0] = vec.x;
+	out[1] = vec.y;
+}
+
+void setCameraPosition(Core::Engine* engine, float x, float y) {
+	Camera& camera = engine->getGraphics().getCamera();
+	camera.setPosition(x, y);
+}
+
+void setViewportSize(Core::Engine* engine, float width, float height) {
+	engine->resizeViewport(width, height);
+}
+
+EntityID getEntityAtPos(Core::Engine* engine, float x, float y) {
+	Input& input = engine->getInput();
+	Entity entity = input.getEntityAtPos(x, y);
+	return entity.getID();
+}
+
+bool getRectSize(Core::Engine* engine, EntityID entityID, float* out) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		Rect rect = rectTransform->getRect();
+		out[0] = rect.w;
+		out[1] = rect.h;
+		return true;
+	}
+	return false;
+}
+
+bool getMinRectScreenPosition(Core::Engine* engine, EntityID entityID, float* out) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Camera& camera = engine->getGraphics().getCamera();
+	Entity entity = Entity(entityID);
+
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		Vector2 rectOffset = rectTransform->getRectOffset();
+		Vector2 screenPosition = camera.getViewMatrix() * rectTransform->getPosition();
+		Vector2 minPosition = Vector2(screenPosition.x + rectOffset.x, screenPosition.y + rectOffset.y);
+		out[0] = minPosition.x;
+		out[1] = minPosition.y;
+		return true;
+	}
+	return false;
+}
+
+bool getWorldPosition(Core::Engine* engine, EntityID entityID, float* out) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		Vector2 vec = rectTransform->getPosition();
+		out[0] = vec.x;
+		out[1] = vec.y;
+		return true;
+	}
+	return false;
+}
+
+bool getLocalPosition(Core::Engine* engine, EntityID entityID, float* out) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		Vector2 vec = rectTransform->getLocalPosition();
+		out[0] = vec.x;
+		out[1] = vec.y;
+		return true;
+	}
+	return false;
+}
+
+bool setLocalPosition(Core::Engine* engine, EntityID entityID, float x, float y) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		rectTransform->setLocalPosition(Vector2(x, y));
+		return true;
+	}
+	return false;
+}
+
+bool setWorldPosition(Core::Engine* engine, EntityID entityID, float x, float y) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
+		rectTransform->setPosition(Vector2(x, y));
+		return true;
+	}
+	return false;
+}
+
+bool hasAnnotation(TypeID typeID, const char* annotation) {
 	Mirror::Class type = Mirror::getType(typeID);
 	return type.hasAnnotation(annotation);
 }
 
-std::size_t DLLInterface::getDerivedTypeIDsCount(std::size_t typeID) {
-	return Mirror::polyGetDerivedTypeIDs(typeID).size();
+void getTypeName(TypeID typeID, char* out, std::size_t outSize) {
+	copyString(Mirror::getName(typeID), out, outSize);
 }
 
-void DLLInterface::getDerivedTypeIDs(std::size_t typeID, std::size_t* out, std::size_t count) {
+void onUpdate(void* instance, TypeID typeID, std::size_t propIndex) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::onUpdate(instance, typeID, type.properties[propIndex]);
+}
+
+void getDerivedTypeIDs(TypeID typeID, TypeID* out, std::size_t outSize) {
 	std::vector<std::size_t> typeIDs = Mirror::polyGetDerivedTypeIDs(typeID);
-	std::size_t size = std::min(count, typeIDs.size());
+	std::size_t size = std::min(outSize, typeIDs.size());
 	for (std::size_t i = 0; i < size; i++) {
 		out[i] = typeIDs[i];
 	}
 }
 
-std::size_t DLLInterface::getAllReflectedTypesCount() {
+void getAllReflectedTypes(TypeID* out, std::size_t outSize) {
+	std::vector<Mirror::ReflectedType> types = Mirror::getAllReflectedTypes();
+	std::size_t size = std::min(outSize, types.size());
+	for (std::size_t i = 0; i < size; i++) {
+		out[i] = types[i].typeID;
+	}
+}
+
+std::size_t getDerivedTypeIDsCount(TypeID typeID) {
+	return Mirror::polyGetDerivedTypeIDs(typeID).size();
+}
+
+std::size_t getAllReflectedTypesCount() {
 	return Mirror::getAllReflectedTypes().size();
 }
 
-void DLLInterface::getAllReflectedTypes(ReflectedTypeData* out, std::size_t count) {
-	std::vector<Mirror::ReflectedType> types = Mirror::getAllReflectedTypes();
-	std::size_t size = std::min(count, types.size());
+std::size_t getPropertiesCount(TypeID typeID) {
+	Mirror::Class type = Mirror::getType(typeID);
+	return type.properties.size();
+}
+
+std::size_t getPropertyID(TypeID typeID, std::size_t propIndex) {
+	/*Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	return type.properties[propIndex].;*/
+	return 0; // TODO
+}
+
+std::size_t getPropertyType(TypeID typeID, std::size_t propIndex) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::Property& prop = type.properties[propIndex];
+	return static_cast<std::size_t>(getRendererFromProp(prop));
+}
+
+std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::Property& prop = type.properties[propIndex];
+	auto fieldData = getFieldDataFromProp(prop, instance, typeID);
+	return fieldData.count;
+}
+
+void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t outSize) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::Property& prop = type.properties[propIndex];
+	auto fieldData = getFieldDataFromProp(prop, instance, typeID);
+	std::size_t size = std::min(fieldData.count, outSize);
 	for (std::size_t i = 0; i < size; i++) {
-		out[i].typeID = types[i].typeID;
-		copyString(types[i].typeName, out[i].typeName, 256);
+		out[i] = fieldData.ptrBuffer[i];
 	}
 }
-// ------------------------------------- END -------------------------------------
 
-DLLInterface* createDLLInterface() {
-	return new DLLInterface();
+void getPropertyName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::Property& prop = type.properties[propIndex];
+	copyString(prop.name, out, outSize);
 }
 
-void releaseDLLInterface(DLLInterface* ptr) {
-	delete ptr;
+void getPropertyTypeName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize) {
+	copyString(Mirror::getName(typeID), out, outSize);
+}
+
+bool loadScene(Core::Engine* engine, const char* path) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	std::wstring decodedPath = utf8_decode(path);
+	ScenePtr scene = sceneManager.loadScene(decodedPath.c_str());
+	return scene != nullptr;
+}
+
+bool unloadScene(Core::Engine* engine, std::size_t sceneIndex) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	return sceneManager.unloadScene(sceneIndex);
+}
+
+bool saveScene(Core::Engine* engine, std::size_t sceneIndex) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	return sceneManager.saveScene(sceneIndex);
+}
+
+bool createScene(Core::Engine* engine, const char* name, const char* path) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	std::wstring decodedName = utf8_decode(name);
+	std::wstring decodedPath = utf8_decode(path);
+	ScenePtr scene = sceneManager.createScene(decodedName);
+	if (scene == nullptr) return false;
+	scene->awake();
+	return sceneManager.saveScene(scene, decodedPath.c_str());
+}
+
+bool destroyEntity(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	SceneManager& sceneManager = engine->getSceneManager();
+	Entity entity = Entity(entityID);
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	return scene->destroyEntity(entity);
+}
+
+bool getAllEntities(Core::Engine* engine, std::size_t sceneIndex, EntityID* out, std::size_t outSize) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	std::vector<Handle>& entities = scene->getAllEntities();
+	std::size_t size = std::min(outSize, entities.size());
+	for (std::size_t i = 0; i < size; i++) {
+		out[i] = entities[i].getEntity().getID();
+	}
+	return true;
+}
+
+bool getSceneName(Core::Engine* engine, std::size_t sceneIndex, char* out, std::size_t outSize) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	std::string encodedName = utf8_encode(scene->getName());
+	copyString(encodedName, out, outSize);
+	return true;
+}
+
+bool getSceneFilePath(Core::Engine* engine, std::size_t sceneIndex, char* out, std::size_t outSize) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	if (const wchar_t* filePath = sceneManager.getSceneFilePath(sceneIndex)) {
+		std::string encodedPath = utf8_encode(filePath);
+		copyString(encodedPath, out, outSize);
+		return true;
+	}
+	return false;
+}
+
+bool hasSceneChanged(Core::Engine* engine, std::size_t sceneIndex) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	return scene->hasEntitiesChanged();
+}
+
+std::size_t getSceneCount(Core::Engine* engine) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	return sceneManager.getAllScenesCount();
+}
+
+std::size_t getAllEntitiesCount(Core::Engine* engine, std::size_t sceneIndex) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return 0;
+	std::vector<Handle>& entities = scene->getAllEntities();
+	return entities.size();
+}
+
+void setSceneAddedCallback(Core::Engine* engine, SceneAddedCallbackFun fun) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	sceneManager.setSceneAddedCallback(fun);
+}
+
+void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	sceneManager.setSceneRemovedCallback(fun);
+}
+
+void setSceneCallbackPtr(Core::Engine* engine, void* ptr) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	sceneManager.setCallbackPtr(ptr);
+}
+
+
+bool isEntityChild(Core::Engine* engine, EntityID entityID, EntityID parentID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	ParentEntity* component = entityManager.getComponent<ParentEntity>(entity);
+	if (component == nullptr) return false;
+	return parentID == component->getParent().getEntity().getID();
+}
+
+bool setEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID, EntityID parentID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	SceneManager& sceneManager = engine->getSceneManager();
+	Entity entity = Entity(entityID);
+	Entity parentEntity = Entity(parentID);
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	Handle handle = scene->getEntityHandle(entity);
+	Handle parentHandle = scene->getEntityHandle(parentEntity);
+	scene->setParent(handle, parentHandle, true);
+	return true;
+}
+
+bool isEntityNameAvailable(Core::Engine* engine, const char* name) {
+	EntityManager& entityManager = engine->getEntityManager();
+	return entityManager.isEntityNameAvailable(name);
+}
+
+bool hasEntityParent(Core::Engine* engine, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	return entityManager.hasComponent<ParentEntity>(entity);
+}
+
+bool detachEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	SceneManager& sceneManager = engine->getSceneManager();
+	Entity entity = Entity(entityID);
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return false;
+	Handle handle = scene->getEntityHandle(entity);
+	handle.removeParent(true);
+	return true;
+}
+
+void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size_t outSize) {
+	if (entityID == Entity::INVALID_ID) {
+		out[0] = '\0';
+		return;
+	}
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	std::string name = entityManager.getEntityName(entity);
+	copyString(name, out, outSize);
+}
+
+EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index) {
+	if (entityID == Entity::INVALID_ID) return Entity::INVALID_ID;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	ChildManager* component = entityManager.getComponent<ChildManager>(entity);
+	if (component == nullptr) return 0;
+	return component->getChild(index).getEntity().getID();
+}
+
+std::size_t getEntityChildCount(Core::Engine* engine, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return 0;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	ChildManager* component = entityManager.getComponent<ChildManager>(entity);
+	if (component == nullptr) return 0;
+	std::size_t immediateChildCount = component->getChildCount();
+
+	std::size_t childCount = immediateChildCount;
+	for (std::size_t i = 0; i < immediateChildCount; i++) {
+		childCount += component->getChild(i).getChildCount();
+	}
+	return childCount;
+}
+
+std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return 0;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	ChildManager* component = entityManager.getComponent<ChildManager>(entity);
+	if (component == nullptr) return 0;
+	return component->getChildCount();
+}
+
+
+bool addComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	Entity entity = Entity(entityID);
+	scene->addComponent(entity, typeID); // TODO: Check if successful
+	return true;
+}
+
+bool removeComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID) {
+	if (entityID == Entity::INVALID_ID) return false;
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	Entity entity = Entity(entityID);
+	scene->removeComponent(entity, typeID); // TODO: Check if successful
+	return true;
+}
+
+bool renameEntity(Core::Engine* engine, EntityID entityID, const char* name) {
+	if (entityID == Entity::INVALID_ID) return false;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	return entityManager.renameEntity(entity, name);
+}
+
+void getComponents(Core::Engine* engine, EntityID entityID, void** outPtrs, TypeID* outTypeIDs, std::size_t outSize) {
+	if (entityID == Entity::INVALID_ID) return;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	std::vector<Component*> components = entityManager.getComponents(entity);
+	std::size_t size = std::min(components.size(), outSize);
+	for (std::size_t i = 0; i < size; i++) {
+		outPtrs[i] = components[i];
+		outTypeIDs[i] = components[i]->getTypeID();
+	}
+}
+
+std::size_t getComponentsCount(Core::Engine* engine, EntityID entityID) {
+	if (entityID == Entity::INVALID_ID) return 0;
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	std::vector<Component*> components = entityManager.getComponents(entity);
+	return components.size();
 }

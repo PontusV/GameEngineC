@@ -1,12 +1,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-#include <Core/Camera.h>
 #include "maths/Vector2.h"
 #include "maths/Matrix4.h"
 namespace Core {
 	class Window;
 
-	class Camera: public ICamera {
+	class Camera {
 	public:
 		Camera(Window* window);
 		~Camera();

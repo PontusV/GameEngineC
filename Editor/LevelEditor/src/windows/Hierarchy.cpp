@@ -1,51 +1,29 @@
 #include "Hierarchy.h"
 #include "utils/string.h"
 #include "LevelEditor.h"
+#include "EngineDLL.h"
 #include <iostream>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include <Core/Core.h>
-#include <Core/Scene.h>
-#include <Core/EntityHandle.h>
-#include <Core/SceneManager.h>
-
 
 using namespace Editor;
-using namespace Core;
 
-void sceneAddedCallback(void* ptr, IScene* scene) {
-	static_cast<Hierarchy*>(ptr)->onSceneAdded(scene);
+void sceneAddedCallback(void* ptr, std::size_t sceneIndex) {
+	static_cast<Hierarchy*>(ptr)->onSceneAdded(sceneIndex);
 }
 
-void sceneRemovedCallback(void* ptr, IScene* scene) {
-	static_cast<Hierarchy*>(ptr)->onSceneRemoved(scene);
+void sceneRemovedCallback(void* ptr, std::size_t sceneIndex) {
+	static_cast<Hierarchy*>(ptr)->onSceneRemoved(sceneIndex);
 }
 
-IEntityHandle* getEntityHandle(const std::vector<IEntityHandle*>& handles, Entity entity) {
-	for (IEntityHandle* handle : handles) {
-		if (handle->getEntity() == entity) {
-			return handle;
-		}
-	}
-	std::cout << "Hierarchy::getEntityHandle::Error Failed to find match" << std::endl;
-	return nullptr;
-}
-
-std::vector<IEntityHandle*> getAllEntitiesFromScene(IScene* scene) {
-	std::size_t count = scene->getAllEntitiesCount();
-	std::vector<IEntityHandle*> allEntities(count);
-	scene->getAllIEntities(&allEntities[0], count);
-	return allEntities;
-}
-
-void entityNode(EntityHierarchy& entry, IEntityHandle* target, GameView* gameView) {
-	IEntityHandle* entity = entry.entity;
-	std::string name = entity->getEntityName();
-	std::size_t childCount = entity->getChildCount();
-	bool selected = target && target->isValid() && entity == target;
+void entityNode(EngineDLL* engineDLL, std::size_t sceneIndex, EntityHierarchy& entry, EntityID targetID, GameView* gameView) {
+	EntityData entity = entry.entity;
+	std::string name = entity.name;
+	std::size_t childCount = entry.children.size();
+	bool selected = entity.id == targetID;
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
 	if (selected) {
 		flags |= ImGuiTreeNodeFlags_Selected;
@@ -55,30 +33,26 @@ void entityNode(EntityHierarchy& entry, IEntityHandle* target, GameView* gameVie
 	}
 	bool nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags);
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
-		gameView->setTarget(entity);
+		gameView->setTarget(entity.id);
 	}
 	if (ImGui::BeginDragDropSource()) {
-		ImGui::SetDragDropPayload("HIERARCHY_ENTITY", &entity->getEntity(), sizeof(Entity));
+		ImGui::SetDragDropPayload("HIERARCHY_ENTITY", &entity, sizeof(EntityData));
 		ImGui::Text("%s", name.c_str());
 		ImGui::EndDragDropSource();
 	}
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
-			IM_ASSERT(payload->DataSize == sizeof(Entity));
-			Entity* data = static_cast<Entity*>(payload->Data);
+			IM_ASSERT(payload->DataSize == sizeof(EntityData));
+			EntityData* data = static_cast<EntityData*>(payload->Data);
 
-			IEntityHandle* dataHandle = getEntityHandle(getAllEntitiesFromScene(entity->getIScene()), *data);
-
-			if (dataHandle && !dataHandle->isChild(entity->getEntity())) {
-				dataHandle->setParent(entity->getEntity(), true);
-			}
+			engineDLL->setEntityParent(sceneIndex, data->id, entity.id);
 		}
 		ImGui::EndDragDropTarget();
 	}
 	if (nodeOpen) {
 		for (std::size_t i = 0; i < entry.children.size(); i++) {
 			EntityHierarchy& child = entry.children[i];
-			entityNode(child, target, gameView);
+			entityNode(engineDLL, sceneIndex, child, targetID, gameView);
 		}
 		ImGui::TreePop();
 	}
@@ -88,14 +62,14 @@ Hierarchy::Hierarchy(LevelEditor* editor, GameView* gameView) : editor(editor), 
 }
 Hierarchy::~Hierarchy() {}
 
-void Hierarchy::tick(IEntityHandle* target) {
-	IEngine* engine = editor->getEngine();
+void Hierarchy::tick(EntityID target) {
+	EngineDLL* engineDLL = editor->getEngineDLL();
 	update();
 	ImGui::Begin("Hierarchy");
-	for (auto& scenePair : sceneOrder) {
+	std::size_t sceneIndex = 0;
+	for (SceneData& sceneData : sceneOrder) {
 		bool openPopup = false;
-		IScene* scene = scenePair.first;
-		std::string sceneName = utf8_encode(scene->getName());
+		std::string sceneName = sceneData.name;
 		std::string scenePopupId = std::string("scene_popup_").append(sceneName);
 		bool nodeOpened = ImGui::TreeNodeEx(sceneName.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
@@ -104,17 +78,15 @@ void Hierarchy::tick(IEntityHandle* target) {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 				IM_ASSERT(payload->DataSize == sizeof(Entity));
-				Entity* data = static_cast<Entity*>(payload->Data);
-				IEntityHandle* dataHandle = getEntityHandle(getAllEntitiesFromScene(scene), *data);
+				EntityData* data = static_cast<EntityData*>(payload->Data);
 
-				if (dataHandle)
-					dataHandle->removeParent(true);
+				engineDLL->detachEntityParent(sceneIndex, data->id);
 			}
 			ImGui::EndDragDropTarget();
 		}
 		if (nodeOpened) {
-			for (EntityHierarchy& entity : scenePair.second) {
-				entityNode(entity, target, gameView);
+			for (EntityHierarchy& entity : sceneData.roots) {
+				entityNode(engineDLL, sceneIndex, entity, target, gameView);
 			}
 			ImGui::TreePop();
 		}
@@ -125,26 +97,32 @@ void Hierarchy::tick(IEntityHandle* target) {
 			if (ImGui::Selectable("New Entity (WIP)", false)) {
 				ImGui::OpenPopup("create_entity_popup"); // TODO: WIP. CURRENTLY DOES NOT WORK. Target this scene
 			}
-			if (ImGui::Selectable("Save and Close", false)) {
-				if (engine) {
-					engine->getSceneManagerInterface()->saveScene(scene);
+			if (ImGui::Selectable("Save", false)) {
+				if (engineDLL->isLoaded()) {
+					engineDLL->saveScene(sceneIndex);
 				}
-				editor->closeScene(scene);
+			}
+			if (ImGui::Selectable("Save and Close", false)) {
+				if (engineDLL->isLoaded()) {
+					engineDLL->saveScene(sceneIndex);
+				}
+				editor->closeScene(sceneIndex);
 			}
 			ImGui::EndPopup();
 		}
+		sceneIndex++;
 	}
 	ImGui::End();
 }
 
-std::unordered_map<IScene*, std::vector<IEntityHandle*>>::iterator findSceneOrder(IScene* scene, std::unordered_map<IScene*, std::vector<IEntityHandle*>>& sceneOrder) {
+/*std::unordered_map<IScene*, std::vector<IEntityHandle*>>::iterator findSceneOrder(IScene* scene, std::unordered_map<IScene*, std::vector<IEntityHandle*>>& sceneOrder) {
 	for (auto it = sceneOrder.begin(); it != sceneOrder.end(); it++) {
 		if (it->first == scene) return it;
 	}
 	return sceneOrder.end();
-}
+}*/
 
-std::size_t Hierarchy::getRootIndex(IScene* scene, const IEntityHandle* handle) {
+std::size_t Hierarchy::getRootIndex(std::size_t sceneIndex, EntityID entityID) {
 	/*auto it = findSceneOrder(scene, sceneOrder);
 	if (it == sceneOrder.end()) {
 		std::cout << "Hierarchy::getRootIndex::ERROR The Scene does not have any order.";
@@ -159,7 +137,7 @@ std::size_t Hierarchy::getRootIndex(IScene* scene, const IEntityHandle* handle) 
 	return 0;
 }
 
-bool Hierarchy::setRootIndex(IScene* scene, IEntityHandle* handle, std::size_t index) {
+bool Hierarchy::setRootIndex(std::size_t sceneIndex, EntityID entityID, std::size_t index) {
 	/*auto it = findSceneOrder(scene, sceneOrder);
 	if (it == sceneOrder.end()) return false;
 	std::vector<IEntityHandle*>& roots = it->second;
@@ -174,131 +152,100 @@ bool Hierarchy::setRootIndex(IScene* scene, IEntityHandle* handle, std::size_t i
 	return true;
 }
 
-std::vector<IScene*> getNewScenes(const std::vector<IScene*>& scenes, const std::unordered_map<IScene*, std::vector<IEntityHandle*>>& sceneOrder) {
-	std::vector<IScene*> newScenes;
-	for (IScene* scene : scenes) {
-		if (sceneOrder.find(scene) == sceneOrder.end()) {
-			newScenes.push_back(scene);
-		}
-	}
-	return newScenes;
-}
-
-void eraseRemovedScenes(const std::vector<IScene*>& scenes, std::unordered_map<IScene*, std::vector<IEntityHandle*>>& sceneOrder) {
-	auto it = sceneOrder.begin();
-	while (it != sceneOrder.end()) {
-		bool found = false;
-		for (const IScene* scene : scenes) {
-			if (it->first == scene) {
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-			it = sceneOrder.erase(it);
-		else
-			it++;
-	}
-}
-
-std::vector<IEntityHandle*> getNewEntities(const std::vector<IEntityHandle*>& currEntities, const std::vector<IEntityHandle*>& prevEntities) {
-	std::vector<IEntityHandle*> newEntities;
-	for (IEntityHandle* current : currEntities) {
-		bool found = false;
-		for (const IEntityHandle* prev : prevEntities) {
-			if (prev == current) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			newEntities.push_back(current);
-		}
-	}
-	return newEntities;
-}
-
-/*void eraseRemovedEntities(const std::vector<IEntityHandle*>& currEntities, std::vector<EntityHierarchy>& prevEntities) {
-	auto it = prevEntities.begin();
-	while (it != prevEntities.end()) {
-		bool found = false;
-		for (const IEntityHandle* current : currEntities) {
-			if (*it == current) {
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-			prevEntities.erase(it);
-		else
-			it++;
-	}
-}*/
-
-std::vector<IEntityHandle*> getRootEntities(const std::vector<IEntityHandle*>& handles) {
+std::vector<EntityData> getRootEntities(EngineDLL* engineDLL, const std::vector<EntityData>& entities) {
 	// Filters out all with a parent
-	std::vector<IEntityHandle*> roots;
-	for (IEntityHandle* entity : handles) {
-		if (!entity->hasParent())
+	std::vector<EntityData> roots;
+	for (const EntityData& entity : entities) {
+		if (!engineDLL->hasEntityParent(entity.id))
 			roots.push_back(entity);
 	}
 	return roots;
 }
 
-EntityHierarchy createEntityHierarchy(const std::vector<IEntityHandle*>& handles, IEntityHandle* handle) {
-	std::size_t count = handle->getImmediateChildCount();
-	std::vector<EntityHierarchy> children(count);
-	for (std::size_t i = 0; i < count; i++) {
-		IEntityHandle* child = getEntityHandle(handles, handle->getChildEntity(i));
-		children[0] = createEntityHierarchy(handles, child);
+EntityData getEntityData(const std::vector<EntityData>& entities, EntityID entityID) {
+	for (const EntityData& entityData : entities) {
+		if (entityData.id == entityID)
+			return entityData;
 	}
-	return EntityHierarchy(handle, children);
+	return EntityData{ 0, std::string() };
 }
 
-std::vector<EntityHierarchy> getCurrentHierarchy(IScene* scene) {
-	std::vector<IEntityHandle*> allEntities = getAllEntitiesFromScene(scene);
+EntityHierarchy createEntityHierarchy(EngineDLL* engineDLL, const std::vector<EntityData>& entities, EntityData entity) {
+	std::size_t count = engineDLL->getEntityImmediateChildCount(entity.id);
+	std::vector<EntityHierarchy> children(count);
+	for (std::size_t i = 0; i < count; i++) {
+		EntityID childID = engineDLL->getEntityChild(entity.id, i);
+		EntityData child = getEntityData(entities, childID);
+		children[0] = createEntityHierarchy(engineDLL, entities, child);
+	}
+	return EntityHierarchy(entity, children);
+}
+
+std::vector<EntityHierarchy> getCurrentHierarchy(EngineDLL* engineDLL, std::size_t sceneIndex) {
+	std::vector<EntityID> allEntityIDs = engineDLL->getAllEntities(sceneIndex);
+	std::vector<EntityData> allEntities(allEntityIDs.size());
+	for (std::size_t i = 0; i < allEntityIDs.size(); i++) {
+		EntityData& entityData = allEntities[i];
+		entityData.id = allEntityIDs[i];
+		entityData.name = engineDLL->getEntityName(entityData.id);
+	}
 	// Create hierarchy
 	std::vector<EntityHierarchy> hierarchy;
-	for (IEntityHandle* handle : getRootEntities(allEntities)) {
-		hierarchy.push_back(createEntityHierarchy(allEntities, handle));
+	for (EntityData& entityData : getRootEntities(engineDLL, allEntities)) {
+		hierarchy.push_back(createEntityHierarchy(engineDLL, allEntities, entityData));
 	}
 	return hierarchy;
 }
 
 void Hierarchy::update() {
-	IEngine* engine = editor->getEngine();
-	if (engine) {
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	if (engineDLL->isLoaded()) {
 		// Check for scene changes
-		for (auto it = sceneOrder.begin(); it != sceneOrder.end(); it++) {
-			if (it->first->hasEntitiesChanged()) {
-				onSceneChanged(it);
+		std::size_t sceneCount = engineDLL->getSceneCount();
+		for (std::size_t i = 0; i < sceneCount; i++) {
+			if (engineDLL->hasSceneChanged(i)) {
+				onSceneChanged(i);
 			}
 		}
 	}
 }
 
-void Hierarchy::onSceneAdded(IScene* scene) {
-	sceneOrder.insert(std::pair(scene, getCurrentHierarchy(scene)));
+void Hierarchy::onSceneAdded(std::size_t sceneIndex) {
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	SceneData sceneData;
+	sceneData.name = engineDLL->getSceneName(sceneIndex);
+	sceneData.roots = getCurrentHierarchy(engineDLL, sceneIndex);
+	sceneOrder.push_back(sceneData);
+	gameView->updateTargetData();
 }
 
-void Hierarchy::onSceneRemoved(IScene* scene) {
-	auto it = sceneOrder.find(scene);
-	if (it != sceneOrder.end()) {
-		sceneOrder.erase(it);
+void Hierarchy::onSceneRemoved(std::size_t sceneIndex) {
+	if (sceneIndex >= sceneOrder.size()) {
+		std::cout << "Hierarchy::onSceneRemoved::ERROR Out of bounds. Index: " << sceneIndex << ", size: " << sceneOrder.size() << std::endl;
+		return;
+	}
+	sceneOrder.erase(sceneOrder.begin() + sceneIndex);
+	if (gameView->getTarget().sceneIndex == sceneIndex) {
+		gameView->releaseTarget();
+	}
+	else {
+		gameView->updateTargetData();
 	}
 }
 
-void Hierarchy::onSceneChanged(std::unordered_map<Core::IScene*, std::vector<EntityHierarchy>>::iterator& iterator) {
-	iterator->second = getCurrentHierarchy(iterator->first);
+void Hierarchy::onSceneChanged(std::size_t sceneIndex) {
+	if (sceneIndex > sceneOrder.size() - 1) return;
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	SceneData& sceneData = sceneOrder[sceneIndex];
+	sceneData.roots = getCurrentHierarchy(engineDLL, sceneIndex);
 }
 
 void Hierarchy::initiate() {
-	IEngine* engine = editor->getEngine();
-	if (engine) {
-		ISceneManager* sceneManager = engine->getSceneManagerInterface();
-		sceneManager->setSceneAddedCallback(sceneAddedCallback);
-		sceneManager->setSceneRemovedCallback(sceneRemovedCallback);
-		sceneManager->setCallbackPtr(this);
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	if (engineDLL->isLoaded()) {
+		engineDLL->setSceneAddedCallback(sceneAddedCallback);
+		engineDLL->setSceneRemovedCallback(sceneRemovedCallback);
+		engineDLL->setSceneCallbackPtr(this);
 	}
 }
 

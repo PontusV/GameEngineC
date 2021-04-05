@@ -37,10 +37,6 @@ Scene* Handle::getScene() const {
 	return scene;
 }
 
-IScene* Handle::getIScene() const {
-	return scene;
-}
-
 void Handle::activate() {
 	scene->activateQueued(*this);
 }
@@ -391,24 +387,4 @@ std::size_t Handle::getComponentCount(ComponentTypeID typeID) {
 		}
 	}
 	return 0;
-}
-
-IComponent* Handle::getIComponent(ComponentTypeID typeID) {
-	return static_cast<IComponent*>(getComponent(typeID));
-}
-
-void Handle::getIComponents(IComponent** out, std::size_t count) {
-	std::vector<Component*> components = getComponents();
-	std::size_t size = std::min(count, components.size());
-	for (std::size_t i = 0; i < size; i++) {
-		out[i] = static_cast<IComponent*>(components[i]);
-	}
-}
-
-void Handle::getIComponents(ComponentTypeID typeID, IComponent** out, std::size_t count) {
-	std::vector<Component*> components = getComponents(typeID);
-	std::size_t size = std::min(count, components.size());
-	for (std::size_t i = 0; i < size; i++) {
-		out[i] = static_cast<IComponent*>(components[i]);
-	}
 }

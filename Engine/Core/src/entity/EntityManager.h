@@ -1,7 +1,6 @@
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
-#include <Core/EntityManager.h>
 #include "Archetype.h"
 #include "entity/Entity.h"
 #include "EntityLocation.h"
@@ -18,7 +17,7 @@ namespace Core {
 
 	class Component; // Forward declare
 
-	class EntityManager : public IEntityManager {
+	class EntityManager {
 	public:
 		EntityManager() : entityIDCounter(1) {}
 		~EntityManager() {

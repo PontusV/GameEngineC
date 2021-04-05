@@ -13,28 +13,32 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::clear() {
-	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
-		it->second->clear();
+	for (ScenePtr& scene : scenes) {
+		scene->clear();
 	}
-	sceneMap.clear();
+	scenes.clear();
 	scenePathMap.clear();
 }
 
 
 void SceneManager::update() {
-	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
-		it->second->processQueue();
+	for (ScenePtr& scene : scenes) {
+		scene->processQueue();
 	}
 }
 
 bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) {
+	if (scene == nullptr) {
+		std::cout << "Failed to save scene because give pointer was nullptr" << std::endl;
+		return false;
+	}
 	std::ofstream file;
 	if (filePath) {
 		std::wcout << L"Saving scene to " << filePath << std::endl;
 		file.open(filePath, std::ios::out | std::ios::binary | std::ios::trunc);
-		scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
+		scenePathMap.insert(std::pair(scene, std::wstring(filePath)));
 	} else {
-		auto it = scenePathMap.find(scene->getName());
+		auto it = scenePathMap.find(scene);
 		if (it == scenePathMap.end()) {
 			// Error: Path not stored
 			std::wcout << L"Failed to save scene. Missing file path to scene" << std::endl;
@@ -52,15 +56,21 @@ bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) {
 	return true;
 }
 
+bool SceneManager::saveScene(std::size_t sceneIndex, const wchar_t* filePath) {
+	ScenePtr scene = getScene(sceneIndex);
+	return saveScene(scene, filePath);
+}
+
 ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	std::ifstream file;
 	std::wstring path = std::wstring(filePath);
 	std::size_t nameStartIndex = path.find_last_of(L"\\");
 	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
 	std::wstring sceneName = fileName.substr(0, fileName.find_last_of(L"."));
-	auto it = sceneMap.find(sceneName);
-	if (it != sceneMap.end()) {
-		return it->second;
+	for (ScenePtr& scene : scenes) {
+		if (sceneName.compare(scene->getName()) == 0) {
+			return scene;
+		}
 	}
 
 	std::wcout << L"Loading Scene: " << filePath << std::endl;
@@ -72,75 +82,28 @@ ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	file.close();
 	scene->awake();
 
-	sceneMap[sceneName] = scene;
-	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
-	if (sceneAddedCallback) sceneAddedCallback(callbackPtr, scene.get());
+	scenes.push_back(scene);
+	scenePathMap.insert(std::pair(scene, std::wstring(filePath)));
+	if (sceneAddedCallback) sceneAddedCallback(callbackPtr, scenes.size() - 1);
 	return scene;
 }
 
 bool SceneManager::unloadScene(std::wstring name) {
-	return unloadScene(name.c_str());
-}
-
-ScenePtr SceneManager::createScene(std::wstring name) {
-	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
-	sceneMap[name] = scene;
-	if (sceneAddedCallback) sceneAddedCallback(callbackPtr, scene.get());
-	return scene;
-}
-
-ScenePtr SceneManager::getScene(std::wstring name) {
-	return sceneMap[name];
-}
-
-std::vector<ScenePtr> SceneManager::getAllScenes() {
-	std::vector<ScenePtr> scenes;
-	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
-		scenes.push_back(it->second);
-	}
-	return scenes;
-}
-
-std::size_t SceneManager::getAllScenesCount() {
-	return sceneMap.size();
-}
-
-std::vector<std::pair<std::wstring, ScenePtr>> SceneManager::getAllScenesAsPairs() {
-	std::vector<std::pair<std::wstring, ScenePtr>> scenes;
-	for (auto it = sceneMap.begin(); it != sceneMap.end(); it++) {
-		scenes.push_back(*it);
-	}
-	return scenes;
-}
-
-void SceneManager::setSceneFilePath(IScene* scene, const wchar_t* filePath) {
-	scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
-}
-
-IScene* SceneManager::loadIScene(const wchar_t* filePath) {
-	return loadScene(filePath).get();
-}
-
-IScene* SceneManager::createIScene(const wchar_t* name) {
-	return createScene(name).get();
-}
-
-IScene* SceneManager::getIScene(const wchar_t* name) {
-	return getScene(name).get();
-}
-
-bool SceneManager::unloadScene(const wchar_t* name) {
 	std::wcout << L"Unloading Scene: " << name << std::endl;
-	auto sceneIt = sceneMap.find(name);
-	if (sceneIt == sceneMap.end()) {
+	std::size_t sceneIndex = getSceneIndex(name);
+	unloadScene(sceneIndex);
+}
+
+bool SceneManager::unloadScene(std::size_t index) {
+	ScenePtr scene = getScene(index);
+	if (scene == nullptr) {
 		std::wcout << L"Failed to unload scene. Scene name not found in sceneMap" << std::endl;
 		return false;
 	}
-	ScenePtr scene = sceneIt->second;
-	if (sceneRemovedCallback) sceneRemovedCallback(callbackPtr, scene.get());
 	scene->clear();
-	sceneMap.erase(sceneIt);
-	auto scenePathIt = scenePathMap.find(name);
+	scenes.erase(scenes.begin() + index);
+	if (sceneRemovedCallback) sceneRemovedCallback(callbackPtr, index);
+	auto scenePathIt = scenePathMap.find(scene);
 	if (scenePathIt == scenePathMap.end()) {
 		std::wcout << L"Failed to unload scene. Scene name not found in scenePathMap" << std::endl;
 		return false;
@@ -149,45 +112,56 @@ bool SceneManager::unloadScene(const wchar_t* name) {
 	return true;
 }
 
-bool SceneManager::saveScene(IScene* scene, const wchar_t* filePath) {
-	std::ofstream file;
-	if (filePath) {
-		std::wcout << L"Saving scene to " << filePath << std::endl;
-		file.open(filePath, std::ios::out | std::ios::binary | std::ios::trunc);
-		scenePathMap.insert(std::pair(scene->getName(), std::wstring(filePath)));
+ScenePtr SceneManager::createScene(std::wstring name) {
+	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
+	scenes.push_back(scene);
+	if (sceneAddedCallback) sceneAddedCallback(callbackPtr, scenes.size() - 1);
+	return scene;
+}
+
+ScenePtr SceneManager::getScene(std::wstring name) {
+	if (std::size_t sceneIndex = getSceneIndex(name) != -1) {
+		return getScene(sceneIndex);
 	}
-	else {
-		auto it = scenePathMap.find(scene->getName());
-		if (it == scenePathMap.end()) {
-			// Error: Path not stored
-			std::wcout << L"Failed to save scene. Missing file path to scene" << std::endl;
-			return false;
+	return nullptr;
+}
+
+ScenePtr SceneManager::getScene(std::size_t index) {
+	if (index > scenes.size() - 1) {
+		std::cout << "SceneManager::getScene::ERROR Out of bounds. Index: " << index << ", Scenes size: " << scenes.size() << std::endl;
+		return nullptr;
+	}
+	return scenes[index];
+}
+
+std::size_t SceneManager::getSceneIndex(std::wstring name) {
+	for (std::size_t i = 0; i < scenes.size(); i++) {
+		if (name.compare(scenes[i]->getName()) == 0) {
+			return i;
 		}
-		std::wcout << L"Saving scene to " << it->second << std::endl;
-		file.open(it->second.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
 	}
+	return -1;
+}
 
-	// Scene
-	reinterpret_cast<Scene*>(scene)->serialize(file); // TODO: Make this prettier
-	file.close();
+std::vector<ScenePtr> SceneManager::getAllScenes() {
+	return scenes;
+}
 
-	std::wcout << L"Successfully saved scene" << std::endl;
+std::size_t SceneManager::getAllScenesCount() {
+	return scenes.size();
+}
+
+bool SceneManager::setSceneFilePath(Scene* scene, const wchar_t* filePath) {
+	if (scene == nullptr) return false;
+	scenePathMap.insert(std::pair(scene, std::wstring(filePath)));
 	return true;
 }
 
-void SceneManager::getAllIScenes(IScene** out, std::size_t count) {
-	std::vector<ScenePtr> scenes = getAllScenes();
-	std::size_t size = std::min(count, scenes.size());
-	for (std::size_t i = 0; i < size; i++) {
-		out[i] = static_cast<IScene*>(scenes[i].get());
-	}
-}
-
-void SceneManager::setSceneAddedCallback(SceneAddedCallback callback) {
+void SceneManager::setSceneAddedCallback(SceneAddedCallbackFun callback) {
 	sceneAddedCallback = callback;
 }
 
-void SceneManager::setSceneRemovedCallback(SceneRemovedCallback callback) {
+void SceneManager::setSceneRemovedCallback(SceneRemovedCallbackFun callback) {
 	sceneRemovedCallback = callback;
 }
 
@@ -195,8 +169,10 @@ void SceneManager::setCallbackPtr(void* ptr) {
 	callbackPtr = ptr;
 }
 
-const wchar_t* SceneManager::getSceneFilePath(const wchar_t* name) {
-	auto it = scenePathMap.find(name);
+const wchar_t* SceneManager::getSceneFilePath(std::size_t sceneIndex) {
+	ScenePtr scene = getScene(sceneIndex);
+	if (scene == nullptr) return nullptr;
+	auto it = scenePathMap.find(scene);
 	if (it != scenePathMap.end()) {
 		return it->second.c_str();
 	}

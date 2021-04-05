@@ -1,16 +1,16 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <Core/Window.h>
 #include <iostream>
 #include "maths/Matrix4.h"
 #include "maths/Vector2.h"
 #include "maths/Vector3.h"
 
-//struct GLFWwindow; // Defined in IWindow
+typedef void* (*GLADloadproc)(const char* name);
+struct GLFWwindow; // Defined in IWindow
 namespace Core {
 
-	class Window: public IWindow {
+	class Window {
 	public:
 		Window(const char* title, int width, int height);
 		Window();

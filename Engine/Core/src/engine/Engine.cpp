@@ -203,10 +203,6 @@ Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physic
 Engine::~Engine() {
 }
 
-void Engine::release() {
-	delete this;
-}
-
 EntityManager& Engine::getEntityManager() {
 	return entityManager;
 }
@@ -229,21 +225,4 @@ Physics& Engine::getPhysics() {
 
 BehaviourManager& Engine::getBehaviourManager() {
 	return behaviourManager;
-}
-
-
-IInput* Engine::getInputInterface() {
-	return &getInput();
-}
-
-IGraphics* Engine::getGraphicsInterface() {
-	return &getGraphics();
-}
-
-ISceneManager* Engine::getSceneManagerInterface() {
-	return &getSceneManager();
-}
-
-IEntityManager* Engine::getEntityManagerInterface() {
-	return &getEntityManager();
 }

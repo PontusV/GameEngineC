@@ -279,7 +279,7 @@
     <ClCompile Include="src\entity\component\ComponentLoader.cpp" />
     <ClCompile Include="src\entity\component\ComponentRegistry.cpp" />
     <ClCompile Include="src\entity\component\ComponentType.cpp" />
-    <ClCompile Include="include\Core\Entity.cpp" />
+    <ClCompile Include="src\entity\Entity.cpp" />
     <ClCompile Include="src\entity\EntityManager.cpp" />
     <ClCompile Include="src\entity\handle\ComponentFunctionHandle.cpp" />
     <ClCompile Include="src\entity\handle\ComponentHandle.cpp" />
@@ -314,20 +314,8 @@
     <ClCompile Include="src\utils\UIDContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\Camera.h" />
-    <ClInclude Include="include\Core\Component.h" />
     <ClInclude Include="include\Core\Core.h" />
     <ClInclude Include="include\Core\dllexport.h" />
-    <ClInclude Include="include\Core\Engine.h" />
-    <ClInclude Include="include\Core\EntityHandle.h" />
-    <ClInclude Include="include\Core\EntityManager.h" />
-    <ClInclude Include="include\Core\Graphics.h" />
-    <ClInclude Include="include\Core\HideFlags.h" />
-    <ClInclude Include="include\Core\Entity.h" />
-    <ClInclude Include="include\Core\Input.h" />
-    <ClInclude Include="include\Core\Scene.h" />
-    <ClInclude Include="include\Core\SceneManager.h" />
-    <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="src\components\graphics\Border.generated.h" />
     <ClInclude Include="src\components\graphics\Border.h" />
     <ClInclude Include="src\components\graphics\CanvasRenderer.generated.h" />

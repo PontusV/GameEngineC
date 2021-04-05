@@ -1,7 +1,6 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <Core/Engine.h>
 #include "entity/EntityManager.h"
 #include "scene/SceneManager.h"
 #include "graphics/Graphics.h"
@@ -14,7 +13,7 @@
 struct SDL_Renderer;
 
 namespace Core {
-	class Engine : public IEngine {
+	class Engine {
 	public:
 		Engine();
 		~Engine();
@@ -27,8 +26,6 @@ namespace Core {
 		void tick(float deltaTime);
 		/* Stops the game loop and terminates glfw */
 		void terminate();
-		/* Used by DLL interface. Deletes this instance */
-		void release() override;
 
 		void resizeViewport(unsigned int width, unsigned int height);
 
@@ -48,11 +45,6 @@ namespace Core {
 		SceneManager& getSceneManager();
 		BehaviourManager& getBehaviourManager();
 		GUISystem& getGUISystem();
-
-		IInput* getInputInterface() override;
-		IGraphics* getGraphicsInterface() override;
-		ISceneManager* getSceneManagerInterface() override;
-		IEntityManager* getEntityManagerInterface() override;
 	private:
 		// Game loop
 		bool running = false;

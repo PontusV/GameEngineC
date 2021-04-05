@@ -2,9 +2,6 @@
 #define EDITOR_H
 #include "EditorSettings.h"
 #include "ProjectSettings.h"
-#include <Core/Engine.h>
-#include <Core/SceneManager.h>
-#include <Core/Scene.h>
 #include "windows/GameView.h"
 #include "windows/Inspector.h"
 #include "windows/Hierarchy.h"
@@ -14,7 +11,12 @@
 
 // Path to the solution to be copied when creating a new project
 #define ENGINE_SOLUTION_PATH L"G:/Projects/ProjectGE/Engine"
-#define ASSET_PATH L"G:/Projects/ProjectGE/Assets"
+#define ENGINE_SOLUTION_BUILD_PATH L"/x64/Release"
+#define ASSETS_PATH L"G:/Projects/ProjectGE/Assets"
+// Defines where in the project directory all neccessary temp files for the Editor goes
+#define TEMP_EDITOR_BUILD_PATH L"/.Editor"
+
+struct GLFWwindow;
 
 namespace Editor {
 	class LevelEditor {
@@ -32,9 +34,11 @@ namespace Editor {
 		bool createProject(std::wstring name, std::wstring path);
 		/* Opens the project at the specified path. If a project is already opened it will be closed and the Engine will be unloaded */
 		void openProject(std::wstring path);
+		/* Closes the current project. Unloads Engine / Game.dll. Cleans up temp Editor directory */
+		void closeProject();
 		/* Returns true if successful */
 		bool openScene(std::wstring path);
-		void closeScene(Core::IScene* scene);
+		void closeScene(std::size_t sceneIndex);
 
 		/* Loads and initializes the Engine DLL of the current project. Returns true if successful*/
 		bool loadEngine();
@@ -43,20 +47,19 @@ namespace Editor {
 		/* Builds a new Game EXE from the current project. Returns true if successful */
 		bool buildGame();
 
-		std::vector<Core::IScene*> getLoadedScenes();
-		Core::IEngine* getEngine();
 		EngineDLL* getEngineDLL();
 	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;
 
 		EngineDLL engineDLL;
-		Core::IEngine* engine;
 
 		GameView gameView;
 		Inspector inspector;
 		Hierarchy hierarchy;
 		FileView fileView;
+
+		GLFWwindow* glfwWindow;
 		bool running = false;
 	};
 }

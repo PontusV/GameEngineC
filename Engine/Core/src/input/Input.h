@@ -3,7 +3,6 @@
 
 #define DOUBLE_CLICK_THRESHOLD 0.2f
 
-#include <Core/Input.h>
 #include "components/graphics/SpriteRenderer.h"
 #include "components/graphics/CanvasRenderer.h"
 #include "components/RectTransform.h"
@@ -63,7 +62,7 @@ namespace Core {
 		}
 	};
 
-	class Input: public IInput {
+	class Input {
 	public:
 		Input(Engine* engine);
 		~Input();
@@ -114,8 +113,6 @@ namespace Core {
 		EntityHandle getEntityHandleAtPos(float x, float y, std::vector<Entity> ignoreList = std::vector<Entity>());
 		/* Gets the Entity at the front at the given position in screen space. */
 		Entity getEntityAtPos(float x, float y);
-		/* DO NOT USE. Used by DLL interface. Creates a new Handle allocated in heap memory. Note: has to be explicitly released to free memory */
-		IEntityHandle* createEntityHandleAtPos(float x, float y) override;
 	private:
 		void processInputEvent(const InputEvent& event, EntityHandle& target);
 

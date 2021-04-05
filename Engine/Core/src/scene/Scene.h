@@ -1,7 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <Core/Scene.h>
 #include "utils/Serializable.h"
 #include "entity/EntityManager.h"
 #include "entity/Entity.h"
@@ -14,7 +13,7 @@
 
 namespace Core {
 	/* Contains a collection of entities. */
-	class Scene : public IScene, public Serializable {
+	class Scene : public Serializable {
 	public:
 		Scene(EntityManager* entityManager, std::wstring name);
 		~Scene();
@@ -22,13 +21,11 @@ namespace Core {
 		std::vector<Handle>& getAllEntities();
 		/* Returns the number of entities attached to this scene. */
 		std::size_t getAllEntitiesCount();
-		/* Used by DLL interface. Returns all entities */
-		void getAllIEntities(IEntityHandle** out, std::size_t count) override;
 		std::vector<Handle> getRootEntities();
 		const wchar_t* getName();
 
-		/* Used by DLL interface. Creates a new Entity in the Scene and adds it to the EntityManager. */
-		Entity createEmptyEntity(const char* name) override;
+		/* Creates a new Entity in the Scene and adds it to the EntityManager. */
+		Entity createEmptyEntity(const char* name);
 		/* Creates a new Entity in the Scene and adds it to the EntityManager. */
 		template <typename... Ts>
 		Handle createEntity(std::string name, Ts... components);

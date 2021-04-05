@@ -8,7 +8,6 @@
 #include "utils/file.h"
 #include "utils/string.h"
 
-#include <Core/Core.h>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
@@ -17,18 +16,20 @@
 #include <GLFW/glfw3.h>
 #include <Windows.h>
 
-using namespace Core;
 using namespace Editor;
 
 constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
 ImVec2 resolutionDefault = ImVec2(600, 480);
 
-LevelEditor::LevelEditor() : engine(nullptr), gameView(this), inspector(&engineDLL, &gameView), hierarchy(this, &gameView), fileView(this) {
+LevelEditor::LevelEditor() : gameView(this), inspector(&engineDLL, &gameView), hierarchy(this, &gameView), fileView(this) {
 }
 
 
 LevelEditor::~LevelEditor() {
-	unloadEngine();
+	if (engineDLL.isLoaded()) {
+		unloadEngine();
+	}
+	closeProject();
 }
 
 static void glfw_error_callback(int error, const char* description) {
@@ -64,7 +65,7 @@ int LevelEditor::initiate() {
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	//glfwWindowHint(GLFW_SAMPLES, 16); // Anti-alias (Makes Sprites blurry)
 
-	GLFWwindow* glfwWindow = glfwCreateWindow(resolutionDefault.x, resolutionDefault.y, "Editor", NULL, NULL);
+	glfwWindow = glfwCreateWindow(resolutionDefault.x, resolutionDefault.y, "Editor", NULL, NULL);
 	if (!glfwWindow) {
 		glfwTerminate();
 		std::cout << "Failed to create GLFW window!" << std::endl;
@@ -141,6 +142,36 @@ int LevelEditor::start() {
 	running = true;
 
 	while (running && !glfwWindowShouldClose(window)) {
+		// Check reload Engine DLL
+		if (projectSettings.isLoaded()) {
+			std::wstring dllPath = projectSettings.getEngineDLLPath();
+			std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/Game.dll";
+			if (std::filesystem::exists(dllPath)) {
+				if (engineDLL.isLoaded()) {
+					auto lastReadTimeRaw = std::filesystem::last_write_time(newDLLPath);
+					auto lastWriteTimeRaw = std::filesystem::last_write_time(dllPath);
+					auto lastReadTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastReadTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
+					auto lastWriteTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastWriteTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
+					if (lastWriteTime != lastReadTime) {
+						std::cout << "Reloading dll" << std::endl;
+						// TODO: Save state
+						unloadEngine();
+					}
+				}
+				else if (loadEngine()) {
+					// TODO: Load state
+					std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
+					projectSettings.getOpenScenes().clear();
+					for (std::wstring& scenePath : scenes) {
+						openScene(scenePath);
+					}
+				}
+			}
+			else {
+				// Wait between loading
+				Sleep(500);
+			}
+		}
 		// Calculate delta time
 		GLfloat currentFrame = (GLfloat)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -155,7 +186,7 @@ int LevelEditor::start() {
 		ImGui::NewFrame();
 
 		// imGui Windows
-		//ImGuiStyle::ScaleAllSizes(2.0f);int width = 0;
+		//ImGuiStyle::ScaleAllSizes(2.0f);
 		int width = 0;
 		int height = 0;
 		glfwGetWindowSize(window, &width, &height);
@@ -172,15 +203,10 @@ int LevelEditor::start() {
 		bool open_create_scene_popup = false;
 
 		if (ImGui::IsKeyPressed(GLFW_KEY_ESCAPE)) { // TODO: Keybind
-			//engine->terminate();
+			// Terminate
 		}
 		if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) { // TODO: Keybind
-			/*
-			for (IScene* scene : loadedScenes) {
-				engine->getSceneManagerInterface()->saveScene(scene);
-			}
-			projectSettings.save();
-			*/
+			// Save
 		}
 
 		if (ImGui::BeginMenuBar()) {
@@ -190,7 +216,7 @@ int LevelEditor::start() {
 					if (ImGui::MenuItem("New Project")) {
 						open_create_project_popup = true;
 					}
-					if (ImGui::MenuItem("New Scene", nullptr, nullptr, engine && projectSettings.isLoaded())) {
+					if (ImGui::MenuItem("New Scene", nullptr, nullptr, engineDLL.isLoaded() && projectSettings.isLoaded())) {
 						open_create_scene_popup = true;
 					}
 					ImGui::EndMenu();
@@ -208,13 +234,12 @@ int LevelEditor::start() {
 				if (ImGui::MenuItem("Save Project", "Ctrl+S", nullptr, projectSettings.isLoaded())) { // TODO: Keybind
 					projectSettings.save();
 				}
-				auto loadedScenes = getLoadedScenes();
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, engine && projectSettings.isLoaded() && loadedScenes.size() > 0)) { // TODO: Keybind
+				auto loadedSceneCount = engineDLL.getSceneCount();
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, engineDLL.isLoaded() && projectSettings.isLoaded() && loadedSceneCount > 0)) { // TODO: Keybind
 					// Saving all loaded scenes
-					for (IScene* scene : loadedScenes) {
-						if (engine) {
-							engine->getSceneManagerInterface()->saveScene(scene);
-						}
+					std::size_t sceneCount = engineDLL.getSceneCount();
+					for (std::size_t i = 0; i < sceneCount; i++) {
+						engineDLL.saveScene(i);
 					}
 					projectSettings.save();
 				}
@@ -255,7 +280,7 @@ int LevelEditor::start() {
 		static std::wstring dirPath = L"";
 		static bool chooseDirPath = false;
 
-		if (open_create_scene_popup && engine) {
+		if (open_create_scene_popup && engineDLL.isLoaded()) {
 			std::wstring path = getSaveFileName(L"Choose scene location", L"Scene\0*.scene;\0", 1, projectSettings.getPath().c_str());
 			if (!path.empty()) {
 				if (!path.ends_with(SCENE_FILE_TYPE)) {
@@ -263,9 +288,10 @@ int LevelEditor::start() {
 				}
 				std::size_t nameStartIndex = path.find_last_of(L"\\");
 				std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
-				IScene* scene = engine->getSceneManagerInterface()->createIScene(fileName.substr(0, fileName.find_last_of(L".")).c_str());
-				engine->getSceneManagerInterface()->saveScene(scene, path.c_str());
-				scene->awake();
+				std::string encodedName = utf8_encode(fileName.substr(0, fileName.find_last_of(L".")));
+				std::string encodedPath = utf8_encode(path);
+				engineDLL.createScene(encodedName.c_str(), encodedPath.c_str());
+				projectSettings.addOpenScene(path);
 				projectSettings.save();
 			}
 		}
@@ -289,7 +315,7 @@ int LevelEditor::start() {
 
 			if (ImGui::Button("Create", ImVec2(120, 0))) {
 				std::wstring name = utf8_decode(buffer);
-				std::wstring path = dirPath;
+				std::wstring path = std::wstring(dirPath).append(path.ends_with(L"/") || path.ends_with(L"\\") ? L"" : L"/").append(name);
 
 				if (createProject(name, path)) {
 					openProject(path);
@@ -323,7 +349,7 @@ int LevelEditor::start() {
 			ImGui::OpenPopup("create_entity_popup");
 
 		if (ImGui::BeginPopupModal("create_entity_popup", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			if (engine) {
+			if (engineDLL.isLoaded()) {
 				static std::string errorMessage = "";
 				if (!errorMessage.empty()) {
 					ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
@@ -333,22 +359,11 @@ int LevelEditor::start() {
 
 				if (ImGui::Button("Create", ImVec2(120, 0))) {
 					std::string name = std::string(buffer);
-					if (engine->getEntityManagerInterface()->isEntityNameAvailable(name.c_str())) {
-						Core::IScene* scene = gameView.getTarget() ? gameView.getTarget()->getIScene() : nullptr;
-						if (scene == nullptr) {
-							std::vector<IScene*> scenes = getLoadedScenes();
-							if (!scenes.empty()) {
-								scene = scenes[0];
-							}
-						}
-						if (scene != nullptr) {
-							Core::ICamera* camera = engine->getGraphicsInterface()->getCameraInterface();
-							ImVec2 pos = ImVec2(camera->getX(), camera->getY());
-							ImVec2 viewportSize = gameView.getViewportSize();
-							if (auto ptr = engineDLL.getInterface()) {
-								ptr->createTemplateEntity(scene, name.c_str(), pos.x + viewportSize.x / 2, pos.y + viewportSize.y / 2);
-							}
-						}
+					if (engineDLL.isEntityNameAvailable(name.c_str())) {
+						std::size_t sceneIndex = gameView.getTarget().sceneIndex;
+						ImVec2 pos = engineDLL.getCameraPosition();
+						ImVec2 viewportSize = gameView.getViewportSize();
+						engineDLL.createTemplateEntity(sceneIndex, name.c_str(), pos.x + viewportSize.x / 2, pos.y + viewportSize.y / 2, 350, 350);
 						errorMessage = "";
 						memset(buffer, 0, 64);
 						ImGui::CloseCurrentPopup();
@@ -376,8 +391,8 @@ int LevelEditor::start() {
 		inspector.tick();
 		// Game view window
 		gameView.tick(deltaTime);
-		IEntityHandle* target = gameView.getTarget();
-		hierarchy.tick(target);
+		EntityTargetData target = gameView.getTarget();
+		hierarchy.tick(target.entityID);
 		// File view window
 		fileView.tick();
 
@@ -414,7 +429,6 @@ void LevelEditor::terminate() {
 
 bool LevelEditor::createProject(std::wstring name, std::wstring path) {
 	// TODO: Check if there already is a project inside selected path
-	path.append(path.ends_with(L"/") || path.ends_with(L"\\") ? L"" : L"/").append(name);
 	ProjectSettings newProject = ProjectSettings::create(name.c_str(), path.c_str());
 	if (!newProject.isLoaded()) {
 		std::cout << "Failed to create new project" << std::endl;
@@ -435,10 +449,10 @@ bool LevelEditor::createProject(std::wstring name, std::wstring path) {
 	std::filesystem::create_directories(path + L"/Engine/libs");
 	std::filesystem::create_directories(path + L"/Engine/tools");
 	auto copyOptions = std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing;
-	std::filesystem::copy(ASSET_PATH, path + L"/Assets", copyOptions);
+	std::filesystem::copy(ASSETS_PATH, path + L"/Assets", copyOptions);
 	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(L"/Core"), path + L"/Engine/Core", copyOptions);
 	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(L"/Game"), path + L"/Engine/Game", copyOptions);
-	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(L"/x64/Release"), path + L"/Engine/x64/Release", copyOptions);
+	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(ENGINE_SOLUTION_BUILD_PATH), path + L"/Engine" + ENGINE_SOLUTION_BUILD_PATH, copyOptions);
 	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(L"/libs"), path + L"/Engine/libs", copyOptions);
 	std::filesystem::copy(std::wstring(ENGINE_SOLUTION_PATH).append(L"/tools"), path + L"/Engine/tools", copyOptions);
 	std::filesystem::copy_file(std::wstring(ENGINE_SOLUTION_PATH).append(L"/Engine.sln"), path + L"/Engine/Engine.sln");
@@ -446,12 +460,22 @@ bool LevelEditor::createProject(std::wstring name, std::wstring path) {
 	return true;
 }
 
+void LevelEditor::closeProject() {
+	if (!projectSettings.isLoaded()) return;
+	if (engineDLL.isLoaded()) {
+		unloadEngine();
+	}
+	std::wstring editorTempPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH;
+	std::filesystem::remove_all(editorTempPath);
+}
+
 void LevelEditor::openProject(std::wstring path) {
 	if (path.empty()) return;
-	if (engineDLL.isLoaded()) {
-		engineDLL.unload();
-	}
+	closeProject();
 	std::size_t seperator = path.find_last_of(L"\\");
+	if (seperator == std::wstring::npos) {
+		seperator = path.find_last_of(L"/");
+	}
 	std::wstring fileName = path.substr(seperator + 1);
 	std::wstring dirPath = path.substr(0, seperator);
 	projectSettings = ProjectSettings::load(fileName.substr(0, fileName.find_last_of(L".")).c_str(), dirPath.c_str());
@@ -474,46 +498,35 @@ void LevelEditor::openProject(std::wstring path) {
 }
 
 bool LevelEditor::openScene(std::wstring path) {
-	if (!engine) {
+	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
 		return false;
 	}
-	if (engine->getSceneManagerInterface()->loadIScene(path.c_str())) {
+	std::string encodedPath = utf8_encode(path);
+	if (engineDLL.loadScene(encodedPath.c_str())) {
 		projectSettings.addOpenScene(path);
 		return true;
 	}
 	return false;
 }
 
-void LevelEditor::closeScene(IScene* scene) {
-	if (!engine) {
+void LevelEditor::closeScene(std::size_t sceneIndex) {
+	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to close scene because the Engine has not been loaded" << std::endl;
 		return;
 	}
-	if (const wchar_t* scenePath = engine->getSceneManagerInterface()->getSceneFilePath(scene->getName())) {
-		engine->getSceneManagerInterface()->unloadScene(scene->getName());
-		projectSettings.removeOpenScene(scenePath);
-		IEntityHandle* target = gameView.getTarget();
-		if (target && target->getIScene() == scene) {
-			target->clear();
+	std::wstring scenePath = utf8_decode(engineDLL.getSceneFilePath(sceneIndex));
+	std::vector<EntityID> entities = engineDLL.getAllEntities(sceneIndex);
+	if (engineDLL.unloadScene(sceneIndex)) {
+		if (std::find(entities.begin(), entities.end(), gameView.getTarget().entityID) != entities.end()) {
+			gameView.releaseTarget();
 		}
+		projectSettings.removeOpenScene(scenePath);
 	}
 }
 
 std::wstring LevelEditor::getProjectName() {
 	return projectSettings.getName();
-}
-
-std::vector<IScene*> LevelEditor::getLoadedScenes() {
-	if (!engine) return {};
-	std::size_t sceneCount = engine->getSceneManagerInterface()->getAllScenesCount();
-	std::vector<IScene*> loadedScenes(sceneCount);
-	engine->getSceneManagerInterface()->getAllIScenes(&loadedScenes[0], sceneCount);
-	return loadedScenes;
-}
-
-IEngine* LevelEditor::getEngine() {
-	return engine;
 }
 
 EngineDLL* LevelEditor::getEngineDLL() {
@@ -526,28 +539,49 @@ bool LevelEditor::loadEngine() {
 		return false;
 	}
 	std::wstring dllPath = projectSettings.getEngineDLLPath();
-	std::wcout << dllPath << std::endl;
-	if (engineDLL.load(dllPath.c_str())) {
-		if (auto ptr = engineDLL.getInterface()) {
-			engine = ptr->createEngine();
-
-			// Initialize egine
-			IWindow* window = engine->getGraphicsInterface()->getWindowInterface();
-			window->setActive(true);
-			window->setResolution(resolutionDefault.x, resolutionDefault.y);
-			window->setBackgroundColor(0.15f, 0.15f, 0.15f);
-			window->initGLAD((GLADloadproc)glfwGetProcAddress);
-
-			int result = engine->initiate(true);
-			if (result != 0) { // Failed to initiate the engine
-				std::cout << "Failed to initiate the Engine. Unloading the Engine now..." << std::endl;
-				unloadEngine();
+	std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/Game.dll";
+	// Moves Engine DLL to allow for the Game solution to build while Editor is running
+	if (std::filesystem::exists(dllPath)) {
+		std::wstring tempDirPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH;
+		if (!std::filesystem::is_directory(tempDirPath)) {
+			if (std::filesystem::exists(tempDirPath)) {
+				std::wcout << L"Failed to create temp Editor directory. A file called .Editor is blocking creation of the directory. Path: " << tempDirPath << std::endl;
 				return false;
 			}
-
-			hierarchy.initiate(); // Initiate hierarchy view for new Engine DLL
-			return true;
+			if (!std::filesystem::create_directory(tempDirPath)) {
+				std::cout << "Failed to create temp Editor directory" << std::endl;
+				return false;
+			}
 		}
+		std::wcout << dllPath << std::endl;
+		std::wcout << newDLLPath << std::endl;
+		try {
+			std::filesystem::copy_file(dllPath, newDLLPath, std::filesystem::copy_options::overwrite_existing);
+		}
+		catch (const std::filesystem::filesystem_error& error) {
+			std::wcout << utf8_decode(error.what()) << std::endl;
+			return false;
+		}
+	}
+	else {
+		std::cout << "No Game.dll found in project Engine DLL Path" << std::endl;
+		return false;
+	}
+	if (engineDLL.load(newDLLPath.c_str())) {
+		// Initialize egine
+		int width, height;
+		glfwGetWindowSize(glfwWindow, &width, &height);
+		if (!engineDLL.engineInit((GLADloadproc)glfwGetProcAddress, width, height)) {
+			std::cout << "Failed to initiate the Engine. Unloading the Engine DLL now..." << std::endl;
+			unloadEngine();
+			return false;
+		}
+		ImVec2 viewPortSize = gameView.getViewportSize();
+		engineDLL.setViewportSize(viewPortSize.x, viewPortSize.y);
+
+		hierarchy.initiate(); // Initiate hierarchy view for new Engine DLL
+		std::cout << "Successfully loaded new Engine DLL" << std::endl;
+		return true;
 	}
 	return false;
 }
@@ -555,10 +589,6 @@ bool LevelEditor::loadEngine() {
 bool LevelEditor::unloadEngine() {
 	hierarchy.clear();
 	gameView.releaseTarget();
-	if (engine) {
-		engine->release();
-		engine = nullptr;
-	}
 	engineDLL.unload();
 	return true;
 }

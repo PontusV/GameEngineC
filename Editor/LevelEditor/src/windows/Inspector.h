@@ -1,7 +1,8 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
-#include <Core/Entity.h>
 #include <string>
+
+typedef std::size_t EntityID;
 
 namespace Editor {
 
@@ -21,7 +22,7 @@ namespace Editor {
 		GameView* gameView;
 		EngineDLL* engineDLL;
 
-		Core::Entity prevTarget = Core::Entity(0);
+		EntityID prevTarget = 0;
 		bool renameActive = false;
 		std::string renameValue;
 	};

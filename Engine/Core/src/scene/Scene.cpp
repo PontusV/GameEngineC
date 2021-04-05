@@ -38,13 +38,6 @@ std::vector<Handle>& Scene::getAllEntities() {
 	return entities;
 }
 
-void Scene::getAllIEntities(IEntityHandle** out, std::size_t count) {
-	std::size_t size = std::min(count, entities.size());
-	for (std::size_t i = 0; i < size; i++) {
-		out[i] = static_cast<IEntityHandle*>(&entities[i]);
-	}
-}
-
 std::vector<Handle> Scene::getRootEntities() {
 	std::vector<Handle> roots;
 	for (Handle& entity : entities) {

@@ -1,12 +1,17 @@
 #ifndef GAME_VIEW_H
 #define GAME_VIEW_H
-#include <Core/EntityHandle.h>
 #include "Viewport.h"
 #include "GridRenderer.h"
 #include "imgui/imgui.h"
 
+typedef std::size_t EntityID;
 
 namespace Editor {
+	struct EntityTargetData {
+		EntityID entityID;
+		std::size_t sceneIndex;
+		std::string entityName;
+	};
 	class LevelEditor;
 
 	/* The game view window */
@@ -20,8 +25,9 @@ namespace Editor {
 		/* Renders imGui window and updates the game */
 		void tick(float deltaTime);
 
-		Core::IEntityHandle* getTarget();
-		void setTarget(Core::IEntityHandle* handle);
+		EntityTargetData getTarget();
+		void setTarget(EntityID entityID);
+		void updateTargetData();
 		/* Releases allocated memory by Engine DLL and assigns the pointer of target a value of nullptr */
 		void releaseTarget();
 
@@ -32,7 +38,7 @@ namespace Editor {
 
 		bool pressed = false;
 		bool targetPressed = false;
-		Core::IEntityHandle* target;
+		EntityTargetData target;
 
 		LevelEditor* editor;
 		Viewport viewport;

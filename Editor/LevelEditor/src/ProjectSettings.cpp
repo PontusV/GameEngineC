@@ -23,7 +23,7 @@ void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring&
 }
 
 bool ProjectSettings::parsePath(std::wstring& string) {
-	replaceAll(string, L"${ProjectDir}", path.append(L"/"));
+	replaceAll(string, L"${ProjectDir}", std::wstring(path).append(L"/"));
 	return true;
 }
 
@@ -104,7 +104,7 @@ std::wstring ProjectSettings::getName() {
 	return name;
 }
 std::wstring ProjectSettings::getPath() {
-	return path.ends_with(L"\\") ? path.substr(0, path.size() - 1) : path;
+	return path.ends_with(L"\\") || path.ends_with(L"/") ? path.substr(0, path.size() - 1) : path;
 }
 std::wstring ProjectSettings::getFilePath() {
 	return getPath().append(L"\\").append(name).append(L".proj");

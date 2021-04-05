@@ -301,11 +301,3 @@ std::vector<RectTransform> Graphics::createBorder(const Border& border, const Re
 
 	return borderLines;
 }
-
-IWindow* Graphics::getWindowInterface() {
-	return &getWindow();
-}
-
-ICamera* Graphics::getCameraInterface() {
-	return &getCamera();
-}

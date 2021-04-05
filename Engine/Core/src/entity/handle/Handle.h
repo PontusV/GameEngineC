@@ -1,7 +1,6 @@
 #ifndef HANDLE_H
 #define HANDLE_H
 
-#include <Core/EntityHandle.h>
 #include "entity/Entity.h"
 #include "entity/HideFlags.h"
 #include "entity/EntityLocation.h"
@@ -16,13 +15,12 @@ namespace Core {
 	class Component;
 
 	/* A handle for Entities */
-	class Handle: public IEntityHandle {
+	class Handle {
 	public:
 		Handle(Entity entity, Scene* scene);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
 
-		void release() override { delete this; }
 		bool operator==(const Handle& other) const;
 		bool operator!=(const Handle& other) const;
 		/* Returns true if the given Entity is a child of the Entity this instance points to. */
@@ -40,7 +38,6 @@ namespace Core {
 
 		const Entity& getEntity() const;
 		Scene* getScene() const;
-		IScene* getIScene() const;
 
 		/* Checks if pointed towards a valid Entity ID. */
 		bool isValid();
@@ -71,12 +68,6 @@ namespace Core {
 		std::size_t getComponentCount();
 		/* Returns the number of components attached to the Entity, matching the given ComponentTypeID */
 		std::size_t getComponentCount(ComponentTypeID typeID);
-		/* Used by DLL interface. */
-		IComponent* getIComponent(ComponentTypeID typeID) override;
-		/* Used by DLL interface. */
-		void getIComponents(IComponent** out, std::size_t count) override;
-		/* Used by DLL interface. */
-		void getIComponents(ComponentTypeID typeID, IComponent** out, std::size_t count) override;
 
 		template<typename T>
 		T* getComponent();
