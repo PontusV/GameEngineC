@@ -12,7 +12,6 @@
 #include <vector>
 
 #define REGISTER_LOADABLE_COMPONENT(T) Core::ComponentLoader::registerComponent<T>()
-#define REGISTER_IGNORE_ON_LOAD_COMPONENT(T) Core::ComponentLoader::registerIgnore<T>();
 
 namespace Core {
 
@@ -23,7 +22,6 @@ namespace Core {
 
 		/* Loads Component from the given instream and adds it to the given EntityHandle. */
 		static void addComponentFromFile(std::istream& is, std::string componentTypeName, EntityHandle& go);
-		template<typename T> static bool registerIgnore();
 		template<typename T> static void registerComponent();
 
 	private:
@@ -34,10 +32,6 @@ namespace Core {
 		static std::map<std::string, LoaderFunc>& getLoaderMap() {
 			static std::map<std::string, LoaderFunc> loaderMap;
 			return loaderMap;
-		}
-		static std::vector<std::string>& getIgnoreList() {
-			static std::vector<std::string> ignoreList;
-			return ignoreList;
 		}
 	};
 
@@ -50,11 +44,6 @@ namespace Core {
 	}
 	
 	template<typename T>
-		bool ComponentLoader::registerIgnore() {
-		getIgnoreList().push_back(nameof(T));
-		return true;
-	}
-	template<typename T>
 	void ComponentLoader::addComponentFromFile_impl(std::istream& is, EntityHandle& go) {
 		if (!go.refresh()) {
 			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!\n";
@@ -62,8 +51,6 @@ namespace Core {
 		}
 
 		T loadedComponent;
-		//char loadedComponent[sizeof(T)];
-		//is.read((char*)&loadedComponent, sizeof(T));
 
 		try {
 			loadedComponent.deserialize(is);

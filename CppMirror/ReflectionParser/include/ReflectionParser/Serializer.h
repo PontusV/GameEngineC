@@ -164,6 +164,18 @@ namespace Mirror {
 				deserializePropertiesImpl<I + 1>(is, properties, prop, args...);
 			}
 		}
+
+		static void skipPropertiesImpl(std::istream& is) {
+			std::size_t count;
+			details::deserialize(count, is);
+			for (std::size_t i = 0; i < count; i++) {
+				details::SerializedPropertyData prop;
+				details::deserialize(prop.name, is);
+				details::deserialize(prop.typeName, is);
+				details::deserialize(prop.typeSize, is);
+				is.seekg(prop.typeSize, std::ios::cur); // Skip property data
+			}
+		}
 	}
 
 	template<typename... Ts>
@@ -194,6 +206,18 @@ namespace Mirror {
 			details::deserialize(prop.typeName, is);
 			details::deserialize(prop.typeSize, is);
 			details::deserializePropertiesImpl(is, properties, prop, args...);
+		}
+	}
+
+	/* Expects the upcoming part of the given istream to be serialized properties. The skip will chain down to all base classes */
+	static void skipProperties(std::istream& is) {
+		details::skipPropertiesImpl(is);
+		std::size_t continueCount;
+		Mirror::deserialize(is, continueCount);
+		for (std::size_t i = 0; i < continueCount; i++) {
+			std::string name = std::string();
+			Mirror::deserialize(is, name);
+			Mirror::skipProperties(is);
 		}
 	}
 }

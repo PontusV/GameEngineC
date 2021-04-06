@@ -24,7 +24,7 @@ bool EngineDLL::load(const wchar_t* path) {
     }
     handle = LoadLibrary(path);
     if (handle == NULL) {
-        std::cout << "Failed to create handle for DLL at specified path" << std::endl;
+        std::wcout << L"Failed to create handle for DLL at specified path: " << path << std::endl;
         return false;
     }
 

@@ -509,8 +509,14 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	}
 	fileInput << ");" << endml;
 	// Call serialize in all direct base classes (chaining)
+	fileInput << printTabs(1) << "std::size_t continueCount = " << directBaseClasses.size() << ";" << endml;
+	fileInput << printTabs(1) << "Mirror::serialize(os, continueCount);" << endml;
 	for (const ClassInfo& baseClass : directBaseClasses) {
-		fileInput << printTabs(1) << baseClass.fullName << "::serialize(os);" << endml;
+		fileInput << printTabs(1) << "{" << endml;
+		fileInput << printTabs(2) << "std::string name = \"" << baseClass.fullName << "\";" << endml;
+		fileInput << printTabs(2) << "Mirror::serialize(os, name);" << endml;
+		fileInput << printTabs(2) << baseClass.fullName << "::serialize(os);" << endml;
+		fileInput << printTabs(1) << "}" << endml;
 	}
 	fileInput << "}" << endml;
 	// deserialize
@@ -532,9 +538,20 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	}
 	fileInput << "); " << endml;
 	// Call deserialize in all direct base classes (chaining)
+	fileInput << printTabs(1) << "std::size_t continueCount;" << endml;
+	fileInput << printTabs(1) << "Mirror::deserialize(is, continueCount);" << endml;
+	fileInput << printTabs(1) << "for (std::size_t i = 0; i < continueCount; i++) {" << endml;
+	fileInput << printTabs(2) << "std::string name = std::string();" << endml;
+	fileInput << printTabs(2) << "Mirror::deserialize(is, name);" << endml;
 	for (const ClassInfo& baseClass : directBaseClasses) {
-		fileInput << printTabs(1) << baseClass.fullName << "::deserialize(is);" << endml;
+		fileInput << printTabs(2) << "if (name == \"" << baseClass.fullName << "\") {" << endml;
+		fileInput << printTabs(3) << baseClass.fullName << "::deserialize(is);" << endml;
+		fileInput << printTabs(3) << "continue;" << endml;
+		fileInput << printTabs(2) << "}" << endml;
 	}
+	fileInput << printTabs(2) << "Mirror::skipProperties(is);" << endml;
+	fileInput << printTabs(1) << "}" << endml;
+
 	for (const Property& prop : currentClass.properties) {
 		if (!prop.type.isPointer && !prop.type.isReference && !prop.type.isConst) {
 			for (const std::string& value : prop.getAnnotationValue("Update")) {

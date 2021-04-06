@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
+#include <system_error>
 using namespace Core;
 
 SceneManager::SceneManager(EntityManager* entityManager) : entityManager(entityManager) {
@@ -62,7 +63,6 @@ bool SceneManager::saveScene(std::size_t sceneIndex, const wchar_t* filePath) {
 }
 
 ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
-	std::ifstream file;
 	std::wstring path = std::wstring(filePath);
 	std::size_t nameStartIndex = path.find_last_of(L"\\");
 	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
@@ -74,7 +74,18 @@ ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	}
 
 	std::wcout << L"Loading Scene: " << filePath << std::endl;
-	file.open(filePath, std::ios::in | std::ios::binary);
+	std::ifstream file;
+	try {
+		file.open(filePath, std::ios::in | std::ios::binary);
+	}
+	catch (std::system_error& e) {
+		std::wcout << L"Failed to load Scene: " << filePath << ". File does not exist" << std::endl;
+		return nullptr;
+	}
+	if (file.fail()) {
+		std::wcout << L"Failed to load Scene: " << filePath << ". File does not exist" << std::endl;
+		return nullptr;
+	}
 
 	// Scene
 	ScenePtr scene = std::make_shared<Scene>(entityManager, sceneName);
