@@ -64,7 +64,7 @@ extern "C" {
 	DLLEXPORT void getAllReflectedTypes(TypeID* out, std::size_t outSize);
 	DLLEXPORT std::size_t getDerivedTypeIDsCount(TypeID typeID);
 	DLLEXPORT std::size_t getAllReflectedTypesCount();
-
+	
 	// Reflection properties
 	DLLEXPORT std::size_t getPropertiesCount(TypeID typeID);
 	DLLEXPORT std::size_t getPropertyID(TypeID typeID, std::size_t propIndex);
@@ -73,7 +73,7 @@ extern "C" {
 	DLLEXPORT void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t outSize);
 	DLLEXPORT void getPropertyName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
 	DLLEXPORT void getPropertyTypeName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
-
+	
 	// Scene
 	DLLEXPORT bool loadScene(Core::Engine* engine, const char* path);
 	DLLEXPORT bool unloadScene(Core::Engine* engine, std::size_t sceneIndex);
@@ -89,7 +89,7 @@ extern "C" {
 	DLLEXPORT void setSceneAddedCallback(Core::Engine* engine, SceneAddedCallbackFun fun);
 	DLLEXPORT void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun);
 	DLLEXPORT void setSceneCallbackPtr(Core::Engine* engine, void* ptr);
-
+	
 	// Entity
 	DLLEXPORT bool addComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID);
 	DLLEXPORT bool removeComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID);

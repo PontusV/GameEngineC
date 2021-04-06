@@ -109,6 +109,51 @@ int LevelEditor::initiate() {
 	return start();
 }
 
+void LevelEditor::updateEngineDLL(float& updateTime) {
+	// Check reload Engine DLL
+	if (updateTime < 1.0f) return;
+	updateTime = 0.0f;
+	if (projectSettings.isLoaded()) {
+		std::wstring dllPath = projectSettings.getEngineDLLPath();
+		std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/" + engineDLL.getCurrentDLLName();
+		if (std::filesystem::exists(dllPath)) {
+			if (engineDLL.isLoaded()) {
+				auto lastReadTimeRaw = std::filesystem::last_write_time(newDLLPath);
+				auto lastWriteTimeRaw = std::filesystem::last_write_time(dllPath);
+				auto lastReadTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastReadTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
+				auto lastWriteTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastWriteTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
+				if (lastWriteTime != lastReadTime) {
+					std::wstring path = copyEngineDLL();
+					if (!path.empty()) {
+						std::cout << "Reloading dll" << std::endl;
+						// TODO: Save state
+						// Saving all loaded scenes
+						std::size_t sceneCount = engineDLL.getSceneCount();
+						for (std::size_t i = 0; i < sceneCount; i++) {
+							engineDLL.saveScene(i);
+						}
+						// TODO: Store GameView target
+						//
+						unloadEngine();
+						loadEngine(path);
+						// TODO: Load state
+						std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
+						projectSettings.getOpenScenes().clear();
+						for (std::wstring& scenePath : scenes) {
+							openScene(scenePath);
+						}
+						//
+					}
+				}
+			}
+		}
+		else {
+			// Wait between loading
+			Sleep(500);
+		}
+	}
+}
+
 int LevelEditor::start() {
 	GLFWwindow* window = glfwGetCurrentContext();
 	// Setup Dear ImGui context
@@ -141,41 +186,15 @@ int LevelEditor::start() {
 	// Game loop
 	running = true;
 
+	GLfloat engineDLLUpdateTime = 0.0f;
 	while (running && !glfwWindowShouldClose(window)) {
-		// Check reload Engine DLL
-		if (projectSettings.isLoaded()) {
-			std::wstring dllPath = projectSettings.getEngineDLLPath();
-			std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/Game.dll";
-			if (std::filesystem::exists(dllPath)) {
-				if (engineDLL.isLoaded()) {
-					auto lastReadTimeRaw = std::filesystem::last_write_time(newDLLPath);
-					auto lastWriteTimeRaw = std::filesystem::last_write_time(dllPath);
-					auto lastReadTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastReadTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
-					auto lastWriteTime = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(lastWriteTimeRaw - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
-					if (lastWriteTime != lastReadTime) {
-						std::cout << "Reloading dll" << std::endl;
-						// TODO: Save state
-						unloadEngine();
-					}
-				}
-				else if (loadEngine()) {
-					// TODO: Load state
-					std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
-					projectSettings.getOpenScenes().clear();
-					for (std::wstring& scenePath : scenes) {
-						openScene(scenePath);
-					}
-				}
-			}
-			else {
-				// Wait between loading
-				Sleep(500);
-			}
-		}
 		// Calculate delta time
 		GLfloat currentFrame = (GLfloat)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		engineDLLUpdateTime += deltaTime;
+		updateEngineDLL(engineDLLUpdateTime);
 
 		// Poll events
 		glfwPollEvents();
@@ -487,7 +506,13 @@ void LevelEditor::openProject(std::wstring path) {
 	fileView.setSourcePath(dirPath);
 
 	// Load Game.dll
-	loadEngine();
+	std::wstring dllPath = copyEngineDLL();
+	if (!dllPath.empty()) {
+		loadEngine(dllPath);
+	}
+	else {
+		std::cout << "LevelEditor::openProject::WARNING Failed to copy Engine DLL to temp Editor directory" << std::endl;
+	}
 
 	// Open scenes
 	std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
@@ -533,24 +558,20 @@ EngineDLL* LevelEditor::getEngineDLL() {
 	return &engineDLL;
 }
 
-bool LevelEditor::loadEngine() {
-	if (engineDLL.isLoaded()) {
-		std::cout << "Unable to load engine DLL because one is already loaded" << std::endl;
-		return false;
-	}
+std::wstring LevelEditor::copyEngineDLL() {
 	std::wstring dllPath = projectSettings.getEngineDLLPath();
-	std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/Game.dll";
+	std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/" + engineDLL.getNextDLLName();
 	// Moves Engine DLL to allow for the Game solution to build while Editor is running
 	if (std::filesystem::exists(dllPath)) {
 		std::wstring tempDirPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH;
 		if (!std::filesystem::is_directory(tempDirPath)) {
 			if (std::filesystem::exists(tempDirPath)) {
 				std::wcout << L"Failed to create temp Editor directory. A file called .Editor is blocking creation of the directory. Path: " << tempDirPath << std::endl;
-				return false;
+				return std::wstring();
 			}
 			if (!std::filesystem::create_directory(tempDirPath)) {
 				std::cout << "Failed to create temp Editor directory" << std::endl;
-				return false;
+				return std::wstring();
 			}
 		}
 		std::wcout << dllPath << std::endl;
@@ -559,15 +580,24 @@ bool LevelEditor::loadEngine() {
 			std::filesystem::copy_file(dllPath, newDLLPath, std::filesystem::copy_options::overwrite_existing);
 		}
 		catch (const std::filesystem::filesystem_error& error) {
-			std::wcout << utf8_decode(error.what()) << std::endl;
-			return false;
+			std::cout << error.what() << std::endl;
+			return std::wstring();
 		}
 	}
 	else {
-		std::cout << "No Game.dll found in project Engine DLL Path" << std::endl;
+		std::cout << "No Engine.dll found in project Engine DLL Path" << std::endl;
+		return std::wstring();
+	}
+	return newDLLPath;
+}
+
+bool LevelEditor::loadEngine(std::wstring path) {
+	if (path.empty()) return false;
+	if (engineDLL.isLoaded()) {
+		std::cout << "Unable to load engine DLL because one is already loaded" << std::endl;
 		return false;
 	}
-	if (engineDLL.load(newDLLPath.c_str())) {
+	if (engineDLL.load(path.c_str())) {
 		// Initialize egine
 		int width, height;
 		glfwGetWindowSize(glfwWindow, &width, &height);

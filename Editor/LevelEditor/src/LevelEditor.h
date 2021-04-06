@@ -40,12 +40,15 @@ namespace Editor {
 		bool openScene(std::wstring path);
 		void closeScene(std::size_t sceneIndex);
 
+		void updateEngineDLL(float& updateTime);
 		/* Loads and initializes the Engine DLL of the current project. Returns true if successful*/
-		bool loadEngine();
+		bool loadEngine(std::wstring path);
 		/* Unloads the currently loaded Engine DLL of the current project. Returns true if successful */
 		bool unloadEngine();
 		/* Builds a new Game EXE from the current project. Returns true if successful */
 		bool buildGame();
+		/* Copies the Engine.dl from the Engine build path to the temp Editor directory */
+		std::wstring copyEngineDLL();
 
 		EngineDLL* getEngineDLL();
 	private:

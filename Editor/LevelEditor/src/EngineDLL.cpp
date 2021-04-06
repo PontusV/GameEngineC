@@ -5,7 +5,12 @@ using namespace Editor;
 #define CHAR_BUFFER_SIZE 256
 
 EngineDLL::EngineDLL() : handle(NULL) {}
-EngineDLL::~EngineDLL() {}
+EngineDLL::~EngineDLL() {
+    if (isLoaded()) {
+        std::cout << "EngineDLL::WARNING Destructor called before unloading the Engine DLL. This may cause memory leaks." << std::endl;
+        unload();
+    }
+}
 
 template<typename T>
 bool loadFunctionFromDLL(HINSTANCE& handle, T& var, const char* functionName) {
@@ -262,6 +267,7 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    altActivated = !altActivated;
     return true;
 }
 
@@ -882,4 +888,16 @@ std::size_t EngineDLLInterface::getEntityImmediateChildCount(EntityID entityID) 
         throw "EngineDLLInterface::getEntityImmediateChildCount::ERROR The function ptr is nullptr";
     }
     return getEntityImmediateChildCountFun(engine, entityID);
+}
+
+std::wstring EngineDLL::getNextDLLName() {
+    return altActivated ? L"Engine.dll" : L"Engine_2.dll";
+}
+
+std::wstring EngineDLL::getCurrentDLLName() {
+    return !altActivated ? L"Engine.dll" : L"Engine_2.dll";
+}
+
+bool EngineDLL::isAltActivated() const {
+    return altActivated;
 }
