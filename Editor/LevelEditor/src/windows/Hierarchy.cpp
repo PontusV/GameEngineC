@@ -44,7 +44,7 @@ void entityNode(EngineDLL* engineDLL, std::size_t sceneIndex, EntityHierarchy& e
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 			IM_ASSERT(payload->DataSize == sizeof(EntityData));
 			EntityData* data = static_cast<EntityData*>(payload->Data);
-
+			std::cout << sceneIndex << std::endl;
 			engineDLL->setEntityParent(sceneIndex, data->id, entity.id);
 		}
 		ImGui::EndDragDropTarget();

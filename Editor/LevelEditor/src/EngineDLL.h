@@ -70,7 +70,7 @@ typedef bool (*RemoveComponentFun)(EnginePtr, EntityID, std::size_t, TypeID);
 typedef bool (*RenameEntityFun)(EnginePtr, EntityID, const char*);
 typedef void (*GetComponentsFun)(EnginePtr, EntityID, void**, TypeID*, std::size_t);
 typedef bool (*IsEntityChildFun)(EnginePtr, EntityID, EntityID);
-typedef bool (*SetEntityParentFun)(EnginePtr, EntityID, EntityID);
+typedef bool (*SetEntityParentFun)(EnginePtr, std::size_t, EntityID, EntityID);
 typedef bool (*IsEntityNameAvailableFun)(EnginePtr, const char*);
 typedef bool (*HasEntityParentFun)(EnginePtr, EntityID);
 typedef bool (*DetachEntityParentFun)(EnginePtr, std::size_t, EntityID);

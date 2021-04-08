@@ -852,7 +852,7 @@ bool EngineDLLInterface::setEntityParent(std::size_t sceneIndex, EntityID entity
         std::cout << "EngineDLLInterface::setEntityParent::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::setEntityParent::ERROR The function ptr is nullptr";
     }
-    return setEntityParentFun(engine, entityID, parentID);
+    return setEntityParentFun(engine, sceneIndex, entityID, parentID);
 }
 
 bool EngineDLLInterface::isEntityNameAvailable(const char* name) {
