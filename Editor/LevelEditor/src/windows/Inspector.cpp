@@ -267,8 +267,9 @@ void Inspector::tick() {
 
 			if (ImGui::InputText("##Inspector_Rename_Field", buffer, 64, ImGuiInputTextFlags_EnterReturnsTrue)) {
 				renameActive = false;
-				engineDLL->renameEntity(target.entityID, buffer);
-				target.entityName = buffer;
+				if (engineDLL->renameEntity(target.entityID, buffer)) {
+					gameView->updateTargetData();
+				}
 			}
 			ImGui::SetKeyboardFocusHere(0);
 			if (!ImGui::IsItemHovered() && ImGui::IsAnyMouseDown()) {

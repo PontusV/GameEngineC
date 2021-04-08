@@ -104,6 +104,7 @@ extern "C" {
 	DLLEXPORT bool detachEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID);
 	DLLEXPORT void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size_t outSize);
 	DLLEXPORT EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index);
+	DLLEXPORT EntityID getEntityFromName(Core::Engine* engine, const char* name);
 	DLLEXPORT std::size_t getComponentsCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityChildCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID);

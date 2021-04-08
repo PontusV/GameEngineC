@@ -497,6 +497,12 @@ void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size
 	copyString(name, out, outSize);
 }
 
+EntityID getEntityFromName(Core::Engine* engine, const char* name) {
+	if (name == nullptr) return Entity::INVALID_ID;
+	EntityManager& entityManager = engine->getEntityManager();
+	return entityManager.getEntity(name).getID();
+}
+
 EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index) {
 	if (entityID == Entity::INVALID_ID) return Entity::INVALID_ID;
 	EntityManager& entityManager = engine->getEntityManager();

@@ -59,6 +59,7 @@
 #pragma comment(linker, "/export:hasEntityParent")
 #pragma comment(linker, "/export:detachEntityParent")
 #pragma comment(linker, "/export:getEntityName")
+#pragma comment(linker, "/export:getEntityFromName")
 #pragma comment(linker, "/export:getEntityChild")
 #pragma comment(linker, "/export:getComponentsCount")
 #pragma comment(linker, "/export:getEntityChildCount")

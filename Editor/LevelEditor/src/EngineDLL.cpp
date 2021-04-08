@@ -253,6 +253,10 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, getEntityFromNameFun, "getEntityFromName")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, getEntityChildFun, "getEntityChild")) {
         unload();
         return false;
@@ -316,8 +320,10 @@ bool EngineDLL::unload() {
     getPropertyNameFun = nullptr;
     getPropertyTypeNameFun = nullptr;
     loadSceneFun = nullptr;
+    loadSceneBackupFun = nullptr;
     unloadSceneFun = nullptr;
     saveSceneFun = nullptr;
+    saveSceneBackupFun = nullptr;
     createSceneFun = nullptr;
     destroyEntityFun = nullptr;
     getAllEntitiesFun = nullptr;
@@ -339,6 +345,7 @@ bool EngineDLL::unload() {
     hasEntityParentFun = nullptr;
     detachEntityParentFun = nullptr;
     getEntityNameFun = nullptr;
+    getEntityFromNameFun = nullptr;
     getEntityChildFun = nullptr;
     getComponentsCountFun = nullptr;
     getEntityChildCountFun = nullptr;
@@ -880,6 +887,14 @@ std::string EngineDLLInterface::getEntityName(EntityID entityID) {
     char buffer[CHAR_BUFFER_SIZE];
     getEntityNameFun(engine, entityID, buffer, CHAR_BUFFER_SIZE);
     return std::string(buffer);
+}
+
+EntityID EngineDLLInterface::getEntityFromName(const char* name) {
+    if (getEntityFromNameFun == nullptr) {
+        std::cout << "EngineDLLInterface::getEntityFromName::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getEntityFromName::ERROR The function ptr is nullptr";
+    }
+    return getEntityFromNameFun(engine, name);
 }
 
 EntityID EngineDLLInterface::getEntityChild(EntityID entityID, std::size_t index) {

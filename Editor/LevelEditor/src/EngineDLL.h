@@ -75,6 +75,7 @@ typedef bool (*IsEntityNameAvailableFun)(EnginePtr, const char*);
 typedef bool (*HasEntityParentFun)(EnginePtr, EntityID);
 typedef bool (*DetachEntityParentFun)(EnginePtr, std::size_t, EntityID);
 typedef void (*GetEntityNameFun)(EnginePtr, EntityID, char*, std::size_t);
+typedef EntityID (*GetEntityFromNameFun)(EnginePtr, const char*);
 typedef EntityID (*GetEntityChildFun)(EnginePtr, EntityID, std::size_t);
 typedef std::size_t (*GetComponentsCountFun)(EnginePtr, EntityID);
 typedef std::size_t (*GetEntityChildCountFun)(EnginePtr, EntityID);
@@ -183,6 +184,7 @@ namespace Editor {
 		bool hasEntityParent(EntityID entityID);
 		bool detachEntityParent(std::size_t sceneIndex, EntityID entityID);
 		std::string getEntityName(EntityID entityID);
+		EntityID getEntityFromName(const char* name);
 		EntityID getEntityChild(EntityID entityID, std::size_t index);
 		std::size_t getComponentsCount(EntityID entityID);
 		std::size_t getEntityChildCount(EntityID entityID);
@@ -250,6 +252,7 @@ namespace Editor {
 		HasEntityParentFun hasEntityParentFun;
 		DetachEntityParentFun detachEntityParentFun;
 		GetEntityNameFun getEntityNameFun;
+		GetEntityFromNameFun getEntityFromNameFun;
 		GetEntityChildFun getEntityChildFun;
 		GetComponentsCountFun getComponentsCountFun;
 		GetEntityChildCountFun getEntityChildCountFun;
