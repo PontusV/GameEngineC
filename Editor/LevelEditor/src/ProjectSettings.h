@@ -26,13 +26,15 @@ namespace Editor {
 		/* Returns the full path to the settings file */
 		std::wstring getFilePath();
 
+		/* Sets the build path of the Engine DLL */
 		void setEngineDLLPath(std::wstring path);
-		/* Returns the full parsed path to the Engine DLL */
+		/* Returns the full parsed build path of the Engine DLL */
 		std::wstring getEngineDLLPath();
 
 		std::vector<std::wstring>& getOpenScenes();
 		void addOpenScene(std::wstring path);
 		void removeOpenScene(std::wstring path);
+		void clearOpenScenes();
 
 	private:
 		/* Reads settings from file at path */

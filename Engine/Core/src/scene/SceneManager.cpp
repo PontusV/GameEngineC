@@ -28,21 +28,23 @@ void SceneManager::update() {
 	}
 }
 
-bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) {
+bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath, bool assignPath) {
 	if (scene == nullptr) {
-		std::cout << "Failed to save scene because give pointer was nullptr" << std::endl;
+		std::cout << "SceneManager::saveScene::ERROR Failed to save scene because give pointer was nullptr" << std::endl;
 		return false;
 	}
 	std::ofstream file;
 	if (filePath) {
 		std::wcout << L"Saving scene to " << filePath << std::endl;
 		file.open(filePath, std::ios::out | std::ios::binary | std::ios::trunc);
-		scenePathMap.insert(std::pair(scene, std::wstring(filePath)));
+		if (assignPath) {
+			scenePathMap.insert(std::pair(scene, std::wstring(filePath)));
+		}
 	} else {
 		auto it = scenePathMap.find(scene);
 		if (it == scenePathMap.end()) {
 			// Error: Path not stored
-			std::wcout << L"Failed to save scene. Missing file path to scene" << std::endl;
+			std::wcout << L"SceneManager::saveScene::ERROR Failed to save scene. Missing file path to scene" << std::endl;
 			return false;
 		}
 		std::wcout << L"Saving scene to " << it->second << std::endl;
@@ -57,22 +59,12 @@ bool SceneManager::saveScene(ScenePtr scene, const wchar_t* filePath) {
 	return true;
 }
 
-bool SceneManager::saveScene(std::size_t sceneIndex, const wchar_t* filePath) {
+bool SceneManager::saveScene(std::size_t sceneIndex, const wchar_t* filePath, bool assignPath) {
 	ScenePtr scene = getScene(sceneIndex);
-	return saveScene(scene, filePath);
+	return saveScene(scene, filePath, assignPath);
 }
 
-ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
-	std::wstring path = std::wstring(filePath);
-	std::size_t nameStartIndex = path.find_last_of(L"\\");
-	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
-	std::wstring sceneName = fileName.substr(0, fileName.find_last_of(L"."));
-	for (ScenePtr& scene : scenes) {
-		if (sceneName.compare(scene->getName()) == 0) {
-			return scene;
-		}
-	}
-
+ScenePtr SceneManager::loadSceneImpl(const wchar_t* filePath, std::wstring name) {
 	std::wcout << L"Loading Scene: " << filePath << std::endl;
 	std::ifstream file;
 	try {
@@ -88,10 +80,56 @@ ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
 	}
 
 	// Scene
-	ScenePtr scene = std::make_shared<Scene>(entityManager, sceneName);
+	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
 	scene->deserialize(file);
 	file.close();
 	scene->awake();
+	return scene;
+}
+
+ScenePtr SceneManager::loadScene(const wchar_t* srcFilePath, const wchar_t* destFilePath) {
+	// Retrieves scene name from dest file path
+	std::wstring destPath = std::wstring(destFilePath);
+	std::size_t nameStartIndex = destPath.find_last_of(L"\\");
+	std::wstring fileName = destPath.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
+	std::wstring sceneName = fileName.substr(0, fileName.find_last_of(L"."));
+
+	// TODO: Unload current scene when loading backup? Dunno
+	for (ScenePtr& scene : scenes) {
+		if (sceneName.compare(scene->getName()) == 0) {
+			return scene;
+		}
+	}
+
+	// Scene
+	ScenePtr scene = loadSceneImpl(srcFilePath, sceneName);
+	if (scene == nullptr) {
+		return nullptr;
+	}
+
+	scenes.push_back(scene);
+	scenePathMap.insert(std::pair(scene, std::wstring(destFilePath)));
+	if (sceneAddedCallback) sceneAddedCallback(callbackPtr, scenes.size() - 1);
+	return scene;
+}
+
+ScenePtr SceneManager::loadScene(const wchar_t* filePath) {
+	std::wstring path = std::wstring(filePath);
+	std::size_t nameStartIndex = path.find_last_of(L"\\");
+	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
+	std::wstring sceneName = fileName.substr(0, fileName.find_last_of(L"."));
+
+	for (ScenePtr& scene : scenes) {
+		if (sceneName.compare(scene->getName()) == 0) {
+			return scene;
+		}
+	}
+
+	// Scene
+	ScenePtr scene = loadSceneImpl(filePath, sceneName);
+	if (scene == nullptr) {
+		return nullptr;
+	}
 
 	scenes.push_back(scene);
 	scenePathMap.insert(std::pair(scene, std::wstring(filePath)));

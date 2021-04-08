@@ -331,9 +331,23 @@ bool loadScene(Core::Engine* engine, const char* path) {
 	return scene != nullptr;
 }
 
+bool loadSceneBackup(Core::Engine* engine, const char* srcPath, const char* destPath) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	std::wstring decodedSrcPath = utf8_decode(srcPath);
+	std::wstring decodedDestPath = utf8_decode(destPath);
+	ScenePtr scene = sceneManager.loadScene(decodedSrcPath.c_str(), decodedDestPath.c_str());
+	return scene != nullptr;
+}
+
 bool unloadScene(Core::Engine* engine, std::size_t sceneIndex) {
 	SceneManager& sceneManager = engine->getSceneManager();
 	return sceneManager.unloadScene(sceneIndex);
+}
+
+bool saveSceneBackup(Core::Engine* engine, std::size_t sceneIndex, const char* path) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	std::wstring decodedPath = utf8_decode(path);
+	return sceneManager.saveScene(sceneIndex, decodedPath.c_str(), false);
 }
 
 bool saveScene(Core::Engine* engine, std::size_t sceneIndex) {

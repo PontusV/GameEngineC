@@ -38,6 +38,8 @@ namespace Editor {
 		void closeProject();
 		/* Returns true if successful */
 		bool openScene(std::wstring path);
+		/* Returns true if successful */
+		bool openSceneFromBackup(std::wstring srcPath, std::wstring destPath);
 		void closeScene(std::size_t sceneIndex);
 
 		void updateEngineDLL(float& updateTime);
@@ -45,9 +47,11 @@ namespace Editor {
 		bool loadEngine(std::wstring path);
 		/* Unloads the currently loaded Engine DLL of the current project. Returns true if successful */
 		bool unloadEngine();
+		/* Reloads the Engine DLL. Expects an Engine DLL to already be loaded. Unloads the currently loaded Engine DLL and loads the one at the specified path. Returns true if successful */
+		bool reloadEngine(std::wstring path);
 		/* Builds a new Game EXE from the current project. Returns true if successful */
 		bool buildGame();
-		/* Copies the Engine.dl from the Engine build path to the temp Editor directory */
+		/* Copies the Engine.dll from the Engine build path to the temp Editor directory. Returns the path to the DLL in the temp directory. Returns an empty string if unsuccessful */
 		std::wstring copyEngineDLL();
 
 		EngineDLL* getEngineDLL();

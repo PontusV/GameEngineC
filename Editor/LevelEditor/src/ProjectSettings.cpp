@@ -134,3 +134,7 @@ void ProjectSettings::removeOpenScene(std::wstring path) {
 		openScenes.erase(it);
 	}
 }
+
+void ProjectSettings::clearOpenScenes() {
+	openScenes.clear();
+}

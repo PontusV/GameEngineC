@@ -32,14 +32,14 @@ namespace Core {
 		std::vector<ScenePtr> getAllScenes();
 		/* Retrieves the count of all loaded Scenes */
 		std::size_t getAllScenesCount();
-		/* Retrieves all loaded Scenes and their names. */
-		//std::vector<std::pair<std::wstring, ScenePtr>> getAllScenesAsPairs();
-		/* Saves scene to file */
-		bool saveScene(ScenePtr scene, const wchar_t* filePath = nullptr);
-		/* Saves scene to file */
-		bool saveScene(std::size_t sceneIndex, const wchar_t* filePath = nullptr);
+		/* Saves scene to file. @param assignPath Defines if the given filePath will be assigned to the scene */
+		bool saveScene(ScenePtr scene, const wchar_t* filePath = nullptr, bool assignPath = true);
+		/* Saves scene to file @param assignPath Defines if the given filePath will be assigned to the scene */
+		bool saveScene(std::size_t sceneIndex, const wchar_t* filePath = nullptr, bool assignPath = true);
 		/* Loads scene from file */
 		ScenePtr loadScene(const wchar_t* filePath);
+		/* Loads scene from file and assigns a different file path to the scene (e.g. for saving). Used for loading backup */
+		ScenePtr loadScene(const wchar_t* srcFilePath, const wchar_t* destFilePath);
 		/* Unloads scene by name */
 		bool unloadScene(std::wstring name);
 		/* Unloads scene by index */
@@ -55,6 +55,8 @@ namespace Core {
 		/* Used by DLL interface. Provides this ptr as an argument in the callback functions */
 		void setCallbackPtr(void* ptr);
 
+	private:
+		ScenePtr loadSceneImpl(const wchar_t* filePath, std::wstring name);
 	private:
 		std::vector<ScenePtr> scenes;
 		std::map<ScenePtr, std::wstring> scenePathMap;

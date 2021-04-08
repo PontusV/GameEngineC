@@ -153,11 +153,19 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, loadSceneBackupFun, "loadSceneBackup")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, unloadSceneFun, "unloadScene")) {
         unload();
         return false;
     }
     if (!loadFunctionFromDLL(handle, saveSceneFun, "saveScene")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, saveSceneBackupFun, "saveSceneBackup")) {
         unload();
         return false;
     }
@@ -650,12 +658,28 @@ bool EngineDLLInterface::loadScene(const char* path) {
     return loadSceneFun(engine, path);
 }
 
+bool EngineDLLInterface::loadSceneBackup(const char* srcPath, const char* destPath) {
+    if (loadSceneBackupFun == nullptr) {
+        std::cout << "EngineDLLInterface::loadSceneBackup::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::loadSceneBackup::ERROR The function ptr is nullptr";
+    }
+    return loadSceneBackupFun(engine, srcPath, destPath);
+}
+
 bool EngineDLLInterface::unloadScene(std::size_t sceneIndex) {
     if (unloadSceneFun == nullptr) {
         std::cout << "EngineDLLInterface::unloadScene::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::unloadScene::ERROR The function ptr is nullptr";
     }
     return unloadSceneFun(engine, sceneIndex);
+}
+
+bool EngineDLLInterface::saveSceneBackup(std::size_t sceneIndex, const char* path) {
+    if (saveSceneBackupFun == nullptr) {
+        std::cout << "EngineDLLInterface::saveSceneBackup::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::saveSceneBackup::ERROR The function ptr is nullptr";
+    }
+    return saveSceneBackupFun(engine, sceneIndex, path);
 }
 
 bool EngineDLLInterface::saveScene(std::size_t sceneIndex) {

@@ -125,24 +125,7 @@ void LevelEditor::updateEngineDLL(float& updateTime) {
 				if (lastWriteTime != lastReadTime) {
 					std::wstring path = copyEngineDLL();
 					if (!path.empty()) {
-						std::cout << "Reloading dll" << std::endl;
-						// TODO: Save state
-						// Saving all loaded scenes
-						std::size_t sceneCount = engineDLL.getSceneCount();
-						for (std::size_t i = 0; i < sceneCount; i++) {
-							engineDLL.saveScene(i);
-						}
-						// TODO: Store GameView target
-						//
-						unloadEngine();
-						loadEngine(path);
-						// TODO: Load state
-						std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
-						projectSettings.getOpenScenes().clear();
-						for (std::wstring& scenePath : scenes) {
-							openScene(scenePath);
-						}
-						//
+						reloadEngine(path);
 					}
 				}
 			}
@@ -262,6 +245,12 @@ int LevelEditor::start() {
 					}
 					projectSettings.save();
 				}
+				if (ImGui::MenuItem("Reload", nullptr, nullptr, projectSettings.isLoaded() && engineDLL.isLoaded())) {
+					std::wstring path = copyEngineDLL();
+					if (!path.empty()) {
+						reloadEngine(path);
+					}
+				}
 				if (ImGui::MenuItem("Build", nullptr, nullptr, projectSettings.isLoaded())) {
 					buildGame();
 				}
@@ -299,7 +288,7 @@ int LevelEditor::start() {
 		static std::wstring dirPath = L"";
 		static bool chooseDirPath = false;
 
-		if (open_create_scene_popup && engineDLL.isLoaded()) {
+		if (open_create_scene_popup && engineDLL.isLoaded() && projectSettings.isLoaded()) {
 			std::wstring path = getSaveFileName(L"Choose scene location", L"Scene\0*.scene;\0", 1, projectSettings.getPath().c_str());
 			if (!path.empty()) {
 				if (!path.ends_with(SCENE_FILE_TYPE)) {
@@ -535,6 +524,20 @@ bool LevelEditor::openScene(std::wstring path) {
 	return false;
 }
 
+bool LevelEditor::openSceneFromBackup(std::wstring srcPath, std::wstring destPath) {
+	if (!engineDLL.isLoaded()) {
+		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
+		return false;
+	}
+	std::string encodedSrcPath = utf8_encode(srcPath);
+	std::string encodedDestPath = utf8_encode(destPath);
+	if (engineDLL.loadSceneBackup(encodedSrcPath.c_str(), encodedDestPath.c_str())) {
+		projectSettings.addOpenScene(destPath);
+		return true;
+	}
+	return false;
+}
+
 void LevelEditor::closeScene(std::size_t sceneIndex) {
 	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to close scene because the Engine has not been loaded" << std::endl;
@@ -559,6 +562,10 @@ EngineDLL* LevelEditor::getEngineDLL() {
 }
 
 std::wstring LevelEditor::copyEngineDLL() {
+	if (!projectSettings.isLoaded()) {
+		std::cout << "LevelEditor::copyEngineDLL::ERROR No project is currently loaded!" << std::endl;
+		return std::wstring();
+	}
 	std::wstring dllPath = projectSettings.getEngineDLLPath();
 	std::wstring newDLLPath = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/" + engineDLL.getNextDLLName();
 	// Moves Engine DLL to allow for the Game solution to build while Editor is running
@@ -621,6 +628,42 @@ bool LevelEditor::unloadEngine() {
 	gameView.releaseTarget();
 	engineDLL.unload();
 	return true;
+}
+
+bool LevelEditor::reloadEngine(std::wstring path) {
+	if (!engineDLL.isLoaded()) {
+		std::cout << "LevelEditor::reloadEngine::ERROR Unable to reload Engine DLL before one has been loaded" << std::endl;
+		return false;
+	}
+	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
+	std::cout << "Reloading dll" << std::endl;
+	// TODO: Save state
+	// Saving all loaded scenes
+	std::size_t sceneCount = engineDLL.getSceneCount();
+	std::vector<std::pair<std::string, std::string>> tempScenes(sceneCount);
+	for (std::size_t i = 0; i < sceneCount; i++) {
+		std::wstring scenePath = tempEditorDirectory + std::to_wstring(i) + SCENE_FILE_TYPE;
+		std::string encodedScenePath = utf8_encode(scenePath);
+		std::string destScenePath = engineDLL.getSceneFilePath(i);
+		if (!engineDLL.saveSceneBackup(i, encodedScenePath.c_str())) {
+			std::wcout << L"Failed to save scene backup. Path: " << scenePath << L". Canceling reload of Engine DLL..." << std::endl;
+			return false;
+		}
+		tempScenes[i] = std::make_pair(encodedScenePath, destScenePath);
+	}
+	// TODO: Store GameView target
+	//
+	unloadEngine();
+	loadEngine(path);
+	// TODO: Load state
+	projectSettings.clearOpenScenes();
+	for (auto scene : tempScenes) {
+		engineDLL.loadSceneBackup(scene.first.c_str(), scene.second.c_str());
+		if (!std::filesystem::remove(scene.first.c_str())) {
+			std::cout << "Failed to cleanup temp scene file: " << scene.first << std::endl;
+		}
+	}
+	//
 }
 
 bool LevelEditor::buildGame() {

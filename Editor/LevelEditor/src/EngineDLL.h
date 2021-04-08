@@ -49,8 +49,10 @@ typedef void (*GetPropertyNameFun)(TypeID, std::size_t, char*, std::size_t);
 typedef void (*GetPropertyTypeNameFun)(TypeID, std::size_t, char*, std::size_t);
 
 typedef bool (*LoadSceneFun)(EnginePtr, const char*);
+typedef bool (*LoadSceneBackupFun)(EnginePtr, const char*, const char*);
 typedef bool (*UnloadSceneFun)(EnginePtr, std::size_t);
 typedef bool (*SaveSceneFun)(EnginePtr, std::size_t);
+typedef bool (*SaveSceneBackupFun)(EnginePtr, std::size_t, const char*);
 typedef bool (*CreateSceneFun)(EnginePtr, const char*, const char*);
 typedef bool (*DestroyEntityFun)(EnginePtr, std::size_t, EntityID);
 typedef bool (*GetAllEntitiesFun)(EnginePtr, std::size_t, EntityID*, std::size_t);
@@ -154,8 +156,10 @@ namespace Editor {
 
 		// Scene
 		bool loadScene(const char* path);
+		bool loadSceneBackup(const char* srcPath, const char* destPath);
 		bool unloadScene(std::size_t sceneIndex);
 		bool saveScene(std::size_t sceneIndex);
+		bool saveSceneBackup(std::size_t sceneIndex, const char* path);
 		bool createScene(const char* name, const char* path);
 		bool destroyEntity(std::size_t sceneIndex, EntityID entityID);
 		std::vector<EntityID> getAllEntities(std::size_t sceneIndex);
@@ -220,8 +224,10 @@ namespace Editor {
 		GetPropertyTypeNameFun getPropertyTypeNameFun;
 
 		LoadSceneFun loadSceneFun;
+		LoadSceneBackupFun loadSceneBackupFun;
 		UnloadSceneFun unloadSceneFun;
 		SaveSceneFun saveSceneFun;
+		SaveSceneBackupFun saveSceneBackupFun;
 		CreateSceneFun createSceneFun;
 		DestroyEntityFun destroyEntityFun;
 		GetAllEntitiesFun getAllEntitiesFun;

@@ -76,8 +76,10 @@ extern "C" {
 	
 	// Scene
 	DLLEXPORT bool loadScene(Core::Engine* engine, const char* path);
+	DLLEXPORT bool loadSceneBackup(Core::Engine* engine, const char* srcPath, const char* destPath);
 	DLLEXPORT bool unloadScene(Core::Engine* engine, std::size_t sceneIndex);
 	DLLEXPORT bool saveScene(Core::Engine* engine, std::size_t sceneIndex);
+	DLLEXPORT bool saveSceneBackup(Core::Engine* engine, std::size_t sceneIndex, const char* path);
 	DLLEXPORT bool createScene(Core::Engine* engine, const char* name, const char* path);
 	DLLEXPORT bool destroyEntity(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID);
 	DLLEXPORT bool getAllEntities(Core::Engine* engine, std::size_t sceneIndex, EntityID* out, std::size_t outSize);

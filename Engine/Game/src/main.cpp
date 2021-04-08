@@ -33,8 +33,10 @@
 #pragma comment(linker, "/export:getPropertyTypeName")
 // Scene
 #pragma comment(linker, "/export:loadScene")
+#pragma comment(linker, "/export:loadSceneBackup")
 #pragma comment(linker, "/export:unloadScene")
 #pragma comment(linker, "/export:saveScene")
+#pragma comment(linker, "/export:saveSceneBackup")
 #pragma comment(linker, "/export:createScene")
 #pragma comment(linker, "/export:destroyEntity")
 #pragma comment(linker, "/export:getAllEntities")
