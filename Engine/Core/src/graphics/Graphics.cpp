@@ -255,20 +255,29 @@ std::vector<RectTransform> Graphics::createBorder(const Border& border, const Re
 	const std::size_t& borderThickness = border.getBorderThickness();
 	bool inner = border.isInner();
 	const Vector2& size = transform.getSize();
+	const Vector2& pivot = transform.getPivot();
+	const std::size_t& padding = border.getPadding();
 
 	std::vector<RectTransform> borderLines;
 
 	for (std::size_t side = 0; side < 4; side++) { // 4 lines
 		if (border.sideEnabled(side)) { // Check if this side is enabled (0 = top, 1 = right, 2 = bottom, 3 = left)
 
+			float localPosX = size.x * -pivot.x; // Init with offset
+			float localPosY = size.y * -pivot.y; // Init with offset
+
 			Vector2 rectSize = size;
-			if (!inner) {
+			rectSize.x += padding * 2;
+			rectSize.y += padding * 2;
+			localPosX -= padding;
+			localPosY -= padding;
+;			if (!inner) {
 				rectSize.x += borderThickness * 2;
 				rectSize.y += borderThickness * 2;
+				localPosX -= borderThickness;
+				localPosY -= borderThickness;
 			}
 
-			float localPosX = rectSize.x * -transform.getPivot().x; // Init with offset
-			float localPosY = rectSize.y * -transform.getPivot().y; // Initi with offset
 
 
 			if (side == 1) {		// Right

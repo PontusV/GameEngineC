@@ -47,6 +47,6 @@ bool Border::isInner() const {
 void Border::setPadding(std::size_t value) {
 	padding = value;
 }
-std::size_t Border::getPadding() {
+const std::size_t& Border::getPadding() const {
 	return padding;
 }

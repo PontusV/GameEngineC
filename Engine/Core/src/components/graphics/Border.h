@@ -20,7 +20,7 @@ namespace Core {
 		const std::size_t& getBorderThickness() const;
 
 		void setPadding(std::size_t value);
-		std::size_t getPadding();
+		const std::size_t& getPadding() const;
 
 	private:
 		PROPERTY()
@@ -36,7 +36,7 @@ namespace Core {
 		PROPERTY()
 		std::size_t borderThickness = 1;
 		PROPERTY()
-		std::size_t padding;
+		std::size_t padding = 0;
 	};
 }
 #endif

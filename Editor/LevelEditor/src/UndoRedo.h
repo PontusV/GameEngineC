@@ -121,6 +121,7 @@ namespace Editor {
 	};
 
 	struct ComponentBlueprint {
+		static ComponentBlueprint createFromComponent(EngineDLL* engineDLL, ComponentData componentData);
 		std::string typeName;
 		std::vector<PropertyBlueprint> propertyBPs;
 	};
@@ -151,11 +152,12 @@ namespace Editor {
 
 	class AddComponentAction : public DoAction { // WIP
 	public:
-		AddComponentAction(std::size_t sceneIndex, std::string entityName, std::string typeName) : DoAction(sceneIndex), entityName(entityName), typeName(typeName) {}
+		AddComponentAction(std::size_t sceneIndex, std::string entityName, std::string typeName, ComponentBlueprint&& blueprint) : DoAction(sceneIndex), entityName(entityName), typeName(typeName), blueprint(blueprint) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 	private:
 		std::string entityName;
 		std::string typeName;
+		ComponentBlueprint blueprint;
 	};
 
 	class RemoveComponentAction : public DoAction { // WIP

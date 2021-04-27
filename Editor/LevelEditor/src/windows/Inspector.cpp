@@ -308,14 +308,16 @@ void Inspector::renderComponent(EntityID entityID, std::string entityName, std::
 	}
 	
 	if (ImGui::BeginPopupModal(popupId.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Are you sure you want to delete %s?\n\n", typeName);
+		ImGui::Text("Are you sure you want to delete %s?\n\n", typeName.c_str());
 		ImGui::Separator();
 
 		if (ImGui::Button("Delete", ImVec2(120, 0))) {
+			ComponentData componentData = engineDLL->getComponent(entityID, typeID);
+			ComponentBlueprint blueprint = ComponentBlueprint::createFromComponent(engineDLL, componentData);
 			if (engineDLL->removeComponent(entityID, sceneIndex, typeID)) {
 				std::string entityName = engineDLL->getEntityName(entityID);
 				std::string typeName = engineDLL->getTypeName(typeID);
-				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(sceneIndex, entityName, typeName));
+				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(sceneIndex, entityName, typeName, std::move(blueprint)));
 			}
 			ImGui::CloseCurrentPopup();
 		}

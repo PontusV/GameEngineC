@@ -184,6 +184,13 @@ std::unique_ptr<DoAction> AddComponentAction::call(EngineDLL* engineDLL) {
 	auto entityID = engineDLL->getEntityFromName(entityName.c_str());
 	auto typeID = engineDLL->getTypeIDFromName(typeName.c_str());
 	if (engineDLL->addComponent(entityID, sceneIndex, typeID)) {
+		auto component = engineDLL->getComponent(entityID, typeID);
+		auto properties = engineDLL->getProperties(typeID, component.instance);
+		for (auto& propertyBP : blueprint.propertyBPs) {
+			if (!setPropertyFields(engineDLL, entityID, typeID, propertyBP.name, propertyBP.propertyValues)) {
+				std::cout << "AddComponentAction::call::ERROR Failed to set property fields" << std::endl;
+			}
+		}
 		return std::make_unique<RemoveComponentAction>(sceneIndex, entityName, typeName);
 	}
 	return nullptr;
@@ -192,8 +199,10 @@ std::unique_ptr<DoAction> AddComponentAction::call(EngineDLL* engineDLL) {
 std::unique_ptr<DoAction> RemoveComponentAction::call(EngineDLL* engineDLL) {
 	auto entityID = engineDLL->getEntityFromName(entityName.c_str());
 	auto typeID = engineDLL->getTypeIDFromName(typeName.c_str());
+	ComponentData componentData = engineDLL->getComponent(entityID, typeID);
+	ComponentBlueprint blueprint = ComponentBlueprint::createFromComponent(engineDLL, componentData);
 	if (engineDLL->removeComponent(entityID, sceneIndex, typeID)) {
-		return std::make_unique<AddComponentAction>(sceneIndex, entityName, typeName);
+		return std::make_unique<AddComponentAction>(sceneIndex, entityName, typeName, std::move(blueprint));
 	}
 	return nullptr;
 }
@@ -329,14 +338,20 @@ EntityBlueprint EntityBlueprint::createFromEntity(EngineDLL* engineDLL, EntityID
 	for (std::size_t i = 0; i < components.size(); i++) {
 		ComponentData& componentData = components[i];
 		ComponentBlueprint& componentBP = instance.componentBPs[i];
-		componentBP.typeName = engineDLL->getTypeName(componentData.typeID);
-		std::vector<ReflectedPropertyData> properties = engineDLL->getProperties(componentData.typeID, componentData.instance);
-		componentBP.propertyBPs.resize(properties.size());
-		for (std::size_t propIndex = 0; propIndex < properties.size(); propIndex++) {
-			componentBP.propertyBPs[propIndex].propertyValues = createPropData(properties[propIndex]);
-			componentBP.propertyBPs[propIndex].name = properties[propIndex].name;
-			componentBP.propertyBPs[propIndex].typeName = properties[propIndex].typeName;
-		}
+		componentBP = ComponentBlueprint::createFromComponent(engineDLL, componentData);
 	}
 	return instance;
+}
+
+ComponentBlueprint ComponentBlueprint::createFromComponent(EngineDLL* engineDLL, ComponentData componentData) {
+	ComponentBlueprint blueprint;
+	blueprint.typeName = engineDLL->getTypeName(componentData.typeID);
+	std::vector<ReflectedPropertyData> properties = engineDLL->getProperties(componentData.typeID, componentData.instance);
+	blueprint.propertyBPs.resize(properties.size());
+	for (std::size_t propIndex = 0; propIndex < properties.size(); propIndex++) {
+		blueprint.propertyBPs[propIndex].propertyValues = createPropData(properties[propIndex]);
+		blueprint.propertyBPs[propIndex].name = properties[propIndex].name;
+		blueprint.propertyBPs[propIndex].typeName = properties[propIndex].typeName;
+	}
+	return blueprint;
 }
