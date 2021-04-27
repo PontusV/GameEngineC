@@ -52,6 +52,7 @@ namespace Editor {
 	private:
 		std::size_t getRootIndex(std::size_t sceneIndex, EntityID entityID);
 		bool setRootIndex(std::size_t sceneIndex, EntityID entityID, std::size_t index);
+		std::size_t getSceneIndexByName(std::string name) const;
 	private:
 		LevelEditor* editor;
 		GameView* gameView;

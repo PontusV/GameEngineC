@@ -384,7 +384,7 @@ void Inspector::tick() {
 				renameActive = false;
 				if (engineDLL->renameEntity(target.entityID, buffer)) {
 					gameView->updateTargetData();
-					undoRedoManager->registerUndo(std::make_unique<RenameEntityAction>(target.sceneIndex, target.entityName, buffer));
+					undoRedoManager->registerUndo(std::make_unique<RenameEntityAction>(target.sceneIndex, buffer, target.entityName));
 				}
 			}
 			ImGui::SetKeyboardFocusHere(0);

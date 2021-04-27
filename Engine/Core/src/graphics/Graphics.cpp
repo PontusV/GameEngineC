@@ -262,7 +262,6 @@ std::vector<RectTransform> Graphics::createBorder(const Border& border, const Re
 
 	for (std::size_t side = 0; side < 4; side++) { // 4 lines
 		if (border.sideEnabled(side)) { // Check if this side is enabled (0 = top, 1 = right, 2 = bottom, 3 = left)
-
 			float localPosX = size.x * -pivot.x; // Init with offset
 			float localPosY = size.y * -pivot.y; // Init with offset
 
@@ -271,14 +270,13 @@ std::vector<RectTransform> Graphics::createBorder(const Border& border, const Re
 			rectSize.y += padding * 2;
 			localPosX -= padding;
 			localPosY -= padding;
+
 ;			if (!inner) {
 				rectSize.x += borderThickness * 2;
 				rectSize.y += borderThickness * 2;
 				localPosX -= borderThickness;
 				localPosY -= borderThickness;
 			}
-
-
 
 			if (side == 1) {		// Right
 				localPosX += (float)rectSize.x - borderThickness;
