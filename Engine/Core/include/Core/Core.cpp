@@ -461,11 +461,17 @@ void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun) 
 	sceneManager.setSceneRemovedCallback(fun);
 }
 
-void setSceneCallbackPtr(Core::Engine* engine, void* ptr) {
+void setCallbackPtr(Core::Engine* engine, void* ptr) {
 	SceneManager& sceneManager = engine->getSceneManager();
+	EntityManager& entityManager = engine->getEntityManager();
 	sceneManager.setCallbackPtr(ptr);
+	entityManager.setCallbackPtr(ptr);
 }
 
+void setEntityRenamedCallback(Core::Engine* engine, EntityRenamedCallbackFun callback) {
+	EntityManager& entityManager = engine->getEntityManager();
+	entityManager.setEntityRenamedCallback(callback);
+}
 
 bool isEntityChild(Core::Engine* engine, EntityID entityID, EntityID parentID) {
 	if (entityID == Entity::INVALID_ID) return false;

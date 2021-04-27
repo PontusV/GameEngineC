@@ -10,6 +10,7 @@ typedef std::size_t TypeID;
 typedef void* EnginePtr;
 typedef void (*SceneAddedCallbackFun)(void*, std::size_t);
 typedef void (*SceneRemovedCallbackFun)(void*, std::size_t);
+typedef void (*EntityRenamedCallbackFun)(void*, EntityID);
 typedef void* (*GLADloadproc)(const char* name);
 
 typedef void* (*CreateEngineFun)();
@@ -60,9 +61,6 @@ typedef bool (*GetSceneFilePathFun)(EnginePtr, std::size_t, char*, std::size_t);
 typedef bool (*HasSceneChangedFun)(EnginePtr, std::size_t);
 typedef std::size_t(*GetSceneCountFun)(EnginePtr);
 typedef std::size_t(*GetAllEntitiesCountFun)(EnginePtr, std::size_t);
-typedef void (*SetSceneAddedCallbackFun)(EnginePtr, SceneAddedCallbackFun);
-typedef void (*SetSceneRemovedCallbackFun)(EnginePtr, SceneRemovedCallbackFun);
-typedef void (*SetSceneCallbackPtrFun)(EnginePtr, void*);
 
 typedef bool (*AddComponentFun)(EnginePtr, EntityID, std::size_t, TypeID);
 typedef bool (*RemoveComponentFun)(EnginePtr, EntityID, std::size_t, TypeID);
@@ -80,6 +78,11 @@ typedef EntityID(*GetEntityChildFun)(EnginePtr, EntityID, std::size_t);
 typedef std::size_t(*GetComponentsCountFun)(EnginePtr, EntityID);
 typedef std::size_t(*GetEntityChildCountFun)(EnginePtr, EntityID);
 typedef std::size_t(*GetEntityImmediateChildCountFun)(EnginePtr, EntityID);
+
+typedef void (*SetSceneAddedCallbackFun)(EnginePtr, SceneAddedCallbackFun);
+typedef void (*SetSceneRemovedCallbackFun)(EnginePtr, SceneRemovedCallbackFun);
+typedef void (*SetEntityRenamedCallbackFun)(EnginePtr, EntityRenamedCallbackFun);
+typedef void (*SetCallbackPtrFun)(EnginePtr, void*);
 
 namespace Editor {
 	enum class InspectorFieldRenderType {
@@ -175,9 +178,6 @@ namespace Editor {
 		bool hasSceneChanged(std::size_t sceneIndex);
 		std::size_t getSceneCount();
 		std::size_t getAllEntitiesCount(std::size_t sceneIndex);
-		void setSceneAddedCallback(SceneAddedCallbackFun fun);
-		void setSceneRemovedCallback(SceneRemovedCallbackFun fun);
-		void setSceneCallbackPtr(void* ptr);
 
 		// Entity
 		bool addComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID);
@@ -197,6 +197,12 @@ namespace Editor {
 		std::size_t getComponentsCount(EntityID entityID);
 		std::size_t getEntityChildCount(EntityID entityID);
 		std::size_t getEntityImmediateChildCount(EntityID entityID);
+
+		// Callback
+		void setSceneAddedCallback(SceneAddedCallbackFun fun);
+		void setSceneRemovedCallback(SceneRemovedCallbackFun fun);
+		void setEntityRenamedCallback(EntityRenamedCallbackFun fun);
+		void setCallbackPtr(void* ptr);
 
 	protected:
 		// Function ptrs
@@ -250,7 +256,8 @@ namespace Editor {
 		GetAllEntitiesCountFun getAllEntitiesCountFun;
 		SetSceneAddedCallbackFun setSceneAddedCallbackFun;
 		SetSceneRemovedCallbackFun setSceneRemovedCallbackFun;
-		SetSceneCallbackPtrFun setSceneCallbackPtrFun;
+		SetEntityRenamedCallbackFun setEntityRenamedCallbackFun;
+		SetCallbackPtrFun setCallbackPtrFun;
 
 		AddComponentFun addComponentFun;
 		RemoveComponentFun removeComponentFun;

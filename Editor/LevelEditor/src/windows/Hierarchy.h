@@ -49,6 +49,7 @@ namespace Editor {
 		void onSceneAdded(std::size_t sceneIndex);
 		void onSceneRemoved(std::size_t sceneIndex);
 		void onSceneChanged(std::size_t sceneIndex);
+		void onEntityChanged(EntityID entityID);
 	private:
 		std::size_t getRootIndex(std::size_t sceneIndex, EntityID entityID);
 		bool setRootIndex(std::size_t sceneIndex, EntityID entityID, std::size_t index);

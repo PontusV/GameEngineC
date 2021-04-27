@@ -215,7 +215,11 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, setSceneCallbackPtrFun, "setSceneCallbackPtr")) {
+    if (!loadFunctionFromDLL(handle, setEntityRenamedCallbackFun, "setEntityRenamedCallback")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setCallbackPtrFun, "setCallbackPtr")) {
         unload();
         return false;
     }
@@ -346,7 +350,8 @@ bool EngineDLL::unload() {
     getAllEntitiesCountFun = nullptr;
     setSceneAddedCallbackFun = nullptr;
     setSceneRemovedCallbackFun = nullptr;
-    setSceneCallbackPtrFun = nullptr;
+    setEntityRenamedCallbackFun = nullptr;
+    setCallbackPtrFun = nullptr;
     addComponentFun = nullptr;
     removeComponentFun = nullptr;
     renameEntityFun = nullptr;

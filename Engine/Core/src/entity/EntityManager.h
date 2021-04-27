@@ -16,6 +16,7 @@
 namespace Core {
 
 	class Component; // Forward declare
+	typedef void* (*EntityRenamedCallbackFun)(void*, std::size_t);
 
 	class EntityManager {
 	public:
@@ -69,6 +70,11 @@ namespace Core {
 		bool isEntityNameAvailable(const char* name);
 		bool renameEntity(Entity entity, std::string name);
 
+		/* Used by DLL interface. Calls the given callback whenever an Entity has been renamed */
+		void setEntityRenamedCallback(EntityRenamedCallbackFun callback);
+		/* Used by DLL interface. Provides this ptr as an argument in the callback functions */
+		void setCallbackPtr(void* ptr);
+
 	private:
 		void removeArchetype(Archetype* archetype);
 		Archetype* createArchetype(std::vector<IComponentTypeInfo> types);
@@ -85,6 +91,9 @@ namespace Core {
 		std::map<Entity, HideFlags> entityHideFlags;
 		std::vector<Archetype*> archetypes;
 		std::size_t entityIDCounter;
+
+		EntityRenamedCallbackFun entityRenamedCallback;
+		void* callbackPtr; // A pointer sent to the callback functions
 	};
 
 

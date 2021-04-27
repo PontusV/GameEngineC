@@ -56,6 +56,7 @@ namespace Editor {
 		std::wstring copyEngineDLL();
 
 		EngineDLL* getEngineDLL();
+		Hierarchy* getHierarchy();
 	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;

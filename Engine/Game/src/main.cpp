@@ -47,9 +47,6 @@
 #pragma comment(linker, "/export:hasSceneChanged")
 #pragma comment(linker, "/export:getSceneCount")
 #pragma comment(linker, "/export:getAllEntitiesCount")
-#pragma comment(linker, "/export:setSceneAddedCallback")
-#pragma comment(linker, "/export:setSceneRemovedCallback")
-#pragma comment(linker, "/export:setSceneCallbackPtr")
 // Entity
 #pragma comment(linker, "/export:addComponent")
 #pragma comment(linker, "/export:removeComponent")
@@ -67,11 +64,18 @@
 #pragma comment(linker, "/export:getComponentsCount")
 #pragma comment(linker, "/export:getEntityChildCount")
 #pragma comment(linker, "/export:getEntityImmediateChildCount")
+// Callback
+#pragma comment(linker, "/export:setSceneAddedCallback")
+#pragma comment(linker, "/export:setSceneRemovedCallback")
+#pragma comment(linker, "/export:setEntityRenamedCallback")
+#pragma comment(linker, "/export:setCallbackPtr")
 
 
 #include "engine/Engine.h"
 #include <cstddef>
 using namespace Core;
+
+
 
 /* Used by EXE */
 int main(int argc, char* argv[]) {

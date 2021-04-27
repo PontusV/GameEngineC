@@ -12,6 +12,7 @@ bool EntityManager::renameEntity(Entity entity, std::string name) {
 	}
 	removeEntityName(entity);
 	entityNameMap[name] = entity;
+	entityRenamedCallback(callbackPtr, entity.getID());
 	return true;
 }
 
@@ -232,4 +233,12 @@ void EntityManager::clear() {
 	entityMap.clear();
 	entityNameMap.clear();
 	entityHideFlags.clear();
+}
+
+void EntityManager::setEntityRenamedCallback(EntityRenamedCallbackFun callback) {
+	entityRenamedCallback = callback;
+}
+
+void EntityManager::setCallbackPtr(void* ptr) {
+	callbackPtr = ptr;
 }

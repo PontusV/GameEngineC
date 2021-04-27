@@ -581,6 +581,10 @@ EngineDLL* LevelEditor::getEngineDLL() {
 	return &engineDLL;
 }
 
+Hierarchy* LevelEditor::getHierarchy() {
+	return &hierarchy;
+}
+
 std::wstring LevelEditor::copyEngineDLL() {
 	if (!projectSettings.isLoaded()) {
 		std::cout << "LevelEditor::copyEngineDLL::ERROR No project is currently loaded!" << std::endl;
@@ -636,6 +640,7 @@ bool LevelEditor::loadEngine(std::wstring path) {
 		}
 		ImVec2 viewPortSize = gameView.getViewportSize();
 		engineDLL.setViewportSize(viewPortSize.x, viewPortSize.y);
+		engineDLL.setCallbackPtr(this);
 
 		hierarchy.initiate(); // Initiate hierarchy view for new Engine DLL
 		std::cout << "Successfully loaded new Engine DLL" << std::endl;

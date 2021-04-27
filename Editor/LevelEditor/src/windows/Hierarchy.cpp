@@ -14,11 +14,15 @@
 using namespace Editor;
 
 void sceneAddedCallback(void* ptr, std::size_t sceneIndex) {
-	static_cast<Hierarchy*>(ptr)->onSceneAdded(sceneIndex);
+	static_cast<LevelEditor*>(ptr)->getHierarchy()->onSceneAdded(sceneIndex);
 }
 
 void sceneRemovedCallback(void* ptr, std::size_t sceneIndex) {
-	static_cast<Hierarchy*>(ptr)->onSceneRemoved(sceneIndex);
+	static_cast<LevelEditor*>(ptr)->getHierarchy()->onSceneRemoved(sceneIndex);
+}
+
+void entityRenamedCallback(void* ptr, EntityID entityID) {
+	static_cast<LevelEditor*>(ptr)->getHierarchy()->onEntityChanged(entityID);
 }
 
 void entityNode(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, std::size_t sceneIndex, EntityHierarchy& entry, EntityID targetID, GameView* gameView) {
@@ -205,18 +209,6 @@ std::vector<EntityHierarchy> getCurrentHierarchy(EngineDLL* engineDLL, std::size
 	return hierarchy;
 }
 
-bool hasEntityNameChanged(EngineDLL* engineDLL, const std::vector<EntityHierarchy>& entities) {
-	for (const EntityHierarchy& data : entities) {
-		std::string actualName = engineDLL->getEntityName(data.entity.id);
-		if (actualName.empty() || data.entity.name.compare(actualName) != 0) {
-			return true;
-		}
-		if (hasEntityNameChanged(engineDLL, data.children)) {
-			return true;
-		}
-	}
-}
-
 void Hierarchy::update() {
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	if (engineDLL->isLoaded()) {
@@ -227,18 +219,20 @@ void Hierarchy::update() {
 				onSceneChanged(i);
 			}
 		}
-		for (const SceneData& sceneData : sceneOrder) {
-			if (hasEntityNameChanged(engineDLL, sceneData.roots)) {
-				std::size_t sceneIndex = getSceneIndexByName(sceneData.name);
-				if (sceneIndex != -1) {
-					onSceneChanged(sceneIndex);
-				}
-				else {
-					std::cout << "Hierarchy::update::ERROR Unable to find scene by name: " << sceneData.name << std::endl;
-				}
-			}
+	}
+}
+
+bool updateEntityName(EngineDLL* engineDLL, std::vector<EntityHierarchy>& entities, EntityID entityID) {
+	for (EntityHierarchy& data : entities) {
+		if (data.entity.id == entityID) {
+			data.entity.name = engineDLL->getEntityName(data.entity.id);
+			return true;
+		}
+		if (updateEntityName(engineDLL, data.children, entityID)) {
+			return true;
 		}
 	}
+	return false;
 }
 
 void Hierarchy::onSceneAdded(std::size_t sceneIndex) {
@@ -271,12 +265,22 @@ void Hierarchy::onSceneChanged(std::size_t sceneIndex) {
 	sceneData.roots = getCurrentHierarchy(engineDLL, sceneIndex);
 }
 
+void Hierarchy::onEntityChanged(EntityID entityID) {
+	EngineDLL* engineDLL = editor->getEngineDLL();
+	std::size_t sceneIndex = engineDLL->getEntitySceneIndex(entityID);
+	if (sceneOrder.size() - 1 >= sceneIndex) {
+		if (!updateEntityName(engineDLL, sceneOrder[sceneIndex].roots, entityID)) {
+			std::cout << "Hierarchy::onEntityChanged::ERROR Failed to update name of Entity with ID: " << entityID << std::endl;
+		}
+	}
+}
+
 void Hierarchy::initiate() {
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	if (engineDLL->isLoaded()) {
 		engineDLL->setSceneAddedCallback(sceneAddedCallback);
 		engineDLL->setSceneRemovedCallback(sceneRemovedCallback);
-		engineDLL->setSceneCallbackPtr(this);
+		engineDLL->setEntityRenamedCallback(entityRenamedCallback);
 	}
 }
 

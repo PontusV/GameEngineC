@@ -443,12 +443,20 @@ void EngineDLLInterface::setSceneRemovedCallback(SceneRemovedCallbackFun fun) {
     setSceneRemovedCallbackFun(engine, fun);
 }
 
-void EngineDLLInterface::setSceneCallbackPtr(void* ptr) {
-    if (setSceneCallbackPtrFun == nullptr) {
-        std::cout << "EngineDLLInterface::setSceneCallbackPtr::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::setSceneCallbackPtr::ERROR The function ptr is nullptr";
+void EngineDLLInterface::setEntityRenamedCallback(EntityRenamedCallbackFun fun) {
+    if (setEntityRenamedCallbackFun == nullptr) {
+        std::cout << "EngineDLLInterface::setEntityRenamedCallback::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setEntityRenamedCallback::ERROR The function ptr is nullptr";
     }
-    setSceneCallbackPtrFun(engine, ptr);
+    setEntityRenamedCallbackFun(engine, fun);
+}
+
+void EngineDLLInterface::setCallbackPtr(void* ptr) {
+    if (setCallbackPtrFun == nullptr) {
+        std::cout << "EngineDLLInterface::setCallbackPtr::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setCallbackPtr::ERROR The function ptr is nullptr";
+    }
+    setCallbackPtrFun(engine, ptr);
 }
 
 bool EngineDLLInterface::addComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID) {

@@ -8,6 +8,7 @@ typedef std::size_t EntityID;
 typedef std::size_t TypeID;
 typedef void* (*SceneAddedCallbackFun)(void*, std::size_t);
 typedef void* (*SceneRemovedCallbackFun)(void*, std::size_t);
+typedef void* (*EntityRenamedCallbackFun)(void*, std::size_t);
 typedef void* (*GLADloadproc)(const char* name);
 
 namespace Core {
@@ -91,9 +92,6 @@ extern "C" {
 	DLLEXPORT bool hasSceneChanged(Core::Engine* engine, std::size_t sceneIndex);
 	DLLEXPORT std::size_t getSceneCount(Core::Engine* engine);
 	DLLEXPORT std::size_t getAllEntitiesCount(Core::Engine* engine, std::size_t sceneIndex);
-	DLLEXPORT void setSceneAddedCallback(Core::Engine* engine, SceneAddedCallbackFun fun);
-	DLLEXPORT void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun);
-	DLLEXPORT void setSceneCallbackPtr(Core::Engine* engine, void* ptr);
 	
 	// Entity
 	DLLEXPORT bool addComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID);
@@ -112,4 +110,10 @@ extern "C" {
 	DLLEXPORT std::size_t getComponentsCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityChildCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID);
+
+	// Callback
+	DLLEXPORT void setSceneAddedCallback(Core::Engine* engine, SceneAddedCallbackFun fun);
+	DLLEXPORT void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun);
+	DLLEXPORT void setEntityRenamedCallback(Core::Engine* engine, EntityRenamedCallbackFun callback);
+	DLLEXPORT void setCallbackPtr(Core::Engine* engine, void* ptr);
 }
