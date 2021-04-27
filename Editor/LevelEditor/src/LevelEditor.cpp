@@ -21,7 +21,7 @@ using namespace Editor;
 constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
 ImVec2 resolutionDefault = ImVec2(600, 480);
 
-LevelEditor::LevelEditor() : gameView(this), inspector(&engineDLL, &gameView), hierarchy(this, &gameView), fileView(this) {
+LevelEditor::LevelEditor() : undoRedoManager(&engineDLL), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
 }
 
 
@@ -204,11 +204,20 @@ int LevelEditor::start() {
 		bool open_create_project_popup = false;
 		bool open_create_scene_popup = false;
 
-		if (ImGui::IsKeyPressed(GLFW_KEY_ESCAPE)) { // TODO: Keybind
-			// Terminate
+		if (ImGui::IsKeyPressed(GLFW_KEY_Z) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			undoRedoManager.undo();
 		}
-		if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) { // TODO: Keybind
-			// Save
+		else if (ImGui::IsKeyPressed(GLFW_KEY_Y) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			undoRedoManager.redo();
+		}
+		else if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			// Save all
+			std::size_t loadedSceneCount = engineDLL.getSceneCount();
+			for (std::size_t i = 0; i < loadedSceneCount; i++) {
+				engineDLL.saveScene(i);
+			}
+			projectSettings.save();
+			editorSettings.save();
 		}
 
 		if (ImGui::BeginMenuBar()) {
@@ -261,8 +270,13 @@ int LevelEditor::start() {
 			}
 			if (ImGui::BeginMenu("Edit"))
 			{
-				if (ImGui::MenuItem("Undo", "CTRL+Z")) {} // TODO
-				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+				if (ImGui::MenuItem("Undo", "CTRL+Z", false, undoRedoManager.isUndoAvailable())) {
+					undoRedoManager.undo();
+					gameView.updateTargetData();
+				}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, undoRedoManager.isRedoAvailable())) {
+					undoRedoManager.redo();
+				}
 				ImGui::Separator();
 				if (ImGui::MenuItem("Cut", "CTRL+X")) {
 					fileView.cut();
@@ -371,7 +385,13 @@ int LevelEditor::start() {
 						std::size_t sceneIndex = gameView.getTarget().sceneIndex;
 						ImVec2 pos = engineDLL.getCameraPosition();
 						ImVec2 viewportSize = gameView.getViewportSize();
-						engineDLL.createTemplateEntity(sceneIndex, name.c_str(), pos.x + viewportSize.x / 2, pos.y + viewportSize.y / 2, 350, 350);
+						float x = pos.x + viewportSize.x / 2;
+						float y = pos.y + viewportSize.y / 2;
+						float width = 350;
+						float height = 350;
+						if (engineDLL.createTemplateEntity(sceneIndex, name.c_str(), x, y, width, height)) {
+							undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(sceneIndex, name)));
+						}
 						errorMessage = "";
 						memset(buffer, 0, 64);
 						ImGui::CloseCurrentPopup();
@@ -544,11 +564,11 @@ void LevelEditor::closeScene(std::size_t sceneIndex) {
 		return;
 	}
 	std::wstring scenePath = utf8_decode(engineDLL.getSceneFilePath(sceneIndex));
-	std::vector<EntityID> entities = engineDLL.getAllEntities(sceneIndex);
 	if (engineDLL.unloadScene(sceneIndex)) {
-		if (std::find(entities.begin(), entities.end(), gameView.getTarget().entityID) != entities.end()) {
+		if (gameView.getTarget().sceneIndex == sceneIndex) {
 			gameView.releaseTarget();
 		}
+		undoRedoManager.removeSceneFromStack(sceneIndex);
 		projectSettings.removeOpenScene(scenePath);
 	}
 }
@@ -605,6 +625,7 @@ bool LevelEditor::loadEngine(std::wstring path) {
 		return false;
 	}
 	if (engineDLL.load(path.c_str())) {
+		undoRedoManager.clearStack();
 		// Initialize egine
 		int width, height;
 		glfwGetWindowSize(glfwWindow, &width, &height);
@@ -624,6 +645,7 @@ bool LevelEditor::loadEngine(std::wstring path) {
 }
 
 bool LevelEditor::unloadEngine() {
+	undoRedoManager.clearStack();
 	hierarchy.clear();
 	gameView.releaseTarget();
 	engineDLL.unload();

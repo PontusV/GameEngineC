@@ -34,6 +34,7 @@ enum class InspectorFieldRenderType {
 struct PropertyFieldData {
 	std::size_t count;
 	void* ptrBuffer[MAX_FIELD_COUNT];
+	std::size_t sizeBuffer[MAX_FIELD_COUNT];
 };
 
 extern "C" {
@@ -46,6 +47,7 @@ extern "C" {
 	DLLEXPORT void getCameraPosition(Core::Engine* engine, float* out);
 	DLLEXPORT void setCameraPosition(Core::Engine* engine, float x, float y);
 	DLLEXPORT void setViewportSize(Core::Engine* engine, float width, float height);
+	DLLEXPORT EntityID createEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name);
 	DLLEXPORT EntityID getEntityAtPos(Core::Engine* engine, float x, float y);
 
 	// Transform / RectTransform
@@ -62,15 +64,16 @@ extern "C" {
 	DLLEXPORT void onUpdate(void* instance, TypeID typeID, std::size_t propIndex);
 	DLLEXPORT void getDerivedTypeIDs(TypeID typeID, TypeID* out, std::size_t outSize);
 	DLLEXPORT void getAllReflectedTypes(TypeID* out, std::size_t outSize);
+	DLLEXPORT TypeID getTypeIDFromName(const char* name);
 	DLLEXPORT std::size_t getDerivedTypeIDsCount(TypeID typeID);
 	DLLEXPORT std::size_t getAllReflectedTypesCount();
 	
 	// Reflection properties
 	DLLEXPORT std::size_t getPropertiesCount(TypeID typeID);
-	DLLEXPORT std::size_t getPropertyID(TypeID typeID, std::size_t propIndex);
 	DLLEXPORT std::size_t getPropertyType(TypeID typeID, std::size_t propIndex);
+	DLLEXPORT std::size_t getPropertyTypeSize(TypeID typeID, std::size_t propIndex);
 	DLLEXPORT std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance);
-	DLLEXPORT void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t outSize);
+	DLLEXPORT void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t* outFieldSize, std::size_t outSize);
 	DLLEXPORT void getPropertyName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
 	DLLEXPORT void getPropertyTypeName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
 	
@@ -103,6 +106,7 @@ extern "C" {
 	DLLEXPORT bool hasEntityParent(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT bool detachEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID);
 	DLLEXPORT void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size_t outSize);
+	DLLEXPORT EntityID getEntityParent(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index);
 	DLLEXPORT EntityID getEntityFromName(Core::Engine* engine, const char* name);
 	DLLEXPORT std::size_t getComponentsCount(Core::Engine* engine, EntityID entityID);

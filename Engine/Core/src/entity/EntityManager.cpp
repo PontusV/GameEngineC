@@ -199,7 +199,10 @@ void EntityManager::removeArchetype(Archetype* archetype) {
 }
 
 std::vector<Component*> EntityManager::getComponents(Entity entity) {
-	Archetype* archetype = entityMap.at(entity);
+	auto it = entityMap.find(entity);
+	if (it == entityMap.end()) return std::vector<Component*>();
+
+	Archetype* archetype = it->second;
 	return archetype->getComponents(entity);
 }
 

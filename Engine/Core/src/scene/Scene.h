@@ -117,7 +117,7 @@ namespace Core {
 		EntityManager* manager;				// A pointer to the manager of the Entities in this Scene
 		bool isAwake;						// Shows if entities have been awakened and if they will be immediately awakened upon creation
 		std::wstring name;					// Name of this Scene
-		void* prevEntitiesPtr = nullptr;	// Used by hasEntitiesChanged to determine if entities vector has been changed
+		bool hasChanged = true;				// Used by hasEntitiesChanged to determine if scene has been changed
 	};
 
 	template <typename... Ts>

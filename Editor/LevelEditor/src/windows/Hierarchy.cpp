@@ -2,6 +2,8 @@
 #include "utils/string.h"
 #include "LevelEditor.h"
 #include "EngineDLL.h"
+#include "GameView.h"
+#include "UndoRedo.h"
 #include <iostream>
 
 #include "imgui/imgui.h"
@@ -19,7 +21,7 @@ void sceneRemovedCallback(void* ptr, std::size_t sceneIndex) {
 	static_cast<Hierarchy*>(ptr)->onSceneRemoved(sceneIndex);
 }
 
-void entityNode(EngineDLL* engineDLL, std::size_t sceneIndex, EntityHierarchy& entry, EntityID targetID, GameView* gameView) {
+void entityNode(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, std::size_t sceneIndex, EntityHierarchy& entry, EntityID targetID, GameView* gameView) {
 	EntityData entity = entry.entity;
 	std::string name = entity.name;
 	std::size_t childCount = entry.children.size();
@@ -44,21 +46,24 @@ void entityNode(EngineDLL* engineDLL, std::size_t sceneIndex, EntityHierarchy& e
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 			IM_ASSERT(payload->DataSize == sizeof(EntityData));
 			EntityData* data = static_cast<EntityData*>(payload->Data);
-			std::cout << sceneIndex << std::endl;
-			engineDLL->setEntityParent(sceneIndex, data->id, entity.id);
+			EntityID prevParentID = engineDLL->getEntityParent(data->id);
+			if (engineDLL->setEntityParent(sceneIndex, data->id, entity.id)) {
+				std::string prevParentName = engineDLL->getEntityName(prevParentID);
+				undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(sceneIndex, data->name, prevParentName));
+			}
 		}
 		ImGui::EndDragDropTarget();
 	}
 	if (nodeOpen) {
 		for (std::size_t i = 0; i < entry.children.size(); i++) {
 			EntityHierarchy& child = entry.children[i];
-			entityNode(engineDLL, sceneIndex, child, targetID, gameView);
+			entityNode(engineDLL, undoRedoManager, sceneIndex, child, targetID, gameView);
 		}
 		ImGui::TreePop();
 	}
 }
 
-Hierarchy::Hierarchy(LevelEditor* editor, GameView* gameView) : editor(editor), gameView(gameView) {
+Hierarchy::Hierarchy(LevelEditor* editor, GameView* gameView, UndoRedoManager* undoRedoManager) : editor(editor), gameView(gameView), undoRedoManager(undoRedoManager) {
 }
 Hierarchy::~Hierarchy() {}
 
@@ -79,14 +84,17 @@ void Hierarchy::tick(EntityID target) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY")) {
 				IM_ASSERT(payload->DataSize == sizeof(Entity));
 				EntityData* data = static_cast<EntityData*>(payload->Data);
-
-				engineDLL->detachEntityParent(sceneIndex, data->id);
+				EntityID parentID = engineDLL->getEntityParent(data->id);
+				if (engineDLL->detachEntityParent(sceneIndex, data->id)) {
+					std::string prevParentName = engineDLL->getEntityName(parentID);
+					undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(sceneIndex, data->name, prevParentName));
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 		if (nodeOpened) {
 			for (EntityHierarchy& entity : sceneData.roots) {
-				entityNode(engineDLL, sceneIndex, entity, target, gameView);
+				entityNode(engineDLL, undoRedoManager, sceneIndex, entity, target, gameView);
 			}
 			ImGui::TreePop();
 		}
@@ -251,4 +259,16 @@ void Hierarchy::initiate() {
 
 void Hierarchy::clear() {
 	sceneOrder.clear();
+}
+
+std::size_t Hierarchy::getActiveSceneIndex() {
+	return activeSceneIndex;
+}
+
+void Hierarchy::setActiveSceneIndex(std::size_t sceneIndex) {
+	if (sceneOrder.size() <= sceneIndex) {
+		std::cout << "Heirarchy::setACtiveSceneIndex::ERROR Unable to set activeSceneIndex to " << sceneIndex << ". Scene count: " << sceneOrder.size() << std::endl;
+		return;
+	}
+	this->activeSceneIndex = sceneIndex;
 }

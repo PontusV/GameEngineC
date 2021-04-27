@@ -66,35 +66,47 @@ InspectorFieldRenderType getRendererFromProp(const Mirror::Property& prop) {
 	}
 	return InspectorFieldRenderType::NONE;
 }
-PropertyFieldData getFieldDataFromProp(const Mirror::Property& prop, void* instance, TypeID typeID) {
+
+template<std::size_t I>
+void createPropFieldsRecursive(PropertyFieldData& data) {} // End of recursion
+
+template<std::size_t I, typename T, typename... Ts>
+void createPropFieldsRecursive(PropertyFieldData& data, T& arg, Ts&... args) {
+	data.ptrBuffer[I] = &arg;
+	data.sizeBuffer[I] = sizeof(arg);
+	createPropFieldsRecursive<I + 1>(data, args...);
+}
+
+template<typename... Ts>
+PropertyFieldData createPropFields(Ts&... args) {
 	PropertyFieldData data;
+	data.count = sizeof...(args);
+	createPropFieldsRecursive<0>(data, args...);
+	return data;
+}
+
+PropertyFieldData getFieldDataFromProp(const Mirror::Property& prop, void* instance, TypeID typeID) {
 	auto renderer = getRendererFromProp(prop);
 	if (renderer == InspectorFieldRenderType::VECTOR2) {
 		Vector2* vec = static_cast<Vector2*>(Mirror::getPointer(prop, instance, typeID));
-		data.count = 2;
-		data.ptrBuffer[0] = &vec->x;
-		data.ptrBuffer[1] = &vec->y;
+		return createPropFields(vec->x, vec->y);
 	}
 	else if (renderer == InspectorFieldRenderType::COLOR) {
 		Color* color = static_cast<Color*>(Mirror::getPointer(prop, instance, typeID));
-		data.count = 4;
-		data.ptrBuffer[0] = &color->r;
-		data.ptrBuffer[1] = &color->g;
-		data.ptrBuffer[2] = &color->b;
-		data.ptrBuffer[3] = &color->a;
+		return createPropFields(color->r, color->g, color->b, color->a);
 	}
 	else if (renderer == InspectorFieldRenderType::FONT) {
 		Font* font = static_cast<Font*>(Mirror::getPointer(prop, instance, typeID));
-		data.count = 2;
-		data.ptrBuffer[0] = &font->fileName;
-		data.ptrBuffer[1] = &font->size;
+		return createPropFields(font->fileName, font->size);
 	}
 	else {
 		Vector2* vec = static_cast<Vector2*>(Mirror::getPointer(prop, instance, typeID));
+		PropertyFieldData data;
 		data.count = 1;
 		data.ptrBuffer[0] = Mirror::getPointer(prop, instance, typeID);
+		data.sizeBuffer[0] = prop.type.size;
+		return data;
 	}
-	return data;
 }
 // End of Utils
 
@@ -150,6 +162,14 @@ void setCameraPosition(Core::Engine* engine, float x, float y) {
 
 void setViewportSize(Core::Engine* engine, float width, float height) {
 	engine->resizeViewport(width, height);
+}
+
+EntityID createEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name) {
+	SceneManager& sceneManager = engine->getSceneManager();
+	ScenePtr scene = sceneManager.getScene(sceneIndex);
+	if (scene == nullptr) return Entity::INVALID_ID;
+	Entity entity = scene->createEmptyEntity(name);
+	return entity.getID();
 }
 
 EntityID getEntityAtPos(Core::Engine* engine, float x, float y) {
@@ -267,6 +287,11 @@ void getAllReflectedTypes(TypeID* out, std::size_t outSize) {
 	}
 }
 
+TypeID getTypeIDFromName(const char* name) {
+	if (name == nullptr) return 0; // Invalid ID
+	return Mirror::getTypeID(name);
+}
+
 std::size_t getDerivedTypeIDsCount(TypeID typeID) {
 	return Mirror::polyGetDerivedTypeIDs(typeID).size();
 }
@@ -280,18 +305,18 @@ std::size_t getPropertiesCount(TypeID typeID) {
 	return type.properties.size();
 }
 
-std::size_t getPropertyID(TypeID typeID, std::size_t propIndex) {
-	/*Mirror::Class type = Mirror::getType(typeID);
-	assert(propIndex < type.properties.size());
-	return type.properties[propIndex].;*/
-	return 0; // TODO
-}
-
 std::size_t getPropertyType(TypeID typeID, std::size_t propIndex) {
 	Mirror::Class type = Mirror::getType(typeID);
 	assert(propIndex < type.properties.size());
 	Mirror::Property& prop = type.properties[propIndex];
 	return static_cast<std::size_t>(getRendererFromProp(prop));
+}
+
+std::size_t getPropertyTypeSize(TypeID typeID, std::size_t propIndex) {
+	Mirror::Class type = Mirror::getType(typeID);
+	assert(propIndex < type.properties.size());
+	Mirror::Property& prop = type.properties[propIndex];
+	return prop.type.size;
 }
 
 std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance) {
@@ -302,7 +327,7 @@ std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* in
 	return fieldData.count;
 }
 
-void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t outSize) {
+void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t* outFieldSize, std::size_t outSize) {
 	Mirror::Class type = Mirror::getType(typeID);
 	assert(propIndex < type.properties.size());
 	Mirror::Property& prop = type.properties[propIndex];
@@ -310,6 +335,7 @@ void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, voi
 	std::size_t size = std::min(fieldData.count, outSize);
 	for (std::size_t i = 0; i < size; i++) {
 		out[i] = fieldData.ptrBuffer[i];
+		outFieldSize[i] = fieldData.sizeBuffer[i];
 	}
 }
 
@@ -501,6 +527,15 @@ EntityID getEntityFromName(Core::Engine* engine, const char* name) {
 	if (name == nullptr) return Entity::INVALID_ID;
 	EntityManager& entityManager = engine->getEntityManager();
 	return entityManager.getEntity(name).getID();
+}
+
+EntityID getEntityParent(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	Entity entity = Entity(entityID);
+	if (ParentEntity* parentEntity = entityManager.getComponent<ParentEntity>(entity)) {
+		return parentEntity->getParent().getEntity().getID();
+	}
+	return Entity::INVALID_ID;
 }
 
 EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index) {

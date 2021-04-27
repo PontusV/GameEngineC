@@ -30,7 +30,7 @@ namespace Core {
 		/* Adds the Entity to the EntityManager. Note: Should only be used by Scene unless Entity does not want to be attached to a Scene. */
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts& ... components);
-		/* Destroys and removes the Entity from the EntityManager. Note: Should only be used by Scene if the Entity is attached to a Scene. */
+		/* Immediately destroys and removes the Entity from the EntityManager. Note: Should only be used by Scene if the Entity is attached to a Scene. */
 		void destroyEntity(Entity entity);
 
 		/* Returns a pointer to the component. Returns nullptr if the Entity does not exist or if the Entity does not have that component. */

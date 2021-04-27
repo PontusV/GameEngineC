@@ -1,6 +1,7 @@
 #include "GameView.h"
 #include "LevelEditor.h"
 #include "EngineDLL.h"
+#include "UndoRedo.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -10,7 +11,7 @@
 using namespace Editor;
 
 
-GameView::GameView(LevelEditor* editor) : editor(editor), target({ 0, 0, std::string() }) {
+GameView::GameView(LevelEditor* editor, UndoRedoManager* undoRedoManager) : editor(editor), undoRedoManager(undoRedoManager), target({ 0, 0, std::string() }) {
 }
 
 GameView::~GameView() {
@@ -77,6 +78,7 @@ void GameView::tick(float deltaTime) {
 		if (!ImGui::GetIO().KeyShift) {
 			EntityID entityID = engineDLL->getEntityAtPos(position.x, position.y);
 			if (entityID != 0) {
+				targetPressedPosition = engineDLL->getWorldPosition(entityID);
 				targetPressed = true;
 				releaseTarget();
 				target.entityID = entityID; // New target
@@ -89,9 +91,14 @@ void GameView::tick(float deltaTime) {
 	if (pressed && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
 		pressed = false;
 		targetPressed = false;
+		if (draggingTarget) {
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.sceneIndex, target.entityName, targetPressedPosition.x, targetPressedPosition.y));
+			draggingTarget = false;
+		}
 	}
 
-	if (pressed && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+	if (pressed && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 10.0f)) {
+		draggingTarget = true;
 		ImVec2 dragDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 		ImGui::ResetMouseDragDelta();
 
@@ -115,18 +122,37 @@ EntityTargetData GameView::getTarget() {
 }
 
 void GameView::setTarget(EntityID entityID) {
+	if (targetPressed) {
+		targetPressed = false;
+		pressed = false;
+		if (draggingTarget) {
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.sceneIndex, target.entityName, targetPressedPosition.x, targetPressedPosition.y));
+			draggingTarget = false;
+		}
+	}
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	target.entityID = entityID;
 	target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
 	target.entityName = engineDLL->getEntityName(entityID);
-	targetPressed = false;
 }
 
 void GameView::updateTargetData() {
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	EntityID entityID = target.entityID;
-	target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
-	target.entityName = engineDLL->getEntityName(entityID);
+	bool entityExists = false;
+	for (EntityID& id : engineDLL->getAllEntities(entityID)) {
+		if (id == entityID) {
+			entityExists = true;
+			break;
+		}
+	}
+	if (entityExists) {
+		target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
+		target.entityName = engineDLL->getEntityName(entityID);
+	}
+	else {
+		releaseTarget();
+	}
 }
 
 ImVec2 GameView::getViewportSize() const {

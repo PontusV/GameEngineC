@@ -351,7 +351,7 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle, bool keepPositio
 	else if (manager->hasComponent<ParentEntity>(entity)) {
 		removeComponent<ParentEntity>(entity);
 	}
-	prevEntitiesPtr = nullptr; // Makes next call to hasEntitiesChanged return true. Ugly but it does the trick
+	hasChanged = true;
 	if (Transform* transform = entityHandle.getComponent<Transform>()) {
 		if (parent.getID() != Entity::INVALID_ID) {
 			if (Transform* parentTransform = parentHandle.getComponent<Transform>()) {
@@ -376,10 +376,12 @@ void Scene::onEntityCreated(Entity entity) {
 }
 
 void Scene::onEntityCreated(Handle entity) {
+	hasChanged = true;
 	if (isAwake) awakeEntity(entity);
 	// Should not have to handle any ParentEntity component here
 }
 void Scene::onEntityDestroyed(Entity entity, bool destroyingParent) {
+	hasChanged = true;
 	Handle handle = getEntityHandle(entity);
 	// Check for parent & call onChildDestroyed
 	Handle parent = handle.getParent();
@@ -431,9 +433,9 @@ void Scene::clear() {
 }
 
 bool Scene::hasEntitiesChanged() {
-	bool hasChanged = prevEntitiesPtr != &entities[0];
-	prevEntitiesPtr = &entities[0];
-	return hasChanged;
+	bool changed = hasChanged;
+	hasChanged = false;
+	return changed;
 }
 
 EntityManager* Scene::getEntityManager() {

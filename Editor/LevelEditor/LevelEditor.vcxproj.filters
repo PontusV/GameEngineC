@@ -90,6 +90,12 @@
     <ClInclude Include="src\EngineDLL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\UndoRedo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EngineDLLInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\LevelEditor.cpp">
@@ -159,6 +165,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EngineDLL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UndoRedo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EngineDLLInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

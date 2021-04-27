@@ -7,6 +7,7 @@
 #include "windows/Hierarchy.h"
 #include "windows/FileView.h"
 #include "EngineDLL.h"
+#include "UndoRedo.h"
 #include <string>
 
 // Path to the solution to be copied when creating a new project
@@ -60,6 +61,7 @@ namespace Editor {
 		ProjectSettings projectSettings;
 
 		EngineDLL engineDLL;
+		UndoRedoManager undoRedoManager;
 
 		GameView gameView;
 		Inspector inspector;

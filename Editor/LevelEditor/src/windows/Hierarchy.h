@@ -2,7 +2,7 @@
 #define HIERARCHY
 
 #include <vector>
-#include "GameView.h"
+#include <string>
 
 typedef std::size_t EntityID;
 
@@ -26,10 +26,12 @@ namespace Editor {
 	};
 
 	class LevelEditor;
+	class GameView;
+	class UndoRedoManager;
 
 	class Hierarchy {
 	public:
-		Hierarchy(LevelEditor* editor, GameView* gameView);
+		Hierarchy(LevelEditor* editor, GameView* gameView, UndoRedoManager* undoRedoManager);
 		~Hierarchy();
 
 		/* Renders ImGui window */
@@ -41,6 +43,9 @@ namespace Editor {
 		/* Removes all currently added scenes */
 		void clear();
 
+		std::size_t getActiveSceneIndex();
+		void setActiveSceneIndex(std::size_t sceneIndex);
+
 		void onSceneAdded(std::size_t sceneIndex);
 		void onSceneRemoved(std::size_t sceneIndex);
 		void onSceneChanged(std::size_t sceneIndex);
@@ -50,7 +55,9 @@ namespace Editor {
 	private:
 		LevelEditor* editor;
 		GameView* gameView;
+		UndoRedoManager* undoRedoManager;
 		std::vector<SceneData> sceneOrder;
+		std::size_t activeSceneIndex;
 	};
 }
 

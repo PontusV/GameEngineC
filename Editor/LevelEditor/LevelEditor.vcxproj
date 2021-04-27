@@ -178,8 +178,10 @@
   <ItemGroup>
     <ClInclude Include="src\EditorSettings.h" />
     <ClInclude Include="src\EngineDLL.h" />
+    <ClInclude Include="src\EngineDLLInterface.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\UndoRedo.h" />
     <ClInclude Include="src\utils\Clipboard.h" />
     <ClInclude Include="src\utils\string.h" />
     <ClInclude Include="src\windows\FileView.h" />
@@ -206,8 +208,10 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="src\EditorSettings.cpp" />
     <ClCompile Include="src\EngineDLL.cpp" />
+    <ClCompile Include="src\EngineDLLInterface.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\UndoRedo.cpp" />
     <ClCompile Include="src\utils\Clipboard.cpp" />
     <ClCompile Include="src\utils\string.cpp" />
     <ClCompile Include="src\windows\FileView.cpp" />

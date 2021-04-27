@@ -1,11 +1,15 @@
 #include "Inspector.h"
 #include "GameView.h"
+#include "UndoRedo.h"
 #include "EngineDLL.h"
 #include "imgui/imgui.h"
 #include "utils/file.h"
 #include "utils/string.h"
+#include <algorithm>
 #include <vector>
+#include <GLFW/glfw3.h>
 
+#undef min
 using namespace Editor;
 
 //-------------
@@ -20,10 +24,16 @@ bool vectorIncludes(std::vector<T> vec, T value) {
 
 //-------------
 
-Inspector::Inspector(EngineDLL* engineDLL, GameView* gameView) : engineDLL(engineDLL), gameView(gameView) {}
+Inspector::Inspector(EngineDLL* engineDLL, GameView* gameView, UndoRedoManager* undoRedoManager) : engineDLL(engineDLL), gameView(gameView), undoRedoManager(undoRedoManager) {}
 Inspector::~Inspector() {}
 
-void renderComponent(EngineDLL* engineDLL, EntityID entityID, std::size_t sceneIndex, std::size_t typeID, void* component, std::size_t index) {
+template<typename T>
+void safeAssignPropValue(ReflectedFieldData& field, T&& value) {
+	std::memset(field.ptr, 0, field.size);
+	std::memcpy(field.ptr, &value, std::min(field.size, sizeof(value)));
+}
+
+void Inspector::renderComponent(EntityID entityID, std::string entityName, std::size_t sceneIndex, std::size_t typeID, void* component, std::size_t index) {
 	if (engineDLL->hasAnnotation(typeID, "hideInInspector")) return;
 	std::string typeName = engineDLL->getTypeName(typeID);
 
@@ -35,134 +45,222 @@ void renderComponent(EngineDLL* engineDLL, EntityID entityID, std::size_t sceneI
 			const char* label = labelString.c_str();
 
 			if (prop.renderer == InspectorFieldRenderType::BOOL) {
-				void* ptr = prop.fieldPtrs[0];
-				ImGui::Checkbox(label, (bool*)ptr);
+				bool* ptr = static_cast<bool*>(prop.fields[0].ptr);
+				bool value = *ptr;
+				if (ImGui::Checkbox(label, &value)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], value);
+					engineDLL->onUpdate(component, typeID, prop.index);
+				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::DECIMAL) { // Note: Decimals are always signed
-				void* ptr = prop.fieldPtrs[0];
 				ImGuiDataType dataType =
 					prop.typeName == "float" ? ImGuiDataType_Float :
 					prop.typeName == "double" ? ImGuiDataType_Double :
 					prop.typeName == "long double" ? ImGuiDataType_Double :
 					ImGuiDataType_Float;
+				if (dataType == ImGuiDataType_Float) {
+					float* ptr = static_cast<float*>(prop.fields[0].ptr);
+					float value = *ptr;
 
-				if (ImGui::InputScalar(label, dataType, ptr, NULL, NULL, "%.1f"))
-					engineDLL->onUpdate(component, typeID, prop.index);
+					if (ImGui::InputScalar(label, dataType, &value, NULL, NULL, "%.1f", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue )) {
+						// Assign value
+						auto prevPropData = createPropData(prop);
+						undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+						safeAssignPropValue(prop.fields[0], value);
+						engineDLL->onUpdate(component, typeID, prop.index);
+					}
+				}
+				else {
+					double* ptr = static_cast<double*>(prop.fields[0].ptr);
+					double value = *ptr;
+
+					if (ImGui::InputScalar(label, dataType, ptr, NULL, NULL, "%.1f", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+						// Assign value
+						auto prevPropData = createPropData(prop);
+						undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+						safeAssignPropValue(prop.fields[0], value);
+						engineDLL->onUpdate(component, typeID, prop.index);
+					}
+					//ImGui::IsItemDeactivatedAfterEdit()
+				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SIGNED_CHAR) {
-				void* ptr = prop.fieldPtrs[0];
-				if (ImGui::InputScalar("char", ImGuiDataType_S8, ptr, NULL, NULL, "%d"))
+				int8_t* ptr = static_cast<int8_t*>(prop.fields[0].ptr);
+				int8_t value = *ptr;
+				if (ImGui::InputScalar("char", ImGuiDataType_S8, &value, NULL, NULL, "%d", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], value);
 					engineDLL->onUpdate(component, typeID, prop.index);
+				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SIGNED_NUMBER) {
-				void* ptr = prop.fieldPtrs[0];
-				if (ImGui::InputScalar("int", ImGuiDataType_S32, ptr, NULL, NULL, "%d"))
+				int32_t* ptr = static_cast<int32_t*>(prop.fields[0].ptr);
+				int32_t value = *ptr;
+				if (ImGui::InputScalar("int", ImGuiDataType_S32, &value, NULL, NULL, "%d", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], value);
 					engineDLL->onUpdate(component, typeID, prop.index);
+				}
 				//ImGui::InputScalar("input s16", ImGuiDataType_S16, &s16_v, inputs_step ? &s16_one : NULL, NULL, "%d");
 				//ImGui::InputScalar("input u16", ImGuiDataType_U16, &u16_v, inputs_step ? &u16_one : NULL, NULL, "%u");
 				//ImGui::InputScalar("input s64", ImGuiDataType_S64, &s64_v, inputs_step ? &s64_one : NULL);
 				//ImGui::InputScalar("input u64", ImGuiDataType_U64, &u64_v, inputs_step ? &u64_one : NULL);
 			}
 			else if (prop.renderer == InspectorFieldRenderType::UNSIGNED_CHAR) {
-				void* ptr = prop.fieldPtrs[0];
-				if (ImGui::InputScalar(label, ImGuiDataType_U8, ptr, NULL, NULL, "%d"))
+				uint8_t* ptr = static_cast<uint8_t*>(prop.fields[0].ptr);
+				uint8_t value = *ptr;
+				if (ImGui::InputScalar(label, ImGuiDataType_U8, &value, NULL, NULL, "%d", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], value);
 					engineDLL->onUpdate(component, typeID, prop.index);
+				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::UNSIGNED_NUMBER) {
-				void* ptr = prop.fieldPtrs[0];
-				if (ImGui::InputScalar(label, ImGuiDataType_U32, ptr, NULL, NULL, "%d"))
+				uint32_t* ptr = static_cast<uint32_t*>(prop.fields[0].ptr);
+				uint32_t value = *ptr;
+				if (ImGui::InputScalar(label, ImGuiDataType_U32, &value, NULL, NULL, "%d", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], value);
 					engineDLL->onUpdate(component, typeID, prop.index);
+				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::STRING) {
-				void* ptr = prop.fieldPtrs[0];
-				std::string* value = static_cast<std::string*>(ptr);
+				assert(sizeof(std::string) == prop.fields[0].size);
+				std::string* ptr = static_cast<std::string*>(prop.fields[0].ptr);
 				char buffer[64];
-				strncpy_s(buffer, value->c_str(), value->size());
+				strncpy_s(buffer, ptr->c_str(), ptr->size());
 
-				if (ImGui::InputText(label, buffer, 64)) {
-					*value = buffer;
+				if (ImGui::InputText(label, buffer, 64, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					*ptr = buffer;
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::WIDE_STRING) {
-				void* ptr = prop.fieldPtrs[0];
-				std::wstring* value = static_cast<std::wstring*>(ptr);
+				assert(sizeof(std::wstring) == prop.fields[0].size);
+				std::wstring* ptr = static_cast<std::wstring*>(prop.fields[0].ptr);
 				char buffer[64];
-				std::string u8 = utf8_encode(*value);
+				std::string u8 = utf8_encode(*ptr);
 				strncpy_s(buffer, u8.c_str(), u8.size());
 
-				if (ImGui::InputText(label, buffer, 64)) {
-					*value = utf8_decode(buffer);
+				if (ImGui::InputText(label, buffer, 64, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					std::wstring value = utf8_decode(buffer);
+					*ptr = value;
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::IMAGE_PATH) {
-				void* ptr = prop.fieldPtrs[0];
-				std::string* value = static_cast<std::string*>(ptr);
+				assert(sizeof(std::string) == prop.fields[0].size);
+				std::string* ptr = static_cast<std::string*>(prop.fields[0].ptr);
 				char buffer[256];
-				strncpy_s(buffer, value->c_str(), value->size());
+				strncpy_s(buffer, ptr->c_str(), ptr->size());
 
-				if (ImGui::InputText(label, buffer, 256)) {
-					*value = buffer;
+				if (ImGui::InputText(label, buffer, 256, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					*ptr = buffer;
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 				ImGui::PushID(typeID);
 				if (ImGui::Button("Select image")) {
 					std::wstring filePath = getOpenFileName(L"Select A File", L"Image Files\0*.png;*.jpg;*.psd;*.tga;*.bmp\0Any File\0*.*\0", 2);
-					*value = utf8_encode(filePath);
-					engineDLL->onUpdate(component, typeID, prop.index);
+					if (!filePath.empty()) {
+						// Assign value
+						auto prevPropData = createPropData(prop);
+						undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+						*ptr = utf8_encode(filePath);
+						engineDLL->onUpdate(component, typeID, prop.index);
+					}
 				}
 				ImGui::PopID();
 			}
 			else if (prop.renderer == InspectorFieldRenderType::SHADER_PATH) {
-				void* ptr = prop.fieldPtrs[0];
-				std::string* value = static_cast<std::string*>(ptr);
+				assert(sizeof(std::string) == prop.fields[0].size);
+				std::string* ptr = static_cast<std::string*>(prop.fields[0].ptr);
 				char buffer[256];
-				strncpy_s(buffer, value->c_str(), value->size());
+				strncpy_s(buffer, ptr->c_str(), ptr->size());
 
-				if (ImGui::InputText(label, buffer, 256)) {
-					*value = buffer;
+				if (ImGui::InputText(label, buffer, 256, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					*ptr = buffer;
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 				ImGui::PushID(typeID);
 				if (ImGui::Button("Select shader")) {
 					std::wstring filePath = getOpenFileName(L"Select A File", L"Shader Files\0*.vert;*.frag\0Any File\0*.*\0", 2);
 					if (!filePath.empty()) {
+						// Assign value
+						auto prevPropData = createPropData(prop);
+						undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
 						std::string newValue = utf8_encode(filePath);
-						*value = newValue.substr(0, newValue.find_last_of("."));
+						*ptr = newValue.substr(0, newValue.find_last_of("."));
 						engineDLL->onUpdate(component, typeID, prop.index);
 					}
 				}
 				ImGui::PopID();
 			}
 			else if (prop.renderer == InspectorFieldRenderType::VECTOR2) {
-				float* xPtr = static_cast<float*>(prop.fieldPtrs[0]);
-				float* yPtr = static_cast<float*>(prop.fieldPtrs[1]);
+				float* xPtr = static_cast<float*>(prop.fields[0].ptr);
+				float* yPtr = static_cast<float*>(prop.fields[1].ptr);
 				float vec2f[2] = { *xPtr, *yPtr };
 				// TODO: Label x and y
-				if (ImGui::InputFloat2(label, vec2f, "%.1f")) {
-					*xPtr = vec2f[0];
-					*yPtr = vec2f[1];
+				if (ImGui::InputFloat2(label, vec2f, "%.1f", ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[0], vec2f[0]);
+					safeAssignPropValue(prop.fields[1], vec2f[1]);
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::COLOR) {
-				unsigned char* rPtr = static_cast<unsigned char*>(prop.fieldPtrs[0]);
-				unsigned char* gPtr = static_cast<unsigned char*>(prop.fieldPtrs[1]);
-				unsigned char* bPtr = static_cast<unsigned char*>(prop.fieldPtrs[2]);
-				unsigned char* aPtr = static_cast<unsigned char*>(prop.fieldPtrs[3]);
+				unsigned char* rPtr = static_cast<unsigned char*>(prop.fields[0].ptr);
+				unsigned char* gPtr = static_cast<unsigned char*>(prop.fields[1].ptr);
+				unsigned char* bPtr = static_cast<unsigned char*>(prop.fields[2].ptr);
+				unsigned char* aPtr = static_cast<unsigned char*>(prop.fields[3].ptr);
 				ImVec4 color = ImVec4(*rPtr / 255.0f, *gPtr / 255.0f, *bPtr / 255.0f, *aPtr / 255.0f);
-				if (ImGui::ColorEdit4(label, (float*)& color)) {
-					*rPtr = color.x * 255.0f;
-					*gPtr = color.y * 255.0f;
-					*bPtr = color.z * 255.0f;
-					*aPtr = color.w * 255.0f;
+				if (ImGui::ColorEdit4(label, (float*)&color, ImGuiColorEditFlags_AlphaBar)) {
+				}
+				if (ImGui::IsItemActivated()) {
+					colorEditOldValue = ImVec4(*rPtr, *gPtr, *bPtr, *aPtr);
+				}
+				if (ImGui::IsItemEdited()) {
+					// Assign value
+					safeAssignPropValue<unsigned char>(prop.fields[0], color.x * 255.0f);
+					safeAssignPropValue<unsigned char>(prop.fields[1], color.y * 255.0f);
+					safeAssignPropValue<unsigned char>(prop.fields[2], color.z * 255.0f);
+					safeAssignPropValue<unsigned char>(prop.fields[3], color.w * 255.0f);
 					engineDLL->onUpdate(component, typeID, prop.index);
+				}
+				bool colorHasChanged = *rPtr != colorEditOldValue.x || *gPtr != colorEditOldValue.y || *bPtr != colorEditOldValue.z || *aPtr != colorEditOldValue.w;
+				if (ImGui::IsItemDeactivatedAfterEdit() && colorHasChanged) {
+					auto prevPropData = createPropDataFromValues((unsigned char)colorEditOldValue.x, (unsigned char)colorEditOldValue.y, (unsigned char)colorEditOldValue.z, (unsigned char)colorEditOldValue.w);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
 				}
 			}
 			else if (prop.renderer == InspectorFieldRenderType::FONT) {
-				std::string* fontPath = static_cast<std::string*>(prop.fieldPtrs[0]);
-				int* fontSize = static_cast<int*>(prop.fieldPtrs[1]);
+				assert(sizeof(std::string) == prop.fields[0].size);
+				std::string* fontPath = static_cast<std::string*>(prop.fields[0].ptr);
+				int* fontSize = static_cast<int*>(prop.fields[1].ptr);
 
 				char buffer[256];
 				strncpy_s(buffer, fontPath->c_str(), fontPath->size());
@@ -171,21 +269,30 @@ void renderComponent(EngineDLL* engineDLL, EntityID entityID, std::size_t sceneI
 				pathLabel.insert(labelString.find_first_of("#"), "_path");
 				std::string sizeLabel = labelString;
 				sizeLabel.insert(labelString.find_first_of("#"), "_size");
-				if (ImGui::InputText(pathLabel.append("_path").c_str(), buffer, 256)) {
+				if (ImGui::InputText(pathLabel.append("_path").c_str(), buffer, 256, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
 					*fontPath = buffer;
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 				if (ImGui::Button("Select font")) {
 					std::wstring filePath = getOpenFileName(L"Select A Font File", L"Font Files\0*.ttf;*.ttc;*.fnt;\0Any File\0*.*\0", 2);
 					if (!filePath.empty()) {
+						// Assign value
+						auto prevPropData = createPropData(prop);
+						undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
 						std::string newValue = utf8_encode(filePath);
 						*fontPath = newValue;
 						engineDLL->onUpdate(component, typeID, prop.index);
 					}
 				}
-				int sizeBuffer[1] = { *fontSize };
-				if (ImGui::InputInt(sizeLabel.append("_size").c_str(), sizeBuffer, 1)) {
-					*fontSize = sizeBuffer[0];
+				int fontSizeValue = *fontSize;
+				if (ImGui::InputInt(sizeLabel.append("_size").c_str(), &fontSizeValue, 1, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_EnterReturnsTrue)) {
+					// Assign value
+					auto prevPropData = createPropData(prop);
+					undoRedoManager->registerUndo(std::make_unique<PropertyAssignAction>(sceneIndex, entityName, typeName, prop.name, std::move(prevPropData)));
+					safeAssignPropValue(prop.fields[1], fontSizeValue);
 					engineDLL->onUpdate(component, typeID, prop.index);
 				}
 			}
@@ -205,7 +312,11 @@ void renderComponent(EngineDLL* engineDLL, EntityID entityID, std::size_t sceneI
 		ImGui::Separator();
 
 		if (ImGui::Button("Delete", ImVec2(120, 0))) {
-			engineDLL->removeComponent(entityID, sceneIndex, typeID);
+			if (engineDLL->removeComponent(entityID, sceneIndex, typeID)) {
+				std::string entityName = engineDLL->getEntityName(entityID);
+				std::string typeName = engineDLL->getTypeName(typeID);
+				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(sceneIndex, entityName, typeName));
+			}
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SetItemDefaultFocus();
@@ -235,7 +346,7 @@ bool filterComponentType(EngineDLL* engineDLL, const std::vector<TypeID>& filter
 	return false;
 }
 
-void renderComponentCombo(EngineDLL* engineDLL, EntityTargetData target) { // TODO: Get list of all types (typeID, name)
+void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, EntityTargetData target) { // TODO: Get list of all types (typeID, name)
 	std::vector<TypeID> filter;
 	for (ComponentData& componentData : engineDLL->getComponents(target.entityID)) {
 		filter.push_back(componentData.typeID);
@@ -243,7 +354,9 @@ void renderComponentCombo(EngineDLL* engineDLL, EntityTargetData target) { // TO
 	for (ReflectedTypeData& type : engineDLL->getAllReflectedTypes()) {
 		if (!filterComponentType(engineDLL, filter, type.typeID)) {
 			if (ImGui::Selectable(type.typeName.c_str(), false)) {
-				engineDLL->addComponent(target.entityID, target.sceneIndex, type.typeID);
+				if (engineDLL->addComponent(target.entityID, target.sceneIndex, type.typeID)) {
+					undoRedoManager->registerUndo(std::make_unique<RemoveComponentAction>(target.sceneIndex, target.entityName, type.typeName));
+				}
 			}
 		}
 	}
@@ -269,6 +382,7 @@ void Inspector::tick() {
 				renameActive = false;
 				if (engineDLL->renameEntity(target.entityID, buffer)) {
 					gameView->updateTargetData();
+					undoRedoManager->registerUndo(std::make_unique<RenameEntityAction>(target.sceneIndex, target.entityName, buffer));
 				}
 			}
 			ImGui::SetKeyboardFocusHere(0);
@@ -292,13 +406,20 @@ void Inspector::tick() {
 			}
 			ImGui::PopStyleColor(3);
 		}
+		if (ImGui::IsKeyPressed(GLFW_KEY_DELETE)) { // TODO: Move this and popup somewhere else?
+			ImGui::OpenPopup("Delete_target_entity");
+		}
 		if (ImGui::BeginPopupModal("Delete_target_entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::Text("Are you sure you want to delete %s?\n\n", targetName);
 			ImGui::Separator();
 
 			if (ImGui::Button("Delete", ImVec2(120, 0))) {
 				if (target.entityID != 0) {
-					engineDLL->destroyEntity(target.sceneIndex, target.entityID);
+					auto blueprint = EntityBlueprint::createFromEntity(engineDLL, target.entityID);
+					if (engineDLL->destroyEntity(target.sceneIndex, target.entityID)) {
+						undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(target.sceneIndex, target.entityName, std::move(blueprint)));
+						gameView->releaseTarget();
+					}
 				}
 				ImGui::CloseCurrentPopup();
 			}
@@ -314,12 +435,12 @@ void Inspector::tick() {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.0f, 5.0f));
 		std::size_t i = 0;
 		for (ComponentData& component : engineDLL->getComponents(target.entityID)) {
-			renderComponent(engineDLL, target.entityID, target.sceneIndex, component.typeID, component.instance, i++);
+			renderComponent(target.entityID, target.entityName, target.sceneIndex, component.typeID, component.instance, i++);
 		}
 		if (ImGui::Button("Add component", ImVec2(ImGui::GetContentRegionAvailWidth(), 30)))
 			ImGui::OpenPopup("add_component_popup");
 		if (ImGui::BeginPopup("add_component_popup")) {
-			renderComponentCombo(engineDLL, target);
+			renderComponentCombo(engineDLL, undoRedoManager, target);
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();

@@ -13,11 +13,12 @@ namespace Editor {
 		std::string entityName;
 	};
 	class LevelEditor;
+	class UndoRedoManager;
 
 	/* The game view window */
 	class GameView {
 	public:
-		GameView(LevelEditor* engineDLL);
+		GameView(LevelEditor* engineDLL, UndoRedoManager* undoRedoManager);
 		~GameView();
 
 		void initialize(ImVec2 viewportSize);
@@ -38,9 +39,12 @@ namespace Editor {
 
 		bool pressed = false;
 		bool targetPressed = false;
+		bool draggingTarget = false;
+		ImVec2 targetPressedPosition;
 		EntityTargetData target;
 
 		LevelEditor* editor;
+		UndoRedoManager* undoRedoManager;
 		Viewport viewport;
 		GridRenderer grid;
 	};
