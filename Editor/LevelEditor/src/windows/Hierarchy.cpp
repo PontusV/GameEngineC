@@ -9,6 +9,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "IconsFontAwesome5.h"
 
 
 using namespace Editor;
@@ -28,6 +29,7 @@ void entityRenamedCallback(void* ptr, EntityID entityID) {
 void entityNode(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, std::size_t sceneIndex, EntityHierarchy& entry, EntityID targetID, GameView* gameView) {
 	EntityData entity = entry.entity;
 	std::string name = entity.name;
+	std::string label = ICON_FA_MALE + (" " + name);
 	std::size_t childCount = entry.children.size();
 	bool selected = entity.id == targetID;
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
@@ -37,7 +39,7 @@ void entityNode(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, std::siz
 	if (childCount == 0) {
 		flags |= ImGuiTreeNodeFlags_Leaf;
 	}
-	bool nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags);
+	bool nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags, label.c_str());
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
 		gameView->setTarget(entity.id);
 	}
@@ -79,8 +81,9 @@ void Hierarchy::tick(EntityID target) {
 	for (SceneData& sceneData : sceneOrder) {
 		bool openPopup = false;
 		std::string sceneName = sceneData.name;
+		std::string sceneLabel = ICON_FA_CUBE + (" " + sceneName);
 		std::string scenePopupId = std::string("scene_popup_").append(sceneName);
-		bool nodeOpened = ImGui::TreeNodeEx(sceneName.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
+		bool nodeOpened = ImGui::TreeNodeEx(sceneLabel.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
 			openPopup = true;
 		}

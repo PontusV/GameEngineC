@@ -24,7 +24,7 @@ namespace Editor {
 		void initialize(ImVec2 viewportSize);
 
 		/* Renders imGui window and updates the game */
-		void tick(float deltaTime);
+		void tick(float deltaTime, std::size_t fpsCount);
 
 		EntityTargetData getTarget();
 		void setTarget(EntityID entityID);
@@ -32,10 +32,13 @@ namespace Editor {
 		/* Releases allocated memory by Engine DLL and assigns the pointer of target a value of nullptr */
 		void releaseTarget();
 
+		/* @param value A value of 1.0 equals 100% */
+		void setZoom(float value);
 		ImVec2 getViewportSize() const;
 
 	private:
 		ImVec2 viewportSize = ImVec2(1.0f, 1.0f);
+		float zoom = 1.0f;
 
 		bool pressed = false;
 		bool targetPressed = false;
@@ -46,6 +49,7 @@ namespace Editor {
 		LevelEditor* editor;
 		UndoRedoManager* undoRedoManager;
 		Viewport viewport;
+		Viewport viewportBG;
 		GridRenderer grid;
 	};
 }

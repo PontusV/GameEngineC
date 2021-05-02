@@ -112,7 +112,9 @@ void Engine::resizeViewport(unsigned int width, unsigned int height) {
 	Matrix4 projection = maths::ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::getInstance().updateShaders(projection);
 	// Resize draw area
+	graphics.getWindow().setResolution(width, height);
 	graphics.getRenderer().updateSize(width, height);
+	graphics.getCamera().updateViewMatrix();
 	// Notify UIBehaviours
 	guiSystem.onWindowResize(); // TODO: onViewportResize?
 }

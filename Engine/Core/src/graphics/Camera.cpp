@@ -64,7 +64,7 @@ void Camera::updateViewMatrix() {
 
 	viewMatrix = maths::translate(viewMatrix, Vector3(center.x, center.y, 0.0f));
 	viewMatrix = maths::rotate(viewMatrix, -rotation, Vector3(0.0f, 0.0f, 1.0f));
-	viewMatrix = maths::translate(viewMatrix, Vector3(-center.x - position.x, -center.y - position.y, 0.0f));
+	viewMatrix = maths::translate(viewMatrix, Vector3(-position.x,-position.y, 0.0f));
 
 	worldToScreenMatrix = maths::inverse(viewMatrix);
 }

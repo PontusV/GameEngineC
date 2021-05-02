@@ -176,6 +176,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\IconsFontAwesome5.h" />
     <ClInclude Include="src\EditorSettings.h" />
     <ClInclude Include="src\EngineDLL.h" />
     <ClInclude Include="src\EngineDLLInterface.h" />

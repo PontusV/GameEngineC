@@ -14,25 +14,34 @@ Viewport::~Viewport() {
 	glDeleteTextures(1, &textureID);
 }
 
-void Viewport::initialize(unsigned int width, unsigned int height) {
+void Viewport::initialize(unsigned int width, unsigned int height, bool background) {
 	// Generate texture/renderbuffer/framebuffer object
 	glGenFramebuffers(1, &FBO);
 	glGenTextures(1, &textureID);
 
-	// Creates texture and updates RBO settings
-	setSize(width, height);
+	// Creates texture and updates FBO settings
+	setSize(width, height, background);
 }
 
-void Viewport::setSize(unsigned int width, unsigned int height) {
+void Viewport::setSize(unsigned int width, unsigned int height, bool background) {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
 	// Texture
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(
-		GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL
-	);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (background) {
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL
+		);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	else {
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL
+		);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0); // Attach texture to framebuffer as its color attachment
 

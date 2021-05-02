@@ -8,10 +8,10 @@ namespace Editor {
 		Viewport();
 		~Viewport();
 
-		void initialize(unsigned int width, unsigned int height);
+		void initialize(unsigned int width, unsigned int height, bool background = false);
 
 		/* Resizes the viewport texture. */
-		void setSize(unsigned int width, unsigned int height);
+		void setSize(unsigned int width, unsigned int height, bool background = false);
 
 		void begin();
 		void end();

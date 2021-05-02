@@ -4,6 +4,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui_internal.h"
+#include "IconsFontAwesome5.h"
 
 #include "utils/string.h"
 #include "utils/file.h"
@@ -53,6 +54,33 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 		if (renameNextFrame && renameFilePath == filePath) renameActive = true;
 		std::string treeNodeId = std::string("##").append(filePath);
 		std::string treeNodeLabel = renameActive ? "" : fileName;
+
+		const char* icon = ICON_FA_FILE;
+		if (entry.is_directory()) {
+			ImGuiID nodeID = ImGui::GetID(treeNodeId.c_str());
+			if (ImGui::TreeNodeBehaviorIsOpen(nodeID)) {
+				icon = ICON_FA_FOLDER_OPEN;
+			}
+			else {
+				icon = ICON_FA_FOLDER;
+			}
+		}
+		else {
+			// TODO: Different kind of files
+			auto extension = entry.path().extension();
+			if (extension == ".scene") {
+				icon = ICON_FA_FILE_ALT;
+			} else if (extension == ".proj") {
+				icon = ICON_FA_FILE_ALT;
+			}
+			else if (extension == ".h" || extension == ".hpp" || extension == ".c" || extension == ".cpp") {
+				icon = ICON_FA_FILE_CODE;
+			}
+			else {
+				icon = ICON_FA_FILE;
+			}
+		}
+		treeNodeLabel = icon + (" " + treeNodeLabel);
 
 		bool selected = entryData.selected;
 		bool windowFocused = ImGui::IsWindowFocused();
@@ -344,7 +372,7 @@ void FileView::tick() {
 	if (ImGui::Button("Refresh") || refreshNextFrame) {
 		refresh();
 	}
-	std::wstring projectName = editor->getProjectName();
+	std::string projectName = utf8_encode(editor->getProjectName());
 	if (!projectName.empty()) {
 		ImGuiTreeNodeFlags rootProjectFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
 		if (projectSelected) rootProjectFlags |= ImGuiTreeNodeFlags_Selected;
@@ -353,7 +381,7 @@ void FileView::tick() {
 			ImVec4 color = ImVec4(1, 1, 1, 0.15f);
 			ImGui::PushStyleColor(ImGuiCol_Header, color);
 		}
-		bool isOpen = ImGui::TreeNodeEx(utf8_encode(projectName).c_str(), rootProjectFlags); // TODO: Project Icon
+		bool isOpen = ImGui::TreeNodeEx(projectName.c_str(), rootProjectFlags); // TODO: Project Icon
 		if (!windowFocused) {
 			ImGui::PopStyleColor();
 		}

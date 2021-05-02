@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include "utils/file.h"
 #include "utils/string.h"
+#include "IconsFontAwesome5.h"
 
 #include <fstream>
 #include <iostream>
@@ -87,6 +88,9 @@ int LevelEditor::initiate() {
 
 	// OpenGL configuration
 	glViewport(0, 0, (int)resolutionDefault.x, (int)resolutionDefault.y);
+	// Enable antialias (for grid)
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	// Enable transparently
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -154,9 +158,16 @@ int LevelEditor::start() {
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
 
+	// Setup FontAwesome
+	io.Fonts->AddFontDefault();
+	// merge in icons from Font Awesome
+	static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+	ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+	io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, 16.0f, &icons_config, icons_ranges);
+
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 150");
+	ImGui_ImplOpenGL3_Init("#version 420");
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0f;
@@ -165,6 +176,10 @@ int LevelEditor::start() {
 
 	// Window initialization
 	gameView.initialize(ImVec2(resolutionDefault.x, resolutionDefault.y));
+
+	std::size_t currentFPS = 0;
+	std::size_t fpsCount = 0;
+	GLfloat fpsTimer = 0;
 
 	// Game loop
 	running = true;
@@ -175,6 +190,15 @@ int LevelEditor::start() {
 		GLfloat currentFrame = (GLfloat)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		// Calculate FPS
+		fpsTimer += deltaTime;
+		fpsCount++;
+		if (fpsTimer > 1.0f) {
+			fpsTimer -= 1.0f;
+			currentFPS = fpsCount;
+			fpsCount = 0;
+		}
 
 		engineDLLUpdateTime += deltaTime;
 		updateEngineDLL(engineDLLUpdateTime);
@@ -221,8 +245,7 @@ int LevelEditor::start() {
 		}
 
 		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("File"))
-			{
+			if (ImGui::BeginMenu("File")) {
 				if (ImGui::BeginMenu("New")) {
 					if (ImGui::MenuItem("New Project")) {
 						open_create_project_popup = true;
@@ -268,8 +291,7 @@ int LevelEditor::start() {
 				}
 				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Edit"))
-			{
+			if (ImGui::BeginMenu("Edit")) {
 				if (ImGui::MenuItem("Undo", "CTRL+Z", false, undoRedoManager.isUndoAvailable())) {
 					undoRedoManager.undo();
 					gameView.updateTargetData();
@@ -289,8 +311,7 @@ int LevelEditor::start() {
 				}
 				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Game Object"))
-			{
+			if (ImGui::BeginMenu("Game Object")) {
 				if (ImGui::MenuItem("Create new")) {
 					open_create_entity_popup = true;
 				}
@@ -418,7 +439,7 @@ int LevelEditor::start() {
 		ImGui::SetNextWindowDockID(dockspaceID, ImGuiCond_FirstUseEver);
 		inspector.tick();
 		// Game view window
-		gameView.tick(deltaTime);
+		gameView.tick(deltaTime, currentFPS);
 		EntityTargetData target = gameView.getTarget();
 		hierarchy.tick(target.entityID);
 		// File view window
