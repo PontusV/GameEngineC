@@ -123,11 +123,11 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 
 	// Dragging target
 	if (pressed && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 10.0f)) {
-		draggingTarget = true;
 		ImVec2 dragDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 		ImGui::ResetMouseDragDelta();
 
 		if (targetPressed && target.entityID != 0) {
+			draggingTarget = true;
 			ImVec2 position = engineDLL->getLocalPosition(target.entityID);
 			position.x += dragDelta.x * zoom;
 			position.y += dragDelta.y * zoom;
@@ -185,7 +185,8 @@ void GameView::updateTargetData() {
 }
 
 void GameView::setZoom(float value) {
-	zoom = value;
+	if (value < 0.1f) return;
+	zoom = std::floor(value * 10) / 10;
 }
 
 ImVec2 GameView::getViewportSize() const {

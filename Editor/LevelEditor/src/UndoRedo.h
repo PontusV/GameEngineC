@@ -8,17 +8,8 @@
 #include "EngineDLLInterface.h"
 #undef min
 
-//typedef std::size_t EntityID;
-//typedef std::size_t TypeID;
-
-/*
-* Note: No actions should be available when Engine DLL is not loaded.
-*/
-
 namespace Editor {
 	class EngineDLL;
-	//struct ReflectedPropertyData;
-	//struct ReflectedFieldData;
 
 	class DoAction {
 	public:
@@ -55,7 +46,7 @@ namespace Editor {
 		std::vector<std::unique_ptr<DoAction>> undoStack;
 		std::vector<std::unique_ptr<DoAction>> redoStack;
 		EngineDLL* engineDLL;
-		std::map<std::size_t, int> stepsSinceSave;
+		std::map<std::size_t, int> stepsSinceSave; // scenIndex, steps
 	};
 
 	// -------------------- Actions --------------------

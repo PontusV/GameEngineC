@@ -82,6 +82,9 @@ void Hierarchy::tick(EntityID target) {
 		bool openPopup = false;
 		std::string sceneName = sceneData.name;
 		std::string sceneLabel = ICON_FA_CUBE + (" " + sceneName);
+		if (undoRedoManager->getStepsSinceSave(sceneIndex) != 0) {
+			sceneLabel.append("*");
+		}
 		std::string scenePopupId = std::string("scene_popup_").append(sceneName);
 		bool nodeOpened = ImGui::TreeNodeEx(sceneLabel.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen);
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {

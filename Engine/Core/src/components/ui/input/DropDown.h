@@ -47,7 +47,7 @@ namespace Core {
 		PROPERTY()
 		int optionHeight = 20;
 		PROPERTY()
-		Font optionFont = Font("resources/fonts/segoeui.ttf", 14);
+		Font optionFont = Font("Fonts/segoeui.ttf", 14);
 		PROPERTY()
 		Color optionTextColor = { 255,255,255,255 };
 		PROPERTY()

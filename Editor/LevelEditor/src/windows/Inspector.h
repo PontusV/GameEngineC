@@ -8,6 +8,7 @@ typedef std::size_t EntityID;
 namespace Editor {
 
 	class GameView;
+	class ProjectSettings;
 	class UndoRedoManager;
 	class EngineDLL;
 

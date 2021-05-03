@@ -40,8 +40,8 @@ bool Graphics::initiate() {
 		return false;
 	}
 	// Load shaders
-	Shader textShader = ResourceManager::getInstance().loadShader("resources/shaders/text");
-	spriteShader = ResourceManager::getInstance().loadShader("resources/shaders/sprite");
+	Shader textShader = ResourceManager::getInstance().loadShader("Shaders/text");
+	spriteShader = ResourceManager::getInstance().loadShader("Shaders/sprite");
 
 	// Configure shaders
 	Matrix4 projection = window.getProjectionMatrix();

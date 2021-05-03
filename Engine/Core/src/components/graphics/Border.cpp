@@ -5,10 +5,10 @@
 using namespace Core;
 
 Border::Border(std::size_t thickness, Color color, bool inner, bool top, bool right, bool bottom, bool left)
-	: Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), color), borderThickness(thickness), inner(inner), top(top), right(right), bottom(bottom), left(left) {
+	: Graphic(0, ResourceManager::getInstance().loadShader("Shaders/sprite"), color), borderThickness(thickness), inner(inner), top(top), right(right), bottom(bottom), left(left) {
 } // Constructor
 
-Border::Border() : Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/sprite"), Color(255,255,255,255)) {
+Border::Border() : Graphic(0, ResourceManager::getInstance().loadShader("Shaders/sprite"), Color(255,255,255,255)) {
 } // Constructor
 
 

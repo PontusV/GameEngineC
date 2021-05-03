@@ -78,6 +78,14 @@ void EngineDLLInterface::setViewportSize(float width, float height) {
     setViewportSizeFun(engine, width, height);
 }
 
+void EngineDLLInterface::setAssetDirPath(const char* path) {
+    if (setAssetDirPathFun == nullptr) {
+        std::cout << "EngineDLLInterface::setAssetDirPath::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setAssetDirPath::ERROR The function ptr is nullptr";
+    }
+    setAssetDirPathFun(path);
+}
+
 EntityID EngineDLLInterface::createEntity(std::size_t sceneIndex, const char* name) {
     if (createEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::createEntity::ERROR The function ptr is nullptr" << std::endl;

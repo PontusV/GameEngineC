@@ -7,7 +7,7 @@ Image::Image(const char* fileName, const char* shaderPath, Color color)
 	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, shaderPath, color) {
 } // Constructor
 Image::Image(const char* fileName, Color color)
-	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, "resources/shaders/sprite", color) {
+	: fileName(fileName), texture(ResourceManager::getInstance().loadTexture(fileName)), Graphic(0, "Shaders/sprite", color) {
 } // Constructor
 
 Image::Image() {

@@ -1,6 +1,7 @@
 #include "Core.h"
 #include "entity/Entity.h"
 #include "engine/Engine.h"
+#include "engine/ResourceManager.h"
 #include "components/graphics/Image.h"
 #include "components/graphics/SpriteRenderer.h"
 #include "components/RectTransform.h"
@@ -123,7 +124,7 @@ bool createTemplateEntity(Core::Engine* engine, std::size_t sceneIndex, const ch
 	ScenePtr scene = sceneManager.getScene(sceneIndex);
 	if (scene == nullptr) return false;
 	scene->createEntity(name,
-		Image("resources/images/awesomeface.png"),
+		Image("Images/awesomeface.png"),
 		RectTransform(x, y, width, height, 0.0f, Alignment::CENTER),
 		SpriteRenderer()
 	);
@@ -176,6 +177,10 @@ EntityID getEntityAtPos(Core::Engine* engine, float x, float y) {
 	Input& input = engine->getInput();
 	Entity entity = input.getEntityAtPos(x, y);
 	return entity.getID();
+}
+
+void setAssetDirPath(const char* path) {
+	return ResourceManager::getInstance().setAssetDirPath(path);
 }
 
 bool getRectSize(Core::Engine* engine, EntityID entityID, float* out) {

@@ -235,13 +235,7 @@ int LevelEditor::start() {
 			undoRedoManager.redo();
 		}
 		else if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			// Save all
-			std::size_t loadedSceneCount = engineDLL.getSceneCount();
-			for (std::size_t i = 0; i < loadedSceneCount; i++) {
-				engineDLL.saveScene(i);
-			}
-			projectSettings.save();
-			editorSettings.save();
+			saveAll();
 		}
 
 		if (ImGui::BeginMenuBar()) {
@@ -270,12 +264,7 @@ int LevelEditor::start() {
 				}
 				auto loadedSceneCount = engineDLL.getSceneCount();
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, engineDLL.isLoaded() && projectSettings.isLoaded() && loadedSceneCount > 0)) { // TODO: Keybind
-					// Saving all loaded scenes
-					std::size_t sceneCount = engineDLL.getSceneCount();
-					for (std::size_t i = 0; i < sceneCount; i++) {
-						engineDLL.saveScene(i);
-					}
-					projectSettings.save();
+					saveAll();
 				}
 				if (ImGui::MenuItem("Reload", nullptr, nullptr, projectSettings.isLoaded() && engineDLL.isLoaded())) {
 					std::wstring path = copyEngineDLL();
@@ -403,14 +392,11 @@ int LevelEditor::start() {
 				if (ImGui::Button("Create", ImVec2(120, 0))) {
 					std::string name = std::string(buffer);
 					if (engineDLL.isEntityNameAvailable(name.c_str())) {
-						std::size_t sceneIndex = gameView.getTarget().sceneIndex;
-						ImVec2 pos = engineDLL.getCameraPosition();
-						ImVec2 viewportSize = gameView.getViewportSize();
-						float x = pos.x + viewportSize.x / 2;
-						float y = pos.y + viewportSize.y / 2;
+						std::size_t sceneIndex = hierarchy.getActiveSceneIndex();
+						ImVec2 cameraPosition = engineDLL.getCameraPosition();
 						float width = 350;
 						float height = 350;
-						if (engineDLL.createTemplateEntity(sceneIndex, name.c_str(), x, y, width, height)) {
+						if (engineDLL.createTemplateEntity(sceneIndex, name.c_str(), cameraPosition.x, cameraPosition.y, width, height)) {
 							undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(sceneIndex, name)));
 						}
 						errorMessage = "";
@@ -654,6 +640,7 @@ bool LevelEditor::loadEngine(std::wstring path) {
 		// Initialize egine
 		int width, height;
 		glfwGetWindowSize(glfwWindow, &width, &height);
+		engineDLL.setAssetDirPath(utf8_encode(projectSettings.getAssetDirPath()).c_str());
 		if (!engineDLL.engineInit((GLADloadproc)glfwGetProcAddress, width, height)) {
 			std::cout << "Failed to initiate the Engine. Unloading the Engine DLL now..." << std::endl;
 			unloadEngine();
@@ -718,4 +705,14 @@ bool LevelEditor::reloadEngine(std::wstring path) {
 bool LevelEditor::buildGame() {
 	std::cout << "Build game is currently a WIP" << std::endl;
 	return false;
+}
+
+bool LevelEditor::saveAll() {
+	std::size_t loadedSceneCount = engineDLL.getSceneCount();
+	for (std::size_t i = 0; i < loadedSceneCount; i++) {
+		engineDLL.saveScene(i);
+		undoRedoManager.resetStepsSinceSave(i);
+	}
+	projectSettings.save();
+	editorSettings.save();
 }

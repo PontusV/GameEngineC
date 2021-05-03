@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 using namespace Core;
 
@@ -26,7 +27,7 @@ Shader ResourceManager::loadShader(const std::string shaderFileName) {
 	auto it = shaders.find(name);
 	if (it != shaders.end())
 		return it->second;
-	Shader shader = loadShaderFromFile(vShaderFile.c_str(), fShaderFile.c_str());
+	Shader shader = loadShaderFromFile(parseFilePath(vShaderFile).c_str(), parseFilePath(fShaderFile).c_str());
 	updateShader(shader); // init projection matrix
 	shaders[name] = shader;
 	return shader;
@@ -39,7 +40,7 @@ Texture2D ResourceManager::loadTexture(const GLchar* file, Vector2 size, Vector2
 	if (it != textures.end()) {
 		texture = it->second;
 	} else {
-		textures[file] = loadTextureFromFile(file);
+		textures[file] = loadTextureFromFile(parseFilePath(file).c_str());
 		texture = textures[file];
 	}
 
@@ -200,4 +201,18 @@ FontManager& ResourceManager::loadFontManager(const std::string file, GLushort t
 
 	fontManagers[fontIDString] = new FontManager(file.c_str(), textSize, ft);
 	return *fontManagers[fontIDString];
+}
+
+void ResourceManager::setAssetDirPath(const GLchar* value) {
+	assetDirPath = value;
+}
+
+std::string ResourceManager::parseFilePath(const std::string& filepath) const {
+	std::filesystem::path path(filepath);
+	if (path.is_absolute() || assetDirPath.empty()) {
+		return filepath;
+	}
+	std::filesystem::path rootPath(assetDirPath);
+	auto absolutePath = rootPath / path;
+	return absolutePath.string();
 }

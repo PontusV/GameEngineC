@@ -29,7 +29,7 @@ void InputField::start() {
 		inputText.setParent(owner);
 
 		RectTransform* textRect = inputText.addComponent(RectTransform(rect->getSize().x / 2, rect->getSize().y / 2, 0, 0, rect->getZ() + 0.01f, Alignment::CENTER));
-		Text* textComponent = inputText.addComponent(Text(filterText(initText), Font("resources/fonts/segoeui.ttf", 15), Color(0, 0, 0)));
+		Text* textComponent = inputText.addComponent(Text(filterText(initText), Font("Fonts/segoeui.ttf", 15), Color(0, 0, 0)));
 
 		textMark = createEntity(std::string(ownerHandle.getEntityName()) + "_Mark",
 			RectSprite(0, Color(markColor.r, markColor.g, markColor.b, 0)),

@@ -44,9 +44,15 @@ namespace Core {
 		void updateShaderViewMatrix(const Matrix4& viewMatrix);
 		// Initializes all shaders. Prepares them for use in rendering.
 		void initShader(const Matrix4& projection);
+
+		void setAssetDirPath(const GLchar* value);
+
 	private:
 		ResourceManager();
-
+		/* Returns an absolute file path. If the given path is relative, assetDirPath will be appended to the beginning; otherwise returns the given value */
+		std::string parseFilePath(const std::string& filepath) const;
+	private:
+		std::string assetDirPath = std::string();
 
 		// Static  Loader functions
 		static Shader loadShaderFromFile(const GLchar* vShaderFile, const GLchar* fShaderFile);

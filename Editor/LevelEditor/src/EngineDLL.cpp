@@ -63,6 +63,10 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, setAssetDirPathFun, "setAssetDirPath")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, createEntityFun, "createEntity")) {
         unload();
         return false;
@@ -312,6 +316,7 @@ bool EngineDLL::unload() {
     getCameraPositionFun = nullptr;
     setCameraPositionFun = nullptr;
     setViewportSizeFun = nullptr;
+    setAssetDirPathFun = nullptr;
     createEntityFun = nullptr;
     getEntityAtPosFun = nullptr;
     getRectSizeFun = nullptr;

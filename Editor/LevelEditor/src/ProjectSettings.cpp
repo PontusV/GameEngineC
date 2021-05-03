@@ -22,7 +22,7 @@ void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring&
 	}
 }
 
-bool ProjectSettings::parsePath(std::wstring& string) {
+bool ProjectSettings::parsePath(std::wstring& string) const {
 	replaceAll(string, L"${ProjectDir}", std::wstring(path).append(L"/"));
 	return true;
 }
@@ -96,17 +96,17 @@ bool ProjectSettings::save() {
 	}
 }
 
-bool ProjectSettings::isLoaded() {
+bool ProjectSettings::isLoaded() const {
 	return !path.empty();
 }
 
-std::wstring ProjectSettings::getName() {
+std::wstring ProjectSettings::getName() const {
 	return name;
 }
-std::wstring ProjectSettings::getPath() {
+std::wstring ProjectSettings::getPath() const {
 	return path.ends_with(L"\\") || path.ends_with(L"/") ? path.substr(0, path.size() - 1) : path;
 }
-std::wstring ProjectSettings::getFilePath() {
+std::wstring ProjectSettings::getFilePath() const {
 	return getPath().append(L"\\").append(name).append(L".proj");
 }
 
@@ -114,7 +114,7 @@ void ProjectSettings::setEngineDLLPath(std::wstring path) {
 	engineDLLPath = path;
 }
 
-std::wstring ProjectSettings::getEngineDLLPath() {
+std::wstring ProjectSettings::getEngineDLLPath() const {
 	std::wstring result = engineDLLPath;
 	parsePath(result);
 	return result;
@@ -137,4 +137,8 @@ void ProjectSettings::removeOpenScene(std::wstring path) {
 
 void ProjectSettings::clearOpenScenes() {
 	openScenes.clear();
+}
+
+std::wstring ProjectSettings::getAssetDirPath() const {
+	return getPath().append(L"/Assets");
 }

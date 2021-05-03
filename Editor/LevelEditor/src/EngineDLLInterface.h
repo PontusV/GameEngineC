@@ -21,6 +21,7 @@ typedef void (*EngineTickFun)(EnginePtr, float);
 typedef void (*GetCameraPositionFun)(EnginePtr, float*);
 typedef void (*SetCameraPositionFun)(EnginePtr, float, float);
 typedef void (*SetViewportSizeFun)(EnginePtr, float, float);
+typedef void (*SetAssetDirPathFun)(const char*);
 typedef EntityID (*CreateEntityFun)(EnginePtr, std::size_t, const char*);
 typedef EntityID(*GetEntityAtPosFun)(EnginePtr, float, float);
 
@@ -133,6 +134,7 @@ namespace Editor {
 		ImVec2 getCameraPosition();
 		void setCameraPosition(float x, float y);
 		void setViewportSize(float width, float height);
+		void setAssetDirPath(const char* path);
 		EntityID createEntity(std::size_t sceneIndex, const char* name);
 		EntityID getEntityAtPos(float x, float y);
 
@@ -214,6 +216,7 @@ namespace Editor {
 		GetCameraPositionFun getCameraPositionFun;
 		SetCameraPositionFun setCameraPositionFun;
 		SetViewportSizeFun setViewportSizeFun;
+		SetAssetDirPathFun setAssetDirPathFun;
 		CreateEntityFun createEntityFun;
 		GetEntityAtPosFun getEntityAtPosFun;
 

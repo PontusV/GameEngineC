@@ -5,10 +5,10 @@ using namespace Core;
 
 
 Text::Text(std::wstring text, Font font, Color color)
-	: font(font), text(text), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/text"), color) {
+	: font(font), text(text), Graphic(0, ResourceManager::getInstance().loadShader("Shaders/text"), color) {
 } // Constructor
 Text::Text(std::string text, Font font, Color color)
-	: font(font), text(text.begin(), text.end()), Graphic(0, ResourceManager::getInstance().loadShader("resources/shaders/text"), color) {
+	: font(font), text(text.begin(), text.end()), Graphic(0, ResourceManager::getInstance().loadShader("Shaders/text"), color) {
 } // Constructor
 
 Text::Text() {

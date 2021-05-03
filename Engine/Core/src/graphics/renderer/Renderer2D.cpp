@@ -9,7 +9,7 @@ using namespace Core;
 
 Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
 	batch.init();
-	textShaderID = ResourceManager::getInstance().loadShader("resources/shaders/text").ID;
+	textShaderID = ResourceManager::getInstance().loadShader("Shaders/text").ID;
 }
 
 Renderer2D::~Renderer2D() {

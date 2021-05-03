@@ -42,6 +42,8 @@ namespace Editor {
 		/* Returns true if successful */
 		bool openSceneFromBackup(std::wstring srcPath, std::wstring destPath);
 		void closeScene(std::size_t sceneIndex);
+		/* Saves everything */
+		bool saveAll();
 
 		void updateEngineDLL(float& updateTime);
 		/* Loads and initializes the Engine DLL of the current project. Returns true if successful*/

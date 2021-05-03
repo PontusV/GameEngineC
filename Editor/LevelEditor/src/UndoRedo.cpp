@@ -110,6 +110,9 @@ void UndoRedoManager::registerUndo(std::unique_ptr<DoAction>&& action) {
 	if (it == stepsSinceSave.end()) {
 		stepsSinceSave[sceneIndex] = 0;
 	}
+	else {
+		it->second++;
+	}
 	undoStack.push_back(std::move(action));
 	redoStack.clear();
 }
@@ -119,6 +122,9 @@ void UndoRedoManager::registerRedo(std::unique_ptr<DoAction>&& action) {
 	auto it = stepsSinceSave.find(sceneIndex);
 	if (it != stepsSinceSave.end()) {
 		stepsSinceSave[sceneIndex] = 0;
+	}
+	else {
+		it->second--;
 	}
 	redoStack.push_back(std::move(action));
 }

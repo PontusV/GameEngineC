@@ -9,6 +9,7 @@
 #pragma comment(linker, "/export:setViewportSize")
 #pragma comment(linker, "/export:createEntity")
 #pragma comment(linker, "/export:getEntityAtPos")
+#pragma comment(linker, "/export:setAssetDirPath")
 // Transform / RectTransform
 #pragma comment(linker, "/export:getRectSize")
 #pragma comment(linker, "/export:getMinRectScreenPosition")
