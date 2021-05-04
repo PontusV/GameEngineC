@@ -18,12 +18,17 @@ typedef void* (*ReleaseEngineFun)(void*);
 typedef bool (*CreateTemplateEntityFun)(EnginePtr, std::size_t, const char*, float, float, float, float);
 typedef bool (*EngineInitFun)(EnginePtr, GLADloadproc, int, int);
 typedef void (*EngineTickFun)(EnginePtr, float);
-typedef void (*GetCameraPositionFun)(EnginePtr, float*);
-typedef void (*SetCameraPositionFun)(EnginePtr, float, float);
 typedef void (*SetViewportSizeFun)(EnginePtr, float, float);
 typedef void (*SetAssetDirPathFun)(const char*);
 typedef EntityID (*CreateEntityFun)(EnginePtr, std::size_t, const char*);
 typedef EntityID(*GetEntityAtPosFun)(EnginePtr, float, float);
+
+typedef void (*SetCameraPositionFun)(EnginePtr, float, float);
+typedef void (*SetCameraRotationFun)(EnginePtr, float);
+typedef void (*SetCameraScaleFun)(EnginePtr, float);
+typedef void (*GetCameraPositionFun)(EnginePtr, float*);
+typedef float (*GetCameraRotationFun)(EnginePtr);
+typedef float (*GetCameraScaleFun)(EnginePtr);
 
 typedef bool (*GetRectSizeFun)(EnginePtr, EntityID, float*);
 typedef bool (*GetMinRectScreenPositionFun)(EnginePtr, EntityID, float*);
@@ -131,12 +136,18 @@ namespace Editor {
 		bool createTemplateEntity(std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 		bool engineInit(GLADloadproc ptr, int screenWidth, int screenHeight);
 		void engineTick(float deltaTime);
-		ImVec2 getCameraPosition();
-		void setCameraPosition(float x, float y);
 		void setViewportSize(float width, float height);
 		void setAssetDirPath(const char* path);
 		EntityID createEntity(std::size_t sceneIndex, const char* name);
 		EntityID getEntityAtPos(float x, float y);
+
+		// Camera
+		void setCameraPosition(float x, float y);
+		void setCameraRotation(float scale);
+		void setCameraScale(float scale);
+		ImVec2 getCameraPosition();
+		float getCameraRotation();
+		float getCameraScale();
 
 		// Transform / RectTransform
 		ImVec2 getRectSize(EntityID entityID);
@@ -213,12 +224,17 @@ namespace Editor {
 		CreateTemplateEntityFun createTemplateEntityFun;
 		EngineInitFun engineInitFun;
 		EngineTickFun engineTickFun;
-		GetCameraPositionFun getCameraPositionFun;
-		SetCameraPositionFun setCameraPositionFun;
 		SetViewportSizeFun setViewportSizeFun;
 		SetAssetDirPathFun setAssetDirPathFun;
 		CreateEntityFun createEntityFun;
 		GetEntityAtPosFun getEntityAtPosFun;
+
+		SetCameraPositionFun setCameraPositionFun;
+		SetCameraRotationFun setCameraRotationFun;
+		SetCameraScaleFun setCameraScaleFun;
+		GetCameraPositionFun getCameraPositionFun;
+		GetCameraRotationFun getCameraRotationFun;
+		GetCameraScaleFun getCameraScaleFun;
 
 		GetRectSizeFun getRectSizeFun;
 		GetMinRectScreenPositionFun getMinRectScreenPositionFun;

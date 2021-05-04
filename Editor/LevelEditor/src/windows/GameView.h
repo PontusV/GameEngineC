@@ -18,7 +18,7 @@ namespace Editor {
 	/* The game view window */
 	class GameView {
 	public:
-		GameView(LevelEditor* engineDLL, UndoRedoManager* undoRedoManager);
+		GameView(LevelEditor* editor, UndoRedoManager* undoRedoManager);
 		~GameView();
 
 		void initialize(ImVec2 viewportSize);

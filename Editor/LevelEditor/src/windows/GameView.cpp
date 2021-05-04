@@ -50,19 +50,20 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 		if (scrollY != 0) {
 			float zoomDelta = -scrollY / 10;
 			setZoom(zoom + zoomDelta);
-			engineDLL->setCameraPosition(cameraPosition.x, cameraPosition.y);
+			grid.setZoom(zoom);
+			//engineDLL->setCameraPosition(cameraPosition.x, cameraPosition.y);
 			// TODO: Move camera to zoom towards/backwards from mouse pos?
 			//ImVec2 move = ImVec2((pMax.x - pMin.x) * zoomDelta / 2, (pMax.y - pMin.y) * zoomDelta / 2);
 			//cameraPosition = ImVec2(cameraPosition.x - move.x, cameraPosition.y - move.y);
 		}
 	}
 
-	ImVec2 currentViewportSize = ImVec2((pMax.x - pMin.x) * zoom, (pMax.y - pMin.y) * zoom);
+	ImVec2 currentViewportSize = ImVec2(pMax.x - pMin.x, pMax.y - pMin.y);
 	if (viewportSize.x != currentViewportSize.x || viewportSize.y != currentViewportSize.y) {
 		viewportSize = currentViewportSize;
 		viewport.setSize(viewportSize.x, viewportSize.y);
 		viewportBG.setSize(viewportSize.x, viewportSize.y, true);
-		grid.initialize(viewportSize.x, viewportSize.y, 100, zoom);
+		grid.initialize(viewportSize.x, viewportSize.y, 100);
 		engineDLL->setViewportSize(viewportSize.x, viewportSize.y);
 	}
 
@@ -87,9 +88,8 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 	if (target.entityID != 0) {
 		ImVec2 targetSize = engineDLL->getRectSize(target.entityID);
 		ImVec2 minPosition = engineDLL->getMinRectScreenPosition(target.entityID);
-		ImVec2 rectMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x + (minPosition.x / zoom), ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y + (minPosition.y / zoom));
-		ImVec2 scaledSize = ImVec2(targetSize.x / zoom, targetSize.y / zoom);
-		ImGui::GetWindowDrawList()->AddRect(rectMin, ImVec2(rectMin.x + scaledSize.x, rectMin.y + scaledSize.y), IM_COL32_WHITE, 0.0f, ImDrawCornerFlags_None, 2.0f);
+		ImVec2 rectMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x + (minPosition.x), ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y + (minPosition.y));
+		ImGui::GetWindowDrawList()->AddRect(rectMin, ImVec2(rectMin.x + (targetSize.x / zoom), rectMin.y + (targetSize.y / zoom)), IM_COL32_WHITE, 0.0f, ImDrawCornerFlags_None, 2.0f);
 	}
 
 	// Click target
@@ -97,7 +97,7 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 		pressed = true;
 		ImVec2 mousePos = ImGui::GetMousePos();
 		ImVec2 screenPosition = ImVec2(mousePos.x - pMin.x, mousePos.y - pMin.y);
-		ImVec2 position = ImVec2(screenPosition.x * zoom, screenPosition.y * zoom);
+		ImVec2 position = ImVec2(screenPosition.x, screenPosition.y);
 		if (!ImGui::GetIO().KeyShift) {
 			EntityID entityID = engineDLL->getEntityAtPos(position.x, position.y);
 			if (entityID != 0) {
@@ -187,6 +187,7 @@ void GameView::updateTargetData() {
 void GameView::setZoom(float value) {
 	if (value < 0.1f) return;
 	zoom = std::floor(value * 10) / 10;
+	editor->getEngineDLL()->setCameraScale(1.0f / zoom);
 }
 
 ImVec2 GameView::getViewportSize() const {

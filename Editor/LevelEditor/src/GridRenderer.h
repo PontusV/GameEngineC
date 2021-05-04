@@ -16,9 +16,11 @@ namespace Editor {
 		~GridRenderer();
 
 		/* Used for initialization and resizing. Calls cleanup before initializing to prevent memory leak */
-		void initialize(unsigned int width, unsigned int height, float spacing, float zoom = 1.0f);
+		void initialize(unsigned int width, unsigned int height, float spacing);
 		/* Renders the grid */
 		void render(float x, float y);
+
+		void setZoom(float value);
 
 	private:
 		void begin();
@@ -30,7 +32,7 @@ namespace Editor {
 		Shader shader;
 		unsigned int width, height; // Viewport size
 		unsigned int wCount, hCount; // Number of lines vertically and horizontally
-		float zoom; // Amount of zoom
+		float zoom = 1.0f; // Amount of zoom
 		float spacing; // Spacing between grid lines
 
 		unsigned int VAO, VBO;

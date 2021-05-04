@@ -53,6 +53,30 @@ void EngineDLLInterface::engineTick(float deltaTime) {
     engineTickFun(engine, deltaTime);
 }
 
+void EngineDLLInterface::setCameraPosition(float x, float y) {
+    if (setCameraPositionFun == nullptr) {
+        std::cout << "EngineDLLInterface::setCameraPosition::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setCameraPosition::ERROR The function ptr is nullptr";
+    }
+    setCameraPositionFun(engine, x, y);
+}
+
+void EngineDLLInterface::setCameraRotation(float value) {
+    if (setCameraRotationFun == nullptr) {
+        std::cout << "EngineDLLInterface::setCameraRotation::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setCameraRotation::ERROR The function ptr is nullptr";
+    }
+    setCameraRotationFun(engine, value);
+}
+
+void EngineDLLInterface::setCameraScale(float value) {
+    if (setCameraScaleFun == nullptr) {
+        std::cout << "EngineDLLInterface::setCameraScale::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setCameraScale::ERROR The function ptr is nullptr";
+    }
+    setCameraScaleFun(engine, value);
+}
+
 ImVec2 EngineDLLInterface::getCameraPosition() {
     if (getCameraPositionFun == nullptr) {
         std::cout << "EngineDLLInterface::getCameraPosition::ERROR The function ptr is nullptr" << std::endl;
@@ -62,12 +86,21 @@ ImVec2 EngineDLLInterface::getCameraPosition() {
     getCameraPositionFun(engine, buffer);
     return ImVec2(buffer[0], buffer[1]);
 }
-void EngineDLLInterface::setCameraPosition(float x, float y) {
-    if (setCameraPositionFun == nullptr) {
-        std::cout << "EngineDLLInterface::setCameraPosition::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::setCameraPosition::ERROR The function ptr is nullptr";
+
+float EngineDLLInterface::getCameraRotation() {
+    if (getCameraRotationFun == nullptr) {
+        std::cout << "EngineDLLInterface::getCameraRotation::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getCameraRotation::ERROR The function ptr is nullptr";
     }
-    setCameraPositionFun(engine, x, y);
+    return getCameraRotationFun(engine);
+}
+
+float EngineDLLInterface::getCameraScale() {
+    if (getCameraScaleFun == nullptr) {
+        std::cout << "EngineDLLInterface::getCameraScale::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getCameraScale::ERROR The function ptr is nullptr";
+    }
+    return getCameraScaleFun(engine);
 }
 
 void EngineDLLInterface::setViewportSize(float width, float height) {

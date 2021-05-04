@@ -161,6 +161,26 @@ void setCameraPosition(Core::Engine* engine, float x, float y) {
 	camera.setPosition(x, y);
 }
 
+void setCameraRotation(Core::Engine* engine, float value) {
+	Camera& camera = engine->getGraphics().getCamera();
+	camera.setRotation(value);
+}
+
+void setCameraScale(Core::Engine* engine, float value) {
+	Camera& camera = engine->getGraphics().getCamera();
+	camera.setScale(value);
+}
+
+float getCameraRotation(Core::Engine* engine) {
+	Camera& camera = engine->getGraphics().getCamera();
+	return camera.getRotation();
+}
+
+float getCameraScale(Core::Engine* engine) {
+	Camera& camera = engine->getGraphics().getCamera();
+	return camera.getScale();
+}
+
 void setViewportSize(Core::Engine* engine, float width, float height) {
 	engine->resizeViewport(width, height);
 }
@@ -203,9 +223,7 @@ bool getMinRectScreenPosition(Core::Engine* engine, EntityID entityID, float* ou
 	Entity entity = Entity(entityID);
 
 	if (RectTransform* rectTransform = entityManager.getComponent<RectTransform>(entity)) {
-		Vector2 rectOffset = rectTransform->getRectOffset();
-		Vector2 screenPosition = camera.getViewMatrix() * rectTransform->getPosition();
-		Vector2 minPosition = Vector2(screenPosition.x + rectOffset.x, screenPosition.y + rectOffset.y);
+		Vector2 minPosition = camera.getViewMatrix() * rectTransform->getVertex(0);
 		out[0] = minPosition.x;
 		out[1] = minPosition.y;
 		return true;

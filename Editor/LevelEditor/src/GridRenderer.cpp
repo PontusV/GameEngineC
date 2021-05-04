@@ -1,7 +1,6 @@
 #include "GridRenderer.h"
 #include "ResourceManager.h"
 #include <glad/glad.h>
-#include <cmath>
 #include <iostream>
 
 using namespace Editor;
@@ -27,19 +26,18 @@ void GridRenderer::cleanup() {
 	}
 }
 
-void GridRenderer::initialize(unsigned int width, unsigned int height, float spacing, float zoom) {
+void GridRenderer::initialize(unsigned int width, unsigned int height, float spacing) {
 	cleanup(); // Cleans up old OpenGL resources
 	shader = ResourceManager::getInstance().loadShader("resources/shaders/grid");
 	this->width = width;
 	this->height = height;
 	this->spacing = spacing;
-	this->zoom = zoom;
 	this->wCount = 0;
 	this->hCount = 0;
-	if (width == 0 || height == 0 || spacing == 0 || width > 10000 || height > 10000 || spacing > 10000) return;
+	if (width == 0 || height == 0 || spacing == 0 || width * zoom > 10000 || height * zoom > 10000 || spacing > 10000) return;
 
-	this->hCount = (height / spacing) + 2;
-	this->wCount = (width / spacing) + 2;
+	this->hCount = (height * zoom / spacing) + 2;
+	this->wCount = (width * zoom / spacing) + 2;
 	unsigned int vertexCount = (hCount * 2) + (wCount * 2);
 
 	glGetError(); //Clear errors
@@ -75,6 +73,8 @@ void GridRenderer::end() {
 
 void GridRenderer::render(float x, float y) {
 	if (width == 0 || height == 0 || spacing == 0 || width > 10000 || height > 10000 || spacing > 10000) return;
+	float width = this->width * zoom;
+	float height = this->height * zoom;
 
 	float offsetX = (std::fmodf(-x + width/2, spacing) * 2) / width;
 	float offsetY = (std::fmodf(y - height/2, spacing) * 2) / height;
@@ -103,8 +103,13 @@ void GridRenderer::render(float x, float y) {
 	glBindVertexArray(VAO);
 
 	// Draw
-	glLineWidth(std::ceil(zoom));
+	glLineWidth(1.0f);
 	glDrawArrays(GL_LINES, 0, vertexCount);
 
 	glBindVertexArray(0);
+}
+
+void GridRenderer::setZoom(float value) {
+	zoom = value;
+	initialize(width, height, spacing);
 }

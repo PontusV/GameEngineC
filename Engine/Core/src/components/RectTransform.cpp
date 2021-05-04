@@ -52,7 +52,7 @@ std::array<Vector2, 4> RectTransform::getVertices() const {
 }
 
 std::array<Vector2, 4> RectTransform::getVertices(const Matrix4& multMatrix) const {
-	Matrix4 matrix = localToWorldMatrix * localModelMatrix * multMatrix;
+	Matrix4 matrix = multMatrix * localToWorldMatrix * localModelMatrix;
 	return {
 		getVertex(0, matrix),
 		getVertex(1, matrix),
@@ -66,7 +66,7 @@ Vector2 RectTransform::getVertex(std::size_t index) const {
 	return getVertex(index, matrix);
 }
 
-Vector2 RectTransform::getVertex(std::size_t index, Matrix4& matrix) const {
+Vector2 RectTransform::getVertex(std::size_t index, const Matrix4& matrix) const {
 	Vector2 pos = getRectOffset();
 	if (index == 0) {
 		return matrix * pos;

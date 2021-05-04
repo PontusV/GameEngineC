@@ -115,6 +115,7 @@ void Engine::resizeViewport(unsigned int width, unsigned int height) {
 	graphics.getWindow().setResolution(width, height);
 	graphics.getRenderer().updateSize(width, height);
 	graphics.getCamera().updateViewMatrix();
+	graphics.getCamera().setProjectionMatrix(projection);
 	// Notify UIBehaviours
 	guiSystem.onWindowResize(); // TODO: onViewportResize?
 }

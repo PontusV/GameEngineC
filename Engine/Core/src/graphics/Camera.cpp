@@ -49,6 +49,18 @@ void Camera::setRotation(float value) {
 	rotation = value;
 }
 
+float Camera::getRotation() {
+	return rotation;
+}
+
+float Camera::getScale() {
+	return scale;
+}
+
+void Camera::setScale(float value) {
+	scale = value;
+}
+
 const Matrix4& Camera::getWorldToScreenMatrix() const {
 	return worldToScreenMatrix;
 }
@@ -64,7 +76,16 @@ void Camera::updateViewMatrix() {
 
 	viewMatrix = maths::translate(viewMatrix, Vector3(center.x, center.y, 0.0f));
 	viewMatrix = maths::rotate(viewMatrix, -rotation, Vector3(0.0f, 0.0f, 1.0f));
+	viewMatrix = maths::scale(viewMatrix, Vector3(scale, scale, 1.0f));
 	viewMatrix = maths::translate(viewMatrix, Vector3(-position.x,-position.y, 0.0f));
 
 	worldToScreenMatrix = maths::inverse(viewMatrix);
+}
+
+void Camera::setProjectionMatrix(Matrix4& matrix) {
+	projection = matrix;
+}
+
+const Matrix4& Camera::getProjectionMatrix() const {
+	return projection;
 }

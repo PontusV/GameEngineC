@@ -51,11 +51,27 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, setCameraPositionFun, "setCameraPosition")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setCameraRotationFun, "setCameraRotation")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setCameraScaleFun, "setCameraScale")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, getCameraPositionFun, "getCameraPosition")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, setCameraPositionFun, "setCameraPosition")) {
+    if (!loadFunctionFromDLL(handle, getCameraRotationFun, "getCameraRotation")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getCameraScaleFun, "getCameraScale")) {
         unload();
         return false;
     }
@@ -313,8 +329,12 @@ bool EngineDLL::unload() {
     createTemplateEntityFun = nullptr;
     engineInitFun = nullptr;
     engineTickFun = nullptr;
-    getCameraPositionFun = nullptr;
     setCameraPositionFun = nullptr;
+    setCameraRotationFun = nullptr;
+    setCameraScaleFun = nullptr;
+    getCameraPositionFun = nullptr;
+    getCameraRotationFun = nullptr;
+    getCameraScaleFun = nullptr;
     setViewportSizeFun = nullptr;
     setAssetDirPathFun = nullptr;
     createEntityFun = nullptr;

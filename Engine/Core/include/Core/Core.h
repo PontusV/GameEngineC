@@ -45,12 +45,18 @@ extern "C" {
 	DLLEXPORT bool createTemplateEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 	DLLEXPORT bool engineInit(Core::Engine* engine, GLADloadproc ptr, int screenWidth, int screenHeight);
 	DLLEXPORT void engineTick(Core::Engine* engine, float deltaTime);
-	DLLEXPORT void getCameraPosition(Core::Engine* engine, float* out);
-	DLLEXPORT void setCameraPosition(Core::Engine* engine, float x, float y);
 	DLLEXPORT void setViewportSize(Core::Engine* engine, float width, float height);
 	DLLEXPORT void setAssetDirPath(const char* path);
 	DLLEXPORT EntityID createEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name);
 	DLLEXPORT EntityID getEntityAtPos(Core::Engine* engine, float x, float y);
+
+	// Camera
+	DLLEXPORT void setCameraPosition(Core::Engine* engine, float x, float y);
+	DLLEXPORT void setCameraRotation(Core::Engine* engine, float scale);
+	DLLEXPORT void setCameraScale(Core::Engine* engine, float scale);
+	DLLEXPORT void getCameraPosition(Core::Engine* engine, float* out);
+	DLLEXPORT float getCameraRotation(Core::Engine* engine);
+	DLLEXPORT float getCameraScale(Core::Engine* engine);
 
 	// Transform / RectTransform
 	DLLEXPORT bool getRectSize(Core::Engine* engine, EntityID entityID, float* out);
