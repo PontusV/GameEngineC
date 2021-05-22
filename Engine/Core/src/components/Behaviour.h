@@ -78,7 +78,7 @@ namespace Core {
 		bool active = false;
 	public:
 		bool started = false;
-		bool runInEditMode = true;
+		bool runInEditMode = false;
 
 		static Input* input;
 		static Window* window;

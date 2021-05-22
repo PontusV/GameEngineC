@@ -83,6 +83,7 @@ ScenePtr SceneManager::loadSceneImpl(const wchar_t* filePath, std::wstring name)
 	ScenePtr scene = std::make_shared<Scene>(entityManager, name);
 	scene->deserialize(file);
 	file.close();
+	scene->processQueue();
 	scene->awake();
 	return scene;
 }

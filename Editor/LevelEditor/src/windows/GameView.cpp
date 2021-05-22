@@ -77,7 +77,7 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 	viewport.begin();
 	glClearColor(0.0, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	engineDLL->engineTick(deltaTime);
+	engineDLL->engineEditorTick(deltaTime);
 	viewport.end();
 
 	// Scene

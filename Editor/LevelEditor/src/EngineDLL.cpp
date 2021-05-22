@@ -51,6 +51,10 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, engineEditorTickFun, "engineEditorTick")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, setCameraPositionFun, "setCameraPosition")) {
         unload();
         return false;
@@ -329,6 +333,7 @@ bool EngineDLL::unload() {
     createTemplateEntityFun = nullptr;
     engineInitFun = nullptr;
     engineTickFun = nullptr;
+    engineEditorTickFun = nullptr;
     setCameraPositionFun = nullptr;
     setCameraRotationFun = nullptr;
     setCameraScaleFun = nullptr;

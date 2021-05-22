@@ -45,6 +45,7 @@ extern "C" {
 	DLLEXPORT bool createTemplateEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 	DLLEXPORT bool engineInit(Core::Engine* engine, GLADloadproc ptr, int screenWidth, int screenHeight);
 	DLLEXPORT void engineTick(Core::Engine* engine, float deltaTime);
+	DLLEXPORT void engineEditorTick(Core::Engine* engine, float deltaTime);
 	DLLEXPORT void setViewportSize(Core::Engine* engine, float width, float height);
 	DLLEXPORT void setAssetDirPath(const char* path);
 	DLLEXPORT EntityID createEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name);

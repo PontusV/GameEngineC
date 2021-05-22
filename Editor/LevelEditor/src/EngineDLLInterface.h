@@ -18,6 +18,7 @@ typedef void* (*ReleaseEngineFun)(void*);
 typedef bool (*CreateTemplateEntityFun)(EnginePtr, std::size_t, const char*, float, float, float, float);
 typedef bool (*EngineInitFun)(EnginePtr, GLADloadproc, int, int);
 typedef void (*EngineTickFun)(EnginePtr, float);
+typedef void (*EngineEditorTickFun)(EnginePtr, float);
 typedef void (*SetViewportSizeFun)(EnginePtr, float, float);
 typedef void (*SetAssetDirPathFun)(const char*);
 typedef EntityID (*CreateEntityFun)(EnginePtr, std::size_t, const char*);
@@ -136,6 +137,7 @@ namespace Editor {
 		bool createTemplateEntity(std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 		bool engineInit(GLADloadproc ptr, int screenWidth, int screenHeight);
 		void engineTick(float deltaTime);
+		void engineEditorTick(float deltaTime);
 		void setViewportSize(float width, float height);
 		void setAssetDirPath(const char* path);
 		EntityID createEntity(std::size_t sceneIndex, const char* name);
@@ -224,6 +226,7 @@ namespace Editor {
 		CreateTemplateEntityFun createTemplateEntityFun;
 		EngineInitFun engineInitFun;
 		EngineTickFun engineTickFun;
+		EngineEditorTickFun engineEditorTickFun;
 		SetViewportSizeFun setViewportSizeFun;
 		SetAssetDirPathFun setAssetDirPathFun;
 		CreateEntityFun createEntityFun;

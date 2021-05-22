@@ -4,6 +4,7 @@
 #pragma comment(linker, "/export:createTemplateEntity")
 #pragma comment(linker, "/export:engineInit")
 #pragma comment(linker, "/export:engineTick")
+#pragma comment(linker, "/export:engineEditorTick")
 #pragma comment(linker, "/export:setViewportSize")
 #pragma comment(linker, "/export:createEntity")
 #pragma comment(linker, "/export:getEntityAtPos")

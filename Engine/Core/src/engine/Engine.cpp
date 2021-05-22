@@ -200,6 +200,11 @@ void Engine::tick(float deltaTime) {
 	behaviourManager.onPostRender(deltaTime);
 }
 
+void Engine::editorTick(float deltaTime) {
+	physics.update(deltaTime);
+	graphics.render(deltaTime);
+}
+
 Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physics(), behaviourManager(this) {
 }
 

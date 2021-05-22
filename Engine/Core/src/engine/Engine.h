@@ -24,6 +24,8 @@ namespace Core {
 		int start();
 		/* Runs one tick of the game. Handles input, updates systems and renders */
 		void tick(float deltaTime);
+		/* Runs one tick of the game in editor mode */
+		void editorTick(float deltaTime);
 		/* Stops the game loop and terminates glfw */
 		void terminate();
 

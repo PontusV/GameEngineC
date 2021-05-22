@@ -149,6 +149,10 @@ void engineTick(Core::Engine* engine, float deltaTime) {
 	engine->tick(deltaTime);
 }
 
+void engineEditorTick(Core::Engine* engine, float deltaTime) {
+	engine->editorTick(deltaTime);
+}
+
 void getCameraPosition(Core::Engine* engine, float* out) {
 	Camera& camera = engine->getGraphics().getCamera();
 	Vector2 vec = camera.getPosition();
