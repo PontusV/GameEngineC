@@ -314,7 +314,7 @@ void LevelEditor::terminate(bool force) {
 }
 
 bool LevelEditor::createProject(std::wstring name, std::wstring path) {
-	if (!isInEditMode()) return;
+	if (!isInEditMode()) return false;
 	// TODO: Check if there already is a project inside selected path
 	ProjectSettings newProject = ProjectSettings::create(name.c_str(), path.c_str());
 	if (!newProject.isLoaded()) {
