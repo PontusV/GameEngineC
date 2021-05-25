@@ -314,6 +314,7 @@ void LevelEditor::terminate(bool force) {
 }
 
 bool LevelEditor::createProject(std::wstring name, std::wstring path) {
+	if (!isInEditMode()) return;
 	// TODO: Check if there already is a project inside selected path
 	ProjectSettings newProject = ProjectSettings::create(name.c_str(), path.c_str());
 	if (!newProject.isLoaded()) {
@@ -347,7 +348,7 @@ bool LevelEditor::createProject(std::wstring name, std::wstring path) {
 }
 
 void LevelEditor::closeProject() {
-	if (!projectSettings.isLoaded()) return;
+	if (!isInEditMode() || !projectSettings.isLoaded()) return;
 	if (engineDLL.isLoaded()) {
 		unloadEngine();
 	}
@@ -356,7 +357,7 @@ void LevelEditor::closeProject() {
 }
 
 void LevelEditor::openProject(std::wstring path) {
-	if (path.empty()) return;
+	if (!isInEditMode() || path.empty()) return;
 	closeProject();
 	std::size_t seperator = path.find_last_of(L"\\");
 	if (seperator == std::wstring::npos) {
@@ -390,6 +391,7 @@ void LevelEditor::openProject(std::wstring path) {
 }
 
 bool LevelEditor::openScene(std::wstring path) {
+	if (!isInEditMode()) return false;
 	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
 		return false;
@@ -417,6 +419,7 @@ bool LevelEditor::openSceneFromBackup(std::wstring srcPath, std::wstring destPat
 }
 
 void LevelEditor::closeScene(std::size_t sceneIndex) {
+	if (!isInEditMode()) return;
 	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to close scene because the Engine has not been loaded" << std::endl;
 		return;
@@ -558,6 +561,7 @@ bool LevelEditor::reloadEngine(std::wstring path) {
 }
 
 bool LevelEditor::buildGame() {
+	if (!isInEditMode()) return false;
 	std::cout << "Build game is currently a WIP" << std::endl;
 	return false;
 }

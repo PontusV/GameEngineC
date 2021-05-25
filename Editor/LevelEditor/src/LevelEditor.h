@@ -48,6 +48,7 @@ namespace Editor {
 		/* Saves everything */
 		bool saveAll();
 
+		/* Checks if Engine DLL may be reloaded */
 		void updateEngineDLL(float& updateTime);
 		/* Loads and initializes the Engine DLL of the current project. Returns true if successful*/
 		bool loadEngine(std::wstring path);
@@ -77,8 +78,6 @@ namespace Editor {
 		bool saveCurrentScenesAsBackups();
 		bool loadPreviousScenesFromBackups();
 	private:
-		std::vector<std::pair<std::wstring, std::wstring>> tempScenes;
-	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;
 
@@ -89,6 +88,7 @@ namespace Editor {
 		bool running = false;
 		bool editMode = true;
 		bool paused = false;
+		std::vector<std::pair<std::wstring, std::wstring>> tempScenes;
 
 		PopupManager popupManager;
 		Menubar menubar;

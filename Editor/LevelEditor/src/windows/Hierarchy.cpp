@@ -119,15 +119,17 @@ void Hierarchy::tick(EntityID target) {
 				editor->getPopupManager()->openCreateEntity(sceneIndex);
 			}
 			if (ImGui::Selectable("Save", false)) {
-				if (engineDLL->isLoaded()) {
+				if (editor->isInEditMode() && engineDLL->isLoaded()) {
 					engineDLL->saveScene(sceneIndex);
 				}
 			}
 			if (ImGui::Selectable("Save and Close", false)) {
-				if (engineDLL->isLoaded()) {
-					engineDLL->saveScene(sceneIndex);
+				if (editor->isInEditMode()) {
+					if (engineDLL->isLoaded()) {
+						engineDLL->saveScene(sceneIndex);
+					}
+					editor->closeScene(sceneIndex);
 				}
-				editor->closeScene(sceneIndex);
 			}
 			ImGui::EndPopup();
 		}
