@@ -22,7 +22,7 @@ using namespace Editor;
 constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
 ImVec2 resolutionDefault = ImVec2(600, 480);
 
-LevelEditor::LevelEditor() : undoRedoManager(&engineDLL), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
+LevelEditor::LevelEditor() : undoRedoManager(&engineDLL), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager, &popupManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
 }
 
 
@@ -35,6 +35,11 @@ LevelEditor::~LevelEditor() {
 
 static void glfw_error_callback(int error, const char* description) {
 	fprintf(stderr, "Editor Glfw Error %d: %s\n", error, description);
+}
+
+static void glfw_window_close_callback(GLFWwindow* window) {
+	LevelEditor* editor = static_cast<LevelEditor*>(glfwGetWindowUserPointer(window));
+	editor->terminate();
 }
 
 Matrix4 ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
@@ -74,6 +79,8 @@ int LevelEditor::initiate() {
 	}
 	glfwMakeContextCurrent(glfwWindow);
 	glfwSwapInterval(0); //0 = DISABLES VSYNC, 1 = ENABLES VSYNC
+	glfwSetWindowUserPointer(glfwWindow, this);
+	glfwSetWindowCloseCallback(glfwWindow, glfw_window_close_callback);
 
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
@@ -185,7 +192,7 @@ int LevelEditor::start() {
 	running = true;
 
 	GLfloat engineDLLUpdateTime = 0.0f;
-	while (running && !glfwWindowShouldClose(window)) {
+	while (running) {
 		// Calculate delta time
 		GLfloat currentFrame = (GLfloat)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -228,204 +235,29 @@ int LevelEditor::start() {
 		bool open_create_project_popup = false;
 		bool open_create_scene_popup = false;
 
-		if (ImGui::IsKeyPressed(GLFW_KEY_Z) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			undoRedoManager.undo();
-		}
-		else if (ImGui::IsKeyPressed(GLFW_KEY_Y) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			undoRedoManager.redo();
-		}
-		else if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			saveAll();
-		}
-
-		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::BeginMenu("New")) {
-					if (ImGui::MenuItem("New Project")) {
-						open_create_project_popup = true;
-					}
-					if (ImGui::MenuItem("New Scene", nullptr, nullptr, engineDLL.isLoaded() && projectSettings.isLoaded())) {
-						open_create_scene_popup = true;
-					}
-					ImGui::EndMenu();
-				}
-				if (ImGui::BeginMenu("Open")) {
-					if (ImGui::MenuItem("Open Project")) {
-						std::wstring filePath = getOpenFileName(L"Select A File", L"All Project Files\0*.proj;\0", 1);
-
-						if (!filePath.empty()) {
-							openProject(filePath);
-						}
-					}
-					ImGui::EndMenu();
-				}
-				if (ImGui::MenuItem("Save Project", "Ctrl+S", nullptr, projectSettings.isLoaded())) { // TODO: Keybind
-					projectSettings.save();
-				}
-				auto loadedSceneCount = engineDLL.getSceneCount();
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, engineDLL.isLoaded() && projectSettings.isLoaded() && loadedSceneCount > 0)) { // TODO: Keybind
-					saveAll();
-				}
-				if (ImGui::MenuItem("Reload", nullptr, nullptr, projectSettings.isLoaded() && engineDLL.isLoaded())) {
-					std::wstring path = copyEngineDLL();
-					if (!path.empty()) {
-						reloadEngine(path);
-					}
-				}
-				if (ImGui::MenuItem("Build", nullptr, nullptr, projectSettings.isLoaded())) {
-					buildGame();
-				}
-				if (ImGui::MenuItem("Exit", "Alt+F4")) {
-					terminate();
-				}
-				ImGui::EndMenu();
+		if (isInEditMode()) {
+			if (ImGui::IsKeyPressed(GLFW_KEY_Z) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+				undoRedoManager.undo();
 			}
-			if (ImGui::BeginMenu("Edit")) {
-				if (ImGui::MenuItem("Undo", "CTRL+Z", false, undoRedoManager.isUndoAvailable())) {
-					undoRedoManager.undo();
-					gameView.updateTargetData();
-				}
-				if (ImGui::MenuItem("Redo", "CTRL+Y", false, undoRedoManager.isRedoAvailable())) {
-					undoRedoManager.redo();
-				}
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "CTRL+X")) {
-					fileView.cut();
-				}
-				if (ImGui::MenuItem("Copy", "CTRL+C")) {
-					fileView.copy();
-				}
-				if (ImGui::MenuItem("Paste", "CTRL+V")) {
-					fileView.paste();
-				}
-				ImGui::EndMenu();
+			else if (ImGui::IsKeyPressed(GLFW_KEY_Y) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+				undoRedoManager.redo();
 			}
-			if (ImGui::BeginMenu("Game Object")) {
-				if (ImGui::MenuItem("Create new")) {
-					open_create_entity_popup = true;
-				}
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
-		}
-
-		static std::wstring dirPath = L"";
-		static bool chooseDirPath = false;
-
-		if (open_create_scene_popup && engineDLL.isLoaded() && projectSettings.isLoaded()) {
-			std::wstring path = getSaveFileName(L"Choose scene location", L"Scene\0*.scene;\0", 1, projectSettings.getPath().c_str());
-			if (!path.empty()) {
-				if (!path.ends_with(SCENE_FILE_TYPE)) {
-					path.append(SCENE_FILE_TYPE);
-				}
-				std::size_t nameStartIndex = path.find_last_of(L"\\");
-				std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
-				std::string encodedName = utf8_encode(fileName.substr(0, fileName.find_last_of(L".")));
-				std::string encodedPath = utf8_encode(path);
-				engineDLL.createScene(encodedName.c_str(), encodedPath.c_str());
-				projectSettings.addOpenScene(path);
-				projectSettings.save();
+			else if (ImGui::IsKeyPressed(GLFW_KEY_S) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+				saveAll();
 			}
 		}
 
-		if (open_create_project_popup) {
-			ImGui::OpenPopup("create_project_popup");
-			chooseDirPath = true;
-		}
+		menubar.tick(this, editMode);
+		popupManager.tick(this);
+		toolbar.tick(this);
 
-		if (ImGui::BeginPopupModal("create_project_popup", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			static std::string errorMessage = "";
-			if (!errorMessage.empty()) {
-				ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
-			}
-			static char buffer[64] = "";
-			if (ImGui::Button("Choose directory")) {
-				chooseDirPath = true;
-			}
-			ImGui::Text(utf8_encode(dirPath).append(dirPath.ends_with(L"\\") ? "" : "\\").append(buffer).c_str());
-			ImGui::InputText("Project name", buffer, 64);
-
-			if (ImGui::Button("Create", ImVec2(120, 0))) {
-				std::wstring name = utf8_decode(buffer);
-				std::wstring path = std::wstring(dirPath).append(path.ends_with(L"/") || path.ends_with(L"\\") ? L"" : L"/").append(name);
-
-				if (createProject(name, path)) {
-					openProject(path);
-					errorMessage = "";
-					dirPath = L"";
-					memset(buffer, 0, 64);
-					ImGui::CloseCurrentPopup();
-				}
-				else {
-					errorMessage = "Failed to create new project!";
-				}
-			}
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-				errorMessage = "";
-				dirPath = L"";
-				ImGui::CloseCurrentPopup();
-			}
-			if (chooseDirPath) {
-				dirPath = getOpenFolderName(L"Choose project location");
-				chooseDirPath = false;
-				if (dirPath.empty()) {
-					ImGui::CloseCurrentPopup();
-				}
-			}
-			ImGui::EndPopup();
-		}
-
-		if (open_create_entity_popup)
-			ImGui::OpenPopup("create_entity_popup");
-
-		if (ImGui::BeginPopupModal("create_entity_popup", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			if (engineDLL.isLoaded()) {
-				static std::string errorMessage = "";
-				if (!errorMessage.empty()) {
-					ImGui::TextColored(ImVec4(1, 0, 0, 1), errorMessage.c_str());
-				}
-				static char buffer[64] = "";
-				ImGui::InputText("Name", buffer, 64);
-
-				if (ImGui::Button("Create", ImVec2(120, 0))) {
-					std::string name = std::string(buffer);
-					if (engineDLL.isEntityNameAvailable(name.c_str())) {
-						std::size_t sceneIndex = hierarchy.getActiveSceneIndex();
-						ImVec2 cameraPosition = engineDLL.getCameraPosition();
-						float width = 350;
-						float height = 350;
-						if (engineDLL.createTemplateEntity(sceneIndex, name.c_str(), cameraPosition.x, cameraPosition.y, width, height)) {
-							undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(sceneIndex, name)));
-						}
-						errorMessage = "";
-						memset(buffer, 0, 64);
-						ImGui::CloseCurrentPopup();
-					}
-					else {
-						errorMessage = "Name is already taken!";
-					}
-				}
-				ImGui::SetItemDefaultFocus();
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-					errorMessage = "";
-					ImGui::CloseCurrentPopup();
-				}
-			}
-			else {
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
-		}
 		ImGui::End();
 
 		// Inspector window
 		ImGui::SetNextWindowDockID(dockspaceID, ImGuiCond_FirstUseEver);
 		inspector.tick();
 		// Game view window
-		gameView.tick(deltaTime, currentFPS);
+		gameView.tick(paused ? 0 : deltaTime, editMode, currentFPS);
 		EntityTargetData target = gameView.getTarget();
 		hierarchy.tick(target.entityID);
 		// File view window
@@ -457,9 +289,28 @@ int LevelEditor::start() {
 	return 0;
 }
 
-void LevelEditor::terminate() {
-	// TODO: Check for unsaved changes
-	running = false;
+void LevelEditor::terminate(bool force) {
+	if (force) {
+		running = false;
+		return;
+	}
+	if (!isInEditMode()) {
+		setEditMode(true);
+	}
+	bool hasUnsavedChanges = false;
+	std::size_t sceneCount = engineDLL.getSceneCount();
+	for (std::size_t i = 0; i < sceneCount; i++) {
+		if (undoRedoManager.getStepsSinceSave(i) != 0) {
+			hasUnsavedChanges = true;
+			break;
+		}
+	}
+	if (hasUnsavedChanges) {
+		popupManager.openSaveChanges();
+	}
+	else {
+		running = false;
+	}
 }
 
 bool LevelEditor::createProject(std::wstring name, std::wstring path) {
@@ -686,10 +537,14 @@ bool LevelEditor::reloadEngine(std::wstring path) {
 		tempScenes[i] = std::make_pair(encodedScenePath, destScenePath);
 	}
 	std::string targetName = gameView.getTarget().entityName;
+	ImVec2 cameraPosition = engineDLL.getCameraPosition();
 	// End of save state
 	unloadEngine();
 	loadEngine(path);
 	// Load state
+	engineDLL.setCameraScale(1.0f / gameView.getZoom());
+	engineDLL.setCameraPosition(cameraPosition.x, cameraPosition.y);
+
 	projectSettings.clearOpenScenes();
 	for (auto scene : tempScenes) {
 		engineDLL.loadSceneBackup(scene.first.c_str(), scene.second.c_str());
@@ -708,6 +563,7 @@ bool LevelEditor::buildGame() {
 }
 
 bool LevelEditor::saveAll() {
+	if (!isInEditMode()) return false;
 	std::size_t loadedSceneCount = engineDLL.getSceneCount();
 	for (std::size_t i = 0; i < loadedSceneCount; i++) {
 		engineDLL.saveScene(i);
@@ -715,4 +571,87 @@ bool LevelEditor::saveAll() {
 	}
 	projectSettings.save();
 	editorSettings.save();
+}
+
+bool LevelEditor::isInEditMode() const {
+	return editMode;
+}
+
+void LevelEditor::setEditMode(bool value) {
+	if (editMode == value) return;
+	editMode = value;
+	// TODO: EditMode = false, disable save, disable UndoRedoStack
+	if (value) {
+		gameView.releaseTarget();
+		std::size_t sceneCount = engineDLL.getSceneCount();
+		for (std::size_t i = 0; i < sceneCount; i++) {
+			engineDLL.unloadScene(0);
+		}
+		projectSettings.clearOpenScenes();
+		loadPreviousScenesFromBackups();
+		undoRedoManager.enable();
+	}
+	else {
+		saveCurrentScenesAsBackups();
+		undoRedoManager.disable();
+	}
+}
+
+bool LevelEditor::isPaused() const {
+	return paused;
+}
+
+void LevelEditor::setPaused(bool value) {
+	paused = value;
+}
+
+ProjectSettings* LevelEditor::getProjectSettings() {
+	return &projectSettings;
+}
+
+UndoRedoManager* LevelEditor::getUndoRedoManager() {
+	return &undoRedoManager;
+}
+
+GameView* LevelEditor::getGameView() {
+	return &gameView;
+}
+
+FileView* LevelEditor::getFileView() {
+	return &fileView;
+}
+
+PopupManager* LevelEditor::getPopupManager() {
+	return &popupManager;
+}
+
+bool LevelEditor::saveCurrentScenesAsBackups() {
+	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
+	std::size_t sceneCount = engineDLL.getSceneCount();
+	tempScenes.resize(sceneCount);
+	for (std::size_t i = 0; i < sceneCount; i++) {
+		std::wstring scenePath = tempEditorDirectory + std::wstring(L"Backup_") + std::to_wstring(i) + SCENE_FILE_TYPE;
+		std::string encodedScenePath = utf8_encode(scenePath);
+		std::string destScenePath = engineDLL.getSceneFilePath(i);
+		if (!engineDLL.saveSceneBackup(i, encodedScenePath.c_str())) {
+			std::wcout << L"Failed to save scene backup. Path: " << scenePath << std::endl;
+			return false;
+		}
+		tempScenes[i] = std::make_pair(scenePath, utf8_decode(destScenePath));
+	}
+	return true;
+}
+
+bool LevelEditor::loadPreviousScenesFromBackups() {
+	bool success = true;
+	for (auto scene : tempScenes) {
+		if (!openSceneFromBackup(scene.first.c_str(), scene.second.c_str())) {
+			std::wcout << L"Failed to load backup at path: " << scene.first << std::endl;
+			success = false;
+		}
+		if (!std::filesystem::remove(scene.first.c_str())) {
+			std::wcout << L"Failed to cleanup temp scene file: " << scene.first << std::endl;
+		}
+	}
+	return success;
 }

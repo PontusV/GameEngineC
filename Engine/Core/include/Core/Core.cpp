@@ -557,7 +557,7 @@ void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size
 }
 
 EntityID getEntityFromName(Core::Engine* engine, const char* name) {
-	if (name == nullptr) return Entity::INVALID_ID;
+	if (name == nullptr || name == "" || name[0] == '\0') return Entity::INVALID_ID;
 	EntityManager& entityManager = engine->getEntityManager();
 	return entityManager.getEntity(name).getID();
 }

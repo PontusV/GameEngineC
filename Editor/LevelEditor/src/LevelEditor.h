@@ -6,6 +6,9 @@
 #include "windows/Inspector.h"
 #include "windows/Hierarchy.h"
 #include "windows/FileView.h"
+#include "ui/Menubar.h"
+#include "ui/PopupManager.h"
+#include "ui/Toolbar.h"
 #include "EngineDLL.h"
 #include "UndoRedo.h"
 #include <string>
@@ -27,7 +30,7 @@ namespace Editor {
 		int initiate();
 		/* Start the engine and rendering of the editor imgui */
 		int start();
-		void terminate();
+		void terminate(bool force = false);
 
 		/* Returns the name of the currently opened project */
 		std::wstring getProjectName();
@@ -57,8 +60,24 @@ namespace Editor {
 		/* Copies the Engine.dll from the Engine build path to the temp Editor directory. Returns the path to the DLL in the temp directory. Returns an empty string if unsuccessful */
 		std::wstring copyEngineDLL();
 
+		bool isInEditMode() const;
+		void setEditMode(bool value);
+		bool isPaused() const;
+		void setPaused(bool value);
+
+		ProjectSettings* getProjectSettings();
+		UndoRedoManager* getUndoRedoManager();
+		GameView* getGameView();
+		FileView* getFileView();
+		PopupManager* getPopupManager();
+
 		EngineDLL* getEngineDLL();
 		Hierarchy* getHierarchy();
+	private:
+		bool saveCurrentScenesAsBackups();
+		bool loadPreviousScenesFromBackups();
+	private:
+		std::vector<std::pair<std::wstring, std::wstring>> tempScenes;
 	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;
@@ -66,13 +85,19 @@ namespace Editor {
 		EngineDLL engineDLL;
 		UndoRedoManager undoRedoManager;
 
+		GLFWwindow* glfwWindow;
+		bool running = false;
+		bool editMode = true;
+		bool paused = false;
+
+		PopupManager popupManager;
+		Menubar menubar;
+		Toolbar toolbar;
+
 		GameView gameView;
 		Inspector inspector;
 		Hierarchy hierarchy;
 		FileView fileView;
-
-		GLFWwindow* glfwWindow;
-		bool running = false;
 	};
 }
 #endif

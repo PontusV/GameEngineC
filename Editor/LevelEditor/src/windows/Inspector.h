@@ -10,12 +10,13 @@ namespace Editor {
 	class GameView;
 	class ProjectSettings;
 	class UndoRedoManager;
+	class PopupManager;
 	class EngineDLL;
 
 	/* The game view window */
 	class Inspector {
 	public:
-		Inspector(EngineDLL* engineDLL, GameView* gameView, UndoRedoManager* undoRedoManager);
+		Inspector(EngineDLL* engineDLL, GameView* gameView, UndoRedoManager* undoRedoManager, PopupManager* popupManager);
 		~Inspector();
 
 		/* Renders ImGui window */
@@ -28,6 +29,7 @@ namespace Editor {
 		GameView* gameView;
 		EngineDLL* engineDLL;
 		UndoRedoManager* undoRedoManager;
+		PopupManager* popupManager;
 
 		EntityID prevTarget = 0;
 		bool renameActive = false;

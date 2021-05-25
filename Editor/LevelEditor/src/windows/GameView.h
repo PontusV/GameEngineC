@@ -24,16 +24,17 @@ namespace Editor {
 		void initialize(ImVec2 viewportSize);
 
 		/* Renders imGui window and updates the game */
-		void tick(float deltaTime, std::size_t fpsCount);
+		void tick(float deltaTime, bool editMode, std::size_t fpsCount);
 
 		EntityTargetData getTarget();
 		void setTarget(EntityID entityID);
 		void updateTargetData();
-		/* Releases allocated memory by Engine DLL and assigns the pointer of target a value of nullptr */
+		/* Removes target */
 		void releaseTarget();
 
 		/* @param value A value of 1.0 equals 100% */
 		void setZoom(float value);
+		float getZoom() const;
 		ImVec2 getViewportSize() const;
 
 	private:

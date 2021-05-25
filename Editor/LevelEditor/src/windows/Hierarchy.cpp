@@ -112,8 +112,11 @@ void Hierarchy::tick(EntityID target) {
 			ImGui::OpenPopup(scenePopupId.c_str());
 		}
 		if (ImGui::BeginPopup(scenePopupId.c_str())) {
-			if (ImGui::Selectable("New Entity (WIP)", false)) {
-				ImGui::OpenPopup("create_entity_popup"); // TODO: WIP. CURRENTLY DOES NOT WORK. Target this scene
+			if (ImGui::Selectable("Make Active scene", activeSceneIndex == sceneIndex)) {
+				setActiveSceneIndex(sceneIndex);
+			}
+			if (ImGui::Selectable("New Entity", false)) {
+				editor->getPopupManager()->openCreateEntity(sceneIndex);
 			}
 			if (ImGui::Selectable("Save", false)) {
 				if (engineDLL->isLoaded()) {
@@ -194,7 +197,7 @@ EntityHierarchy createEntityHierarchy(EngineDLL* engineDLL, const std::vector<En
 	for (std::size_t i = 0; i < count; i++) {
 		EntityID childID = engineDLL->getEntityChild(entity.id, i);
 		EntityData child = getEntityData(entities, childID);
-		children[0] = createEntityHierarchy(engineDLL, entities, child);
+		children[i] = createEntityHierarchy(engineDLL, entities, child);
 	}
 	return EntityHierarchy(entity, children);
 }
@@ -315,4 +318,15 @@ std::size_t Hierarchy::getSceneIndexByName(std::string name) const {
 		}
 	}
 	return -1;
+}
+
+std::size_t Hierarchy::getSceneCount() {
+	return sceneOrder.size();
+}
+
+std::string Hierarchy::getSceneName(std::size_t sceneIndex) {
+	if (sceneIndex >= sceneOrder.size()) {
+		return "OUT_OF_BOUNDS";
+	}
+	return sceneOrder[sceneIndex].name;
 }

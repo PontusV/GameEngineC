@@ -177,6 +177,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\IconsFontAwesome5.h" />
+    <ClInclude Include="src\ui\Menubar.h" />
+    <ClInclude Include="src\ui\PopupManager.h" />
     <ClInclude Include="src\EditorSettings.h" />
     <ClInclude Include="src\EngineDLL.h" />
     <ClInclude Include="src\EngineDLLInterface.h" />
@@ -204,9 +206,12 @@
     <ClInclude Include="src\windows\GameView.h" />
     <ClInclude Include="src\windows\Hierarchy.h" />
     <ClInclude Include="src\windows\Inspector.h" />
+    <ClInclude Include="src\ui\Toolbar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="src\ui\Menubar.cpp" />
+    <ClCompile Include="src\ui\PopupManager.cpp" />
     <ClCompile Include="src\EditorSettings.cpp" />
     <ClCompile Include="src\EngineDLL.cpp" />
     <ClCompile Include="src\EngineDLLInterface.cpp" />
@@ -234,6 +239,7 @@
     <ClCompile Include="src\windows\GameView.cpp" />
     <ClCompile Include="src\windows\Hierarchy.cpp" />
     <ClCompile Include="src\windows\Inspector.cpp" />
+    <ClCompile Include="src\ui\Toolbar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelEditor.rc" />

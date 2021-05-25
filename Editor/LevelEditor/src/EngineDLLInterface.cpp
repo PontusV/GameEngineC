@@ -58,7 +58,7 @@ void EngineDLLInterface::engineEditorTick(float deltaTime) {
         std::cout << "EngineDLLInterface::engineEditorTick::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::engineEditorTick::ERROR The function ptr is nullptr";
     }
-    engineEditorTickFun(engine, deltaTime);
+    engineTickFun(engine, deltaTime);
 }
 
 void EngineDLLInterface::setCameraPosition(float x, float y) {

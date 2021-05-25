@@ -23,9 +23,9 @@ void GameView::initialize(ImVec2 viewportSize) {
 	grid.initialize(viewportSize.x, viewportSize.y, 100);
 }
 
-void GameView::tick(float deltaTime, std::size_t fpsCount) {
+void GameView::tick(float deltaTime, bool editMode, std::size_t fpsCount) {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("Scene window");
+	ImGui::Begin("Scene");
 
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	ImVec2 pMin = ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y);
@@ -77,7 +77,12 @@ void GameView::tick(float deltaTime, std::size_t fpsCount) {
 	viewport.begin();
 	glClearColor(0.0, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	engineDLL->engineEditorTick(deltaTime);
+	if (editMode) {
+		engineDLL->engineEditorTick(deltaTime);
+	}
+	else {
+		engineDLL->engineTick(deltaTime);
+	}
 	viewport.end();
 
 	// Scene
@@ -188,6 +193,10 @@ void GameView::setZoom(float value) {
 	if (value < 0.1f) return;
 	zoom = std::floor(value * 10) / 10;
 	editor->getEngineDLL()->setCameraScale(1.0f / zoom);
+}
+
+float GameView::getZoom() const {
+	return zoom;
 }
 
 ImVec2 GameView::getViewportSize() const {

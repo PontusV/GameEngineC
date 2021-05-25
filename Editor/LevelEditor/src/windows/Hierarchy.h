@@ -1,5 +1,5 @@
-#ifndef HIERARCHY
-#define HIERARCHY
+#ifndef HIERARCHY_H
+#define HIERARCHY_H
 
 #include <vector>
 #include <string>
@@ -50,6 +50,9 @@ namespace Editor {
 		void onSceneRemoved(std::size_t sceneIndex);
 		void onSceneChanged(std::size_t sceneIndex);
 		void onEntityChanged(EntityID entityID);
+
+		std::size_t getSceneCount();
+		std::string getSceneName(std::size_t sceneIndex);
 	private:
 		std::size_t getRootIndex(std::size_t sceneIndex, EntityID entityID);
 		bool setRootIndex(std::size_t sceneIndex, EntityID entityID, std::size_t index);

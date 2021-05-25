@@ -43,7 +43,7 @@ bool setPropertyFields(EngineDLL* engineDLL, EntityID entityID, TypeID typeID, s
 DoAction::~DoAction() {}
 
 bool UndoRedoManager::undo() {
-	if (undoStack.empty()) return false;
+	if (!enabled || undoStack.empty()) return false;
 	if (!engineDLL->isLoaded()) {
 		std::cout << "UndoRedoManager::undo::ERROR Unable to undo while no Engine DLL is loaded" << std::endl;
 		return false;
@@ -60,8 +60,9 @@ bool UndoRedoManager::undo() {
 	clearStack();
 	return false;
 }
+
 bool UndoRedoManager::redo() {
-	if (redoStack.empty()) return false;
+	if (!enabled || redoStack.empty()) return false;
 	if (!engineDLL->isLoaded()) {
 		std::cout << "UndoRedoManager::redo::ERROR Unable to redo while no Engine DLL is loaded" << std::endl;
 		return false;
@@ -77,6 +78,14 @@ bool UndoRedoManager::redo() {
 	std::cout << "UndoRedoManager::redo::ERROR Failed to redo" << std::endl;
 	clearStack();
 	return false;
+}
+
+void UndoRedoManager::enable() {
+	enabled = true;
+}
+
+void UndoRedoManager::disable() {
+	enabled = false;
 }
 
 void UndoRedoManager::clearStack() {
@@ -105,6 +114,7 @@ void UndoRedoManager::removeSceneFromStack(std::size_t sceneIndex) {
 }
 
 void UndoRedoManager::registerUndo(std::unique_ptr<DoAction>&& action) {
+	if (!enabled) return;
 	std::size_t sceneIndex = action->getSceneIndex();
 	auto it = stepsSinceSave.find(sceneIndex);
 	if (it == stepsSinceSave.end()) {
@@ -118,6 +128,7 @@ void UndoRedoManager::registerUndo(std::unique_ptr<DoAction>&& action) {
 }
 
 void UndoRedoManager::registerRedo(std::unique_ptr<DoAction>&& action) {
+	if (!enabled) return;
 	std::size_t sceneIndex = action->getSceneIndex();
 	auto it = stepsSinceSave.find(sceneIndex);
 	if (it != stepsSinceSave.end()) {
@@ -130,6 +141,7 @@ void UndoRedoManager::registerRedo(std::unique_ptr<DoAction>&& action) {
 }
 
 bool UndoRedoManager::isUndoAvailable() {
+	if (!enabled) return false;
 	if (engineDLL->isLoaded()) {
 		return undoStack.size() > 0;
 	}
@@ -137,6 +149,7 @@ bool UndoRedoManager::isUndoAvailable() {
 }
 
 bool UndoRedoManager::isRedoAvailable() {
+	if (!enabled) return false;
 	if (engineDLL->isLoaded()) {
 		return redoStack.size() > 0;
 	}
@@ -154,23 +167,8 @@ int UndoRedoManager::getStepsSinceSave(std::size_t sceneIndex) {
 // -- Actions --
 
 std::unique_ptr<DoAction> CreateEntityAction::call(EngineDLL* engineDLL) {
-	if (EntityID entityID = engineDLL->createEntity(sceneIndex, entityName.c_str())) {
-		for (auto& componentBP : blueprint.componentBPs) {
-			std::size_t typeID = engineDLL->getTypeIDFromName(componentBP.typeName.c_str());
-			if (!engineDLL->addComponent(entityID, sceneIndex, typeID)) {
-				std::cout << "CreateEntityAction::call::ERROR Failed to add component. Cleaning up..." << std::endl;
-				engineDLL->destroyEntity(sceneIndex, entityID); // Cleanup
-				return nullptr;
-			}
-			auto component = engineDLL->getComponent(entityID, typeID);
-			auto properties = engineDLL->getProperties(typeID, component.instance);
-			for (auto& propertyBP : componentBP.propertyBPs) {
-				if (!setPropertyFields(engineDLL, entityID, typeID, propertyBP.name, propertyBP.propertyValues)) {
-					std::cout << "CreateEntityAction::call::ERROR Failed to set property fields" << std::endl;
-				}
-			}
-		}
-		return std::make_unique<DestroyEntityAction>(sceneIndex, entityName);
+	if (EntityBlueprint::createEntityFromBlueprint(engineDLL, blueprint, sceneIndex)) {
+		return std::make_unique<DestroyEntityAction>(sceneIndex, blueprint.entityName);
 	}
 	return nullptr;
 }
@@ -337,14 +335,52 @@ std::vector<std::shared_ptr<IPropertyValueData>> Editor::createPropData(Reflecte
 	return {};
 }
 
+EntityID EntityBlueprint::createEntityFromBlueprint(EngineDLL* engineDLL, EntityBlueprint blueprint, std::size_t sceneIndex) {
+	std::cout << "Creating: " << blueprint.entityName << std::endl;
+	if (EntityID entityID = engineDLL->createEntity(sceneIndex, blueprint.entityName.c_str())) {
+		for (auto& componentBP : blueprint.componentBPs) {
+			std::size_t typeID = engineDLL->getTypeIDFromName(componentBP.typeName.c_str());
+			if (!engineDLL->addComponent(entityID, sceneIndex, typeID)) {
+				std::cout << "EntityBlueprint::createEntityFromBlueprint::ERROR Failed to add component. Cleaning up..." << std::endl;
+				engineDLL->destroyEntity(sceneIndex, entityID); // Cleanup
+				return 0;
+			}
+			auto component = engineDLL->getComponent(entityID, typeID);
+			auto properties = engineDLL->getProperties(typeID, component.instance);
+			for (auto& propertyBP : componentBP.propertyBPs) {
+				if (!setPropertyFields(engineDLL, entityID, typeID, propertyBP.name, propertyBP.propertyValues)) {
+					std::cout << "EntityBlueprint::createEntityFromBlueprint::ERROR Failed to set property fields" << std::endl;
+				}
+			}
+		}
+		for (EntityBlueprint& childBP : blueprint.children) {
+			if (EntityID childID = createEntityFromBlueprint(engineDLL, childBP, sceneIndex)) {
+				engineDLL->setEntityParent(sceneIndex, childID, entityID);
+			}
+			else {
+				return 0;
+			}
+		}
+		return entityID;
+	}
+	return 0;
+}
+
 EntityBlueprint EntityBlueprint::createFromEntity(EngineDLL* engineDLL, EntityID entityID) {
 	EntityBlueprint instance;
+	instance.entityName = engineDLL->getEntityName(entityID);
 	std::vector<ComponentData> components = engineDLL->getComponents(entityID);
 	instance.componentBPs.resize(components.size());
 	for (std::size_t i = 0; i < components.size(); i++) {
 		ComponentData& componentData = components[i];
 		ComponentBlueprint& componentBP = instance.componentBPs[i];
 		componentBP = ComponentBlueprint::createFromComponent(engineDLL, componentData);
+	}
+	std::size_t immediateChildCount = engineDLL->getEntityImmediateChildCount(entityID);
+	instance.children.resize(immediateChildCount);
+	for (std::size_t i = 0; i < immediateChildCount; i++) {
+		EntityID childID = engineDLL->getEntityChild(entityID, i);
+		instance.children[i] = createFromEntity(engineDLL, childID);
 	}
 	return instance;
 }

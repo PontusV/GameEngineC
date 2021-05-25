@@ -3,6 +3,7 @@
 #include "UndoRedo.h"
 #include "EngineDLL.h"
 #include "imgui/imgui.h"
+#include "ui/PopupManager.h"
 #include "utils/file.h"
 #include "utils/string.h"
 #include <algorithm>
@@ -24,7 +25,7 @@ bool vectorIncludes(std::vector<T> vec, T value) {
 
 //-------------
 
-Inspector::Inspector(EngineDLL* engineDLL, GameView* gameView, UndoRedoManager* undoRedoManager) : engineDLL(engineDLL), gameView(gameView), undoRedoManager(undoRedoManager) {}
+Inspector::Inspector(EngineDLL* engineDLL, GameView* gameView, UndoRedoManager* undoRedoManager, PopupManager* popupManager) : engineDLL(engineDLL), gameView(gameView), undoRedoManager(undoRedoManager), popupManager(popupManager){}
 Inspector::~Inspector() {}
 
 template<typename T>
@@ -348,12 +349,23 @@ bool filterComponentType(EngineDLL* engineDLL, const std::vector<TypeID>& filter
 	return false;
 }
 
-void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, EntityTargetData target) { // TODO: Get list of all types (typeID, name)
+std::size_t findCaseInsensitive(std::string data, std::string toSearch, std::size_t pos = 0) {
+	std::transform(data.begin(), data.end(), data.begin(), std::tolower);
+	std::transform(toSearch.begin(), toSearch.end(), toSearch.begin(), std::tolower);
+	return data.find(toSearch, pos);
+}
+
+void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, EntityTargetData target, char* searchStr) { // TODO: Get list of all types (typeID, name)
 	std::vector<TypeID> filter;
 	for (ComponentData& componentData : engineDLL->getComponents(target.entityID)) {
 		filter.push_back(componentData.typeID);
 	}
+	ImGui::InputText("##component_search", searchStr, 128);
+	ImGui::SetItemDefaultFocus();
 	for (ReflectedTypeData& type : engineDLL->getAllReflectedTypes()) {
+		std::size_t nameIndex = type.typeName.find_last_of("::");
+		std::string shortTypeName = nameIndex == std::string::npos ? type.typeName : type.typeName.substr(nameIndex + 1);
+		if (findCaseInsensitive(shortTypeName, searchStr) != 0) continue;
 		if (!filterComponentType(engineDLL, filter, type.typeID)) {
 			if (ImGui::Selectable(type.typeName.c_str(), false)) {
 				if (engineDLL->addComponent(target.entityID, target.sceneIndex, type.typeID)) {
@@ -404,34 +416,14 @@ void Inspector::tick() {
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 0, 0, 1));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0, 0, 1));
 			if (ImGui::Button("Delete")) {
-				ImGui::OpenPopup("Delete_target_entity");
+				popupManager->openDeleteEntity(target.entityID);
 			}
 			ImGui::PopStyleColor(3);
 		}
-		if (ImGui::IsKeyPressed(GLFW_KEY_DELETE)) { // TODO: Move this and popup somewhere else?
-			ImGui::OpenPopup("Delete_target_entity");
+		if (ImGui::IsKeyPressed(GLFW_KEY_DELETE)) {
+			popupManager->openDeleteEntity(target.entityID);
 		}
-		if (ImGui::BeginPopupModal("Delete_target_entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text("Are you sure you want to delete %s?\n\n", targetName);
-			ImGui::Separator();
-
-			if (ImGui::Button("Delete", ImVec2(120, 0))) {
-				if (target.entityID != 0) {
-					auto blueprint = EntityBlueprint::createFromEntity(engineDLL, target.entityID);
-					if (engineDLL->destroyEntity(target.sceneIndex, target.entityID)) {
-						undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(target.sceneIndex, target.entityName, std::move(blueprint)));
-						gameView->releaseTarget();
-					}
-				}
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
-		}
+		
 		ImGui::BeginChild(targetName.c_str(), ImVec2(0, 0));
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.0f, 5.0f));
@@ -439,10 +431,13 @@ void Inspector::tick() {
 		for (ComponentData& component : engineDLL->getComponents(target.entityID)) {
 			renderComponent(target.entityID, target.entityName, target.sceneIndex, component.typeID, component.instance, i++);
 		}
-		if (ImGui::Button("Add component", ImVec2(ImGui::GetContentRegionAvailWidth(), 30)))
+		static char searchStr[128] = "";
+		if (ImGui::Button("Add component", ImVec2(ImGui::GetContentRegionAvailWidth(), 30))) {
 			ImGui::OpenPopup("add_component_popup");
+			searchStr[0] = '\0';
+		}
 		if (ImGui::BeginPopup("add_component_popup")) {
-			renderComponentCombo(engineDLL, undoRedoManager, target);
+			renderComponentCombo(engineDLL, undoRedoManager, target, searchStr);
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();

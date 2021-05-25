@@ -307,6 +307,7 @@ void Scene::setParent(Handle entityHandle, Handle parentHandle, bool keepPositio
 
 	Entity entity = entityHandle.getEntity();
 	Entity parent = parentHandle.getEntity();
+
 	// Notify previous parent of removal & remove
 	Handle currentParent = getParent(entity);
 	if (currentParent.refresh()) {

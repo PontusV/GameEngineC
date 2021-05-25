@@ -29,6 +29,8 @@ namespace Editor {
 
 		bool undo();
 		bool redo();
+		void enable();
+		void disable();
 		/* Clears both undo and redo stack */
 		void clearStack();
 		/* Clears both undo and redo stack for the given scene */
@@ -43,6 +45,7 @@ namespace Editor {
 		int getStepsSinceSave(std::size_t sceneIndex);
 
 	private:
+		bool enabled = true;
 		std::vector<std::unique_ptr<DoAction>> undoStack;
 		std::vector<std::unique_ptr<DoAction>> redoStack;
 		EngineDLL* engineDLL;
@@ -119,17 +122,19 @@ namespace Editor {
 
 	struct EntityBlueprint {
 		static EntityBlueprint createFromEntity(EngineDLL* engineDLL, EntityID entityID);
+		static EntityID createEntityFromBlueprint(EngineDLL* engineDLL, EntityBlueprint blueprint, std::size_t sceneIndex);
+		std::string entityName;
 		std::vector<ComponentBlueprint> componentBPs;
+		std::vector<EntityBlueprint> children;
 	};
 
 	// ---
 
 	class CreateEntityAction : public DoAction { // WIP
 	public:
-		CreateEntityAction(std::size_t sceneIndex, std::string entityName, EntityBlueprint&& blueprint) : DoAction(sceneIndex), entityName(entityName), blueprint(blueprint) {}
+		CreateEntityAction(std::size_t sceneIndex, std::string entityName, EntityBlueprint&& blueprint) : DoAction(sceneIndex), blueprint(blueprint) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 	private:
-		std::string entityName;
 		EntityBlueprint blueprint;
 	};
 
