@@ -99,7 +99,7 @@ void RectTransform::notifyResize() {
 	changed = true;
 	// TODO: Move this to a system
 	// Notity scripts attached to the same Entity
-	std::vector<UIBehaviour*> scripts = owner.getComponents<UIBehaviour>();
+	/*std::vector<UIBehaviour*> scripts = owner.getComponents<UIBehaviour>();
 	for (UIBehaviour* script : scripts) {
 		script->onRectTransformResized();
 	}
@@ -107,7 +107,7 @@ void RectTransform::notifyResize() {
 	scripts = owner.getParent().getComponents<UIBehaviour>();
 	for (UIBehaviour* script : scripts) {
 		script->onChildRectTransformResized();
-	}
+	}*/
 }
 
 void RectTransform::setSize(Vector2 size) {

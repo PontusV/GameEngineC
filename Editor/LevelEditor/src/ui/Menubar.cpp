@@ -40,8 +40,7 @@ void Menubar::tick(LevelEditor* editor, bool editMode) {
 			if (ImGui::MenuItem("Save Project", "Ctrl+S", nullptr, editMode && projectSettings->isLoaded())) { // TODO: Keybind
 				projectSettings->save();
 			}
-			auto loadedSceneCount = engineDLL->getSceneCount();
-			if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, editMode && engineDLL->isLoaded() && projectSettings->isLoaded() && loadedSceneCount > 0)) { // TODO: Keybind
+			if (ImGui::MenuItem("Save All", "Ctrl+S", nullptr, editMode && engineDLL->isLoaded() && projectSettings->isLoaded())) { // TODO: Keybind
 				editor->saveAll();
 			}
 			if (ImGui::MenuItem("Reload", nullptr, nullptr, projectSettings->isLoaded() && engineDLL->isLoaded())) {

@@ -75,8 +75,8 @@ namespace Editor {
 		EngineDLL* getEngineDLL();
 		Hierarchy* getHierarchy();
 	private:
-		bool saveCurrentScenesAsBackups();
-		bool loadPreviousScenesFromBackups();
+		bool saveGameState();
+		bool loadGameState();
 	private:
 		EditorSettings editorSettings;
 		ProjectSettings projectSettings;

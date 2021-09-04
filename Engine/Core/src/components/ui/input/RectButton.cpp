@@ -15,7 +15,7 @@ RectButton::RectButton() {
 RectButton::~RectButton() {
 }
 
-void RectButton::awake() {
+void RectButton::initialize() {
 	changeState(DISABLED);
 }
 

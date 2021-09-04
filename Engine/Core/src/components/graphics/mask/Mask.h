@@ -1,12 +1,12 @@
 #ifndef MASK_H
 #define MASK_H
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include <cstddef>
 #include "Mask.generated.h"
 
 namespace Core {
 
-	CLASS() Mask : public Component {
+	CLASS() Mask : public IComponentData {
 		GENERATED_BODY()
 	public:
 		Mask();

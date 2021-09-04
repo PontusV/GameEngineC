@@ -8,7 +8,8 @@ BehaviourManager::BehaviourManager(Engine* engine) {
 	Behaviour::input = &engine->getInput();
 	Behaviour::window = &engine->getGraphics().getWindow();
 	Behaviour::camera = &engine->getGraphics().getCamera();
-	Behaviour::sceneManager = &engine->getSceneManager();
+	Behaviour::entityManager = &engine->getEntityManager();
+	Behaviour::prefabManager = &engine->getPrefabManager();
 }
 
 
@@ -22,6 +23,11 @@ void BehaviourManager::update(float deltaTime) {
 	// Run scripts
 	for (std::size_t i = 0; i < scriptAmount; i++) {
 		Behaviour& behaviour = behaviourGroup.get<Behaviour>(i);
+		if (!behaviour.initialized) {
+			behaviour.owner = behaviourGroup.createHandle(i, Behaviour::entityManager);
+			behaviour.initialized = true;
+			behaviour.initialize();
+		}
 		if (behaviour.isEnabled()) { // Check if enabled
 			// Start
 			if (!behaviour.started) {

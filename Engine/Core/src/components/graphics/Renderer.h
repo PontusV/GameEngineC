@@ -1,11 +1,11 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "Renderer.generated.h"
 
 namespace Core {
-	CLASS() Renderer : public Component {
+	CLASS() Renderer : public IComponentData {
 		GENERATED_BODY()
 	public:
 		virtual ~Renderer() = 0;

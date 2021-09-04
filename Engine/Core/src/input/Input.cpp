@@ -4,7 +4,7 @@
 #include "Maths/Algorithm.h"
 
 #include "entity/EntityManager.h"
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "components/Behaviour.h"
 #include "components/ui/input/Selectable.h"
 
@@ -15,7 +15,7 @@ using namespace Core;
 const float Input::SELECT_NEXT_DELAY = 0.05f; // The delay before selecting next
 const float Input::INITIAL_SELECT_NEXT_DELAY = 0.5f; // The initial delay before repeating selectNext
 
-Input::Input(Engine* engine) : behaviourManager(engine->getBehaviourManager()), graphics(engine->getGraphics()) {
+Input::Input(Engine* engine) : behaviourManager(engine->getBehaviourManager()), graphics(engine->getGraphics()), entityManager(engine->getEntityManager()) {
 	mouseMoved = true;
 	leftMouseButtonPressed = false;
 	timeSinceLastClick = std::chrono::system_clock::now();
@@ -380,7 +380,7 @@ EntityHandle Input::getEntityHandleAtPos(float x, float y, std::vector<Entity> i
 	for (std::size_t i = 0; i < guiGroupSize; i++) {
 		Entity&			entity		= guiGroup.getEntity(i);
 		CanvasRenderer&	renderer	= guiGroup.get<CanvasRenderer>(i);
-		RectTransform	transform	= guiGroup.get<RectTransform>(i);
+		RectTransform&	transform	= guiGroup.get<RectTransform>(i);
 
 		if (!renderer.isEnabled()) continue;
 		if (contains(ignoreList, entity)) continue;
@@ -399,16 +399,14 @@ EntityHandle Input::getEntityHandleAtPos(float x, float y, std::vector<Entity> i
 	}
 
 	if (currentHit.index < guiGroupSize) {
-		Entity entity = guiGroup.getEntity(currentHit.index);
-		Scene* scene = guiGroup.get<RectTransform>(currentHit.index).getOwner().getScene(); // TODO: Find a prettier way to do this?
-		return EntityHandle(entity, scene);
+		return guiGroup.createHandle(currentHit.index, &entityManager);
 	}
 
 	// --------------------------------- World -------------------------------------
 	for (std::size_t i = 0; i < spriteGroupSize; i++) {
 		Entity&			entity		= spriteGroup.getEntity(i);
 		SpriteRenderer&	renderer	= spriteGroup.get<SpriteRenderer>(i);
-		RectTransform	transform	= spriteGroup.get<RectTransform>(i);
+		RectTransform&	transform	= spriteGroup.get<RectTransform>(i);
 
 		if (!renderer.isEnabled()) continue;
 		if (contains(ignoreList, entity)) continue;
@@ -427,9 +425,7 @@ EntityHandle Input::getEntityHandleAtPos(float x, float y, std::vector<Entity> i
 	}
 
 	if (currentHit.index < spriteGroupSize) {
-		Entity entity = spriteGroup.getEntity(currentHit.index);
-		Scene* scene = spriteGroup.get<RectTransform>(currentHit.index).getOwner().getScene(); // TODO: Find a prettier way to do this?
-		return EntityHandle(entity, scene);
+		return spriteGroup.createHandle(currentHit.index, &entityManager);
 	}
 
 	// Miss

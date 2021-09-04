@@ -23,16 +23,3 @@ const char* Font::getFileName() const {
 const int& Font::getSize() const {
 	return size;
 }
-
-
-/* Save */
-void Font::serialize(std::ostream& os) const {
-	os.write(fileName.c_str(), fileName.size() + 1);	// File name
-	os.write((char*)&size, sizeof(size));				// Text size
-}
-
-/* Load */
-void Font::deserialize(std::istream& is) {
-	std::getline(is, fileName, '\0');					// File name
-	is.read((char*)&size, sizeof(size));				// Text size
-}

@@ -2,58 +2,78 @@
 #define COMPONENT_HANDLE_H
 
 #include "Handle.h"
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 
 namespace Core {
-	class Scene;
+	class EntityManager;
 
 	/* A handle for a component with a specific ComponentTypeID. Does not look for components with a type deriving from the type with the specified ComponentTypeID. */
 	template<typename T>
 	class TComponentHandle {
 	public:
-		TComponentHandle(ComponentTypeID id, Entity entity, Scene* scene) : id(id), owner(Handle(entity, scene)) {}
-		TComponentHandle(ComponentTypeID id, Handle owner) : id(id), owner(Handle(owner)) {}
-		TComponentHandle(T* instance) : id(instance->getComponentID()), owner(instance->getOwner()) {
-			static_assert(std::is_base_of<Component, T>::value || std::is_same<Component, T>::value, "Not an instance of Component");
-		}
+		TComponentHandle(ComponentTypeID typeID, Entity entity, EntityManager* entityManager) : typeID(typeID), owner(Handle(entity, entityManager)) {}
+		TComponentHandle(ComponentTypeID typeID, Handle owner) : typeID(typeID), owner(Handle(owner)) {}
 		TComponentHandle() {}
 		virtual ~TComponentHandle() {}
 
+		bool operator==(const TComponentHandle<T>& other) const {
+			return owner == other.owner && typeID == other.typeID;
+		}
+		bool operator!=(const TComponentHandle<T>& other) const {
+			return !(*this == other);
+		}
+
 		T* get() {
-			for (T* component : owner.getComponents<T>()) {
-				if (component->getComponentID() == id) return component;
-			}
-			return nullptr;
+			return static_cast<T*>(owner.getComponent(typeID));
 		}
 		bool isValid() {
-			return owner.refresh();
+			return owner.refresh() && owner.hasComponent(typeID);
 		}
 		void clear() {
 			owner = Handle();
-			id = 0;
+			typeID = 0;
+		}
+
+		void setOwner(Handle handle) {
+			owner = handle;
+		}
+		void setComponentTypeID(ComponentTypeID typeID) {
+			this->typeID = typeID;
+		}
+		Handle getOwner() const {
+			return owner;
+		}
+		ComponentTypeID getComponentTypeID() const {
+			return typeID;
 		}
 
 	private:
 		Handle owner;
-		ComponentID id = 0;
+		ComponentTypeID typeID = 0;
 	};
 
 	/* A handle for a component with a specific ComponentTypeID. Does not look for components with a type deriving from the type with the specified ComponentTypeID. */
-	class ComponentHandle : public TComponentHandle<Component> {
+	class ComponentHandle : public TComponentHandle<IComponentData> {
 	public:
-		ComponentHandle(ComponentID id, Entity entity, Scene* scene) : TComponentHandle<Component>(id, entity, scene) {}
-		ComponentHandle(ComponentID id, Handle owner) : TComponentHandle<Component>(id, owner) {}
-		ComponentHandle(Component* instance) : TComponentHandle<Component>(instance) {}
+		ComponentHandle(ComponentTypeID typeID, Entity entity, EntityManager* entityManager) : TComponentHandle<IComponentData>(typeID, entity, entityManager) {}
+		ComponentHandle(ComponentTypeID typeID, Handle owner) : TComponentHandle<IComponentData>(typeID, owner) {}
 		ComponentHandle() {}
 		~ComponentHandle() {}
 
-		Component* getComponent() {
-			return TComponentHandle<Component>::get();
+		bool operator==(const ComponentHandle& other) const {
+			return TComponentHandle<IComponentData>::operator==(other);
+		}
+		bool operator!=(const ComponentHandle& other) const {
+			return !(*this == other);
+		}
+
+		IComponentData* getComponent() {
+			return TComponentHandle<IComponentData>::get();
 		}
 
 		template<typename T>
 		T* getComponent() {
-			return static_cast<T*>(TComponentHandle<Component>::get());
+			return static_cast<T*>(TComponentHandle<IComponentData>::get());
 		}
 	};
 }

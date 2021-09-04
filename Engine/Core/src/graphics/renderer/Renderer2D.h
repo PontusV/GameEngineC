@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <array>
 
 namespace Core {
 
@@ -24,9 +25,6 @@ namespace Core {
 	public:
 		Renderer2D(Window* window);
 		~Renderer2D();
-
-		/* Returns unique ID for a layer */
-		unsigned char createLayer();
 
 		/* Render sprite. Submits a Renderable2D to a batchRenderer2D. */
 		void submit(const Texture2D& texture, const RectTransform& transform, const unsigned int& shaderID, const Color& color, const unsigned char& sortingOrder);
@@ -45,7 +43,7 @@ namespace Core {
 		void flush(std::size_t startIndex, std::size_t endIndex);
 
 	private:
-		Renderable2D renderableBuffer[MAX_RENDERABLES];
+		std::array<Renderable2D, MAX_RENDERABLES> renderableBuffer;
 		std::size_t renderablesSize = 0;
 
 		BatchRenderer2D	batch;

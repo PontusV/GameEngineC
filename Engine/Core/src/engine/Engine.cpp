@@ -1,7 +1,6 @@
 #include "Engine.h"
 #include "ResourceManager.h"
 #include "FpsCounter.h"
-#include "scene/Scene.h"
 #include "graphics/Window.h"
 #include "graphics/renderer/Renderer2D.h"
 #include "components/ui/WindowAnchor.h"
@@ -187,7 +186,7 @@ int Engine::start() {
 
 void Engine::tick(float deltaTime) {
 	// Update systems
-	sceneManager.update();
+	entityManager.processQueue();
 	input.update(deltaTime);
 	behaviourManager.update(deltaTime);
 	guiSystem.update();
@@ -205,7 +204,7 @@ void Engine::editorTick(float deltaTime) {
 	graphics.render(deltaTime);
 }
 
-Engine::Engine() : sceneManager(&entityManager), graphics(), input(this), physics(), behaviourManager(this) {
+Engine::Engine() : entityManager(&eventSystem), graphics(), input(this), physics(&entityManager), behaviourManager(this), prefabManager(&entityManager), guiSystem(&entityManager) {
 }
 
 Engine::~Engine() {
@@ -213,10 +212,6 @@ Engine::~Engine() {
 
 EntityManager& Engine::getEntityManager() {
 	return entityManager;
-}
-
-SceneManager& Engine::getSceneManager() {
-	return sceneManager;
 }
 
 Input& Engine::getInput() {
@@ -229,6 +224,10 @@ Graphics& Engine::getGraphics() {
 
 Physics& Engine::getPhysics() {
 	return physics;
+}
+
+PrefabManager& Engine::getPrefabManager() {
+	return prefabManager;
 }
 
 BehaviourManager& Engine::getBehaviourManager() {

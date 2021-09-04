@@ -30,7 +30,7 @@ void ScrollBar::start() {
 		else {
 			handleHeight = rect->getSize().y - handlePadding * 2;
 		}
-		handle = createEntity(std::string(ownerHandle.getEntityName()) + "_Handle",
+		handle = createEntity(
 			RectSprite(0, handleColorDefault),
 			RectTransform(0, 0, handleWidth, handleHeight, rect->getZ() + 0.01f, Alignment::TOP_LEFT)
 		);

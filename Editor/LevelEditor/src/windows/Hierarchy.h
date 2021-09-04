@@ -8,21 +8,17 @@ typedef std::size_t EntityID;
 
 namespace Editor {
 
-	struct EntityData {
-		EntityID id;
+	struct EntityHierarchyNode {
+		EntityHierarchyNode() {}
+		EntityHierarchyNode(EntityID entityID, std::string name, std::vector<EntityHierarchyNode> children) : entityID(entityID), name(name), children(children) {}
+		EntityID entityID = 0;
 		std::string name;
-	};
-
-	struct EntityHierarchy {
-		EntityHierarchy() : entity(EntityData{ 0, std::string() }), children({}) {}
-		EntityHierarchy(EntityData entity, std::vector<EntityHierarchy> children) : entity(entity), children(children) {}
-		EntityData entity;
-		std::vector<EntityHierarchy> children;
+		std::vector<EntityHierarchyNode> children;
 	};
 	
-	struct SceneData {
-		std::string name;
-		std::vector<EntityHierarchy> roots;
+	struct EntityHierarchyRootNode : EntityHierarchyNode {
+		std::string filePath;
+		std::vector<EntityHierarchyNode> children;
 	};
 
 	class LevelEditor;
@@ -42,27 +38,22 @@ namespace Editor {
 		void initiate();
 		/* Removes all currently added scenes */
 		void clear();
+		bool isDirty() const;
+		void setDirty(bool value);
 
-		std::size_t getActiveSceneIndex();
-		void setActiveSceneIndex(std::size_t sceneIndex);
+		EntityID getActiveScene();
+		void setActiveScene(EntityID rootEntityID);
 
-		void onSceneAdded(std::size_t sceneIndex);
-		void onSceneRemoved(std::size_t sceneIndex);
-		void onSceneChanged(std::size_t sceneIndex);
-		void onEntityChanged(EntityID entityID);
+		void onEntitiesChanged(EntityID entityID);
 
 		std::size_t getSceneCount();
-		std::string getSceneName(std::size_t sceneIndex);
-	private:
-		std::size_t getRootIndex(std::size_t sceneIndex, EntityID entityID);
-		bool setRootIndex(std::size_t sceneIndex, EntityID entityID, std::size_t index);
-		std::size_t getSceneIndexByName(std::string name) const;
 	private:
 		LevelEditor* editor;
 		GameView* gameView;
 		UndoRedoManager* undoRedoManager;
-		std::vector<SceneData> sceneOrder;
-		std::size_t activeSceneIndex;
+		std::vector<EntityHierarchyRootNode> scenes;
+		EntityID activeScene; // rootEntityID
+		bool dirty = false;
 	};
 }
 

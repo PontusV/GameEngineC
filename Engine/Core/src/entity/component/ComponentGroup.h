@@ -4,11 +4,14 @@
 #include "ComponentArrayManager.h"
 #include "ComponentArray.h"
 #include "ComponentTypeInfo.h"
+#include "entity/handle/Handle.h"
 
 #include <tuple>
 #include <initializer_list>
 
 namespace Core {
+	class EntityManager;
+
 	/* Has access to all chunks compatible with its template. */
 	template <typename T, typename... Ts>
 	class ComponentGroup {
@@ -39,6 +42,11 @@ namespace Core {
 
 		Entity& getEntity(std::size_t index) {
 			return std::get<0>(componentArrays)->getEntity(index);
+		}
+
+		/* Creates and returns a handle for the Entity at the specified index */
+		Handle createHandle(std::size_t index, EntityManager* entityManager) {
+			return std::get<0>(componentArrays)->createHandle(index, entityManager);
 		}
 
 		std::size_t size() {

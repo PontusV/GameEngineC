@@ -186,7 +186,6 @@
     <ClInclude Include="include\ReflectionParser\ReflectionMacros.h" />
     <ClInclude Include="include\ReflectionParser\ReflectionParser.h" />
     <ClInclude Include="include\ReflectionParser\ReflectionTypes.h" />
-    <ClInclude Include="include\ReflectionParser\Serializer.h" />
     <ClInclude Include="include\ReflectionParser\TypeList.h" />
     <ClInclude Include="include\ReflectionParser\Utility.h" />
     <ClInclude Include="PropertyParser.h" />

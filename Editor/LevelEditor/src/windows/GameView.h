@@ -9,7 +9,7 @@ typedef std::size_t EntityID;
 namespace Editor {
 	struct EntityTargetData {
 		EntityID entityID;
-		std::size_t sceneIndex;
+		EntityID rootEntityID;
 		std::string entityName;
 	};
 	class LevelEditor;

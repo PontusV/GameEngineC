@@ -25,20 +25,20 @@ void InputField::start() {
 	RectTransform* rect = owner.getComponent<RectTransform>();
 	EntityHandle ownerHandle = owner;
 	if (rect) {
-		inputText = createEntity(std::string(ownerHandle.getEntityName()) + "_Text");
+		inputText = createEntity();
 		inputText.setParent(owner);
 
 		RectTransform* textRect = inputText.addComponent(RectTransform(rect->getSize().x / 2, rect->getSize().y / 2, 0, 0, rect->getZ() + 0.01f, Alignment::CENTER));
 		Text* textComponent = inputText.addComponent(Text(filterText(initText), Font("Fonts/segoeui.ttf", 15), Color(0, 0, 0)));
 
-		textMark = createEntity(std::string(ownerHandle.getEntityName()) + "_Mark",
+		textMark = createEntity(
 			RectSprite(0, Color(markColor.r, markColor.g, markColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);
 		textMark.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideAndDontSave);
 		textMark.setParent(inputText);
 
-		textHighlight = createEntity(std::string(ownerHandle.getEntityName()) + "_Highlight",
+		textHighlight = createEntity(
 			RectSprite(0, Color(highlightColor.r, highlightColor.g, highlightColor.b, 0)),
 			RectTransform(0, 0, 0, 0, textRect->getZ(), Alignment::LEFT)
 		);
@@ -48,9 +48,9 @@ void InputField::start() {
 }
 
 void InputField::onDestroy() {
-	destroyEntity(inputText);
-	destroyEntity(textMark);
-	destroyEntity(textHighlight);
+	inputText.destroy();
+	textMark.destroy();
+	textHighlight.destroy();
 }
 
 void InputField::submit() {
@@ -176,7 +176,7 @@ void InputField::onSelect() {
 	markTime = 0.0f;
 	showMark();
 	showHighlight();
-	input->focusKeyboard(TComponentHandle<InputField>(this));
+	input->focusKeyboard(TComponentHandle<InputField>(InputField::getClassTypeID(), owner));
 }
 
 void InputField::onDeselect() {

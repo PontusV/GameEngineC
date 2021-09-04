@@ -1,7 +1,7 @@
 #ifndef CHILD_MANAGER_H
 #define CHILD_MANAGER_H
 
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "entity/handle/Handle.h"
 #include "entity/Entity.h"
 #include <vector>
@@ -10,13 +10,14 @@
 
 namespace Core {
 
-	CLASS(hideInInspector) ChildManager : public Component {
+	/* Gives an Entity a reference to its children */
+	CLASS(hideInInspector) ChildManager : public IComponentData {
 		GENERATED_BODY()
 	public:
 		ChildManager() {}
 		~ChildManager();
 
-		/* Adds entity to collection if no reference to the child already exists; otherwise the reference held to the child will be replace with the parameter value. */
+		/* Adds entity to collection if no reference to the child already exists; otherwise the reference held to the child will be replaced with the parameter value. TODO: Create an unsafe and faster option (no checks) */
 		bool onChildAdded(Handle entity);
 		bool onChildRemoved(Handle entity);
 
@@ -25,7 +26,7 @@ namespace Core {
 		std::vector<Handle>& getChildren();
 
 	private:
-		//PROPERTY()
+		PROPERTY()
 		std::vector<Handle> children;
 	};
 }

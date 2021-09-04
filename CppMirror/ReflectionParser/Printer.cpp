@@ -372,9 +372,9 @@ void Printer::printFile(std::string fileName, std::ostringstream& osstream) {
 
 bool isComponentType(const ClassInfo& currentClass, const std::vector<ClassInfo>& baseClasses) {
 	for (const ClassInfo& base : baseClasses) {
-		if (base.name == "Component") return true;
+		if (base.name == "IComponentData") return true;
 	}
-	return currentClass.name == "Component";
+	return currentClass.name == "IComponentData";
 }
 
 void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassInfo>& baseClasses, const std::vector<ClassInfo>& directBaseClasses) {
@@ -490,8 +490,25 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	printGetArraySize(currentClass, directBaseClasses, fileInput);
 	// getPointer
 	printGetPointer(currentClass, directBaseClasses, fileInput);
+	// serializeProperty
+	fileInput << "template<typename Archive>" << endml;
+	fileInput << "bool serializeProperty(Archive& ar, std::string propertyName) const {" << endml;
+	for (const Property& prop : currentClass.properties) {
+		fileInput << printTabs(1) << "if (propertyName == \"" << prop.name << "\") {" << endml;
+		fileInput << printTabs(2) << "ar(" << prop.name << ");" << endml;
+		fileInput << printTabs(2) << "return true;" << endml;
+		fileInput << printTabs(1) << "}" << endml;
+	}
+	for (const ClassInfo& baseClass : directBaseClasses) {
+		fileInput << printTabs(1) << "if (" << baseClass.fullName << "::serializeProperty(ar, propertyName)) {" << endml;
+		fileInput << printTabs(2) << "return true;" << endml;
+		fileInput << printTabs(1) << "}" << endml;
+	}
+	fileInput << printTabs(1) << "return false;" << endml;
+	fileInput << "}" << endml;
 	// serialize
-	fileInput << "void serialize(std::ostream& os) const {" << endml;
+	fileInput << "template<typename Archive>" << endml;
+	fileInput << "void serialize(Archive& ar) const {" << endml;
 	//
 	fileInput << printTabs(1) << "std::vector<" << LIBRARY_NAME_SPACE << "::Property> properties;" << endml;
 	fileInput << printTabs(1) << LIBRARY_NAME_SPACE << "::Property newProperty;" << endml;
@@ -502,7 +519,7 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 		fileInput << printTabs(1) << "properties.push_back(newProperty);" << endml;
 	}
 	//
-	fileInput << printTabs(1) + LIBRARY_NAME_SPACE + "::serializeProperties(os, properties";
+	fileInput << printTabs(1) << "ar(properties";
 	for (const Property& prop : currentClass.properties) {
 		if (prop.type.isPointer || prop.type.isReference || prop.type.isConst) continue;
 		fileInput << ", " << prop.name;
@@ -510,17 +527,18 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	fileInput << ");" << endml;
 	// Call serialize in all direct base classes (chaining)
 	fileInput << printTabs(1) << "std::size_t continueCount = " << directBaseClasses.size() << ";" << endml;
-	fileInput << printTabs(1) << "Mirror::serialize(os, continueCount);" << endml;
+	fileInput << printTabs(1) << "ar(continueCount);" << endml;
 	for (const ClassInfo& baseClass : directBaseClasses) {
 		fileInput << printTabs(1) << "{" << endml;
 		fileInput << printTabs(2) << "std::string name = \"" << baseClass.fullName << "\";" << endml;
-		fileInput << printTabs(2) << "Mirror::serialize(os, name);" << endml;
-		fileInput << printTabs(2) << baseClass.fullName << "::serialize(os);" << endml;
+		fileInput << printTabs(2) << "ar(name);" << endml;
+		fileInput << printTabs(2) << baseClass.fullName << "::serialize(ar);" << endml;
 		fileInput << printTabs(1) << "}" << endml;
 	}
 	fileInput << "}" << endml;
 	// deserialize
-	fileInput << "void deserialize(std::istream& is) {" << endml;
+	fileInput << "template<typename Archive>" << endml;
+	fileInput << "void deserialize(Archive& ar) {" << endml;
 	//
 	fileInput << printTabs(1) << "std::vector<" << LIBRARY_NAME_SPACE << "::Property> properties;" << endml;
 	fileInput << printTabs(1) << LIBRARY_NAME_SPACE << "::Property newProperty;" << endml;
@@ -531,7 +549,7 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 		fileInput << printTabs(1) << "properties.push_back(newProperty);" << endml;
 	}
 	//
-	fileInput << printTabs(1) + LIBRARY_NAME_SPACE + "::deserializeProperties(is, properties";
+	fileInput << printTabs(1) << "ar(properties";
 	for (const Property& prop : currentClass.properties) {
 		if (prop.type.isPointer || prop.type.isReference || prop.type.isConst) continue;
 		fileInput << ", " << prop.name;
@@ -539,17 +557,17 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	fileInput << "); " << endml;
 	// Call deserialize in all direct base classes (chaining)
 	fileInput << printTabs(1) << "std::size_t continueCount;" << endml;
-	fileInput << printTabs(1) << "Mirror::deserialize(is, continueCount);" << endml;
+	fileInput << printTabs(1) << "ar(continueCount);" << endml;
 	fileInput << printTabs(1) << "for (std::size_t i = 0; i < continueCount; i++) {" << endml;
 	fileInput << printTabs(2) << "std::string name = std::string();" << endml;
-	fileInput << printTabs(2) << "Mirror::deserialize(is, name);" << endml;
+	fileInput << printTabs(2) << "ar(name);" << endml;
 	for (const ClassInfo& baseClass : directBaseClasses) {
 		fileInput << printTabs(2) << "if (name == \"" << baseClass.fullName << "\") {" << endml;
-		fileInput << printTabs(3) << baseClass.fullName << "::deserialize(is);" << endml;
+		fileInput << printTabs(3) << baseClass.fullName << "::deserialize(ar);" << endml;
 		fileInput << printTabs(3) << "continue;" << endml;
 		fileInput << printTabs(2) << "}" << endml;
 	}
-	fileInput << printTabs(2) << "Mirror::skipProperties(is);" << endml;
+	fileInput << printTabs(2) << "ar.skipProperties();" << endml;
 	fileInput << printTabs(1) << "}" << endml;
 
 	for (const Property& prop : currentClass.properties) {
@@ -595,7 +613,7 @@ void Printer::printReflectionPolymorph(const std::vector<ClassInfo>& classes) {
 			fileInput << "else ";
 		if (classes[i].isAbstract) {
 			fileInput << "if (typeID == " << classes[i].typeID << ") {" << std::endl;
-			fileInput << printTabs(1) << "throw std::invalid_argument(\"createInstance::ERROR Unable to create instance of abstract class\");" << std::endl;
+			fileInput << printTabs(2) << "throw std::invalid_argument(\"createInstance::ERROR Unable to create instance of abstract class\");" << std::endl;
 			fileInput << printTabs(1) << "}" << std::endl;
 		}
 		else {
@@ -790,19 +808,32 @@ void Printer::printReflectionPolymorph(const std::vector<ClassInfo>& classes) {
 	fileInput << "\t" << "\t" << "\t" << "throw std::invalid_argument(\"memcpy::ERROR Invalid typeID\");" << std::endl;
 	fileInput << "\t" << "}" << std::endl;
 	fileInput << "}" << std::endl;
-	// serialize
-	fileInput << "inline void serialize(void* instance, std::size_t typeID, std::ostream& os) {" << std::endl;
+	// serializeProperty
+	fileInput << "template<typename Archive>" << std::endl;
+	fileInput << "bool serializeProperty(Archive& ar, void* instance, std::size_t typeID, std::string propertyName) {" << std::endl;
 	for (std::size_t i = 0; i < classes.size(); i++) {
 		fileInput << "\t";
 		if (i != 0)
 			fileInput << "else ";
 		fileInput << "if (typeID == " + std::to_string(classes[i].typeID) + ")" << std::endl;
-		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->serialize(os);" << std::endl;
+		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->serializeProperty(ar, propertyName);" << std::endl;
+	}
+	fileInput << "\t" << "return false;" << std::endl;
+	fileInput << "}" << std::endl;
+	// serialize
+	fileInput << "template<typename Archive>" << std::endl;
+	fileInput << "inline void serialize(void* instance, std::size_t typeID, Archive& ar) {" << std::endl;
+	for (std::size_t i = 0; i < classes.size(); i++) {
+		fileInput << "\t";
+		if (i != 0)
+			fileInput << "else ";
+		fileInput << "if (typeID == " + std::to_string(classes[i].typeID) + ")" << std::endl;
+		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->serialize(ar);" << std::endl;
 	}
 	fileInput << "\t" << "throw std::invalid_argument(\"serialize::ERROR\");" << std::endl;
 	fileInput << "}" << std::endl;
 	// deserialize
-	fileInput << "inline void deserialize(void* instance, std::size_t typeID, std::istream& is) {" << std::endl;
+	/*fileInput << "inline void deserialize(void* instance, std::size_t typeID, std::istream& is) {" << std::endl;
 	for (std::size_t i = 0; i < classes.size(); i++) {
 		fileInput << "\t";
 		if (i != 0)
@@ -811,9 +842,9 @@ void Printer::printReflectionPolymorph(const std::vector<ClassInfo>& classes) {
 		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->deserialize(is);" << std::endl;
 	}
 	fileInput << "\t" << "throw std::invalid_argument(\"deserialize::ERROR\");" << std::endl;
-	fileInput << "}" << std::endl;
+	fileInput << "}" << std::endl;*/
 	// onUpdate
-	fileInput << "inline void onUpdate(void* instance, std::size_t typeID, Mirror::Property prop) {" << std::endl;
+	fileInput << "inline void onUpdate(void* instance, std::size_t typeID, " << LIBRARY_NAME_SPACE << "::Property prop) {" << std::endl;
 	for (std::size_t i = 0; i < classes.size(); i++) {
 		fileInput << "\t" << "if (typeID == " << classes[i].typeID << ")" << std::endl;
 		fileInput << "\t" << "\t" << "return prop.onUpdate(reinterpret_cast<" + classes[i].fullName + "*>(instance));" << std::endl;
@@ -904,12 +935,17 @@ void Printer::printPropertyType(const VariableType& type, std::ostream& os, std:
 	std::string sizeString = fullTypeName.compare("void") == 0 ? "0" : "sizeof(" + fullTypeName + ")";
 	os << printTabs(1) << varName << ".name = \"" + type.name + "\";" << endml;
 	os << printTabs(1) << varName << ".size = " << sizeString << ";" << endml;
-	os << printTabs(1) << varName << ".isConst = " + toString(type.isConst) + ";" << endml;
-	os << printTabs(1) << varName << ".isPointer = " + toString(type.isPointer) + ";" << endml;
-	os << printTabs(1) << varName << ".isReference = " + toString(type.isReference) + ";" << endml;
-	os << printTabs(1) << varName << ".isEnumeration = " + toString(type.isEnumeration) + ";" << endml;
-	os << printTabs(1) << varName << ".isArray = " + toString(type.isArray) + ";" << endml;
-	os << printTabs(1) << varName << ".arraySize = " + std::to_string(type.arraySize) + ";" << endml;
+	os << printTabs(1) << varName << ".isConst = std::is_const<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isPointer = std::is_pointer<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isReference = std::is_reference<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isEnumeration = std::is_enum<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isArithmetic = std::is_arithmetic<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isIntegral = std::is_integral<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isFloatingPoint = std::is_floating_point<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isSigned = std::is_signed<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isUnsigned = std::is_unsigned<" << fullTypeName << ">::value;" << endml;
+	os << printTabs(1) << varName << ".isArray = " << toString(type.isArray) + ";" << endml;
+	os << printTabs(1) << varName << ".arraySize = " << std::to_string(type.arraySize) + ";" << endml;
 	std::size_t i = 0;
 	for (VariableType tParam : type.templateParams) {
 		std::string variableName = "type";

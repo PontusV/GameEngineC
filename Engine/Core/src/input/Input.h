@@ -127,6 +127,7 @@ namespace Core {
 		void typeText(unsigned int codepoint);
 
 	private:
+		EntityManager& entityManager;
 		BehaviourManager& behaviourManager;
 		Graphics& graphics;
 

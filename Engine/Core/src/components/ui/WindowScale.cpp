@@ -17,7 +17,7 @@ WindowScale::~WindowScale() {
 }
 
 
-void WindowScale::awake() {
+void WindowScale::initialize() {
 	onWindowResize();
 }
 

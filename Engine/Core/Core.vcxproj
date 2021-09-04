@@ -235,6 +235,8 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="include\Core\Core.cpp" />
+    <ClCompile Include="src\components\entity\DebugNameComponent.cpp" />
+    <ClCompile Include="src\components\entity\PrefabComponent.cpp" />
     <ClCompile Include="src\components\graphics\Border.cpp" />
     <ClCompile Include="src\components\graphics\CanvasRenderer.cpp" />
     <ClCompile Include="src\components\graphics\Graphic.cpp" />
@@ -276,9 +278,10 @@
     <ClCompile Include="src\engine\BehaviourManager.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
     <ClCompile Include="src\engine\ResourceManager.cpp" />
+    <ClCompile Include="src\engine\Serializer.cpp" />
     <ClCompile Include="src\entity\Archetype.cpp" />
     <ClCompile Include="src\entity\Chunk.cpp" />
-    <ClCompile Include="src\entity\component\Component.cpp" />
+    <ClCompile Include="src\entity\component\IComponentData.cpp" />
     <ClCompile Include="src\entity\component\ComponentLoader.cpp" />
     <ClCompile Include="src\entity\component\ComponentRegistry.cpp" />
     <ClCompile Include="src\entity\component\ComponentType.cpp" />
@@ -288,6 +291,7 @@
     <ClCompile Include="src\entity\handle\ComponentHandle.cpp" />
     <ClCompile Include="src\entity\handle\EntityHandle.cpp" />
     <ClCompile Include="src\entity\handle\Handle.cpp" />
+    <ClCompile Include="src\event\EventSystem.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\data\Color.cpp" />
     <ClCompile Include="src\graphics\data\Shader.cpp" />
@@ -306,19 +310,21 @@
     <ClCompile Include="src\maths\Vector3.cpp" />
     <ClCompile Include="src\maths\Vector4.cpp" />
     <ClCompile Include="src\physics\Physics.cpp" />
-    <ClCompile Include="src\scene\Scene.cpp" />
-    <ClCompile Include="src\scene\SceneManager.cpp" />
+    <ClCompile Include="src\prefab\PrefabManager.cpp" />
     <ClCompile Include="src\ui\GUISystem.cpp" />
     <ClCompile Include="src\utils\Bounds.cpp" />
     <ClCompile Include="src\utils\Clipboard.cpp" />
     <ClCompile Include="src\utils\FunctionCaller.cpp" />
-    <ClCompile Include="src\utils\Serializable.cpp" />
+    <ClCompile Include="src\utils\GUID.cpp" />
     <ClCompile Include="src\utils\string.cpp" />
     <ClCompile Include="src\utils\UIDContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Core.h" />
     <ClInclude Include="include\Core\dllexport.h" />
+    <ClInclude Include="src\components\entity\DisabledComponent.h" />
+    <ClInclude Include="src\components\entity\DebugNameComponent.h" />
+    <ClInclude Include="src\components\entity\PrefabComponent.h" />
     <ClInclude Include="src\components\graphics\Border.generated.h" />
     <ClInclude Include="src\components\graphics\Border.h" />
     <ClInclude Include="src\components\graphics\CanvasRenderer.generated.h" />
@@ -386,6 +392,14 @@
     <ClInclude Include="src\components\ui\input\CheckBox.h" />
     <ClInclude Include="src\components\ui\input\InputField.generated.h" />
     <ClInclude Include="src\components\ui\input\InputField.h" />
+    <ClInclude Include="src\engine\Serializer.h" />
+    <ClInclude Include="src\entity\EntitySerializer.h" />
+    <ClInclude Include="src\event\events\EntityActivatedEvent.h" />
+    <ClInclude Include="src\event\events\EntityChangedArchetypeEvent.h" />
+    <ClInclude Include="src\event\events\EntityCreatedEvent.h" />
+    <ClInclude Include="src\event\events\EntityDeactivatedEvent.h" />
+    <ClInclude Include="src\event\events\EntityDestroyedEvent.h" />
+    <ClInclude Include="src\event\EventSystem.h" />
     <ClInclude Include="src\engine\FpsCounter.h" />
     <ClInclude Include="src\components\graphics\RectSprite.generated.h" />
     <ClInclude Include="src\components\graphics\RectSprite.h" />
@@ -403,8 +417,7 @@
     <ClInclude Include="src\entity\Archetype.h" />
     <ClInclude Include="src\entity\Chunk.h" />
     <ClInclude Include="src\entity\ComponentDataBlock.h" />
-    <ClInclude Include="src\entity\component\Component.generated.h" />
-    <ClInclude Include="src\entity\component\Component.h" />
+    <ClInclude Include="src\entity\component\IComponentData.h" />
     <ClInclude Include="src\entity\component\ComponentArray.h" />
     <ClInclude Include="src\entity\component\ComponentArrayManager.h" />
     <ClInclude Include="src\entity\component\ComponentGroup.h" />
@@ -420,6 +433,9 @@
     <ClInclude Include="src\entity\handle\EntityHandle.h" />
     <ClInclude Include="src\entity\handle\Handle.h" />
     <ClInclude Include="src\entity\HideFlags.h" />
+    <ClInclude Include="src\event\events\EntityDestroyEvent.h" />
+    <ClInclude Include="src\event\IEvent.h" />
+    <ClInclude Include="src\event\IEventListener.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\data\Color.h" />
     <ClInclude Include="src\graphics\data\Shader.h" />
@@ -443,16 +459,15 @@
     <ClInclude Include="src\maths\Vector3.h" />
     <ClInclude Include="src\maths\Vector4.h" />
     <ClInclude Include="src\physics\Physics.h" />
+    <ClInclude Include="src\prefab\PrefabManager.h" />
     <ClInclude Include="src\ReflectionEnum.generated.h" />
-    <ClInclude Include="src\scene\Scene.h" />
-    <ClInclude Include="src\scene\SceneManager.h" />
     <ClInclude Include="src\ui\GUISystem.h" />
     <ClInclude Include="src\utils\Alignment.h" />
     <ClInclude Include="src\utils\Anchor.h" />
     <ClInclude Include="src\utils\Bounds.h" />
     <ClInclude Include="src\utils\Clipboard.h" />
     <ClInclude Include="src\utils\FunctionCaller.h" />
-    <ClInclude Include="src\utils\Serializable.h" />
+    <ClInclude Include="src\utils\GUID.h" />
     <ClInclude Include="src\utils\string.h" />
     <ClInclude Include="src\utils\UIDContainer.h" />
     <ClInclude Include="src\ReflectionMacros.h" />

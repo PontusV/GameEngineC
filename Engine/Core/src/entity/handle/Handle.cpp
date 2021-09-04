@@ -1,7 +1,7 @@
 #include "Handle.h"
-#include "scene/Scene.h"
+#include "entity/EntityManager.h"
 #include "entity/Chunk.h"
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 
 #include "components/entity/ParentEntity.h"
 #include "components/entity/ChildManager.h"
@@ -11,7 +11,10 @@
 
 using namespace Core;
 
-Handle::Handle(Entity entity, Scene* scene) : entity(entity), scene(scene) {
+Handle::Handle(Entity entity, EntityManager* entityManager) : entity(entity), entityManager(entityManager) {
+}
+
+Handle::Handle(Entity entity, EntityManager* entityManager, EntityLocationDetailed locationData) : entity(entity), entityManager(entityManager), locationData(locationData) {
 }
 
 Handle::Handle() : entity(0) {
@@ -33,32 +36,31 @@ const Entity& Handle::getEntity() const {
 	return entity;
 }
 
-Scene* Handle::getScene() const {
-	return scene;
+EntityManager* Handle::getEntityManager() const {
+	return entityManager;
 }
 
 void Handle::activate() {
-	scene->activateQueued(*this);
+	entityManager->activateQueued(entity);
 }
 
 void Handle::deactivate() {
-	scene->deactivateQueued(*this);
+	entityManager->deactivateQueued(entity);
 }
 
 bool Handle::isActive() {
 	if (refresh()) {
-		if (auto chunk = locationData.chunk.lock())
-			return chunk->isActive(locationData.index);
+		entityManager->isActive(locationData);
 	}
 	return false;
 }
 
 void Handle::setSiblingIndex(std::size_t index) {
-	scene->setSiblingIndex(*this, index);
+	entityManager->setSiblingIndex(locationData, index);
 }
 
 void Handle::setSiblingIndexQueued(std::size_t index) {
-	scene->setSiblingIndexQueued(*this, index);
+	entityManager->setSiblingIndexQueued(entity, index);
 }
 
 std::size_t Handle::getSiblingIndex() {
@@ -90,7 +92,7 @@ std::size_t Handle::getDepth() {
 
 void Handle::clear() {
 	entity = Entity(0);
-	scene = nullptr;
+	entityManager = nullptr;
 }
 
 bool Handle::isValid() {
@@ -115,16 +117,16 @@ bool Handle::refresh() {
 }
 
 void Handle::update() {
-	if (scene) {
-		locationData = scene->getEntityManager()->getLocation(entity);
+	if (entityManager) {
+		locationData = entityManager->getLocationDetailed(entity);
 	}
 }
 
-void Handle::updateLocation(EntityLocation location) {
+void Handle::updateLocation(EntityLocationDetailed location) {
 	locationData = location;
 }
 
-const EntityLocation& Handle::getLocation() const {
+const EntityLocationDetailed& Handle::getLocation() const {
 	return locationData;
 }
 
@@ -169,7 +171,7 @@ bool Handle::hasComponent(ComponentTypeID typeID) {
 	return getComponent(typeID) != nullptr; // Faster than EntityManager::hasComponent
 }
 
-Component* Handle::getComponent(ComponentTypeID typeID) {
+IComponentData* Handle::getComponent(ComponentTypeID typeID) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponent(locationData.index, typeID);
@@ -177,7 +179,7 @@ Component* Handle::getComponent(ComponentTypeID typeID) {
 	return nullptr;
 }
 
-Component* Handle::getComponent(ComponentType type) {
+IComponentData* Handle::getComponent(ComponentType type) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponent(locationData.index, type);
@@ -185,61 +187,61 @@ Component* Handle::getComponent(ComponentType type) {
 	return nullptr;
 }
 
-std::vector<Component*> Handle::getComponents(ComponentType type) {
+std::vector<IComponentData*> Handle::getComponents(ComponentType type) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index, type);
 	}
-	return std::vector<Component*>(); // Empty
+	return std::vector<IComponentData*>(); // Empty
 }
 
-std::vector<Component*> Handle::getComponents(ComponentTypeID typeID) {
+std::vector<IComponentData*> Handle::getComponents(ComponentTypeID typeID) {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index, typeID);
 	}
-	return std::vector<Component*>(); // Empty
+	return std::vector<IComponentData*>(); // Empty
 }
 
-std::vector<Component*> Handle::getComponents() {
+std::vector<IComponentData*> Handle::getComponents() {
 	if (refresh()) {
 		if (auto chunk = locationData.chunk.lock())
 			return chunk->getComponents(locationData.index);
 	}
-	return std::vector<Component*>(); // Empty
+	return std::vector<IComponentData*>(); // Empty
 }
 
-std::vector<Component*> Handle::getComponentsInImmediateChildren(bool includeInactive) {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Handle::getComponentsInImmediateChildren(bool includeInactive) {
+	std::vector<IComponentData*> components;
 	std::size_t childCount = getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = getChild(i);
 		if (child.isActive() || includeInactive) {
-			std::vector<Component*> childComponents = child.getComponents();
+			std::vector<IComponentData*> childComponents = child.getComponents();
 			components.insert(components.end(), childComponents.begin(), childComponents.end());
 		}
 	}
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsInChildren(bool includeInactive) {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Handle::getComponentsInChildren(bool includeInactive) {
+	std::vector<IComponentData*> components;
 	std::size_t childCount = getChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = getChild(i);
 		if (child.isActive() || includeInactive) {
-			std::vector<Component*> childComponents = child.getComponents();
+			std::vector<IComponentData*> childComponents = child.getComponents();
 			components.insert(components.end(), childComponents.begin(), childComponents.end());
 		}
 	}
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsInParents() {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Handle::getComponentsInParents() {
+	std::vector<IComponentData*> components;
 	Handle parent = getParent();
 	if (parent.refresh()) {
-		std::vector<Component*> parentComponents = parent.getComponents();
+		std::vector<IComponentData*> parentComponents = parent.getComponents();
 		components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 		parentComponents = parent.getComponentsInParents();
 		components.insert(components.end(), parentComponents.begin(), parentComponents.end());
@@ -247,38 +249,31 @@ std::vector<Component*> Handle::getComponentsInParents() {
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsUpwards() {
-	std::vector<Component*> components = getComponents();
-	std::vector<Component*> parentComponents = getComponentsInParents();
+std::vector<IComponentData*> Handle::getComponentsUpwards() {
+	std::vector<IComponentData*> components = getComponents();
+	std::vector<IComponentData*> parentComponents = getComponentsInParents();
 	components.insert(components.end(), parentComponents.begin(), parentComponents.end());
 	return components;
 }
 
-std::vector<Component*> Handle::getComponentsDownwards(bool includeInactive) {
-	std::vector<Component*> components = getComponents();
-	std::vector<Component*> childComponents = getComponentsInChildren(includeInactive);
+std::vector<IComponentData*> Handle::getComponentsDownwards(bool includeInactive) {
+	std::vector<IComponentData*> components = getComponents();
+	std::vector<IComponentData*> childComponents = getComponentsInChildren(includeInactive);
 	components.insert(components.end(), childComponents.begin(), childComponents.end());
 	return components;
 }
 
-const char* Handle::getEntityName() {
+std::vector<IComponentTypeInfo> Handle::getComponentTypes() {
+	std::vector<IComponentData*> components;
 	if (refresh()) {
-		return scene->getEntityManager()->getEntityName(entity);
+		if (auto archetype = locationData.archetype.lock())
+			return archetype->getTypes();
 	}
-	std::cout << "EntityHandle::getEntityName::ERROR Invalid Handle!" << std::endl;
-	return "Invalid";
-}
-
-bool Handle::renameEntity(const char* name) {
-	if (refresh()) {
-		return scene->getEntityManager()->renameEntity(entity, name);
-	}
-	std::cout << "EntityHandle::renameEntity::ERROR Invalid Handle!" << std::endl;
-	return false;
+	return std::vector<IComponentTypeInfo>();
 }
 
 HideFlags Handle::getEntityHideFlags() {
-	HideFlags result = scene->getEntityManager()->getEntityHideFlags(entity);
+	HideFlags result = entityManager->getEntityHideFlags(entity);
 	Handle parent = getParent();
 	while (parent.refresh()) {
 		HideFlags hideFlags = parent.getEntityHideFlags();
@@ -289,24 +284,24 @@ HideFlags Handle::getEntityHideFlags() {
 }
 
 void Handle::setEntityHideFlags(HideFlags hideFlags) {
-	return scene->getEntityManager()->setEntityHideFlags(entity, hideFlags);
+	return entityManager->setEntityHideFlags(entity, hideFlags);
 }
 
 void Handle::setParent(const Entity& entity, bool keepPosition) {
-	Handle parent = scene->getEntityHandle(entity);
+	Handle parent = Handle(entity, entityManager);
 	setParent(parent, keepPosition);
 }
 
-void Handle::setParent(Handle entity, bool keepPosition) {
-	scene->setParentQueued(*this, entity, keepPosition);
+void Handle::setParent(Handle parent, bool keepPosition) {
+	entityManager->setParentQueued(entity, parent.getEntity(), keepPosition);
 }
 
 void Handle::removeParent(bool keepPosition) {
-	scene->setParentQueued(*this, Handle(Entity(0), scene), keepPosition);
+	entityManager->setParentQueued(entity, Entity(0), keepPosition);
 }
 
 Handle Handle::getParent() {
-	ParentEntity* parentCmp = static_cast<ParentEntity*>(getComponent(typeIDof(ParentEntity))); // Get component with ComponentTypeID is much faster
+	ParentEntity* parentCmp = static_cast<ParentEntity*>(getComponent(ParentEntity::getClassTypeID())); // Get component with ComponentTypeID is much faster
 	if (parentCmp) {
 		return parentCmp->getParent();
 	}
@@ -314,7 +309,7 @@ Handle Handle::getParent() {
 }
 
 Handle Handle::getChild(std::size_t index) {
-	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
+	ChildManager* childManager = static_cast<ChildManager*>(getComponent(ChildManager::getClassTypeID())); // Get component with ComponentTypeID is much faster
 	if (childManager) {
 		std::size_t immediateChildCount = childManager->getChildCount();
 		// Check if child is immediate
@@ -347,7 +342,7 @@ Entity Handle::getChildEntity(std::size_t index) {
 }
 
 std::size_t Handle::getImmediateChildCount() {
-	ChildManager* childManager = static_cast<ChildManager*>(getComponent(typeIDof(ChildManager))); // Get component with ComponentTypeID is much faster
+	ChildManager* childManager = static_cast<ChildManager*>(getComponent(ChildManager::getClassTypeID())); // Get component with ComponentTypeID is much faster
 	if (childManager) {
 		return childManager->getChildCount();
 	}
@@ -364,11 +359,43 @@ std::size_t Handle::getChildCount() {
 }
 
 void Handle::addComponent(ComponentTypeID componentTypeID) {
-	scene->addComponentQueued(entity, componentTypeID);
+	if (refresh()) {
+		entityManager->addComponentQueued(entity, componentTypeID);
+	}
+}
+
+IComponentData* Handle::addComponentImmediate(ComponentTypeID componentTypeID) {
+	if (refresh()) {
+		EntityLocationDetailed newLocation = entityManager->addComponent(locationData, componentTypeID);
+		updateLocation(newLocation);
+		return getComponent(componentTypeID);
+	}
 }
 
 void Handle::removeComponent(ComponentTypeID componentTypeID) {
-	scene->removeComponentQueued(entity, componentTypeID);
+	if (refresh()) {
+		entityManager->removeComponentQueued(entity, componentTypeID);
+	}
+}
+
+bool Handle::removeComponentImmediate(ComponentTypeID componentTypeID) {
+	if (refresh()) {
+		EntityLocationDetailed newLocation = entityManager->removeComponent(locationData, componentTypeID);
+		updateLocation(newLocation);
+		return !hasComponent(componentTypeID);
+	}
+}
+
+void Handle::destroy() {
+	if (refresh()) {
+		entityManager->destroyEntityQueued(entity);
+	}
+}
+
+void Handle::destroyImmediate() {
+	if (refresh()) {
+		entityManager->destroyEntity(locationData);
+	}
 }
 
 std::size_t Handle::getComponentCount() {

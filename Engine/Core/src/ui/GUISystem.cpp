@@ -3,34 +3,34 @@
 
 using namespace Core;
 
-GUISystem::GUISystem() {
+GUISystem::GUISystem(EntityManager* entityManager) : entityManager(entityManager) {
 }
 
 
 GUISystem::~GUISystem() {
 }
 
-void updateLayout(LayoutGroup* group) {
+void updateLayout(LayoutGroup* group, Handle& owner) {
 	// Update self
 	group->refresh();
 	// Update children layout
-	Handle handle = group->getOwner();
-	std::size_t childCount = handle.getImmediateChildCount();
+	std::size_t childCount = owner.getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
-		for (LayoutGroup* childGroup : handle.getChild(i).getComponents<LayoutGroup>()) {
-			updateLayout(childGroup);
+		Handle child = owner.getChild(i);
+		for (LayoutGroup* childGroup : child.getComponents<LayoutGroup>()) {
+			updateLayout(childGroup, child);
 		}
 	}
 }
 
-void updateLayoutSizes(LayoutGroup* group) {
+void updateLayoutSizes(LayoutGroup* group, Handle& owner) {
 	if (group->isDirtySize()) {
 		// Update children layout sizes
-		Handle handle = group->getOwner();
-		std::size_t childCount = handle.getImmediateChildCount();
+		std::size_t childCount = owner.getImmediateChildCount();
 		for (std::size_t i = 0; i < childCount; i++) {
-			for (LayoutGroup* childGroup : handle.getChild(i).getComponents<LayoutGroup>()) {
-				updateLayoutSizes(childGroup);
+			Handle child = owner.getChild(i);
+			for (LayoutGroup* childGroup : child.getComponents<LayoutGroup>()) {
+				updateLayoutSizes(childGroup, child);
 			}
 		}
 		// Update self
@@ -52,9 +52,9 @@ void GUISystem::update() {
 	std::size_t layoutGroupSize = layoutGroupComponentGroup.size();
 	for (std::size_t i = 0; i < layoutGroupSize; i++) {
 		LayoutGroup& group = layoutGroupComponentGroup.get<LayoutGroup>(i);
-		updateLayoutSizes(&group);
+		Handle groupEntity = layoutGroupComponentGroup.createHandle(i, entityManager);
+		updateLayoutSizes(&group, groupEntity);
 		if (group.isDirty()) {
-			Handle groupEntity = group.getOwner();
 			bool add = true;
 			for (auto it = dirtyRoots.begin(); it != dirtyRoots.end();) {
 				EntityHandle& root = *it;
@@ -73,8 +73,9 @@ void GUISystem::update() {
 	}
 
 	for (EntityHandle& root : dirtyRoots) {
-		for (LayoutGroup* rootGroup : root.getComponents<LayoutGroup>())
-			updateLayout(rootGroup);
+		for (LayoutGroup* rootGroup : root.getComponents<LayoutGroup>()) {
+			updateLayout(rootGroup, root);
+		}
 	}
 }
 

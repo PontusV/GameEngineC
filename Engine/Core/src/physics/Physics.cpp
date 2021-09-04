@@ -8,15 +8,14 @@ using namespace Core;
 
 
 
-Physics::Physics() {
+Physics::Physics(EntityManager* entityManager) : entityManager(entityManager) {
 }
 
 
 Physics::~Physics() {
 }
 
-void onTransformChange(Transform& transform) {
-	EntityHandle owner = transform.getOwner();
+void onTransformChange(Transform& transform, Handle& owner) {
 	// Updates text position
 	for (Text* text : owner.getComponents<Text>()) {
 		text->setDirty();
@@ -26,7 +25,7 @@ void onTransformChange(Transform& transform) {
 /* Updates the Model Matrix of the target Transform and its child transforms.
  * @parameter matrixChanged specifies if the modelMatrix has changed from the previous update
 */
-void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChanged) {
+void updateTransformModel(Transform& root, Handle& owner, Matrix4 modelMatrix, bool matrixChanged) {
 	bool blockNotify = false;
 	if (root.hasChanged()) {
 		matrixChanged = true;
@@ -35,11 +34,10 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 
 	if (matrixChanged) {
 		root.updateLocalToWorldMatrix(modelMatrix);
-		onTransformChange(root);
+		onTransformChange(root, owner);
 	}
 
 	// Iterate through all children (immediate children iterate through their immediate children)
-	EntityHandle owner = root.getOwner();
 	std::size_t childCount = owner.getImmediateChildCount();
 	if (childCount > 0) {
 		modelMatrix = root.getLocalToWorldMatrix() * root.getLocalModelMatrix();
@@ -54,9 +52,10 @@ void updateTransformModel(Transform& root, Matrix4 modelMatrix, bool matrixChang
 	}
 
 	for (std::size_t childIndex = 0; childIndex < childCount; childIndex++) {
-		Transform* childTransform = owner.getChild(childIndex).getComponent<Transform>();
+		Handle child = owner.getChild(childIndex);
+		Transform* childTransform = child.getComponent<Transform>();
 		if (childTransform) {
-			updateTransformModel(*childTransform, modelMatrix, matrixChanged);
+			updateTransformModel(*childTransform, child, modelMatrix, matrixChanged);
 		}
 	}
 	// Notify behaviours of change in transform
@@ -72,8 +71,9 @@ void Physics::update(float dt) {
 
 	for (std::size_t i = 0; i < sizeTransform; i++) {
 		Transform& root = rootTransforms.get<Transform>(i);
+		Handle owner = rootTransforms.createHandle(i, entityManager);
 
 		//glm::mat4 rootModelMatrix = glm::mat4(1.0f);
-		updateTransformModel(root, Matrix4(1.0f), false);
+		updateTransformModel(root, owner, Matrix4(1.0f), false);
 	}
 }

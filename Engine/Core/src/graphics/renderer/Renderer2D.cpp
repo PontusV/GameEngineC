@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
 using namespace Core;
 
 Renderer2D::Renderer2D(Window* window) : batch(window), postProcessor(window) {
@@ -53,9 +54,12 @@ void Renderer2D::flushAll() {
 }
 
 void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
+	if (startIndex > 0 && startIndex < MAX_RENDERABLES && endIndex > 0 && endIndex < MAX_RENDERABLES) {
+		std::cout << "Renderer2D::flush::ERROR Index out of bounds" << std::endl;
+		throw std::invalid_argument("Renderer2D::flush::ERROR Index out of bounds");
+	}
 	// Sort list of renderable copies
 	std::sort(&renderableBuffer[startIndex], &renderableBuffer[endIndex], [](Renderable2D& l, Renderable2D& r) {
-
 		if (l.z < r.z) return true;
 		if (r.z < l.z) return false;
 
@@ -69,7 +73,7 @@ void Renderer2D::flush(std::size_t startIndex, std::size_t endIndex) {
 		if (r.textureID > l.textureID) return false;
 
 		return false; // They are equal
-		});
+	});
 
 	bool batchBegun = false;
 	for (std::size_t i = startIndex; i < endIndex; i++) {

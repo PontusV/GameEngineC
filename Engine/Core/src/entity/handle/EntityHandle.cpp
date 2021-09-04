@@ -5,7 +5,10 @@
 using namespace Core;
 
 
-EntityHandle::EntityHandle(Entity entity, Scene* scene) : Handle(entity, scene) {
+EntityHandle::EntityHandle(Entity entity, EntityManager* entityManager) : Handle(entity, entityManager) {
+}
+
+EntityHandle::EntityHandle(Entity entity, EntityManager* entityManager, EntityLocationDetailed location) : Handle(entity, entityManager, location) {
 }
 
 EntityHandle::EntityHandle(const Handle& handle) : Handle(handle) {

@@ -3,27 +3,30 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <array>
 #include "imgui/imgui.h"
+
+#define DLL_INTERFACE_READ_BUFFER_SIZE 100000
 
 typedef std::size_t EntityID;
 typedef std::size_t TypeID;
 typedef void* EnginePtr;
-typedef void (*SceneAddedCallbackFun)(void*, std::size_t);
-typedef void (*SceneRemovedCallbackFun)(void*, std::size_t);
-typedef void (*EntityRenamedCallbackFun)(void*, EntityID);
+typedef void (*EntitiesChangedCallbackFun)(void*, std::size_t);
 typedef void* (*GLADloadproc)(const char* name);
 
+// Engine
 typedef void* (*CreateEngineFun)();
-typedef void* (*ReleaseEngineFun)(void*);
-typedef bool (*CreateTemplateEntityFun)(EnginePtr, std::size_t, const char*, float, float, float, float);
+typedef void* (*ReleaseEngineFun)(EnginePtr);
 typedef bool (*EngineInitFun)(EnginePtr, GLADloadproc, int, int);
 typedef void (*EngineTickFun)(EnginePtr, float);
 typedef void (*EngineEditorTickFun)(EnginePtr, float);
 typedef void (*SetViewportSizeFun)(EnginePtr, float, float);
 typedef void (*SetAssetDirPathFun)(const char*);
-typedef EntityID (*CreateEntityFun)(EnginePtr, std::size_t, const char*);
-typedef EntityID(*GetEntityAtPosFun)(EnginePtr, float, float);
+typedef bool (*LoadGameStateFun)(EnginePtr engine, const char*);
+typedef bool (*SaveGameStateFun)(EnginePtr engine, const char*);
+typedef EntityID (*CreateTemplateEntityFun)(EnginePtr, const char*, float, float, float, float);
 
+// Camera
 typedef void (*SetCameraPositionFun)(EnginePtr, float, float);
 typedef void (*SetCameraRotationFun)(EnginePtr, float);
 typedef void (*SetCameraScaleFun)(EnginePtr, float);
@@ -31,6 +34,7 @@ typedef void (*GetCameraPositionFun)(EnginePtr, float*);
 typedef float (*GetCameraRotationFun)(EnginePtr);
 typedef float (*GetCameraScaleFun)(EnginePtr);
 
+// Transform / RectTransform
 typedef bool (*GetRectSizeFun)(EnginePtr, EntityID, float*);
 typedef bool (*GetMinRectScreenPositionFun)(EnginePtr, EntityID, float*);
 typedef bool (*GetWorldPositionFun)(EnginePtr, EntityID, float*);
@@ -38,95 +42,127 @@ typedef bool (*GetLocalPositionFun)(EnginePtr, EntityID, float*);
 typedef bool (*SetLocalPositionFun)(EnginePtr, EntityID, float, float);
 typedef bool (*SetWorldPositionFun)(EnginePtr, EntityID, float, float);
 
+// Reflection general
 typedef bool (*HasAnnotationFun)(TypeID, const char*);
 typedef void (*GetTypeNameFun)(TypeID, char*, std::size_t);
 typedef void (*OnUpdateFun)(void*, TypeID, std::size_t);
 typedef void (*GetDerivedTypeIDsFun)(TypeID, TypeID*, std::size_t);
 typedef void (*GetAllReflectedTypesFun)(TypeID*, std::size_t);
-typedef TypeID(*GetTypeIDFromNameFun)(const char*);
+typedef TypeID (*GetTypeIDFromNameFun)(const char*);
+typedef TypeID (*GetPrefabComponentTypeIDFun)();
 typedef std::size_t(*GetDerivedTypeIDsCountFun)(TypeID);
 typedef std::size_t(*GetAllReflectedTypesCountFun)();
 
+// Reflection properties
 typedef std::size_t(*GetPropertiesCountFun)(TypeID);
-typedef std::size_t(*GetPropertyTypeFun)(TypeID, std::size_t);
-typedef std::size_t(*GetPropertyTypeSizeFun)(TypeID, std::size_t);
-typedef std::size_t(*GetPropertyFieldCountFun)(TypeID, std::size_t, void*);
-typedef void (*GetPropertyFieldsFun)(TypeID, std::size_t, void*, void**, std::size_t*, std::size_t);
-typedef void (*GetPropertyNameFun)(TypeID, std::size_t, char*, std::size_t);
-typedef void (*GetPropertyTypeNameFun)(TypeID, std::size_t, char*, std::size_t);
+typedef std::size_t(*GetPropertyIndexFun)(TypeID, const char*);
+typedef void(*GetPropertyNameFun)(TypeID, std::size_t, char*, std::size_t);
+typedef void(*GetPropertyInspectorDataFun)(TypeID, std::size_t, void*, char*, std::size_t);
+typedef void(*SetPropertyFieldValueFun)(TypeID, std::size_t, void*, std::size_t, char*, std::size_t);
 
-typedef bool (*LoadSceneFun)(EnginePtr, const char*);
-typedef bool (*LoadSceneBackupFun)(EnginePtr, const char*, const char*);
-typedef bool (*UnloadSceneFun)(EnginePtr, std::size_t);
-typedef bool (*SaveSceneFun)(EnginePtr, std::size_t);
-typedef bool (*SaveSceneBackupFun)(EnginePtr, std::size_t, const char*);
-typedef bool (*CreateSceneFun)(EnginePtr, const char*, const char*);
-typedef bool (*DestroyEntityFun)(EnginePtr, std::size_t, EntityID);
-typedef bool (*GetAllEntitiesFun)(EnginePtr, std::size_t, EntityID*, std::size_t);
-typedef bool (*GetSceneNameFun)(EnginePtr, std::size_t, char*, std::size_t);
-typedef bool (*GetSceneFilePathFun)(EnginePtr, std::size_t, char*, std::size_t);
-typedef bool (*HasSceneChangedFun)(EnginePtr, std::size_t);
-typedef std::size_t(*GetSceneCountFun)(EnginePtr);
-typedef std::size_t(*GetAllEntitiesCountFun)(EnginePtr, std::size_t);
+// Prefab
+typedef bool (*UnpackPrefabFun)(EnginePtr, EntityID);
+typedef bool (*SavePrefabFun)(EnginePtr, EntityID, const char*);
+typedef bool (*UpdatePrefabsFun)(EnginePtr, const char*);
+typedef bool (*UpdatePrefabFun)(EnginePtr, EntityID);
+typedef bool (*CreatePrefabFromEntityFun)(EnginePtr, EntityID, const char*);
+typedef bool (*OverridePropertyFun)(EnginePtr, EntityID, std::size_t, std::size_t);
+typedef bool (*RemovePropertyOverrideFun)(EnginePtr, EntityID, std::size_t, std::size_t);
+typedef bool (*OverrideComponentFun)(EnginePtr, EntityID, std::size_t);
+typedef bool (*RemoveComponentOverrideFun)(EnginePtr, EntityID, std::size_t);
+typedef bool (*IsEntityPrefabRootFun)(EnginePtr, EntityID);
+typedef bool (*IsEntityAnOverrideFun)(EnginePtr, EntityID);
+typedef bool (*ClearOverridesFun)(EnginePtr, EntityID);
+typedef void (*GetPrefabFilePathFun)(EnginePtr, EntityID, char*, std::size_t);
+typedef void (*GetPropertyOverridesFun)(EnginePtr, EntityID, TypeID, std::size_t*, std::size_t);
+typedef void (*GetPropertyOverridesAtFun)(EnginePtr, EntityID, EntityID*, TypeID*, std::size_t*, std::size_t);
+typedef void (*GetComponentOverridesFun)(EnginePtr, EntityID, TypeID*, std::size_t);
+typedef void (*GetComponentOverridesAtFun)(EnginePtr, EntityID, EntityID*, TypeID*, std::size_t);
+typedef EntityID (*CreatePrefabEntityFun)(EnginePtr, const char*, float, float);
+typedef EntityID (*CreateEntityFromPrefabFun)(EnginePtr, const char*, float, float);
+typedef EntityID (*GetPrefabOverrideReceiverFun)(EnginePtr, EntityID);
+typedef std::size_t (*GetPropertyOverridesCountFun)(EnginePtr, EntityID, TypeID);
+typedef std::size_t (*GetPropertyOverridesAtCountFun)(EnginePtr, EntityID);
+typedef std::size_t (*GetComponentOverridesCountFun)(EnginePtr, EntityID);
+typedef std::size_t (*GetComponentOverridesAtCountFun)(EnginePtr, EntityID);
 
-typedef bool (*AddComponentFun)(EnginePtr, EntityID, std::size_t, TypeID);
-typedef bool (*RemoveComponentFun)(EnginePtr, EntityID, std::size_t, TypeID);
-typedef bool (*RenameEntityFun)(EnginePtr, EntityID, const char*);
-typedef void (*GetComponentsFun)(EnginePtr, EntityID, void**, TypeID*, std::size_t);
+// Serialization
+typedef bool (*LoadPropertyFromBufferFun)(EnginePtr, EntityID, TypeID, const char*, std::size_t);
+typedef bool (*LoadComponentFromBufferFun)(EnginePtr, EntityID, const char*, std::size_t);
+typedef bool (*LoadEntityFromBufferFun)(EnginePtr, const char*, std::size_t);
+typedef std::size_t(*WritePropertyToBufferFun)(EnginePtr, EntityID, TypeID, std::size_t, char*, std::size_t);
+typedef std::size_t(*WriteComponentToBufferFun)(EnginePtr, EntityID, TypeID, char*, std::size_t);
+typedef std::size_t(*WriteEntityToBufferFun)(EnginePtr, EntityID, char*, std::size_t);
+
+// Entity
+typedef bool (*DestroyEntityFun)(EnginePtr, EntityID);
+typedef bool (*AddComponentFun)(EnginePtr, EntityID, TypeID);
+typedef bool (*RemoveComponentFun)(EnginePtr, EntityID, TypeID);
+typedef bool (*HasComponentFun)(EnginePtr, EntityID, TypeID);
+typedef bool (*SetEntityNameFun)(EnginePtr, EntityID, const char*);
 typedef bool (*IsEntityChildFun)(EnginePtr, EntityID, EntityID);
-typedef bool (*SetEntityParentFun)(EnginePtr, std::size_t, EntityID, EntityID);
-typedef bool (*IsEntityNameAvailableFun)(EnginePtr, const char*);
+typedef bool (*SetEntityParentFun)(EnginePtr, EntityID, EntityID);
 typedef bool (*HasEntityParentFun)(EnginePtr, EntityID);
-typedef bool (*DetachEntityParentFun)(EnginePtr, std::size_t, EntityID);
+typedef bool (*DetachEntityParentFun)(EnginePtr, EntityID);
+typedef bool (*GetAllEntitiesFun)(EnginePtr, EntityID*, std::size_t);
+typedef void (*GetComponentsFun)(EnginePtr, EntityID, void**, TypeID*, std::size_t);
 typedef void (*GetEntityNameFun)(EnginePtr, EntityID, char*, std::size_t);
-typedef EntityID(*GetEntityParentFun)(EnginePtr, EntityID);
-typedef EntityID(*GetEntityFromNameFun)(EnginePtr, const char*);
-typedef EntityID(*GetEntityChildFun)(EnginePtr, EntityID, std::size_t);
 typedef std::size_t(*GetComponentsCountFun)(EnginePtr, EntityID);
 typedef std::size_t(*GetEntityChildCountFun)(EnginePtr, EntityID);
 typedef std::size_t(*GetEntityImmediateChildCountFun)(EnginePtr, EntityID);
+typedef std::size_t(*GetAllEntitiesCountFun)(EnginePtr);
+typedef EntityID(*GetEntityParentFun)(EnginePtr, EntityID);
+typedef EntityID(*GetEntityChildFun)(EnginePtr, EntityID, std::size_t);
+typedef EntityID(*CreateEntityFun)(EnginePtr, const char*);
+typedef EntityID(*GetEntityAtPosFun)(EnginePtr, float, float);
 
-typedef void (*SetSceneAddedCallbackFun)(EnginePtr, SceneAddedCallbackFun);
-typedef void (*SetSceneRemovedCallbackFun)(EnginePtr, SceneRemovedCallbackFun);
-typedef void (*SetEntityRenamedCallbackFun)(EnginePtr, EntityRenamedCallbackFun);
+// Callback
+typedef void (*SetEntitiesChangedCallbackFun)(EnginePtr, EntitiesChangedCallbackFun);
 typedef void (*SetCallbackPtrFun)(EnginePtr, void*);
 
 namespace Editor {
-	enum class InspectorFieldRenderType {
+	enum class InspectorFieldType {
 		NONE = 0,
 		BOOL,
 		DECIMAL,
-		SIGNED_CHAR,
-		UNSIGNED_CHAR,
 		SIGNED_NUMBER,
 		UNSIGNED_NUMBER,
 		STRING,
 		WIDE_STRING,
 		IMAGE_PATH,
 		SHADER_PATH,
-		COLOR,
-		VECTOR2,
-		FONT
+		FONT_PATH
 	};
 	struct ReflectedTypeData {
 		std::size_t typeID;
 		std::string typeName;
 	};
-	struct ReflectedFieldData {
-		void* ptr;
-		std::size_t size;
-	};
-	struct ReflectedPropertyData {
-		std::size_t index;
-		std::string name;
-		std::string typeName;
-		std::size_t typeSize;
-		InspectorFieldRenderType renderer;
-		std::vector<ReflectedFieldData> fields;
-	};
 	struct ComponentData {
 		TypeID typeID;
 		void* instance;
+	};
+	struct PropertyField {
+		void* ptr;
+		std::string name;
+		std::size_t typeSize;
+		InspectorFieldType type;
+	};
+	struct PropertyData {
+		std::size_t index;
+		std::string name;
+		bool overriden;
+		std::size_t arraySize;
+		std::string typeName;
+		std::vector<PropertyField> fields;
+	};
+	struct ComponentOverride {
+		EntityID entityID;
+		TypeID typeID;
+	};
+	struct PropertyOverride {
+		EntityID entityID;
+		TypeID typeID;
+		std::string propertyName;
 	};
 
 	class EngineDLLInterface {
@@ -134,13 +170,14 @@ namespace Editor {
 		// Engine
 		EnginePtr createEngine();
 		void releaseEngine();
-		bool createTemplateEntity(std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 		bool engineInit(GLADloadproc ptr, int screenWidth, int screenHeight);
+		bool loadGameState(const char* path);
+		bool saveGameState(const char* path);
 		void engineTick(float deltaTime);
 		void engineEditorTick(float deltaTime);
 		void setViewportSize(float width, float height);
 		void setAssetDirPath(const char* path);
-		EntityID createEntity(std::size_t sceneIndex, const char* name);
+		EntityID createTemplateEntity(const char* name, float x, float y, float width, float height);
 		EntityID getEntityAtPos(float x, float y);
 
 		// Camera
@@ -166,61 +203,85 @@ namespace Editor {
 		std::vector<TypeID> getDerivedTypeIDs(TypeID typeID);
 		std::vector<ReflectedTypeData> getAllReflectedTypes();
 		TypeID getTypeIDFromName(const char* name);
+		TypeID getPrefabComponentTypeID();
 		std::size_t getDerivedTypeIDsCount(TypeID typeID);
 		std::size_t getAllReflectedTypesCount();
 
 		// Reflection properties
 		std::size_t getPropertiesCount(TypeID typeID);
-		std::vector<ReflectedPropertyData> getProperties(TypeID typeID, void* instance);
-		std::size_t getPropertyType(TypeID typeID, std::size_t propIndex);
-		std::size_t getPropertyTypeSize(TypeID typeID, std::size_t propIndex);
-		std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance);
-		std::vector<ReflectedFieldData> getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance);
+		std::size_t getPropertyIndex(TypeID typeID, const char* propName);
 		std::string getPropertyName(TypeID typeID, std::size_t propIndex);
-		std::string getPropertyTypeName(TypeID typeID, std::size_t propIndex);
+		void getPropertyInspectorData(TypeID typeID, std::size_t propIndex, void* instance, char* buffer, std::size_t bufferSize);
+		void setPropertyFieldValue(TypeID typeID, std::size_t propIndex, void* instance, std::size_t fieldIndex, char* buffer, std::size_t bufferSize);
+		std::vector<PropertyData> getProperties(EntityID entityID, TypeID typeID, void* instance);
 
-		// Scene
-		bool loadScene(const char* path);
-		bool loadSceneBackup(const char* srcPath, const char* destPath);
-		bool unloadScene(std::size_t sceneIndex);
-		bool saveScene(std::size_t sceneIndex);
-		bool saveSceneBackup(std::size_t sceneIndex, const char* path);
-		bool createScene(const char* name, const char* path);
-		bool destroyEntity(std::size_t sceneIndex, EntityID entityID);
-		std::vector<EntityID> getAllEntities(std::size_t sceneIndex);
-		std::string getSceneName(std::size_t sceneIndex);
-		std::string getSceneFilePath(std::size_t sceneIndex);
-		bool hasSceneChanged(std::size_t sceneIndex);
-		std::size_t getSceneCount();
-		std::size_t getAllEntitiesCount(std::size_t sceneIndex);
+		// Prefab
+		bool unpackPrefab(EntityID entityID);
+		bool savePrefab(EntityID entityID, const char* path);
+		bool updatePrefabs(const char* path);
+		bool updatePrefab(EntityID entityID);
+		bool createPrefabFromEntity(EntityID entityID, const char* path);
+		bool overrideProperty(EntityID entityID, std::size_t typeID, std::size_t propIndex);
+		bool removePropertyOverride(EntityID entityID, std::size_t typeID, std::size_t propIndex);
+		bool overrideComponent(EntityID entityID, std::size_t typeID);
+		bool removeComponentOverride(EntityID entityID, std::size_t typeID);
+		bool isEntityPrefabRoot(EntityID entityID);
+		bool isEntityAnOverride(EntityID entityID);
+		bool isComponentOverriden(EntityID entityID, TypeID typeID);
+		bool isPropertyOverriden(EntityID entityID, TypeID typeID, std::string propertyName);
+		bool clearOverrides(EntityID entityID);
+		std::string getPrefabFilePath(EntityID entityID);
+		std::vector<PropertyOverride> getPropertyOverrides(EntityID entityID, TypeID typeID);
+		std::vector<PropertyOverride> getPropertyOverridesAt(EntityID entityID);
+		std::vector<ComponentOverride> getComponentOverrides(EntityID entityID);
+		std::vector<ComponentOverride> getComponentOverridesAt(EntityID entityID);
+		EntityID getNearestPrefabRootEntityID(EntityID entityID);
+		EntityID createPrefabEntity(const char* path, float x, float y);
+		EntityID createEntityFromPrefab(const char* path, float x, float y);
+		EntityID getPrefabOverrideReceiver(EntityID entityID);
+		std::size_t getPropertyOverridesCount(EntityID entityID, TypeID typeID);
+		std::size_t getPropertyOverridesAtCount(EntityID entityID);
+		std::size_t getComponentOverridesCount(EntityID entityID);
+		std::size_t getComponentOverridesAtCount(EntityID entityID);
+
+		// Serialization
+		bool loadPropertyFromBuffer(EntityID entityID, TypeID typeID, const char* serializedData, std::size_t dataSize);
+		bool loadComponentFromBuffer(EntityID entityID, const char* serializedData, std::size_t dataSize);
+		bool loadEntityFromBuffer(const char* serializedData, std::size_t dataSize);
+		std::string writePropertyToBuffer(EntityID entityID, TypeID typeID, std::size_t propIndex);
+		std::string writeComponentToBuffer(EntityID entityID, TypeID typeID);
+		std::string writeEntityToBuffer(EntityID entityID);
 
 		// Entity
-		bool addComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID);
-		bool removeComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID);
-		bool renameEntity(EntityID entityID, const char* name);
+		bool destroyEntity(EntityID entityID);
+		bool addComponent(EntityID entityID, TypeID typeID);
+		bool removeComponent(EntityID entityID, TypeID typeID);
+		bool hasComponent(EntityID entityID, TypeID typeID);
+		bool setEntityName(EntityID entityID, const char* name);
 		std::vector<ComponentData> getComponents(EntityID entityID);
 		ComponentData getComponent(EntityID entityID, TypeID typeID);
 		bool isEntityChild(EntityID entityID, EntityID parentID);
-		bool setEntityParent(std::size_t sceneIndex, EntityID entityID, EntityID parentID);
-		bool isEntityNameAvailable(const char* name);
+		bool setEntityParent(EntityID entityID, EntityID parentID);
 		bool hasEntityParent(EntityID entityID);
-		bool detachEntityParent(std::size_t sceneIndex, EntityID entityID);
+		bool detachEntityParent(EntityID entityID);
 		std::string getEntityName(EntityID entityID);
+		EntityID createEntity(const char* name);
 		EntityID getEntityParent(EntityID entityID);
-		EntityID getEntityFromName(const char* name);
 		EntityID getEntityChild(EntityID entityID, std::size_t index);
+		EntityID getRootEntityID(EntityID entityID);
+		std::vector<EntityID> getAllEntities();
 		std::size_t getComponentsCount(EntityID entityID);
 		std::size_t getEntityChildCount(EntityID entityID);
 		std::size_t getEntityImmediateChildCount(EntityID entityID);
+		std::size_t getAllEntitiesCount();
 
 		// Callback
-		void setSceneAddedCallback(SceneAddedCallbackFun fun);
-		void setSceneRemovedCallback(SceneRemovedCallbackFun fun);
-		void setEntityRenamedCallback(EntityRenamedCallbackFun fun);
+		void setEntitiesChangedCallback(EntitiesChangedCallbackFun fun);
 		void setCallbackPtr(void* ptr);
 
 	protected:
 		// Function ptrs
+		// Engine
 		CreateEngineFun createEngineFun;
 		ReleaseEngineFun releaseEngineFun;
 		CreateTemplateEntityFun createTemplateEntityFun;
@@ -229,9 +290,10 @@ namespace Editor {
 		EngineEditorTickFun engineEditorTickFun;
 		SetViewportSizeFun setViewportSizeFun;
 		SetAssetDirPathFun setAssetDirPathFun;
-		CreateEntityFun createEntityFun;
-		GetEntityAtPosFun getEntityAtPosFun;
+		LoadGameStateFun loadGameStateFun;
+		SaveGameStateFun saveGameStateFun;
 
+		// Camera
 		SetCameraPositionFun setCameraPositionFun;
 		SetCameraRotationFun setCameraRotationFun;
 		SetCameraScaleFun setCameraScaleFun;
@@ -239,6 +301,7 @@ namespace Editor {
 		GetCameraRotationFun getCameraRotationFun;
 		GetCameraScaleFun getCameraScaleFun;
 
+		// Transform / RectTransform
 		GetRectSizeFun getRectSizeFun;
 		GetMinRectScreenPositionFun getMinRectScreenPositionFun;
 		GetWorldPositionFun getWorldPositionFun;
@@ -246,58 +309,85 @@ namespace Editor {
 		SetLocalPositionFun setLocalPositionFun;
 		SetWorldPositionFun setWorldPositionFun;
 
+		// Reflection general
 		HasAnnotationFun hasAnnotationFun;
 		GetTypeNameFun getTypeNameFun;
 		OnUpdateFun onUpdateFun;
 		GetDerivedTypeIDsFun getDerivedTypeIDsFun;
 		GetAllReflectedTypesFun getAllReflectedTypesFun;
 		GetTypeIDFromNameFun getTypeIDFromNameFun;
+		GetPrefabComponentTypeIDFun getPrefabComponentTypeIDFun;
 		GetDerivedTypeIDsCountFun getDerivedTypeIDsCountFun;
 		GetAllReflectedTypesCountFun getAllReflectedTypesCountFun;
 
+		// Reflection properties
 		GetPropertiesCountFun getPropertiesCountFun;
-		GetPropertyTypeFun getPropertyTypeFun;
-		GetPropertyTypeSizeFun getPropertyTypeSizeFun;
-		GetPropertyFieldCountFun getPropertyFieldCountFun;
-		GetPropertyFieldsFun getPropertyFieldsFun;
+		GetPropertyIndexFun getPropertyIndexFun;
 		GetPropertyNameFun getPropertyNameFun;
-		GetPropertyTypeNameFun getPropertyTypeNameFun;
+		GetPropertyInspectorDataFun getPropertyInspectorDataFun;
+		SetPropertyFieldValueFun setPropertyFieldValueFun;
 
-		LoadSceneFun loadSceneFun;
-		LoadSceneBackupFun loadSceneBackupFun;
-		UnloadSceneFun unloadSceneFun;
-		SaveSceneFun saveSceneFun;
-		SaveSceneBackupFun saveSceneBackupFun;
-		CreateSceneFun createSceneFun;
+		// Prefab
+		UnpackPrefabFun unpackPrefabFun;
+		SavePrefabFun savePrefabFun;
+		UpdatePrefabsFun updatePrefabsFun;
+		UpdatePrefabFun updatePrefabFun;
+		CreatePrefabFromEntityFun createPrefabFromEntityFun;
+		CreatePrefabEntityFun createPrefabEntityFun;
+		CreateEntityFromPrefabFun createEntityFromPrefabFun;
+		OverridePropertyFun overridePropertyFun;
+		RemovePropertyOverrideFun removePropertyOverrideFun;
+		OverrideComponentFun overrideComponentFun;
+		RemoveComponentOverrideFun removeComponentOverrideFun;
+		IsEntityPrefabRootFun isEntityPrefabRootFun;
+		IsEntityAnOverrideFun isEntityAnOverrideFun;
+		GetPropertyOverridesFun getPropertyOverridesFun;
+		GetPropertyOverridesAtFun getPropertyOverridesAtFun;
+		GetComponentOverridesFun getComponentOverridesFun;
+		GetComponentOverridesAtFun getComponentOverridesAtFun;
+		ClearOverridesFun clearOverridesFun;
+		GetPrefabFilePathFun getPrefabFilePathFun;
+		GetPrefabOverrideReceiverFun getPrefabOverrideReceiverFun;
+		GetPropertyOverridesCountFun getPropertyOverridesCountFun;
+		GetPropertyOverridesAtCountFun getPropertyOverridesAtCountFun;
+		GetComponentOverridesCountFun getComponentOverridesCountFun;
+		GetComponentOverridesAtCountFun getComponentOverridesAtCountFun;
+
+		// Serialization
+		LoadPropertyFromBufferFun loadPropertyFromBufferFun;
+		LoadComponentFromBufferFun loadComponentFromBufferFun;
+		LoadEntityFromBufferFun loadEntityFromBufferFun;
+		WritePropertyToBufferFun writePropertyToBufferFun;
+		WriteComponentToBufferFun writeComponentToBufferFun;
+		WriteEntityToBufferFun writeEntityToBufferFun;
+
+		// Entity
 		DestroyEntityFun destroyEntityFun;
-		GetAllEntitiesFun getAllEntitiesFun;
-		GetSceneNameFun getSceneNameFun;
-		GetSceneFilePathFun getSceneFilePathFun;
-		HasSceneChangedFun hasSceneChangedFun;
-		GetSceneCountFun getSceneCountFun;
-		GetAllEntitiesCountFun getAllEntitiesCountFun;
-		SetSceneAddedCallbackFun setSceneAddedCallbackFun;
-		SetSceneRemovedCallbackFun setSceneRemovedCallbackFun;
-		SetEntityRenamedCallbackFun setEntityRenamedCallbackFun;
-		SetCallbackPtrFun setCallbackPtrFun;
-
 		AddComponentFun addComponentFun;
 		RemoveComponentFun removeComponentFun;
-		RenameEntityFun renameEntityFun;
-		GetComponentsFun getComponentsFun;
+		HasComponentFun hasComponentFun;
+		SetEntityNameFun setEntityNameFun;
 		IsEntityChildFun isEntityChildFun;
 		SetEntityParentFun setEntityParentFun;
-		IsEntityNameAvailableFun isEntityNameAvailableFun;
 		HasEntityParentFun hasEntityParentFun;
 		DetachEntityParentFun detachEntityParentFun;
+		GetAllEntitiesFun getAllEntitiesFun;
+		GetComponentsFun getComponentsFun;
 		GetEntityNameFun getEntityNameFun;
-		GetEntityParentFun getEntityParentFun;
-		GetEntityFromNameFun getEntityFromNameFun;
-		GetEntityChildFun getEntityChildFun;
 		GetComponentsCountFun getComponentsCountFun;
 		GetEntityChildCountFun getEntityChildCountFun;
 		GetEntityImmediateChildCountFun getEntityImmediateChildCountFun;
+		GetAllEntitiesCountFun getAllEntitiesCountFun;
+		GetEntityParentFun getEntityParentFun;
+		GetEntityChildFun getEntityChildFun;
+		CreateEntityFun createEntityFun;
+		GetEntityAtPosFun getEntityAtPosFun;
+
+		// Callback
+		SetEntitiesChangedCallbackFun setEntitiesChangedCallbackFun;
+		SetCallbackPtrFun setCallbackPtrFun;
 	private:
+		std::array<char, DLL_INTERFACE_READ_BUFFER_SIZE> readBuffer;
 		EnginePtr engine;
 	};
 }

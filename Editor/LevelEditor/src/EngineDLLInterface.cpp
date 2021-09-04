@@ -1,8 +1,60 @@
 #include "EngineDLLInterface.h"
 #include <iostream>
+#include <algorithm>
+#include <streambuf>
 using namespace Editor;
 
-#define CHAR_BUFFER_SIZE 256
+template <typename char_type>
+struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type>> {
+public:
+    ostreambuf(char_type* buffer, std::streamsize bufferLength) {
+        // set the "put" pointer the start of the buffer and record it's length.
+        this->setp(buffer, buffer + bufferLength);
+    }
+protected:
+    std::streampos seekoff(std::streamoff off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::out) override {
+        if (which != std::ios_base::out)
+            throw std::invalid_argument("ostreambuf::seekoff::ERROR Not supported. Only supports out");
+
+        if (dir == std::ios_base::cur)
+            this->pbump(off);
+        else if (dir == std::ios_base::end)
+            this->setp(this->pbase(), this->epptr() + off, this->epptr());
+        else if (dir == std::ios_base::beg)
+            this->setp(this->pbase(), this->pbase() + off, this->epptr());
+        return this->pptr() - this->pbase();
+    }
+
+    std::streampos seekpos(std::streampos pos, std::ios_base::openmode which) override {
+        return seekoff(pos - std::streampos(std::streamoff(0)), std::ios_base::beg, which);
+    }
+};
+
+template <typename char_type>
+struct istreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type>> {
+public:
+    istreambuf(char_type* buffer, std::streamsize bufferLength) {
+        // Set the "get" pointer to the start of the buffer, the next item, and record its length.
+        this->setg(buffer, buffer, buffer + bufferLength);
+    }
+protected:
+    std::streampos seekoff(std::streamoff off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) {
+        if (which != std::ios_base::in)
+            throw std::invalid_argument("istreambuf::seekoff::ERROR Not supported. Only supports in");
+
+        if (dir == std::ios_base::cur)
+            this->gbump(off);
+        else if (dir == std::ios_base::end)
+            this->setg(this->eback(), this->egptr() + off, this->egptr());
+        else if (dir == std::ios_base::beg)
+            this->setg(this->eback(), this->eback() + off, this->egptr());
+        return this->gptr() - this->eback();
+    }
+
+    std::streampos seekpos(std::streampos pos, std::ios_base::openmode which) override {
+        return seekoff(pos - std::streampos(std::streamoff(0)), std::ios_base::beg, which);
+    }
+};
 
 EnginePtr EngineDLLInterface::createEngine() {
     if (createEngineFun == nullptr) {
@@ -29,12 +81,12 @@ void EngineDLLInterface::releaseEngine() {
     engine = nullptr;
 }
 
-bool EngineDLLInterface::createTemplateEntity(std::size_t sceneIndex, const char* name, float x, float y, float width, float height) {
+EntityID EngineDLLInterface::createTemplateEntity(const char* name, float x, float y, float width, float height) {
     if (createTemplateEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::createTemplateEntity::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::createTemplateEntity::ERROR The function ptr is nullptr";
     }
-    return createTemplateEntityFun(engine, sceneIndex, name, x, y, width, height);
+    return createTemplateEntityFun(engine, name, x, y, width, height);
 }
 
 bool EngineDLLInterface::engineInit(GLADloadproc ptr, int screenWidth, int screenHeight) {
@@ -43,6 +95,22 @@ bool EngineDLLInterface::engineInit(GLADloadproc ptr, int screenWidth, int scree
         throw "EngineDLLInterface::engineInit::ERROR The function ptr is nullptr";
     }
     return engineInitFun(engine, ptr, screenWidth, screenHeight);
+}
+
+bool EngineDLLInterface::loadGameState(const char* path) {
+    if (loadGameStateFun == nullptr) {
+        std::cout << "EngineDLLInterface::loadGameState::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::loadGameState::ERROR The function ptr is nullptr";
+    }
+    return loadGameStateFun(engine, path);
+}
+
+bool EngineDLLInterface::saveGameState(const char* path) {
+    if (saveGameStateFun == nullptr) {
+        std::cout << "EngineDLLInterface::saveGameState::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::saveGameState::ERROR The function ptr is nullptr";
+    }
+    return saveGameStateFun(engine, path);
 }
 
 void EngineDLLInterface::engineTick(float deltaTime) {
@@ -127,12 +195,12 @@ void EngineDLLInterface::setAssetDirPath(const char* path) {
     setAssetDirPathFun(path);
 }
 
-EntityID EngineDLLInterface::createEntity(std::size_t sceneIndex, const char* name) {
+EntityID EngineDLLInterface::createEntity(const char* name) {
     if (createEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::createEntity::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::createEntity::ERROR The function ptr is nullptr";
     }
-    return createEntityFun(engine, sceneIndex, name);
+    return createEntityFun(engine, name);
 }
 
 EntityID EngineDLLInterface::getEntityAtPos(float x, float y) {
@@ -212,9 +280,8 @@ std::string EngineDLLInterface::getTypeName(TypeID typeID) {
         std::cout << "EngineDLLInterface::getTypeName::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getTypeName::ERROR The function ptr is nullptr";
     }
-    char buffer[CHAR_BUFFER_SIZE];
-    getTypeNameFun(typeID, buffer, CHAR_BUFFER_SIZE);
-    return std::string(buffer);
+    getTypeNameFun(typeID, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data());
 }
 
 void EngineDLLInterface::onUpdate(void* instance, TypeID typeID, std::size_t propIndex) {
@@ -260,6 +327,14 @@ TypeID EngineDLLInterface::getTypeIDFromName(const char* name) {
     return getTypeIDFromNameFun(name);
 }
 
+TypeID EngineDLLInterface::getPrefabComponentTypeID() {
+    if (getPrefabComponentTypeIDFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPrefabComponentTypeID::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPrefabComponentTypeID::ERROR The function ptr is nullptr";
+    }
+    return getPrefabComponentTypeIDFun();
+}
+
 std::size_t EngineDLLInterface::getDerivedTypeIDsCount(TypeID typeID) {
     if (getDerivedTypeIDsCountFun == nullptr) {
         std::cout << "EngineDLLInterface::getDerivedTypeIDsCount::ERROR The function ptr is nullptr" << std::endl;
@@ -284,59 +359,49 @@ std::size_t EngineDLLInterface::getPropertiesCount(TypeID typeID) {
     return getPropertiesCountFun(typeID);
 }
 
-std::vector<ReflectedPropertyData> EngineDLLInterface::getProperties(TypeID typeID, void* instance) {
+std::vector<PropertyData> EngineDLLInterface::getProperties(EntityID entityID, TypeID typeID, void* instance) {
     std::size_t size = getPropertiesCount(typeID);
-    std::vector<ReflectedPropertyData> properties(size);
+    std::size_t overrideSize = getPropertyOverridesCount(entityID, typeID);
+    std::vector<PropertyData> properties(size);
+    std::vector<std::size_t> propertyOverrides(overrideSize);
+    getPropertyOverridesFun(engine, entityID, typeID, &propertyOverrides[0], overrideSize);
+
     for (std::size_t i = 0; i < size; i++) {
+        getPropertyInspectorData(typeID, i, instance, readBuffer.data(), sizeof(readBuffer));
+        if (readBuffer[0] == '\0') {
+            std::cout << "EngineDLLInterface::getProperties::ERROR Failed to read property" << std::endl;
+            continue;
+        }
         properties[i].index = i;
-        properties[i].name = getPropertyName(typeID, i);
-        properties[i].renderer = static_cast<InspectorFieldRenderType>(getPropertyType(typeID, i));
-        properties[i].typeName = getPropertyTypeName(typeID, i);
-        properties[i].typeSize = getPropertyTypeSize(typeID, i);
-        properties[i].fields = getPropertyFields(typeID, i, instance);
+        properties[i].overriden = std::find(propertyOverrides.begin(), propertyOverrides.end(), i) != propertyOverrides.end();
+        // Read serialized data from buffer
+        istreambuf sbuf(readBuffer.data(), sizeof(readBuffer));
+        std::istream is(&sbuf);
+        is >> properties[i].name;
+        is >> properties[i].typeName;
+        is >> properties[i].arraySize;
+        std::size_t fieldCount;
+        is >> fieldCount;
+        properties[i].fields.resize(fieldCount);
+        for (std::size_t fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+            PropertyField& field = properties[i].fields[fieldIndex];
+            is >> field.name;
+            is >> field.ptr;
+            int fieldType;
+            is >> fieldType;
+            field.type = static_cast<InspectorFieldType>(fieldType);
+            is >> field.typeSize;
+        }
     }
     return properties;
 }
 
-std::size_t EngineDLLInterface::getPropertyType(TypeID typeID, std::size_t propIndex) {
-    if (getPropertyTypeFun == nullptr) {
-        std::cout << "EngineDLLInterface::getPropertyType::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getPropertyType::ERROR The function ptr is nullptr";
+std::size_t EngineDLLInterface::getPropertyIndex(TypeID typeID, const char* propName) {
+    if (getPropertyIndexFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyIndex::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyIndex::ERROR The function ptr is nullptr";
     }
-    return getPropertyTypeFun(typeID, propIndex);
-}
-
-std::size_t EngineDLLInterface::getPropertyTypeSize(TypeID typeID, std::size_t propIndex) {
-    if (getPropertyTypeSizeFun == nullptr) {
-        std::cout << "EngineDLLInterface::getPropertyTypeSize::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getPropertyTypeSize::ERROR The function ptr is nullptr";
-    }
-    return getPropertyTypeSizeFun(typeID, propIndex);
-}
-
-std::size_t EngineDLLInterface::getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance) {
-    if (getPropertyFieldCountFun == nullptr) {
-        std::cout << "EngineDLLInterface::getPropertyFieldCount::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getPropertyFieldCount::ERROR The function ptr is nullptr";
-    }
-    return getPropertyFieldCountFun(typeID, propIndex, instance);
-}
-
-std::vector<ReflectedFieldData> EngineDLLInterface::getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance) {
-    if (getPropertyFieldsFun == nullptr) {
-        std::cout << "EngineDLLInterface::getPropertyFields::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getPropertyFields::ERROR The function ptr is nullptr";
-    }
-    std::size_t outSize = getPropertyFieldCount(typeID, propIndex, instance);
-    std::vector<ReflectedFieldData> fields(outSize);
-    std::vector<void*> fieldValuePtrs(outSize);
-    std::vector<std::size_t> fieldValueSizes(outSize);
-    getPropertyFieldsFun(typeID, propIndex, instance, &fieldValuePtrs[0], &fieldValueSizes[0], outSize);
-    for (std::size_t i = 0; i < outSize; i++) {
-        fields[i].ptr = fieldValuePtrs[i];
-        fields[i].size = fieldValueSizes[i];
-    }
-    return fields;
+    return getPropertyIndexFun(typeID, propName);
 }
 
 std::string EngineDLLInterface::getPropertyName(TypeID typeID, std::size_t propIndex) {
@@ -344,160 +409,372 @@ std::string EngineDLLInterface::getPropertyName(TypeID typeID, std::size_t propI
         std::cout << "EngineDLLInterface::getPropertyName::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getPropertyName::ERROR The function ptr is nullptr";
     }
-    char buffer[CHAR_BUFFER_SIZE];
-    getPropertyNameFun(typeID, propIndex, buffer, CHAR_BUFFER_SIZE);
-    return std::string(buffer);
+    getPropertyNameFun(typeID, propIndex, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data());
 }
 
-std::string EngineDLLInterface::getPropertyTypeName(TypeID typeID, std::size_t propIndex) {
-    if (getPropertyTypeNameFun == nullptr) {
-        std::cout << "EngineDLLInterface::getPropertyTypeName::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getPropertyTypeName::ERROR The function ptr is nullptr";
+void EngineDLLInterface::getPropertyInspectorData(TypeID typeID, std::size_t propIndex, void* instance, char* buffer, std::size_t bufferSize) {
+    if (getPropertyInspectorDataFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyInspectorData::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyInspectorData::ERROR The function ptr is nullptr";
     }
-    char buffer[CHAR_BUFFER_SIZE];
-    getPropertyTypeNameFun(typeID, propIndex, buffer, CHAR_BUFFER_SIZE);
-    return std::string(buffer);
+    return getPropertyInspectorDataFun(typeID, propIndex, instance, buffer, bufferSize);
 }
 
-bool EngineDLLInterface::loadScene(const char* path) {
-    if (loadSceneFun == nullptr) {
-        std::cout << "EngineDLLInterface::loadScene::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::loadScene::ERROR The function ptr is nullptr";
+void EngineDLLInterface::setPropertyFieldValue(TypeID typeID, std::size_t propIndex, void* instance, std::size_t fieldIndex, char* buffer, std::size_t bufferSize) {
+    if (setPropertyFieldValueFun == nullptr) {
+        std::cout << "EngineDLLInterface::setPropertyFieldValue::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setPropertyFieldValue::ERROR The function ptr is nullptr";
     }
-    return loadSceneFun(engine, path);
+    return setPropertyFieldValueFun(typeID, propIndex, instance, fieldIndex, buffer, bufferSize);
 }
 
-bool EngineDLLInterface::loadSceneBackup(const char* srcPath, const char* destPath) {
-    if (loadSceneBackupFun == nullptr) {
-        std::cout << "EngineDLLInterface::loadSceneBackup::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::loadSceneBackup::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::unpackPrefab(EntityID entityID) {
+    if (unpackPrefabFun == nullptr) {
+        std::cout << "EngineDLLInterface::unpackPrefab::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::unpackPrefab::ERROR The function ptr is nullptr";
     }
-    return loadSceneBackupFun(engine, srcPath, destPath);
+    return unpackPrefabFun(engine, entityID);
 }
 
-bool EngineDLLInterface::unloadScene(std::size_t sceneIndex) {
-    if (unloadSceneFun == nullptr) {
-        std::cout << "EngineDLLInterface::unloadScene::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::unloadScene::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::savePrefab(EntityID entityID, const char* path) {
+    if (savePrefabFun == nullptr) {
+        std::cout << "EngineDLLInterface::savePrefab::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::savePrefab::ERROR The function ptr is nullptr";
     }
-    return unloadSceneFun(engine, sceneIndex);
+    return savePrefabFun(engine, entityID, path);
 }
 
-bool EngineDLLInterface::saveSceneBackup(std::size_t sceneIndex, const char* path) {
-    if (saveSceneBackupFun == nullptr) {
-        std::cout << "EngineDLLInterface::saveSceneBackup::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::saveSceneBackup::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::updatePrefabs(const char* path) {
+    if (updatePrefabsFun == nullptr) {
+        std::cout << "EngineDLLInterface::updatePrefabs::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::updatePrefabs::ERROR The function ptr is nullptr";
     }
-    return saveSceneBackupFun(engine, sceneIndex, path);
+    return updatePrefabsFun(engine, path);
 }
 
-bool EngineDLLInterface::saveScene(std::size_t sceneIndex) {
-    if (saveSceneFun == nullptr) {
-        std::cout << "EngineDLLInterface::saveScene::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::saveScene::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::updatePrefab(EntityID entityID) {
+    if (updatePrefabFun == nullptr) {
+        std::cout << "EngineDLLInterface::updatePrefab::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::updatePrefab::ERROR The function ptr is nullptr";
     }
-    return saveSceneFun(engine, sceneIndex);
+    return updatePrefabFun(engine, entityID);
 }
 
-bool EngineDLLInterface::createScene(const char* name, const char* path) {
-    if (createSceneFun == nullptr) {
-        std::cout << "EngineDLLInterface::createScene::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::createScene::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::createPrefabFromEntity(EntityID entityID, const char* path) {
+    if (createPrefabFromEntityFun == nullptr) {
+        std::cout << "EngineDLLInterface::createPrefabFromEntity::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::createPrefabFromEntity::ERROR The function ptr is nullptr";
     }
-    return createSceneFun(engine, name, path);
+    return createPrefabFromEntityFun(engine, entityID, path);
 }
 
-bool EngineDLLInterface::destroyEntity(std::size_t sceneIndex, EntityID entityID) {
+EntityID EngineDLLInterface::getNearestPrefabRootEntityID(EntityID entityID) {
+    EntityID parentID = getEntityParent(entityID);
+    if (parentID == 0) {
+        return 0;
+    }
+    if (isEntityPrefabRoot(parentID)) {
+        return parentID;
+    }
+    else {
+        return getNearestPrefabRootEntityID(parentID);
+    }
+}
+
+EntityID EngineDLLInterface::createPrefabEntity(const char* path, float x, float y) {
+    if (createPrefabEntityFun == nullptr) {
+        std::cout << "EngineDLLInterface::createPrefabEntity::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::createPrefabEntity::ERROR The function ptr is nullptr";
+    }
+    return createPrefabEntityFun(engine, path, x, y);
+}
+
+EntityID EngineDLLInterface::createEntityFromPrefab(const char* path, float x, float y) {
+    if (createEntityFromPrefabFun == nullptr) {
+        std::cout << "EngineDLLInterface::createEntityFromPrefab::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::createEntityFromPrefab::ERROR The function ptr is nullptr";
+    }
+    return createEntityFromPrefabFun(engine, path, x, y);
+}
+
+bool EngineDLLInterface::overrideProperty(EntityID entityID, std::size_t typeID, std::size_t propIndex) {
+    if (overridePropertyFun == nullptr) {
+        std::cout << "EngineDLLInterface::overrideProperty::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::overrideProperty::ERROR The function ptr is nullptr";
+    }
+    return overridePropertyFun(engine, entityID, typeID, propIndex);
+}
+
+bool EngineDLLInterface::removePropertyOverride(EntityID entityID, std::size_t typeID, std::size_t propIndex) {
+    if (removePropertyOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::removePropertyOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::removePropertyOverride::ERROR The function ptr is nullptr";
+    }
+    return removePropertyOverrideFun(engine, entityID, typeID, propIndex);
+}
+
+bool EngineDLLInterface::overrideComponent(EntityID entityID, std::size_t typeID) {
+    if (overrideComponentFun == nullptr) {
+        std::cout << "EngineDLLInterface::overrideComponent::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::overrideComponent::ERROR The function ptr is nullptr";
+    }
+    return overrideComponentFun(engine, entityID, typeID);
+}
+
+bool EngineDLLInterface::removeComponentOverride(EntityID entityID, std::size_t typeID) {
+    if (removeComponentOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::removeComponentOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::removeComponentOverride::ERROR The function ptr is nullptr";
+    }
+    return removeComponentOverrideFun(engine, entityID, typeID);
+}
+
+bool EngineDLLInterface::isEntityPrefabRoot(EntityID entityID) {
+    if (isEntityPrefabRootFun == nullptr) {
+        std::cout << "EngineDLLInterface::isEntityPrefabRoot::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::isEntityPrefabRoot::ERROR The function ptr is nullptr";
+    }
+    return isEntityPrefabRootFun(engine, entityID);
+}
+
+bool EngineDLLInterface::isEntityAnOverride(EntityID entityID) {
+    if (isEntityAnOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::isEntityAnOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::isEntityAnOverride::ERROR The function ptr is nullptr";
+    }
+    return isEntityAnOverrideFun(engine, entityID);
+}
+
+bool EngineDLLInterface::isComponentOverriden(EntityID entityID, TypeID typeID) {
+    auto componentOverrides = getComponentOverrides(entityID);
+    return std::find_if(componentOverrides.begin(), componentOverrides.end(), [&typeID](const ComponentOverride& override) { return override.typeID == typeID; }) != componentOverrides.end();
+}
+
+bool EngineDLLInterface::isPropertyOverriden(EntityID entityID, TypeID typeID, std::string propertyName) {
+    auto propertyOverrides = getPropertyOverrides(entityID, typeID);
+    return std::find_if(propertyOverrides.begin(), propertyOverrides.end(), [&propertyName](const PropertyOverride& override) { return override.propertyName == propertyName; }) != propertyOverrides.end();
+}
+
+std::vector<PropertyOverride> EngineDLLInterface::getPropertyOverrides(EntityID entityID, TypeID typeID) {
+    if (getPropertyOverridesFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyOverrides::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyOverrides::ERROR The function ptr is nullptr";
+    }
+    std::size_t overrideCount = getPropertyOverridesCount(entityID, typeID);
+    std::vector<std::size_t> propertyIndices(overrideCount);
+    getPropertyOverridesFun(engine, entityID, typeID, &propertyIndices[0], overrideCount);
+    std::vector<PropertyOverride> overrides;
+    overrides.resize(overrideCount);
+    for (std::size_t i = 0; i < overrideCount; i++) {
+        PropertyOverride & override = overrides[i];
+        override.entityID = entityID;
+        override.typeID = typeID;
+        override.propertyName = getPropertyName(typeID, propertyIndices[i]);
+    }
+    return overrides;
+}
+
+std::vector<PropertyOverride> EngineDLLInterface::getPropertyOverridesAt(EntityID entityID) {
+    if (getPropertyOverridesAtFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyOverridesAt::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyOverridesAt::ERROR The function ptr is nullptr";
+    }
+    std::size_t overrideCount = getPropertyOverridesAtCount(entityID);
+    std::vector<EntityID> entityIDs(overrideCount);
+    std::vector<TypeID> propertyTypeIDs(overrideCount);
+    std::vector<std::size_t> propertyIndices(overrideCount);
+    getPropertyOverridesAtFun(engine, entityID, &entityIDs[0], &propertyTypeIDs[0], &propertyIndices[0], overrideCount);
+    std::vector<PropertyOverride> overrides;
+    overrides.resize(overrideCount);
+    for (std::size_t i = 0; i < overrideCount; i++) {
+        auto& typeID = propertyTypeIDs[i];
+        PropertyOverride& override = overrides[i];
+        override.entityID = entityIDs[i];
+        override.typeID = propertyTypeIDs[i];
+        override.propertyName = getPropertyName(typeID, propertyIndices[i]);
+    }
+    return overrides;
+}
+
+std::vector<ComponentOverride> EngineDLLInterface::getComponentOverrides(EntityID entityID) {
+    if (getComponentOverridesFun == nullptr) {
+        std::cout << "EngineDLLInterface::getComponentOverrides::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getComponentOverrides::ERROR The function ptr is nullptr";
+    }
+    std::size_t overrideCount = getComponentOverridesCount(entityID);
+    std::vector<std::size_t> typeIDs(overrideCount);
+    getComponentOverridesFun(engine, entityID, &typeIDs[0], overrideCount);
+    std::vector<ComponentOverride> overrides(overrideCount);
+    for (std::size_t i = 0; i < overrideCount; i++) {
+        ComponentOverride& override = overrides[i];
+        override.entityID = entityID;
+        override.typeID = typeIDs[i];
+    }
+    return overrides;
+}
+
+std::vector<ComponentOverride> EngineDLLInterface::getComponentOverridesAt(EntityID entityID) {
+    if (getComponentOverridesAtFun == nullptr) {
+        std::cout << "EngineDLLInterface::getComponentOverridesAt::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getComponentOverridesAt::ERROR The function ptr is nullptr";
+    }
+    std::size_t overrideCount = getComponentOverridesAtCount(entityID);
+    std::vector<std::size_t> entityIDs(overrideCount); // TODO
+    std::vector<std::size_t> typeIDs(overrideCount);
+    getComponentOverridesAtFun(engine, entityID, &entityIDs[0], &typeIDs[0], overrideCount);
+    std::vector<ComponentOverride> overrides(overrideCount);
+    for (std::size_t i = 0; i < overrideCount; i++) {
+        ComponentOverride& override = overrides[i];
+        override.entityID = entityIDs[i];
+        override.typeID = typeIDs[i];
+    }
+    return overrides;
+}
+
+bool EngineDLLInterface::clearOverrides(EntityID entityID) {
+    if (clearOverridesFun == nullptr) {
+        std::cout << "EngineDLLInterface::clearOverrides::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::clearOverrides::ERROR The function ptr is nullptr";
+    }
+    return clearOverridesFun(engine, entityID);
+}
+
+std::string EngineDLLInterface::getPrefabFilePath(EntityID entityID) {
+    if (getPrefabFilePathFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPrefabFilePath::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPrefabFilePath::ERROR The function ptr is nullptr";
+    }
+    getPrefabFilePathFun(engine, entityID, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data());
+}
+
+EntityID EngineDLLInterface::getPrefabOverrideReceiver(EntityID entityID) {
+    if (getPrefabOverrideReceiverFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPrefabOverrideReceiver::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPrefabOverrideReceiver::ERROR The function ptr is nullptr";
+    }
+    return getPrefabOverrideReceiverFun(engine, entityID);
+}
+
+std::size_t EngineDLLInterface::getPropertyOverridesCount(EntityID entityID, TypeID typeID) {
+    if (getPropertyOverridesCountFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyOverridesCount::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyOverridesCount::ERROR The function ptr is nullptr";
+    }
+    return getPropertyOverridesCountFun(engine, entityID, typeID);
+}
+
+std::size_t EngineDLLInterface::getPropertyOverridesAtCount(EntityID entityID) {
+    if (getPropertyOverridesAtCountFun == nullptr) {
+        std::cout << "EngineDLLInterface::getPropertyOverridesAtCount::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getPropertyOverridesAtCount::ERROR The function ptr is nullptr";
+    }
+    return getPropertyOverridesAtCountFun(engine, entityID);
+}
+
+std::size_t EngineDLLInterface::getComponentOverridesCount(EntityID entityID) {
+    if (getComponentOverridesCountFun == nullptr) {
+        std::cout << "EngineDLLInterface::getComponentOverridesCount::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getComponentOverridesCount::ERROR The function ptr is nullptr";
+    }
+    return getComponentOverridesCountFun(engine, entityID);
+}
+
+std::size_t EngineDLLInterface::getComponentOverridesAtCount(EntityID entityID) {
+    if (getComponentOverridesAtCountFun == nullptr) {
+        std::cout << "EngineDLLInterface::getComponentOverridesAtCount::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getComponentOverridesAtCount::ERROR The function ptr is nullptr";
+    }
+    return getComponentOverridesAtCountFun(engine, entityID);
+}
+
+bool EngineDLLInterface::loadPropertyFromBuffer(EntityID entityID, TypeID typeID, const char* serializedData, std::size_t dataSize) {
+    if (loadPropertyFromBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::loadPropertyFromBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::loadPropertyFromBuffer::ERROR The function ptr is nullptr";
+    }
+    return loadPropertyFromBufferFun(engine, entityID, typeID, serializedData, dataSize);
+}
+
+bool EngineDLLInterface::loadComponentFromBuffer(EntityID entityID, const char* serializedData, std::size_t dataSize) {
+    if (loadComponentFromBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::loadComponentFromBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::loadComponentFromBuffer::ERROR The function ptr is nullptr";
+    }
+    return loadComponentFromBufferFun(engine, entityID, serializedData, dataSize);
+}
+
+bool EngineDLLInterface::loadEntityFromBuffer(const char* serializedData, std::size_t dataSize) {
+    if (loadEntityFromBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::loadEntityFromBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::loadEntityFromBuffer::ERROR The function ptr is nullptr";
+    }
+    return loadEntityFromBufferFun(engine, serializedData, dataSize);
+}
+
+std::string EngineDLLInterface::writePropertyToBuffer(EntityID entityID, TypeID typeID, std::size_t propIndex) {
+    if (writePropertyToBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::writePropertyToBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::writePropertyToBuffer::ERROR The function ptr is nullptr";
+    }
+    std::size_t size = writePropertyToBufferFun(engine, entityID, typeID, propIndex, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data(), size);
+}
+
+std::string EngineDLLInterface::writeComponentToBuffer(EntityID entityID, TypeID typeID) {
+    if (writeComponentToBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::writeComponentToBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::writeComponentToBuffer::ERROR The function ptr is nullptr";
+    }
+    std::size_t size = writeComponentToBufferFun(engine, entityID, typeID, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data(), size);
+}
+
+std::string EngineDLLInterface::writeEntityToBuffer(EntityID entityID) {
+    if (writeEntityToBufferFun == nullptr) {
+        std::cout << "EngineDLLInterface::writeEntityToBuffer::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::writeEntityToBuffer::ERROR The function ptr is nullptr";
+    }
+    std::size_t size = writeEntityToBufferFun(engine, entityID, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data(), size);
+}
+
+bool EngineDLLInterface::destroyEntity(EntityID entityID) {
     if (destroyEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::destroyEntity::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::destroyEntity::ERROR The function ptr is nullptr";
     }
-    return destroyEntityFun(engine, sceneIndex, entityID);
+    return destroyEntityFun(engine, entityID);
 }
 
-std::vector<EntityID> EngineDLLInterface::getAllEntities(std::size_t sceneIndex) {
+std::vector<EntityID> EngineDLLInterface::getAllEntities() {
     if (getAllEntitiesFun == nullptr) {
         std::cout << "EngineDLLInterface::getAllEntities::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getAllEntities::ERROR The function ptr is nullptr";
     }
-    std::size_t outSize = getAllEntitiesCount(sceneIndex);
+    std::size_t outSize = getAllEntitiesCount();
     std::vector<EntityID> entities(outSize);
-    if (getAllEntitiesFun(engine, sceneIndex, &entities[0], outSize)) {
+    if (getAllEntitiesFun(engine, &entities[0], outSize)) {
         return entities;
     }
     return std::vector<EntityID>();
 }
 
-std::string EngineDLLInterface::getSceneName(std::size_t sceneIndex) {
-    if (getSceneNameFun == nullptr) {
-        std::cout << "EngineDLLInterface::getSceneName::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getSceneName::ERROR The function ptr is nullptr";
-    }
-    char buffer[CHAR_BUFFER_SIZE];
-    if (getSceneNameFun(engine, sceneIndex, buffer, CHAR_BUFFER_SIZE)) {
-        return std::string(buffer);
-    }
-    return std::string();
-}
-
-std::string EngineDLLInterface::getSceneFilePath(std::size_t sceneIndex) {
-    if (getSceneFilePathFun == nullptr) {
-        std::cout << "EngineDLLInterface::getSceneFilePath::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getSceneFilePath::ERROR The function ptr is nullptr";
-    }
-    char buffer[CHAR_BUFFER_SIZE];
-    if (getSceneFilePathFun(engine, sceneIndex, buffer, CHAR_BUFFER_SIZE)) {
-        return std::string(buffer);
-    }
-    return std::string();
-}
-
-bool EngineDLLInterface::hasSceneChanged(std::size_t sceneIndex) {
-    if (hasSceneChangedFun == nullptr) {
-        std::cout << "EngineDLLInterface::hasSceneChanged::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::hasSceneChanged::ERROR The function ptr is nullptr";
-    }
-    return hasSceneChangedFun(engine, sceneIndex);
-}
-
-std::size_t EngineDLLInterface::getSceneCount() {
-    if (getSceneCountFun == nullptr) {
-        std::cout << "EngineDLLInterface::getSceneCount::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getSceneCount::ERROR The function ptr is nullptr";
-    }
-    return getSceneCountFun(engine);
-}
-
-std::size_t EngineDLLInterface::getAllEntitiesCount(std::size_t sceneIndex) {
+std::size_t EngineDLLInterface::getAllEntitiesCount() {
     if (getAllEntitiesCountFun == nullptr) {
         std::cout << "EngineDLLInterface::getAllEntitiesCount::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getAllEntitiesCount::ERROR The function ptr is nullptr";
     }
-    return getAllEntitiesCountFun(engine, sceneIndex);
+    return getAllEntitiesCountFun(engine);
 }
 
-void EngineDLLInterface::setSceneAddedCallback(SceneAddedCallbackFun fun) {
-    if (setSceneAddedCallbackFun == nullptr) {
-        std::cout << "EngineDLLInterface::setSceneAddedCallback::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::setSceneAddedCallback::ERROR The function ptr is nullptr";
+void EngineDLLInterface::setEntitiesChangedCallback(EntitiesChangedCallbackFun fun) {
+    if (setEntitiesChangedCallbackFun == nullptr) {
+        std::cout << "EngineDLLInterface::setEntitiesChangedCallback::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setEntitiesChangedCallback::ERROR The function ptr is nullptr";
     }
-    setSceneAddedCallbackFun(engine, fun);
-}
-
-void EngineDLLInterface::setSceneRemovedCallback(SceneRemovedCallbackFun fun) {
-    if (setSceneRemovedCallbackFun == nullptr) {
-        std::cout << "EngineDLLInterface::setSceneRemovedCallback::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::setSceneRemovedCallback::ERROR The function ptr is nullptr";
-    }
-    setSceneRemovedCallbackFun(engine, fun);
-}
-
-void EngineDLLInterface::setEntityRenamedCallback(EntityRenamedCallbackFun fun) {
-    if (setEntityRenamedCallbackFun == nullptr) {
-        std::cout << "EngineDLLInterface::setEntityRenamedCallback::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::setEntityRenamedCallback::ERROR The function ptr is nullptr";
-    }
-    setEntityRenamedCallbackFun(engine, fun);
+    setEntitiesChangedCallbackFun(engine, fun);
 }
 
 void EngineDLLInterface::setCallbackPtr(void* ptr) {
@@ -508,28 +785,36 @@ void EngineDLLInterface::setCallbackPtr(void* ptr) {
     setCallbackPtrFun(engine, ptr);
 }
 
-bool EngineDLLInterface::addComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID) {
+bool EngineDLLInterface::addComponent(EntityID entityID, TypeID typeID) {
     if (addComponentFun == nullptr) {
         std::cout << "EngineDLLInterface::addComponent::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::addComponent::ERROR The function ptr is nullptr";
     }
-    return addComponentFun(engine, entityID, sceneIndex, typeID);
+    return addComponentFun(engine, entityID, typeID);
 }
 
-bool EngineDLLInterface::removeComponent(EntityID entityID, std::size_t sceneIndex, TypeID typeID) {
+bool EngineDLLInterface::removeComponent(EntityID entityID, TypeID typeID) {
     if (removeComponentFun == nullptr) {
         std::cout << "EngineDLLInterface::removeComponent::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::removeComponent::ERROR The function ptr is nullptr";
     }
-    return removeComponentFun(engine, entityID, sceneIndex, typeID);
+    return removeComponentFun(engine, entityID, typeID);
 }
 
-bool EngineDLLInterface::renameEntity(EntityID entityID, const char* name) {
-    if (renameEntityFun == nullptr) {
-        std::cout << "EngineDLLInterface::renameEntity::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::renameEntity::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::hasComponent(EntityID entityID, TypeID typeID) {
+    if (hasComponentFun == nullptr) {
+        std::cout << "EngineDLLInterface::hasComponent::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::hasComponent::ERROR The function ptr is nullptr";
     }
-    return renameEntityFun(engine, entityID, name);
+    return hasComponentFun(engine, entityID, typeID);
+}
+
+bool EngineDLLInterface::setEntityName(EntityID entityID, const char* name) {
+    if (setEntityNameFun == nullptr) {
+        std::cout << "EngineDLLInterface::setEntityName::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::setEntityName::ERROR The function ptr is nullptr";
+    }
+    return setEntityNameFun(engine, entityID, name);
 }
 
 std::vector<ComponentData> EngineDLLInterface::getComponents(EntityID entityID) {
@@ -570,20 +855,12 @@ bool EngineDLLInterface::isEntityChild(EntityID entityID, EntityID parentID) {
     return isEntityChildFun(engine, entityID, parentID);
 }
 
-bool EngineDLLInterface::setEntityParent(std::size_t sceneIndex, EntityID entityID, EntityID parentID) {
+bool EngineDLLInterface::setEntityParent(EntityID entityID, EntityID parentID) {
     if (setEntityParentFun == nullptr) {
         std::cout << "EngineDLLInterface::setEntityParent::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::setEntityParent::ERROR The function ptr is nullptr";
     }
-    return setEntityParentFun(engine, sceneIndex, entityID, parentID);
-}
-
-bool EngineDLLInterface::isEntityNameAvailable(const char* name) {
-    if (isEntityNameAvailableFun == nullptr) {
-        std::cout << "EngineDLLInterface::isEntityNameAvailable::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::isEntityNameAvailable::ERROR The function ptr is nullptr";
-    }
-    return isEntityNameAvailableFun(engine, name);
+    return setEntityParentFun(engine, entityID, parentID);
 }
 
 bool EngineDLLInterface::hasEntityParent(EntityID entityID) {
@@ -594,12 +871,12 @@ bool EngineDLLInterface::hasEntityParent(EntityID entityID) {
     return hasEntityParentFun(engine, entityID);
 }
 
-bool EngineDLLInterface::detachEntityParent(std::size_t sceneIndex, EntityID entityID) {
+bool EngineDLLInterface::detachEntityParent(EntityID entityID) {
     if (detachEntityParentFun == nullptr) {
         std::cout << "EngineDLLInterface::detachEntityParent::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::detachEntityParent::ERROR The function ptr is nullptr";
     }
-    return detachEntityParentFun(engine, sceneIndex, entityID);
+    return detachEntityParentFun(engine, entityID);
 }
 
 std::string EngineDLLInterface::getEntityName(EntityID entityID) {
@@ -607,9 +884,8 @@ std::string EngineDLLInterface::getEntityName(EntityID entityID) {
         std::cout << "EngineDLLInterface::getEntityName::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getEntityName::ERROR The function ptr is nullptr";
     }
-    char buffer[CHAR_BUFFER_SIZE];
-    getEntityNameFun(engine, entityID, buffer, CHAR_BUFFER_SIZE);
-    return std::string(buffer);
+    getEntityNameFun(engine, entityID, readBuffer.data(), sizeof(readBuffer));
+    return std::string(readBuffer.data());
 }
 
 EntityID EngineDLLInterface::getEntityParent(EntityID entityID) {
@@ -620,20 +896,20 @@ EntityID EngineDLLInterface::getEntityParent(EntityID entityID) {
     return getEntityParentFun(engine, entityID);
 }
 
-EntityID EngineDLLInterface::getEntityFromName(const char* name) {
-    if (getEntityFromNameFun == nullptr) {
-        std::cout << "EngineDLLInterface::getEntityFromName::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getEntityFromName::ERROR The function ptr is nullptr";
-    }
-    return getEntityFromNameFun(engine, name);
-}
-
 EntityID EngineDLLInterface::getEntityChild(EntityID entityID, std::size_t index) {
     if (getEntityChildFun == nullptr) {
         std::cout << "EngineDLLInterface::getEntityChild::ERROR The function ptr is nullptr" << std::endl;
         throw "EngineDLLInterface::getEntityChild::ERROR The function ptr is nullptr";
     }
     return getEntityChildFun(engine, entityID, index);
+}
+
+EntityID EngineDLLInterface::getRootEntityID(EntityID entityID) {
+    EntityID rootEntityID = getEntityParent(entityID);
+    if (rootEntityID == 0) {
+        return entityID;
+    }
+    return getRootEntityID(rootEntityID);
 }
 
 std::size_t EngineDLLInterface::getComponentsCount(EntityID entityID) {

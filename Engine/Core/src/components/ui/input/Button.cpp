@@ -14,7 +14,7 @@ Button::~Button() {
 }
 
 
-void Button::awake() {
+void Button::initialize() {
 	changeState(DISABLED);
 }
 

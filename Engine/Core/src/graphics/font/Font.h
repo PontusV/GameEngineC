@@ -1,11 +1,10 @@
 #ifndef FONT_H
 #define FONT_H
-#include "utils/Serializable.h"
 #include <string>
 
 namespace Core {
 	/* Stores a font size and an address to a ttf font. */
-	class Font : public Serializable {
+	class Font {
 	public:
 		static const char* defaultAddress;
 		static int defaultSize;
@@ -16,8 +15,14 @@ namespace Core {
 		const int& getSize() const;
 
 		//Save & Load operator
-		void serialize(std::ostream &os) const;
-		void deserialize(std::istream &is);
+		template<typename Archive>
+		void serialize(Archive& ar) const {
+			ar(fileName, size);
+		}
+		template<typename Archive>
+		void deserialize(Archive& ar) {
+			ar(fileName, size);
+		}
 
 		std::string fileName;
 		int size;

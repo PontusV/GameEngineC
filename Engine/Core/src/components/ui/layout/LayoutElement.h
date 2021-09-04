@@ -1,6 +1,6 @@
 #ifndef LAYOUT_ELEMENT_H
 #define LAYOUT_ELEMENT_H
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "ILayoutElement.h"
 #include "maths/Vector2.h"
 #include "LayoutElement.generated.h"
@@ -8,7 +8,7 @@
 namespace Core {
 
 	/* Manages the size and position of immediate children. */
-	CLASS() LayoutElement : public Component, public ILayoutElement {
+	CLASS() LayoutElement : public IComponentData, public ILayoutElement {
 		GENERATED_BODY()
 	public:
 		LayoutElement();

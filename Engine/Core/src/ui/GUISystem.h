@@ -8,7 +8,7 @@ namespace Core {
 	/* Graphical User Interface System */
 	class GUISystem {
 	public:
-		GUISystem();
+		GUISystem(EntityManager* entityManager);
 		~GUISystem();
 
 		void update();
@@ -16,6 +16,8 @@ namespace Core {
 		void onWindowResize();
 
 	private:
+		EntityManager* entityManager;
+
 		ComponentGroup<ContentSizeFitter> contentSizeFitterGroup;
 		ComponentGroup<LayoutGroup> layoutGroupComponentGroup;
 		ComponentGroup<UIBehaviour> behavioursGroup;

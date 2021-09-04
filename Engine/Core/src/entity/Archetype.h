@@ -11,19 +11,22 @@
 
 namespace Core {
 
-	class Component; // Forward declare
+	class IComponentData; // Forward declare
 
 	/* Contains entities with the archetype specified by the given types. If the types of components contained by an Entity matches the template it is added to the first chunk with room. */
-	class Archetype {
+	class Archetype : public std::enable_shared_from_this<Archetype> {
 	public:
 		Archetype(std::vector<IComponentTypeInfo> types);
 		~Archetype();
+
+		std::vector<Entity> getAllEntities();
 
 		template <typename... Ts>
 		EntityLocation addEntity(Entity entity, Ts&... components);
 		void removeEntity(Entity entity);
 		/* Moves the Entity to this Archetype. */
-		EntityLocation moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive = false);
+		EntityLocation moveEntity(Entity entity, std::vector<ComponentDataBlock> sources);
+		bool containsEntity(Entity entity);
 
 		template<typename T>
 		void setComponent(Entity entity, T& component);
@@ -31,8 +34,8 @@ namespace Core {
 		template<typename T>
 		T* getComponent(Entity entity);
 		/* Returns first match. */
-		Component* getComponent(Entity entity, ComponentType componentType);
-		std::vector<Component*> getComponents(Entity entity);
+		IComponentData* getComponent(Entity entity, ComponentType componentType);
+		std::vector<IComponentData*> getComponents(Entity entity);
 
 		bool isEmpty();
 		bool match(std::vector<ComponentTypeID> typeIDs);
@@ -50,7 +53,7 @@ namespace Core {
 		std::shared_ptr<Chunk> getContainer(Entity entity);
 
 	private:
-		void createChunk();
+		std::shared_ptr<Chunk> createChunk();
 		void removeChunk(std::size_t index);
 
 	private:

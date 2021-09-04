@@ -18,7 +18,7 @@ void CheckBox::showTick() {
 	if (rect) {
 		Vector2 position = rect->getRectOffset();
 		hideTick(); // Make sure tick is destroyed
-		tick = createEntity(std::string(owner.getEntityName()) + "_Tick",
+		tick = createEntity(
 			Image("Images/ui/CheckBox-tick.png", "Shaders/figure", Color(0, 0, 0, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ() + 0.0002f, Alignment::TOP_LEFT)
 		);
@@ -29,7 +29,7 @@ void CheckBox::showTick() {
 
 void CheckBox::hideTick() {
 	if (tick.refresh()) {
-		destroyEntity(tick);
+		tick.destroy();
 	}
 }
 
@@ -39,13 +39,13 @@ void CheckBox::start() {
 		if (toggle) showTick();
 		Vector2 position = rect->getRectOffset();
 		// Create graphics
-		background = createEntity(std::string(owner.getEntityName()) + "_Background",
+		background = createEntity(
 			Image("Images/ui/CheckBox-background.png", "Shaders/figure", Color(255, 255, 255, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ(), Alignment::TOP_LEFT)
 		);
 		background.setParent(owner);
 		background.setEntityHideFlags(HideFlags::HideInInspector | HideFlags::HideInHierarchy);
-		border = createEntity(std::string(owner.getEntityName()) + "_Border",
+		border = createEntity(
 			Image("Images/ui/CheckBox-border.png", "Shaders/figure", Color(0, 0, 0, 255)),
 			RectTransform(position.x, position.y, rect->getSize().x, rect->getSize().y, rect->getZ()+0.0001f, Alignment::TOP_LEFT)
 		);
@@ -55,9 +55,9 @@ void CheckBox::start() {
 }
 
 void CheckBox::onDestroy() {
-	destroyEntity(tick);
-	destroyEntity(background);
-	destroyEntity(border);
+	tick.destroy();
+	background.destroy();
+	border.destroy();
 }
 
 void CheckBox::onMouseButtonPressedAsButton(int buttoncode, int mods) {

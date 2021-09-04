@@ -14,7 +14,7 @@ namespace Core {
 		WindowAnchor(Anchor anchor, float offsetX = 0, float offsetY = 0);
 		~WindowAnchor();
 
-		void awake() override;
+		void initialize() override;
 		void onWindowResize() override;
 
 	public:

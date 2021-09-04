@@ -11,13 +11,14 @@ typedef std::size_t ComponentTypeID;
 
 namespace Core {
 
-	class Scene;
-	class Component;
+	class EntityManager;
+	class IComponentData;
 
-	/* A handle for Entities */
+	/* A handle for an Entity. Used for management of an Entity, including its hierarchy */
 	class Handle {
 	public:
-		Handle(Entity entity, Scene* scene);
+		Handle(Entity entity, EntityManager* entityManager);
+		Handle(Entity entity, EntityManager* entityManager, EntityLocationDetailed locationData);
 		Handle(); // Invalid handle constructor
 		virtual ~Handle();
 
@@ -37,7 +38,7 @@ namespace Core {
 		bool isActive();
 
 		const Entity& getEntity() const;
-		Scene* getScene() const;
+		EntityManager* getEntityManager() const;
 
 		/* Checks if pointed towards a valid Entity ID. */
 		bool isValid();
@@ -50,14 +51,24 @@ namespace Core {
 
 		/* Updates the Handle so it points towards the target Entity. */
 		void update();
-		void updateLocation(EntityLocation location);
-		const EntityLocation& getLocation() const;
+		void updateLocation(EntityLocationDetailed location);
+		const EntityLocationDetailed& getLocation() const;
 
 		/* Returns the number of parents above in the hierarchy. */
 		std::size_t getDepth();
 
+		/* Adds the component next frame */
 		void addComponent(ComponentTypeID componentTypeID);
+		/* Adds the component immediately. Warning: may cause unknown behaviour */
+		IComponentData* addComponentImmediate(ComponentTypeID componentTypeID);
+		/* Removes the component next frame */
 		void removeComponent(ComponentTypeID componentTypeID);
+		/* Removes the component immediate. Warning: may cause unknown behaviour */
+		bool removeComponentImmediate(ComponentTypeID componentTypeID);
+		/* Destroys the Entity next frame */
+		void destroy();
+		/* Destroys the Entity immediately. Warning: may cause unknown behaviour */
+		void destroyImmediate();
 
 		template<typename T>
 		bool hasComponent();
@@ -71,46 +82,45 @@ namespace Core {
 
 		template<typename T>
 		T* getComponent();
-		Component* getComponent(ComponentType type);
-		Component* getComponent(ComponentTypeID typeID);
-		std::vector<Component*> getComponents();
+		IComponentData* getComponent(ComponentType type);
+		IComponentData* getComponent(ComponentTypeID typeID);
+		std::vector<IComponentData*> getComponents();
 		template<typename T>
 		std::vector<T*> getComponents();
-		std::vector<Component*> getComponents(ComponentType type);
-		std::vector<Component*> getComponents(ComponentTypeID typeID);
+		std::vector<IComponentData*> getComponents(ComponentType type);
+		std::vector<IComponentData*> getComponents(ComponentTypeID typeID);
 
 		template<typename T>
 		T* getComponentInChildren(bool includeInactive = false);
-		std::vector<Component*> getComponentsInChildren(bool includeInactive = false);
+		std::vector<IComponentData*> getComponentsInChildren(bool includeInactive = false);
 		template<typename T>
 		std::vector<T*> getComponentsInChildren(bool includeInactive = false);
 
 		template<typename T>
 		T* getComponentInImmediateChildren(bool includeInactive = false);
-		std::vector<Component*> getComponentsInImmediateChildren(bool includeInactive = false);
+		std::vector<IComponentData*> getComponentsInImmediateChildren(bool includeInactive = false);
 		template<typename T>
 		std::vector<T*> getComponentsInImmediateChildren(bool includeInactive = false);
 
 		template<typename T>
 		T* getComponentInParents();
-		std::vector<Component*> getComponentsInParents();
+		std::vector<IComponentData*> getComponentsInParents();
 		template<typename T>
 		std::vector<T*> getComponentsInParents();
 
 		/* Returns all components attached to the entity and its parents. */
-		std::vector<Component*> getComponentsUpwards();
+		std::vector<IComponentData*> getComponentsUpwards();
 		/* Returns all components (deriving from T) attached to the entity and its parents. */
 		template<typename T>
 		std::vector<T*> getComponentsUpwards();
 
 		/* Returns all components attached to the entity, its children and the childrens children, etc... */
-		std::vector<Component*> getComponentsDownwards(bool includeInactive = false);
+		std::vector<IComponentData*> getComponentsDownwards(bool includeInactive = false);
 		/* Returns all components (deriving from T) attached to the entity and its parent and the parent of the parent, etc... */
 		template<typename T>
 		std::vector<T*> getComponentsDownwards(bool includeInactive = false);
 
-		const char* getEntityName();
-		bool renameEntity(const char* name);
+		std::vector<IComponentTypeInfo> getComponentTypes();
 		HideFlags getEntityHideFlags();
 		void setEntityHideFlags(HideFlags hideFlags);
 		
@@ -129,13 +139,20 @@ namespace Core {
 		void setSiblingIndexQueued(std::size_t index);
 		std::size_t getSiblingIndex();
 
+		template<typename Archetype>
+		void serialize(Archetype& ar) const {
+			ar(entity);
+		}
+		template<typename Archetype>
+		void deserialize(Archetype& ar) {
+			ar(entity);
+		}
+
 	protected:
 		// Data required to update itself
-		Scene* scene = nullptr;
+		EntityManager* entityManager = nullptr;
 		Entity entity = Entity(0);
-
-	private:
-		EntityLocation locationData = EntityLocation();
+		EntityLocationDetailed locationData = EntityLocationDetailed();
 	};
 
 	template<typename T>
@@ -150,10 +167,10 @@ namespace Core {
 
 	template<typename T>
 	std::vector<T*> Handle::getComponents() {
-		std::vector<Component*> components = getComponents(typeof(T));
+		std::vector<IComponentData*> components = getComponents(typeof(T));
 		std::vector<T*> castedPtrs; // Copying
 		castedPtrs.reserve(components.size());
-		for (Component* ptr : components) {
+		for (IComponentData* ptr : components) {
 			castedPtrs.push_back((T*)ptr);
 		}
 		return castedPtrs;
@@ -214,12 +231,11 @@ namespace Core {
 
 	template<typename T>
 	T* Handle::getComponentInParents() {
-		Handle* parent = getParent();
-		while (parent) {
-			if (T* ptr = parent->getComponent<T>()) // Check if parent has the component
+		Handle parent = getParent();
+		if (parent.refresh()) {
+			if (T* ptr = parent.getComponent<T>()) // Check if parent has the component
 				return ptr;
-
-			parent = parent->getParent(); // Check next parent
+			return parent.getComponentInParents<T>();
 		}
 		return nullptr;
 	}

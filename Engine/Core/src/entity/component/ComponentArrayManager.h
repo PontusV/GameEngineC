@@ -22,15 +22,15 @@ namespace Core {
 		}
 
 		template<typename T>
-		ComponentArray<T>* createComponentArray(std::initializer_list<ComponentType> required = {}, std::initializer_list<ComponentType> ignoreables = {}) {
-			ComponentArray<T>* cmpArray = new ComponentArray<T>(required, ignoreables);
+		ComponentArray<T>* createComponentArray(std::initializer_list<ComponentType> required = {}, std::initializer_list<ComponentType> blocked = {}) {
+			ComponentArray<T>* cmpArray = new ComponentArray<T>(required, blocked);
 			arrays.push_back(cmpArray);
 			return cmpArray;
 		}
 
-		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
+		void chunkAdded(std::shared_ptr<Archetype> archetype, std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
 			for (IComponentArray* a : arrays) {
-				a->chunkAdded(chunk, chunkTypes);
+				a->chunkAdded(archetype, chunk, chunkTypes);
 			}
 		}
 

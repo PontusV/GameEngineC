@@ -23,7 +23,7 @@ namespace Editor {
 		void tick();
 	
 	private:
-		void renderComponent(EntityID entityID, std::string entityName, std::size_t sceneIndex, std::size_t typeID, void* component, std::size_t index);
+		void renderComponent(EntityID rootEntityID, EntityID entityID, std::string entityName, std::size_t typeID, void* component, std::size_t index);
 
 	private:
 		GameView* gameView;

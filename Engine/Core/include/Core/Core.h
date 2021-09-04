@@ -2,54 +2,29 @@
 #include "dllexport.h"
 #include <cstddef>
 
-#define MAX_FIELD_COUNT 10
+#define MAX_FIELD_COUNT 100
 
 typedef std::size_t EntityID;
 typedef std::size_t TypeID;
-typedef void* (*SceneAddedCallbackFun)(void*, std::size_t);
-typedef void* (*SceneRemovedCallbackFun)(void*, std::size_t);
-typedef void* (*EntityRenamedCallbackFun)(void*, std::size_t);
+typedef void (*EntitiesChangedCallbackFun)(void*, std::size_t);
 typedef void* (*GLADloadproc)(const char* name);
 
 namespace Core {
 	class Engine;
 }
 
-enum class InspectorFieldRenderType {
-	NONE = 0,
-	BOOL,
-	DECIMAL,
-	SIGNED_CHAR,
-	UNSIGNED_CHAR,
-	SIGNED_NUMBER,
-	UNSIGNED_NUMBER,
-	STRING,
-	WIDE_STRING,
-	IMAGE_PATH,
-	SHADER_PATH,
-	COLOR,
-	VECTOR2,
-	FONT
-};
-
-struct PropertyFieldData {
-	std::size_t count;
-	void* ptrBuffer[MAX_FIELD_COUNT];
-	std::size_t sizeBuffer[MAX_FIELD_COUNT];
-};
-
 extern "C" {
 	// Engine
 	DLLEXPORT Core::Engine* createEngine();
 	DLLEXPORT void releaseEngine(Core::Engine* engine);
-	DLLEXPORT bool createTemplateEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name, float x, float y, float width, float height);
 	DLLEXPORT bool engineInit(Core::Engine* engine, GLADloadproc ptr, int screenWidth, int screenHeight);
 	DLLEXPORT void engineTick(Core::Engine* engine, float deltaTime);
 	DLLEXPORT void engineEditorTick(Core::Engine* engine, float deltaTime);
 	DLLEXPORT void setViewportSize(Core::Engine* engine, float width, float height);
 	DLLEXPORT void setAssetDirPath(const char* path);
-	DLLEXPORT EntityID createEntity(Core::Engine* engine, std::size_t sceneIndex, const char* name);
-	DLLEXPORT EntityID getEntityAtPos(Core::Engine* engine, float x, float y);
+	DLLEXPORT bool loadGameState(Core::Engine* engine, const char* path);
+	DLLEXPORT bool saveGameState(Core::Engine* engine, const char* path);
+	DLLEXPORT EntityID createTemplateEntity(Core::Engine* engine, const char* name, float x, float y, float width, float height);
 
 	// Camera
 	DLLEXPORT void setCameraPosition(Core::Engine* engine, float x, float y);
@@ -74,54 +49,74 @@ extern "C" {
 	DLLEXPORT void getDerivedTypeIDs(TypeID typeID, TypeID* out, std::size_t outSize);
 	DLLEXPORT void getAllReflectedTypes(TypeID* out, std::size_t outSize);
 	DLLEXPORT TypeID getTypeIDFromName(const char* name);
+	DLLEXPORT TypeID getPrefabComponentTypeID();
 	DLLEXPORT std::size_t getDerivedTypeIDsCount(TypeID typeID);
 	DLLEXPORT std::size_t getAllReflectedTypesCount();
 	
 	// Reflection properties
 	DLLEXPORT std::size_t getPropertiesCount(TypeID typeID);
-	DLLEXPORT std::size_t getPropertyType(TypeID typeID, std::size_t propIndex);
-	DLLEXPORT std::size_t getPropertyTypeSize(TypeID typeID, std::size_t propIndex);
-	DLLEXPORT std::size_t getPropertyFieldCount(TypeID typeID, std::size_t propIndex, void* instance);
-	DLLEXPORT void getPropertyFields(TypeID typeID, std::size_t propIndex, void* instance, void** out, std::size_t* outFieldSize, std::size_t outSize);
-	DLLEXPORT void getPropertyName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
-	DLLEXPORT void getPropertyTypeName(TypeID typeID, std::size_t propIndex, char* out, std::size_t outSize);
+	DLLEXPORT void getPropertyInspectorData(TypeID typeID, std::size_t propIndex, void* instance, char* bufferPtr, std::size_t bufferSize);
+	DLLEXPORT void setPropertyFieldValue(TypeID typeID, std::size_t propIndex, void* instance, std::size_t fieldIndex, char* buffer, std::size_t bufferSize);
+	DLLEXPORT std::size_t getPropertyIndex(TypeID typeID, const char* propertyName);
+	DLLEXPORT void getPropertyName(TypeID typeID, std::size_t propIndex, char* buffer, std::size_t bufferSize);
 	
-	// Scene
-	DLLEXPORT bool loadScene(Core::Engine* engine, const char* path);
-	DLLEXPORT bool loadSceneBackup(Core::Engine* engine, const char* srcPath, const char* destPath);
-	DLLEXPORT bool unloadScene(Core::Engine* engine, std::size_t sceneIndex);
-	DLLEXPORT bool saveScene(Core::Engine* engine, std::size_t sceneIndex);
-	DLLEXPORT bool saveSceneBackup(Core::Engine* engine, std::size_t sceneIndex, const char* path);
-	DLLEXPORT bool createScene(Core::Engine* engine, const char* name, const char* path);
-	DLLEXPORT bool destroyEntity(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID);
-	DLLEXPORT bool getAllEntities(Core::Engine* engine, std::size_t sceneIndex, EntityID* out, std::size_t outSize);
-	DLLEXPORT bool getSceneName(Core::Engine* engine, std::size_t sceneIndex, char* out, std::size_t outSize);
-	DLLEXPORT bool getSceneFilePath(Core::Engine* engine, std::size_t sceneIndex, char* out, std::size_t outSize);
-	DLLEXPORT bool hasSceneChanged(Core::Engine* engine, std::size_t sceneIndex);
-	DLLEXPORT std::size_t getSceneCount(Core::Engine* engine);
-	DLLEXPORT std::size_t getAllEntitiesCount(Core::Engine* engine, std::size_t sceneIndex);
+	// Prefab
+	DLLEXPORT bool unpackPrefab(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool savePrefab(Core::Engine* engine, EntityID entityID, const char* path);
+	DLLEXPORT bool updatePrefabs(Core::Engine* engine, const char* path);
+	DLLEXPORT bool updatePrefab(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool createPrefabFromEntity(Core::Engine* engine, EntityID entityID, const char* path);
+	DLLEXPORT bool overrideProperty(Core::Engine* engine, EntityID entityID, std::size_t typeID, std::size_t propIndex);
+	DLLEXPORT bool removePropertyOverride(Core::Engine* engine, EntityID entityID, std::size_t typeID, std::size_t propIndex);
+	DLLEXPORT bool overrideComponent(Core::Engine* engine, EntityID entityID, std::size_t typeID);
+	DLLEXPORT bool removeComponentOverride(Core::Engine* engine, EntityID entityID, std::size_t typeID);
+	DLLEXPORT bool isEntityPrefabRoot(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool isEntityAnOverride(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT void getPrefabFilePath(Core::Engine* engine, EntityID entityID, char* out, std::size_t outSize);
+	DLLEXPORT void getPropertyOverrides(Core::Engine* engine, EntityID entityID, TypeID typeID, std::size_t* out, std::size_t outSize);
+	DLLEXPORT void getPropertyOverridesAt(Core::Engine* engine, EntityID entityID, EntityID* entityIDOut, TypeID* typeIDOut, std::size_t* propIndexOut, std::size_t outSize);
+	DLLEXPORT void getComponentOverrides(Core::Engine* engine, EntityID entityID, TypeID* out, std::size_t outSize);
+	DLLEXPORT void getComponentOverridesAt(Core::Engine* engine, EntityID entityID, EntityID* entityIDOut, TypeID* typeIDOut, std::size_t outSize);
+	DLLEXPORT bool clearOverrides(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT EntityID createPrefabEntity(Core::Engine* engine, const char* path, float x, float y);
+	DLLEXPORT EntityID createEntityFromPrefab(Core::Engine* engine, const char* path, float x, float y);
+	DLLEXPORT EntityID getPrefabOverrideReceiver(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT std::size_t getPropertyOverridesCount(Core::Engine* engine, EntityID entityID, TypeID typeID);
+	DLLEXPORT std::size_t getPropertyOverridesAtCount(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT std::size_t getComponentOverridesCount(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT std::size_t getComponentOverridesAtCount(Core::Engine* engine, EntityID entityID);
+
+	// Serialization
+	DLLEXPORT bool loadPropertyFromBuffer(Core::Engine* engine, EntityID entityID, TypeID typeID, char* serializedData, std::size_t dataSize);
+	DLLEXPORT bool loadComponentFromBuffer(Core::Engine* engine, EntityID entityID, char* serializedData, std::size_t dataSize);
+	DLLEXPORT bool loadEntityFromBuffer(Core::Engine* engine, char* serializedData, std::size_t dataSize);
+	DLLEXPORT std::size_t writePropertyToBuffer(Core::Engine* engine, EntityID entityID, TypeID typeID, std::size_t propIndex, char* bufferPtr, std::size_t bufferSize);
+	DLLEXPORT std::size_t writeComponentToBuffer(Core::Engine* engine, EntityID entityID, TypeID typeID, char* bufferPtr, std::size_t bufferSize);
+	DLLEXPORT std::size_t writeEntityToBuffer(Core::Engine* engine, EntityID entityID, char* bufferPtr, std::size_t bufferSize);
 	
 	// Entity
-	DLLEXPORT bool addComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID);
-	DLLEXPORT bool removeComponent(Core::Engine* engine, EntityID entityID, std::size_t sceneIndex, TypeID typeID);
-	DLLEXPORT bool renameEntity(Core::Engine* engine, EntityID entityID, const char* name);
-	DLLEXPORT void getComponents(Core::Engine* engine, EntityID entityID, void** outPtrs, TypeID* outTypeIDs, std::size_t outSize);
+	DLLEXPORT bool addComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);
+	DLLEXPORT bool removeComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);
+	DLLEXPORT bool hasComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);
 	DLLEXPORT bool isEntityChild(Core::Engine* engine, EntityID entityID, EntityID parentID);
-	DLLEXPORT bool setEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID, EntityID parentID);
-	DLLEXPORT bool isEntityNameAvailable(Core::Engine* engine, const char* name);
+	DLLEXPORT bool setEntityParent(Core::Engine* engine, EntityID entityID, EntityID parentID);
 	DLLEXPORT bool hasEntityParent(Core::Engine* engine, EntityID entityID);
-	DLLEXPORT bool detachEntityParent(Core::Engine* engine, std::size_t sceneIndex, EntityID entityID);
+	DLLEXPORT bool detachEntityParent(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool destroyEntity(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool getAllEntities(Core::Engine* engine, EntityID* out, std::size_t outSize);
+	DLLEXPORT bool setEntityName(Core::Engine* engine, EntityID entityID, const char* name);
 	DLLEXPORT void getEntityName(Core::Engine* engine, EntityID entityID, char* out, std::size_t outSize);
+	DLLEXPORT void getComponents(Core::Engine* engine, EntityID entityID, void** outPtrs, TypeID* outTypeIDs, std::size_t outSize);
+	DLLEXPORT EntityID createEntity(Core::Engine* engine);
+	DLLEXPORT EntityID getEntityAtPos(Core::Engine* engine, float x, float y);
 	DLLEXPORT EntityID getEntityParent(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t index);
-	DLLEXPORT EntityID getEntityFromName(Core::Engine* engine, const char* name);
 	DLLEXPORT std::size_t getComponentsCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityChildCount(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT std::size_t getAllEntitiesCount(Core::Engine* engine);
 
 	// Callback
-	DLLEXPORT void setSceneAddedCallback(Core::Engine* engine, SceneAddedCallbackFun fun);
-	DLLEXPORT void setSceneRemovedCallback(Core::Engine* engine, SceneRemovedCallbackFun fun);
-	DLLEXPORT void setEntityRenamedCallback(Core::Engine* engine, EntityRenamedCallbackFun callback);
+	DLLEXPORT void setEntitiesChangedCallback(Core::Engine* engine, EntitiesChangedCallbackFun callback);
 	DLLEXPORT void setCallbackPtr(Core::Engine* engine, void* ptr);
 }

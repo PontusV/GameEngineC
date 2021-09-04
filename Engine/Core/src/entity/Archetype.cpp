@@ -28,6 +28,15 @@ Archetype::~Archetype() {
 	clear();
 }
 
+std::vector<Entity> Archetype::getAllEntities() {
+	std::vector<Entity> result;
+	for (const auto& chunk : chunks) {
+		std::vector<Entity> entities = chunk->getAllEntities();
+		result.insert(result.begin(), entities.begin(), entities.end());
+	}
+	return result;
+}
+
 /* Removes all chunks */
 void Archetype::clear() {
 	while (!chunks.empty())
@@ -47,11 +56,11 @@ void Archetype::removeEntity(Entity entity) {
 	}
 }
 
-EntityLocation Archetype::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive) {
+EntityLocation Archetype::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources) {
 	//Checking for space in existing chunks
 	for (std::shared_ptr<Chunk> chunk : chunks) {
 		if (!chunk->isFull()) {
-			std::size_t index = chunk->moveEntity(entity, sources, inactive);
+			std::size_t index = chunk->moveEntity(entity, sources);
 			return EntityLocation(index, chunk);
 		}
 	}
@@ -59,17 +68,25 @@ EntityLocation Archetype::moveEntity(Entity entity, std::vector<ComponentDataBlo
 	//No space found, adding new chunk
 	createChunk();
 	std::shared_ptr<Chunk> chunk = chunks.back();
-	std::size_t index = chunk->moveEntity(entity, sources, inactive);
+	std::size_t index = chunk->moveEntity(entity, sources);
 	return EntityLocation(index, chunk);
 }
 
+bool Archetype::containsEntity(Entity entity) {
+	for (std::shared_ptr<Chunk>& chunk : chunks) {
+		if (chunk->contains(entity)) {
+			return true;
+		}
+	}
+	return false;
+}
 
-Component* Archetype::getComponent(Entity entity, ComponentType componentType) {
+IComponentData* Archetype::getComponent(Entity entity, ComponentType componentType) {
 	return getContainer(entity)->getComponent(entity, componentType);
 }
 
 
-std::vector<Component*> Archetype::getComponents(Entity entity) {
+std::vector<IComponentData*> Archetype::getComponents(Entity entity) {
 	return getContainer(entity)->getComponents(entity);
 }
 
@@ -116,28 +133,29 @@ std::shared_ptr<Chunk> Archetype::getContainer(Entity entity) {
 			return chunk;
 		}
 	}
-	std::cout << "Archetype::getContainer::ERROR The entity(" << entity.getID() << ") is not contained by this Archetype!" << std::endl;
-	throw std::invalid_argument("Archetype::getContainer::ERROR The entity is not contained by this Archetype!");
+	//std::cout << "Archetype::getContainer::ERROR The entity(" << entity.getID() << ") is not contained by this Archetype!" << std::endl;
+	//throw std::invalid_argument("Archetype::getContainer::ERROR The entity is not contained by this Archetype!");
+	return nullptr;
 }
 
 EntityLocation Archetype::getLocation(Entity entity) {
-	try {
-		std::shared_ptr<Chunk> chunk = getContainer(entity);
-		std::size_t index = chunk->getIndex(entity);
-		return EntityLocation(index, chunk);
-	} catch (std::exception&) {
-		std::cout << "Archetype::getLocation::ERROR could not find location for Entity.\n";
-		return EntityLocation(); // Returns invalid location
+	std::shared_ptr<Chunk> chunk = getContainer(entity);
+	if (chunk == nullptr) {
+		return EntityLocation();
 	}
+	std::size_t index = chunk->getIndex(entity);
+	return EntityLocation(index, chunk);
 }
 
 std::vector<ComponentDataBlock> Archetype::getComponentDataBlocks(Entity entity) {
 	return getContainer(entity)->getComponentDataBlocks(entity);
 }
 
-void Archetype::createChunk() {
-	chunks.push_back(std::make_shared<Chunk>(types));
-	ComponentArrayManager::getInstance().chunkAdded(chunks.back(), getTypeIDs());
+std::shared_ptr<Chunk> Archetype::createChunk() {
+	auto chunkPtr = std::make_shared<Chunk>(types);
+	chunks.push_back(chunkPtr);
+	ComponentArrayManager::getInstance().chunkAdded(shared_from_this(), chunkPtr, getTypeIDs());
+	return chunkPtr;
 }
 
 void Archetype::removeChunk(std::size_t index) {

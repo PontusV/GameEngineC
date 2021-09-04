@@ -1,5 +1,5 @@
 #include "Chunk.h"
-#include "component/Component.h"
+#include "component/IComponentData.h"
 #include "ReflectionPolymorph.generated.h"
 
 #include <stdexcept>
@@ -11,7 +11,7 @@ using namespace Core;
 int ChunkIDCounter::idCounter = 0;
 
 
-Chunk::Chunk(std::vector<IComponentTypeInfo> infoVec) : size(0), inactiveSize(0), id(idCounter++) {
+Chunk::Chunk(std::vector<IComponentTypeInfo> infoVec) : size(0), id(idCounter++) {
 	// Calculate max number of entries
 	stride = sizeof(Entity);
 	for (IComponentTypeInfo& info : infoVec) {
@@ -35,17 +35,23 @@ Chunk::~Chunk() {
 	while (size != 0) {
 		remove(size - 1);
 	}
-	while (inactiveSize != 0) {
-		remove(MAX_SIZE - inactiveSize);
-	}
 	delete[] buffer;
+}
+
+std::vector<Entity> Chunk::getAllEntities() {
+	std::vector<Entity> result;
+	result.reserve(size);
+	for (std::size_t i = 0; i < size; i++) {
+		result.push_back(getEntity(i));
+	}
+	return result;
 }
 
 void Chunk::clear(std::size_t index) {
 	getEntity(index).setID(0); // Makes the back entry invalid
 	// Call component destructors (destroy object without releasing memory from buffer)
-	for (Component* component : getComponents(index)) {
-		component->~Component();
+	for (IComponentData* component : getComponents(index)) {
+		component->~IComponentData();
 	}
 }
 
@@ -56,70 +62,20 @@ void Chunk::remove(Entity entity) {
 
 void Chunk::remove(std::size_t index) {
 	clear(index);
-	if (isActive(index)) { // Active
-		if (index < size - 1) {
-			move(size - 1, index);
-		}
-		size--;
-	}
-	else { // Inactive
-		std::size_t backIndex = MAX_SIZE - inactiveSize;
-		if (backIndex < index) {
-			move(backIndex, index);
-		}
-		inactiveSize--;
-	}
-}
-
-bool Chunk::activate(Entity entity) {
-	std::size_t index = getIndex(entity);
-	return activate(index);
-}
-
-bool Chunk::activate(std::size_t index) {
-	if (isActive(index)) return true; // Already active
-	std::size_t backIndex = MAX_SIZE - inactiveSize;
-	if (backIndex < index) { // Swaps to back of the inactives
-		swap(index, backIndex);
-	}
-	move(backIndex, size);
-	size++;
-	inactiveSize--;
-	return true;
-}
-
-bool Chunk::deactivate(Entity entity) {
-	std::size_t index = getIndex(entity);
-	return deactivate(index);
-}
-
-bool Chunk::deactivate(std::size_t index) {
-	if (!isActive(index)) return true; // Already inactive
-	if (index < size - 1) { // Swaps to back of the actives
-		swap(index, size - 1);
+	if (index < size - 1) {
+		move(size - 1, index);
 	}
 	size--;
-	inactiveSize++;
-	move(size, MAX_SIZE - inactiveSize);
-	return true;
-}
-
-bool Chunk::isActive(Entity entity) {
-	return isActive(getIndex(entity));
-}
-
-bool Chunk::isActive(std::size_t index) {
-	return index < size;
 }
 
 void Chunk::move(std::size_t fromIndex, std::size_t toIndex) {
 	if (fromIndex == toIndex) return;
-	std::vector<Component*> iComponents = getComponents(fromIndex);
-	std::vector<Component*> lComponents = getComponents(toIndex);
+	std::vector<IComponentData*> iComponents = getComponents(fromIndex);
+	std::vector<IComponentData*> lComponents = getComponents(toIndex);
 
 	for (std::size_t i = 0; i < types.size(); i++) {
 		Mirror::memcpy(lComponents[i], iComponents[i], types[i].typeID);
-		iComponents[i]->~Component();
+		iComponents[i]->~IComponentData();
 	}
 
 	getEntity(toIndex) = getEntity(fromIndex);
@@ -128,19 +84,19 @@ void Chunk::move(std::size_t fromIndex, std::size_t toIndex) {
 
 void Chunk::swap(std::size_t index, std::size_t otherIndex) {
 	if (index == otherIndex) return;
-	std::vector<Component*> iComponents = getComponents(index);
-	std::vector<Component*> lComponents = getComponents(otherIndex);
+	std::vector<IComponentData*> iComponents = getComponents(index);
+	std::vector<IComponentData*> lComponents = getComponents(otherIndex);
 
 	for (std::size_t i = 0; i < types.size(); i++) {
 		char* temp = new char[types[i].size];
 		Mirror::memcpy(temp, iComponents[i], types[i].typeID);
-		iComponents[i]->~Component();
+		iComponents[i]->~IComponentData();
 
 		Mirror::memcpy(iComponents[i], lComponents[i], types[i].typeID);
-		lComponents[i]->~Component();
+		lComponents[i]->~IComponentData();
 
 		Mirror::memcpy(lComponents[i], temp, types[i].typeID);
-		((Component*)temp)->~Component();
+		((IComponentData*)temp)->~IComponentData();
 
 		delete[] temp;
 	}
@@ -151,7 +107,7 @@ void Chunk::swap(std::size_t index, std::size_t otherIndex) {
 	getEntity(otherIndex) = temp;
 }
 
-Component* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeID) {
+IComponentData* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeID) {
 	for (ComponentDataArrayInfo& info : types) {
 		if (componentTypeID == info.typeID)
 			return getComponent(index, info);
@@ -159,12 +115,17 @@ Component* Chunk::getComponent(std::size_t index, ComponentTypeID componentTypeI
 	return nullptr;
 }
 
-Component* Chunk::getComponent(Entity entity, ComponentType componentType) {
+IComponentData* Chunk::getComponent(Entity entity, ComponentType componentType) {
 	int index = getIndex(entity);
 	return getComponent(index, componentType);
 }
 
-Component* Chunk::getComponent(std::size_t index, ComponentType componentType) {
+IComponentData* Chunk::getComponent(Entity entity, ComponentTypeID componentTypeID) {
+	int index = getIndex(entity);
+	return getComponent(index, componentTypeID);
+}
+
+IComponentData* Chunk::getComponent(std::size_t index, ComponentType componentType) {
 	for (ComponentDataArrayInfo& info : types) {
 		if (componentType == info.typeID)
 			return getComponent(index, info);
@@ -172,18 +133,18 @@ Component* Chunk::getComponent(std::size_t index, ComponentType componentType) {
 	return nullptr;
 }
 
-Component* Chunk::getComponent(std::size_t index, ComponentDataArrayInfo& info) {
+IComponentData* Chunk::getComponent(std::size_t index, ComponentDataArrayInfo& info) {
 	if (index >= MAX_SIZE) throw std::out_of_range("Chunk::getComponent::ERROR out of range!");
-	return (Component*)(&info.beginPtr[stride * index]);
+	return (IComponentData*)(&info.beginPtr[stride * index]);
 }
 
-std::vector<Component*> Chunk::getComponents(Entity entity) {
+std::vector<IComponentData*> Chunk::getComponents(Entity entity) {
 	std::size_t index = getIndex(entity);
 	return getComponents(index);
 }
 
-std::vector<Component*> Chunk::getComponents(std::size_t index) {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Chunk::getComponents(std::size_t index) {
+	std::vector<IComponentData*> components;
 
 	for (ComponentDataArrayInfo& info : types) {
 		components.push_back(getComponent(index, info));
@@ -192,13 +153,13 @@ std::vector<Component*> Chunk::getComponents(std::size_t index) {
 	return components;
 }
 
-std::vector<Component*> Chunk::getComponents(Entity entity, ComponentType componentType) {
+std::vector<IComponentData*> Chunk::getComponents(Entity entity, ComponentType componentType) {
 	std::size_t index = getIndex(entity);
 	return getComponents(index, componentType);
 }
 
-std::vector<Component*> Chunk::getComponents(std::size_t index, ComponentType componentType) {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Chunk::getComponents(std::size_t index, ComponentType componentType) {
+	std::vector<IComponentData*> components;
 
 	for (ComponentDataArrayInfo& info : types) {
 		if (componentType == info.typeID)
@@ -208,13 +169,13 @@ std::vector<Component*> Chunk::getComponents(std::size_t index, ComponentType co
 	return components;
 }
 
-std::vector<Component*> Chunk::getComponents(Entity entity, ComponentTypeID componentTypeID) {
+std::vector<IComponentData*> Chunk::getComponents(Entity entity, ComponentTypeID componentTypeID) {
 	std::size_t index = getIndex(entity);
 	return getComponents(index, componentTypeID);
 }
 
-std::vector<Component*> Chunk::getComponents(std::size_t index, ComponentTypeID componentTypeID) {
-	std::vector<Component*> components;
+std::vector<IComponentData*> Chunk::getComponents(std::size_t index, ComponentTypeID componentTypeID) {
+	std::vector<IComponentData*> components;
 
 	for (ComponentDataArrayInfo& info : types) {
 		if (componentTypeID == info.typeID)
@@ -272,17 +233,8 @@ std::vector<ComponentDataArrayInfo> Chunk::getComponentArrayInfo(ComponentType t
 	return infoVec;
 }
 
-std::size_t Chunk::addInactive(Entity entity) {
-	if (isFull()) throw std::invalid_argument("Chunk::addInactive::ERROR there is no more room in this chunk!");
-
-	inactiveSize++;
-	std::size_t index = MAX_SIZE - inactiveSize;
-	getEntity(index) = entity;
-	return index;
-}
-
-std::size_t Chunk::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive) {
-	std::size_t index = inactive ? addInactive(entity) : add(entity);
+std::size_t Chunk::moveEntity(Entity entity, std::vector<ComponentDataBlock> sources) {
+	std::size_t index = add(entity);
 
 	for (ComponentDataBlock& src : sources) {
 		if (char* dest = getComponentBeginPtr(src.typeID)) {
@@ -297,19 +249,16 @@ bool Chunk::contains(Entity entity) {
 	for (std::size_t i = 0; i < size; i++) {
 		if (getEntity(i) == entity) return true;
 	}
-	for (std::size_t i = MAX_SIZE - inactiveSize; i < MAX_SIZE; i++) {
-		if (getEntity(i) == entity) return true;
-	}
 
 	return false;
 }
 
 bool Chunk::isFull() {
-	return (size + inactiveSize) >= MAX_SIZE;
+	return size >= MAX_SIZE;
 }
 
 bool Chunk::isEmpty() {
-	return size == 0 && inactiveSize == 0;
+	return size == 0;
 }
 
 std::size_t Chunk::getID() {
@@ -321,13 +270,7 @@ std::size_t Chunk::getSize() {
 }
 
 std::size_t Chunk::getIndex(Entity entity) {
-	// Check active
 	for (std::size_t i = 0; i < size; i++) {
-		if (getEntity(i) == entity)
-			return i;
-	}
-	// Check inactive
-	for (std::size_t i = MAX_SIZE - inactiveSize; i < MAX_SIZE; i++) {
 		if (getEntity(i) == entity)
 			return i;
 	}
@@ -361,7 +304,7 @@ void Chunk::setComponent(std::size_t index, ComponentTypeID componentTypeID) {
 	if (componentBeginPtr) {
 		void* dest = &componentBeginPtr[index * stride];
 		// Creates the component at the specified location
-		Component* newComponent = Mirror::createInstance<Component>(componentTypeID, dest);
+		IComponentData* newComponent = Mirror::createInstance<IComponentData>(componentTypeID, dest);
 	}
 	else {
 		throw std::invalid_argument("Chunk::setComponent invalid component type! It does not exist in this chunk.");

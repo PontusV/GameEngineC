@@ -3,6 +3,7 @@
 #include "components/Transform.h"
 #include "utils/Alignment.h"
 #include "utils/Anchor.h"
+#include <array>
 namespace Core {
 
 	struct Rect {

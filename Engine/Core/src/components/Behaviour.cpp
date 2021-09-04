@@ -6,7 +6,8 @@ using namespace Core;
 Input* Behaviour::input;
 Window* Behaviour::window;
 Camera* Behaviour::camera;
-SceneManager* Behaviour::sceneManager;
+PrefabManager* Behaviour::prefabManager;
+EntityManager* Behaviour::entityManager;
 
 Behaviour::Behaviour() : started(false), enabled(true) {
 }
@@ -33,20 +34,8 @@ bool Behaviour::isActive() {
 }
 
 void Behaviour::activate() {
-	awake();
+	initialize();
 	if (enabled)
 		onEnable();
 	active = true;
-}
-
-void Behaviour::destroyEntity(EntityHandle& handle) {
-	if (!handle.isValid()) return;
-	Scene* scene = handle.getScene();
-	scene->destroyEntityQueued(handle.getEntity());
-	handle.clear();
-}
-
-void Behaviour::destroyEntity(Entity entity) {
-	Scene* scene = owner.getScene();
-	scene->destroyEntityQueued(entity);
 }

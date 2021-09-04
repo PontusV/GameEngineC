@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_COMPONENT_H
 #define TRANSFORM_COMPONENT_H
 
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "maths/Matrix4.h"
 #include "maths/Vector2.h"
 
@@ -9,7 +9,7 @@ namespace Core {
 
 	#include "Transform.generated.h"
 
-	CLASS() Transform : public Component {
+	CLASS() Transform : public IComponentData {
 		GENERATED_BODY()
 	public:
 		Transform(float x, float y, float z = 0.0f, float rotation = 0.0f, float scale = 1.0f);

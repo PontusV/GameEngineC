@@ -1,7 +1,7 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
 
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "graphics/data/Color.h"
 #include "graphics/data/Shader.h"
 #include <cstddef>
@@ -9,7 +9,7 @@
 #include "Graphic.generated.h"
 
 namespace Core {
-	CLASS() Graphic : public Component {
+	CLASS() Graphic : public IComponentData {
 		GENERATED_BODY()
 	public:
 		virtual ~Graphic() = 0;

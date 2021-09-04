@@ -6,10 +6,11 @@
 #include "component/ComponentTypeInfo.h"
 #include "component/ComponentType.h"
 #include <vector>
+#include <cstddef>
 
 namespace Core {
 
-	class Component; // Forward declare
+	class IComponentData; // Forward declare
 
 	struct ComponentDataArrayInfo {
 		ComponentDataArrayInfo(char* beginPtr, ComponentTypeID typeID, std::size_t size) : size(size), typeID(typeID), beginPtr(beginPtr) {}
@@ -30,17 +31,13 @@ namespace Core {
 		Chunk(std::vector<IComponentTypeInfo> types);
 		~Chunk();
 
+		std::vector<Entity> getAllEntities();
+
 		/* Adds entity and components to the back of the chunk. */
 		template<typename... Ts>
 		std::size_t add(Entity entity, Ts&... componentPack);
 		void remove(Entity entity);
-
-		bool activate(Entity entity);
-		bool activate(std::size_t index);
-		bool deactivate(Entity entity);
-		bool deactivate(std::size_t index);
-		bool isActive(Entity entity);
-		bool isActive(std::size_t index);
+		void remove(std::size_t index);
 
 		template<typename T>
 		void setComponent(Entity entity, T& component);
@@ -52,22 +49,26 @@ namespace Core {
 		template<typename T>
 		T* getComponent(Entity entity);
 		/* Returns first match. */
-		Component* getComponent(Entity entity, ComponentType componentType);
-		Component* getComponent(std::size_t index, ComponentType componentType);
-		Component* getComponent(std::size_t index, ComponentTypeID componentTypeID);
+		template<typename T>
+		T* getComponent(std::size_t index);
+		/* Returns first match. */
+		IComponentData* getComponent(Entity entity, ComponentType componentType);
+		IComponentData* getComponent(Entity entity, ComponentTypeID componentTypeID);
+		IComponentData* getComponent(std::size_t index, ComponentType componentType);
+		IComponentData* getComponent(std::size_t index, ComponentTypeID componentTypeID);
 		/* Returns all components attached to entity, who match with template T */
 		template<typename T>
-		std::vector<Component*> getComponents(Entity entity);
+		std::vector<IComponentData*> getComponents(Entity entity);
 		/* Returns all components attached to entity, who match with componentType. */
-		std::vector<Component*> getComponents(Entity entity, ComponentType componentType);
+		std::vector<IComponentData*> getComponents(Entity entity, ComponentType componentType);
 		/* Returns all components attached to entity at index, who match with componentType. */
-		std::vector<Component*> getComponents(std::size_t index, ComponentType componentType);
+		std::vector<IComponentData*> getComponents(std::size_t index, ComponentType componentType);
 		/* Returns all components attached to entity, who match with componentTypeID. */
-		std::vector<Component*> getComponents(Entity entity, ComponentTypeID componentTypeID);
+		std::vector<IComponentData*> getComponents(Entity entity, ComponentTypeID componentTypeID);
 		/* Returns all components attached to entity at index, who match with componentTypeID. */
-		std::vector<Component*> getComponents(std::size_t index, ComponentTypeID componentTypeID);
+		std::vector<IComponentData*> getComponents(std::size_t index, ComponentTypeID componentTypeID);
 		/* Returns all components attached to entity. */
-		std::vector<Component*> getComponents(Entity entity);
+		std::vector<IComponentData*> getComponents(Entity entity);
 		Entity* getEntityPtr(Entity entity);
 		Entity& getEntity(std::size_t index);
 		/* Returns start of component array containing the exact type from template. */
@@ -82,10 +83,10 @@ namespace Core {
 
 		std::vector<ComponentDataBlock> getComponentDataBlocks(Entity entity);
 		/* Moves the Entity to this chunk. */
-		std::size_t moveEntity(Entity entity, std::vector<ComponentDataBlock> sources, bool inactive = false);
+		std::size_t moveEntity(Entity entity, std::vector<ComponentDataBlock> sources);
 
 		std::size_t getIndex(Entity entity);
-		std::vector<Component*> getComponents(std::size_t index);
+		std::vector<IComponentData*> getComponents(std::size_t index);
 
 		bool contains(Entity entity);
 		bool isFull();
@@ -96,10 +97,8 @@ namespace Core {
 		std::size_t getStride();
 
 	private:
-		std::size_t addInactive(Entity entity);
-		void remove(std::size_t index);
 		char* getComponentBeginPtr(ComponentTypeID typeID);
-		Component* getComponent(std::size_t index, ComponentDataArrayInfo& type);
+		IComponentData* getComponent(std::size_t index, ComponentDataArrayInfo& type);
 
 		/* Returns start of Entity array. */
 		char* getEntityBeginPtr();
@@ -121,7 +120,6 @@ namespace Core {
 
 		std::size_t id;
 		std::size_t size;
-		std::size_t inactiveSize;
 		std::vector<ComponentDataArrayInfo> types;
 	};
 
@@ -164,7 +162,12 @@ namespace Core {
 	}
 
 	template<typename T>
-	std::vector<Component*>	Chunk::getComponents(Entity entity) {
+	T* Chunk::getComponent(std::size_t index) {
+		return static_cast<T*>(getComponent(index, typeof(T)));
+	}
+
+	template<typename T>
+	std::vector<IComponentData*> Chunk::getComponents(Entity entity) {
 		return getComponents(entity, typeof(T));
 	}
 

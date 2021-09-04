@@ -1,8 +1,9 @@
 #ifndef COMPONENT_ARRAY_H
 #define COMPONENT_ARRAY_H
 
+#include "entity/Archetype.h"
 #include "entity/Chunk.h"
-#include "Component.h"
+#include "entity/handle/Handle.h"
 #include "ComponentTypeInfo.h"
 #include "ComponentType.h"
 
@@ -13,15 +14,27 @@
 #include <memory>
 #include <iostream>
 
+/* TODO: Change to ArchetypeArray and register Archetypes instead of Chunks? Perhaps saving pointers to chunks is faster though */
 namespace Core {
+
+	struct ComponentQuery { // WIP
+		std::vector<ComponentTypeID> typeIDs;
+	};
+
+	struct ArchetypeQuery { // WIP
+		std::vector<ComponentQuery> componentQueries;
+	};
+
 	struct ChunkDataArray {
-		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr) : beginPtr(info.beginPtr), chunkPtr(chunkPtr) {}
+		ChunkDataArray(ComponentDataArrayInfo info, std::shared_ptr<Chunk> chunkPtr, std::shared_ptr<Archetype> archetypePtr) : beginPtr(info.beginPtr), chunkPtr(chunkPtr) {}
 		char* beginPtr;
 		std::shared_ptr<Chunk> chunkPtr;
+		std::shared_ptr<Archetype> archetypePtr;
 
 		ChunkDataArray& operator=(const ChunkDataArray& other) {
 			beginPtr = other.beginPtr;
 			chunkPtr = other.chunkPtr;
+			archetypePtr = other.archetypePtr;
 			return *this;
 		}
 	};
@@ -31,7 +44,7 @@ namespace Core {
 		IComponentArray(ComponentType type) : type(type) {}
 		const ComponentType& getType() const { return type; }
 
-		virtual void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
+		virtual void chunkAdded(std::shared_ptr<Archetype> archetype, std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) = 0;
 		virtual void chunkRemoved(std::size_t chunkID) = 0;
 
 	protected:
@@ -95,17 +108,33 @@ namespace Core {
 			throw std::out_of_range("ComponentArray::getEntity::ERROR Index out of range.");
 		}
 
+		Handle createHandle(std::size_t index, EntityManager* entityManager) {
+			for (ChunkDataArray& info : data) {
+				std::size_t chunkSize = info.chunkPtr->getSize();
+				if (index < chunkSize) {
+					Entity entity = info.chunkPtr->getEntity(index);
+					EntityLocationDetailed location = EntityLocationDetailed(index, info.chunkPtr, info.archetypePtr);
+					return Handle(entity, entityManager, location);
+				}
+				else {
+					index -= chunkSize;
+				}
+
+			}
+			throw std::out_of_range("ComponentArray::getEntity::ERROR Index out of range.");
+		}
+
 		T& operator[](std::size_t index) {
 			return get(index);
 		}
 
-		void chunkAdded(std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
+		void chunkAdded(std::shared_ptr<Archetype> archetype, std::shared_ptr<Chunk> chunk, std::vector<ComponentTypeID> chunkTypes) {
 			if (filter(chunkTypes)) return;
 
 			std::vector<ComponentDataArrayInfo> infoVec = chunk->getComponentArrayInfo(typeof(T));
 			std::vector<std::size_t> indices;
 			for (ComponentDataArrayInfo& info : infoVec) { // Add all matches
-				ChunkDataArray chunkData(info, chunk);
+				ChunkDataArray chunkData(info, chunk, archetype);
 				std::size_t repeat = calculateRepeat(chunkTypes);
 				for (std::size_t i = 0; i < repeat; i++) {
 					indices.push_back(data.size());

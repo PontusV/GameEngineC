@@ -8,8 +8,15 @@ namespace Core {
 		Color() : r(255), g(255), b(255), a(255) {}
 		Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255) : r(r), g(g), b(b), a(a) {}
 
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
+		template <typename Archive>
+		void serialize(Archive& ar) const {
+			ar(r, g, b, a);
+		}
+
+		template <typename Archive>
+		void deserialize(Archive& ar) {
+			ar(r, g, b, a);
+		}
 
 		unsigned char r, g, b, a;
 	};

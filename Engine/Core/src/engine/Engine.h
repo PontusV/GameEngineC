@@ -2,11 +2,12 @@
 #define ENGINE_H
 
 #include "entity/EntityManager.h"
-#include "scene/SceneManager.h"
+#include "event/EventSystem.h"
 #include "graphics/Graphics.h"
 #include "physics/Physics.h"
 #include "input/Input.h"
 #include "ui/GUISystem.h"
+#include "prefab/PrefabManager.h"
 #include "BehaviourManager.h"
 #include <memory>
 
@@ -44,24 +45,22 @@ namespace Core {
 		Graphics& getGraphics();
 		Physics& getPhysics();
 		EntityManager& getEntityManager();
-		SceneManager& getSceneManager();
+		PrefabManager& getPrefabManager();
 		BehaviourManager& getBehaviourManager();
-		GUISystem& getGUISystem();
+		//GUISystem& getGUISystem();
 	private:
 		// Game loop
 		bool running = false;
 
-		// Scene
-		ScenePtr debugScene; // Where you put entities showing debugging data. These will not be loaded/saved
-
 		// Main Systems
 		EntityManager entityManager;
-		SceneManager sceneManager;
+		EventSystem eventSystem;
 		Graphics graphics;
 		Input input;
 		Physics physics;
 		GUISystem guiSystem;
 
+		PrefabManager prefabManager;
 		BehaviourManager behaviourManager;
 	};
 }

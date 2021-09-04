@@ -110,7 +110,7 @@ void GameView::tick(float deltaTime, bool editMode, std::size_t fpsCount) {
 				targetPressed = true;
 				releaseTarget();
 				target.entityID = entityID; // New target
-				target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
+				target.rootEntityID = engineDLL->getRootEntityID(entityID);
 				target.entityName = engineDLL->getEntityName(entityID);
 			}
 		}
@@ -121,7 +121,7 @@ void GameView::tick(float deltaTime, bool editMode, std::size_t fpsCount) {
 		pressed = false;
 		targetPressed = false;
 		if (draggingTarget) {
-			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.sceneIndex, target.entityName, targetPressedPosition.x, targetPressedPosition.y));
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y));
 			draggingTarget = false;
 		}
 	}
@@ -160,13 +160,13 @@ void GameView::setTarget(EntityID entityID) {
 		targetPressed = false;
 		pressed = false;
 		if (draggingTarget) {
-			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.sceneIndex, target.entityName, targetPressedPosition.x, targetPressedPosition.y));
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y));
 			draggingTarget = false;
 		}
 	}
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	target.entityID = entityID;
-	target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
+	target.rootEntityID = engineDLL->getRootEntityID(entityID);
 	target.entityName = engineDLL->getEntityName(entityID);
 }
 
@@ -174,14 +174,14 @@ void GameView::updateTargetData() {
 	EngineDLL* engineDLL = editor->getEngineDLL();
 	EntityID entityID = target.entityID;
 	bool entityExists = false;
-	for (EntityID& id : engineDLL->getAllEntities(entityID)) {
+	for (EntityID& id : engineDLL->getAllEntities()) {
 		if (id == entityID) {
 			entityExists = true;
 			break;
 		}
 	}
 	if (entityExists) {
-		target.sceneIndex = engineDLL->getEntitySceneIndex(entityID);
+		target.rootEntityID = engineDLL->getRootEntityID(entityID);
 		target.entityName = engineDLL->getEntityName(entityID);
 	}
 	else {
@@ -205,6 +205,6 @@ ImVec2 GameView::getViewportSize() const {
 
 void GameView::releaseTarget() {
 	target.entityID = 0;
-	target.sceneIndex = 0;
+	target.rootEntityID = 0;
 	target.entityName = std::string();
 }

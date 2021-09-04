@@ -59,12 +59,12 @@ namespace Core {
 
 	template<typename T, typename R, typename... Args>
 	std::shared_ptr<IComponentFunctionHandleImpl<Args...>> bind(T* component, R(T::*ptr)(Args...)) {
-		return std::make_shared<ComponentFunctionHandleImpl<T, R, Args...>>(ComponentFunctionHandleImpl(ComponentHandle(component->getComponentID(), component->getOwner()), ptr));
+		return std::make_shared<ComponentFunctionHandleImpl<T, R, Args...>>(ComponentFunctionHandleImpl(ComponentHandle(T::getClassTypeID(), component->getOwner()), ptr));
 	}
 
 	template<typename T, typename R, typename Arg, typename... Args>
 	std::shared_ptr<IComponentFunctionHandleImpl<>> bind(T* component, R(T::* ptr)(Arg, Args...), Arg arg, Args... args) {
-		return std::make_shared<ComponentFunctionHandleWrapper<T, R, Arg, Args...>>(ComponentFunctionHandleWrapper(ComponentHandle(component->getComponentID(), component->getOwner()), ptr, arg, args...));
+		return std::make_shared<ComponentFunctionHandleWrapper<T, R, Arg, Args...>>(ComponentFunctionHandleWrapper(ComponentHandle(T::getClassTypeID(), component->getOwner()), ptr, arg, args...));
 	}
 
 	template<typename R, typename... Args>

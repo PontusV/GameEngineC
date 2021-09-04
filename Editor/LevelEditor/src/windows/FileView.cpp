@@ -140,7 +140,12 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 		}
 
 		if (ImGui::BeginDragDropSource()) {
-			ImGui::SetDragDropPayload("DIRECTORY_ENTRY", NULL, 0);
+			if (entry.is_regular_file()) {
+				ImGui::SetDragDropPayload("DIRECTORY_ENTRY", filePath.c_str(), filePath.size());
+			}
+			else {
+				ImGui::SetDragDropPayload("DIRECTORY_ENTRY", NULL, 0);
+			}
 			if (selectedEntries.size() == 1) {
 				ImGui::Text("%s", fileName.c_str());
 			}
@@ -150,7 +155,7 @@ void FileView::renderDirectory(std::vector<FileEntry>& entries) {
 			ImGui::EndDragDropSource();
 		}
 		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("DIRECTORY_ENTRY")) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DIRECTORY_ENTRY")) {
 				std::size_t startIndex = pasteQueue.size();
 				pasteQueue.resize(pasteQueue.size() + selectedEntries.size());
 				for (std::size_t i = 0; i < selectedEntries.size(); i++) {

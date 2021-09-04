@@ -57,12 +57,6 @@
     <ClCompile Include="src\physics\Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scene\SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\Bounds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -70,9 +64,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\FunctionCaller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utils\Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\UIDContainer.cpp">
@@ -222,7 +213,7 @@
     <ClCompile Include="src\utils\string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\entity\component\Component.cpp">
+    <ClCompile Include="src\entity\component\IComponentData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\entity\component\ComponentLoader.cpp">
@@ -259,6 +250,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\entity\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\prefab\PrefabManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\EventSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\entity\DebugNameComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\entity\PrefabComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\GUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -317,9 +326,6 @@
     <ClInclude Include="src\physics\Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\SceneManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\Alignment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -333,9 +339,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\FunctionCaller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Serializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\UIDContainer.h">
@@ -429,9 +432,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ReflectionEnum.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scene\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\ui\input\CheckBox.generated.h">
@@ -614,10 +614,7 @@
     <ClInclude Include="src\utils\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\entity\component\Component.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\entity\component\Component.h">
+    <ClInclude Include="src\entity\component\IComponentData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\entity\component\ComponentArray.h">
@@ -681,6 +678,54 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\dllexport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\prefab\PrefabManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\entity\PrefabComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\EventSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\IEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityCreatedEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityDestroyedEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityChangedArchetypeEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityActivatedEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityDeactivatedEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\entity\DisabledComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\entity\DebugNameComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\IEventListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\events\EntityDestroyEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\GUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\EntitySerializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

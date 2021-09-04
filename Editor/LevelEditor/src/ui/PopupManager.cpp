@@ -30,7 +30,9 @@ void PopupManager::tick(LevelEditor* editor) {
 			std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
 			std::string encodedName = utf8_encode(fileName.substr(0, fileName.find_last_of(L".")));
 			std::string encodedPath = utf8_encode(path);
-			engineDLL.createScene(encodedName.c_str(), encodedPath.c_str());
+			auto entityID = engineDLL.createPrefabEntity(encodedPath.c_str(), 0, 0);
+			engineDLL.setEntityName(entityID, encodedName.c_str());
+			hierarchy.setActiveScene(entityID);
 			projectSettings.addOpenScene(path);
 			projectSettings.save();
 		}
@@ -100,22 +102,20 @@ void PopupManager::tick(LevelEditor* editor) {
 			static char buffer[64] = "";
 			ImGui::InputText("Name", buffer, 64);
 
+			EntityID activeScene = hierarchy.getActiveScene();
 			if (ImGui::Button("Create", ImVec2(120, 0))) {
-				std::string name = std::string(buffer);
-				if (engineDLL.isEntityNameAvailable(name.c_str())) {
-					std::size_t sceneIndex = createEntitySceneIndex == -1 ? hierarchy.getActiveSceneIndex() : createEntitySceneIndex;
+				if (activeScene != 0) {
+					std::string name = std::string(buffer);
+					std::size_t sceneIndex = createEntitySceneIndex == -1 ? hierarchy.getActiveScene() : createEntitySceneIndex;
 					ImVec2 cameraPosition = engineDLL.getCameraPosition();
 					float width = 350;
 					float height = 350;
-					if (engineDLL.createTemplateEntity(sceneIndex, name.c_str(), cameraPosition.x, cameraPosition.y, width, height)) {
-						undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(sceneIndex, name)));
-					}
+					EntityID entityID = engineDLL.createTemplateEntity(name.c_str(), cameraPosition.x, cameraPosition.y, width, height);
+					engineDLL.setEntityParent(entityID, activeScene);
+					undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(activeScene, entityID)));
 					errorMessage = "";
 					memset(buffer, 0, 64);
 					ImGui::CloseCurrentPopup();
-				}
-				else {
-					errorMessage = "Name is already taken!";
 				}
 			}
 			ImGui::SetItemDefaultFocus();
@@ -138,7 +138,7 @@ void PopupManager::tick(LevelEditor* editor) {
 
 	if (ImGui::BeginPopupModal("Delete_entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 		auto entityName = engineDLL.getEntityName(deleteEntityID);
-		auto sceneIndex = engineDLL.getEntitySceneIndex(deleteEntityID);
+		auto rootEntityID = engineDLL.getRootEntityID(deleteEntityID);
 		EngineDLL* engineDLL = editor->getEngineDLL();
 		UndoRedoManager* undoRedoManager = editor->getUndoRedoManager();
 		GameView* gameView = editor->getGameView();
@@ -147,9 +147,9 @@ void PopupManager::tick(LevelEditor* editor) {
 
 		if (ImGui::Button("Delete", ImVec2(120, 0))) {
 			if (deleteEntityID != 0) {
-				auto blueprint = EntityBlueprint::createFromEntity(engineDLL, deleteEntityID);
-				if (engineDLL->destroyEntity(sceneIndex, deleteEntityID)) {
-					undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(sceneIndex, entityName, std::move(blueprint)));
+				auto serializedEntityData = engineDLL->writeEntityToBuffer(deleteEntityID);
+				if (engineDLL->destroyEntity(deleteEntityID)) {
+					undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(rootEntityID, deleteEntityID, std::move(serializedEntityData)));
 					gameView->releaseTarget();
 				}
 			}
@@ -170,7 +170,7 @@ void PopupManager::tick(LevelEditor* editor) {
 
 	if (ImGui::BeginPopupModal("Save_unsaved_changes", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 		auto entityName = engineDLL.getEntityName(deleteEntityID);
-		auto sceneIndex = engineDLL.getEntitySceneIndex(deleteEntityID);
+		auto rootEntityID = engineDLL.getRootEntityID(deleteEntityID);
 		EngineDLL* engineDLL = editor->getEngineDLL();
 		UndoRedoManager* undoRedoManager = editor->getUndoRedoManager();
 		GameView* gameView = editor->getGameView();
@@ -180,7 +180,7 @@ void PopupManager::tick(LevelEditor* editor) {
 
 		std::size_t sceneCount = hierarchy->getSceneCount();
 		for (std::size_t i = 0; i < sceneCount; i++) {
-			std::string sceneName = hierarchy->getSceneName(i);
+			std::string sceneName = engineDLL->getEntityName(rootEntityID);
 			ImGui::Text("%s*", sceneName);
 		}
 

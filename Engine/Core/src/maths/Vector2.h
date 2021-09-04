@@ -24,12 +24,24 @@ namespace Core {
 		float& operator[](std::size_t index);
 		Vector2 operator*(const float& scalar) const;
 
-		void serialize(std::ostream& os) const;
-		void deserialize(std::istream& is);
+		template<typename Archive>
+		void serialize(Archive& ar) const;
+		template<typename Archive>
+		void deserialize(Archive& ar);
 	public:
 		float x;
 		float y;
 	};
+
+	template<typename Archive>
+	void Vector2::serialize(Archive& ar) const {
+		ar(x, y);
+	}
+
+	template<typename Archive>
+	void Vector2::deserialize(Archive& ar) {
+		ar(x, y);
+	}
 
 	template<typename T>
 	struct TVector2 {

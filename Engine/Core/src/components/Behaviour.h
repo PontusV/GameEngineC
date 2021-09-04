@@ -1,9 +1,8 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 
-#include "entity/component/Component.h"
+#include "entity/component/IComponentData.h"
 #include "entity/handle/EntityHandle.h"
-#include "scene/Scene.h"
 #include "Behaviour.generated.h"
 
 namespace Core {
@@ -11,15 +10,15 @@ namespace Core {
 	class Input;
 	class Window;
 	class Camera;
-	class SceneManager;
+	class PrefabManager;
 
-	CLASS() Behaviour : public Component {
+	CLASS() Behaviour : public IComponentData {
 		GENERATED_BODY()
 	public:
 		virtual ~Behaviour() = 0; // Abstract
 
 		/* Called when the Script is being loaded. */
-		virtual void awake() {};
+		virtual void initialize() {};
 		/* Called when the Script is enabled. */
 		virtual void start() {};
 		/* Called every frame. */
@@ -60,7 +59,9 @@ namespace Core {
 		virtual void onTransformChanged() {}
 
 		// Hierarchy
+		/* Called when a child has been added. */
 		virtual void onChildAdded(EntityHandle entity) {}
+		/* Called when a child has been removed. */
 		virtual void onChildRemoved(EntityHandle entity) {}
 		/* Called when a child has been changed; either by having a component removed or added. */
 		virtual void onChildChanged(EntityHandle entity) {}
@@ -77,30 +78,28 @@ namespace Core {
 		bool enabled = false;
 		bool active = false;
 	public:
+		bool initialized = false;
 		bool started = false;
 		bool runInEditMode = false;
+		EntityHandle owner;
 
 		static Input* input;
 		static Window* window;
 		static Camera* camera;
-		static SceneManager* sceneManager;
+		static PrefabManager* prefabManager;
+		static EntityManager* entityManager;
 	protected:
 		Behaviour();
 
 		/* Creates an Entity in the same Scene at the end of the frame. */
 		template<typename... Ts>
-		EntityHandle createEntity(std::string name, Ts... components);
-
-		/* Destroys the Entity in its own scene. */
-		void destroyEntity(EntityHandle& handle);
-		/* Destroys the Entity in this Scene. */
-		void destroyEntity(Entity entity);
+		EntityHandle createEntity(Ts... components);
 	};
 
 	template<typename... Ts>
-	EntityHandle Behaviour::createEntity(std::string name, Ts... components) {
-		Scene* scene = owner.getScene();
-		return scene->createEntityQueued(name, components...);
+	EntityHandle Behaviour::createEntity(Ts... components) {
+		Entity entity = entityManager->createEntityQueued(components...);
+		return EntityHandle(entity, entityManager);
 	}
 }
 #endif

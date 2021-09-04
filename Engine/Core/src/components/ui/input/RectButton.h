@@ -19,7 +19,7 @@ namespace Core {
 		RectButton();
 		~RectButton();
 
-		void awake() override;
+		void initialize() override;
 		void onEnable() override;
 		void onDisable() override;
 		void onMouseButtonPressedAsButton(int buttoncode, int mods) override;

@@ -25,8 +25,6 @@ namespace Editor {
 		bool isAltActivated() const;
 		std::wstring getNextDLLName();
 		std::wstring getCurrentDLLName();
-
-		std::size_t getEntitySceneIndex(EntityID entityID);
 	private:
 		HINSTANCE handle;
 		bool altActivated = true; // Engine DLL loaded from alternative path

@@ -11,7 +11,7 @@ namespace Core {
 		WindowScale();
 		~WindowScale();
 
-		void awake() override;
+		void initialize() override;
 		void onWindowResize() override;
 
 

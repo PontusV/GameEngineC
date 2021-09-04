@@ -14,7 +14,7 @@ WindowAnchor::~WindowAnchor() {
 }
 
 
-void WindowAnchor::awake() {
+void WindowAnchor::initialize() {
 	onWindowResize();
 }
 

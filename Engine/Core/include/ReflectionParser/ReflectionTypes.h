@@ -57,6 +57,11 @@ namespace Mirror {
 		bool isConst = false;
 		bool isEnumeration = false;
 		bool isArray = false;
+		bool isArithmetic = false;
+		bool isIntegral = false;
+		bool isFloatingPoint = false;
+		bool isSigned = false;
+		bool isUnsigned = false;
 		std::size_t arraySize = 0;
 		std::vector<VariableType> templateParams;
 		bool operator==(const VariableType& other) const {
@@ -77,86 +82,6 @@ namespace Mirror {
 		std::vector<VariableType> getTemplateParameters() {
 			return templateParams;
 		}
-		// Data Type Queries
-		bool isDecimal() const {
-			if (name == "float") return true;
-			if (name == "double") return true;
-			if (name == "long double") return true;
-			return false;
-		}
-		bool isNumber() const {
-			if (name == "std::size_t") return true;
-			if (name == "short int") return true;
-			if (name == "unsigned short int") return true;
-			if (name == "unsigned int") return true;
-			if (name == "int") return true;
-			if (name == "long int") return true;
-			if (name == "unsigned long int") return true;
-			if (name == "long long int") return true;
-			if (name == "unsigned long long int") return true;
-			if (name == "char") return true;
-			if (name == "signed char") return true;
-			if (name == "unsigned char") return true;
-			if (name == "float") return true;
-			if (name == "double") return true;
-			if (name == "long double") return true;
-			if (name == "wchar_t") return true;
-			return false;
-		}
-		bool isUnsignedNumber() const {
-			if (name == "std::size_t") return true;
-			if (name == "unsigned short int") return true;
-			if (name == "unsigned int") return true;
-			if (name == "unsigned long int") return true;
-			if (name == "unsigned long long int") return true;
-			if (name == "unsigned char") return true;
-			return false;
-		}
-		bool isSignedNumber() const {
-			if (name == "short int") return true;
-			if (name == "int") return true;
-			if (name == "long int") return true;
-			if (name == "long long int") return true;
-			if (name == "char") return true;
-			if (name == "signed char") return true;
-			if (name == "float") return true;
-			if (name == "double") return true;
-			if (name == "long double") return true;
-			if (name == "wchar_t") return true;
-			return false;
-		}
-		bool isChar() const {
-			if (name == "char") return true;
-			if (name == "signed char") return true;
-			if (name == "unsigned char") return true;
-			if (name == "wchar_t") return true;
-			return false;
-		}
-		bool isBool() const {
-			if (name == "bool") return true;
-			return false;
-		}
-		bool isCArray() const {
-			return isArray;
-		}
-		bool isString() const {
-			if (name == "std::string") return true;
-			return false;
-		}
-		bool isWideString() const {
-			if (name == "std::wstring") return true;
-			return false;
-		}
-		bool isEnum() const {
-			return isEnumeration;
-		}
-		bool isObject() const {
-			if (isNumber() || isBool() || isChar() || isEnum())
-				return false;
-			else
-				return true;
-		}
-		// End of Data Type Queries
 	};
 
 	struct Variable {

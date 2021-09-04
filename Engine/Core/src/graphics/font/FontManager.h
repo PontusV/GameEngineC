@@ -35,7 +35,7 @@ namespace Core {
 		unsigned short textureY;
 	};
 
-	//Texture2D with an offset position
+	/* Texture2D with an offset position */
 	struct CharTexture2D {
 		CharTexture2D() {}
 		CharTexture2D(Texture2D texture, Vector2 offset) : texture(texture), offset(offset) {}
@@ -43,6 +43,7 @@ namespace Core {
 		Vector2 offset;
 	};
 
+	/* Contains textures and offsets for characters of a text and the size of the bounding box of the text */
 	struct TextData2D {
 		std::vector<CharTexture2D> textures;
 		Vector2 size;

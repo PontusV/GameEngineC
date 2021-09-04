@@ -298,11 +298,14 @@ void LevelEditor::terminate(bool force) {
 		setEditMode(true);
 	}
 	bool hasUnsavedChanges = false;
-	std::size_t sceneCount = engineDLL.getSceneCount();
-	for (std::size_t i = 0; i < sceneCount; i++) {
-		if (undoRedoManager.getStepsSinceSave(i) != 0) {
-			hasUnsavedChanges = true;
-			break;
+	if (engineDLL.isLoaded()) {
+		for (const EntityID& entityID : engineDLL.getAllEntities()) {
+			if (!engineDLL.hasEntityParent(entityID)) {
+				if (undoRedoManager.isUnsaved(entityID)) {
+					hasUnsavedChanges = true;
+					break;
+				}
+			}
 		}
 	}
 	if (hasUnsavedChanges) {
@@ -397,39 +400,48 @@ bool LevelEditor::openScene(std::wstring path) {
 		return false;
 	}
 	std::string encodedPath = utf8_encode(path);
-	if (engineDLL.loadScene(encodedPath.c_str())) {
-		projectSettings.addOpenScene(path);
-		return true;
-	}
-	return false;
-}
-
-bool LevelEditor::openSceneFromBackup(std::wstring srcPath, std::wstring destPath) {
-	if (!engineDLL.isLoaded()) {
-		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
+	// Get scene name from path
+	std::size_t nameStartIndex = path.find_last_of(L"\\");
+	std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
+	std::string sceneName = utf8_encode(fileName.substr(0, fileName.find_last_of(L".")));
+	// Create scene root node
+	EntityID entityID = engineDLL.createEntityFromPrefab(encodedPath.c_str(), 0, 0);
+	if (!engineDLL.setEntityName(entityID, sceneName.c_str())) {
+		std::cout << "LevelEditor::openScene::ERROR Failed to name the scene at path: " << encodedPath << std::endl;
+		if (!engineDLL.destroyEntity(entityID)) {
+			std::cout << "LevelEditor::openScene::ERROR Failed to remove scene at path: " << encodedPath << std::endl;
+		}
 		return false;
 	}
-	std::string encodedSrcPath = utf8_encode(srcPath);
-	std::string encodedDestPath = utf8_encode(destPath);
-	if (engineDLL.loadSceneBackup(encodedSrcPath.c_str(), encodedDestPath.c_str())) {
-		projectSettings.addOpenScene(destPath);
+	if (entityID) {
+		projectSettings.addOpenScene(path);
+		hierarchy.setActiveScene(entityID);
 		return true;
 	}
 	return false;
 }
 
-void LevelEditor::closeScene(std::size_t sceneIndex) {
+void LevelEditor::closeScene(EntityID rootEntityID) {
 	if (!isInEditMode()) return;
 	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to close scene because the Engine has not been loaded" << std::endl;
 		return;
 	}
-	std::wstring scenePath = utf8_decode(engineDLL.getSceneFilePath(sceneIndex));
-	if (engineDLL.unloadScene(sceneIndex)) {
-		if (gameView.getTarget().sceneIndex == sceneIndex) {
+	if (!engineDLL.isEntityPrefabRoot(rootEntityID)) {
+		std::cout << "Unable to close given scene " << rootEntityID << " because it is not a prefab" << std::endl;
+		return;
+	}
+	if (engineDLL.hasEntityParent(rootEntityID)) {
+		std::cout << "Unable to close given scene " << rootEntityID << "because it is not a root" << std::endl;
+		return;
+	}
+	std::wstring scenePath = utf8_decode(engineDLL.getPrefabFilePath(rootEntityID));
+	if (engineDLL.destroyEntity(rootEntityID)) {
+		// TODO: Check for unsaved changes?
+		if (gameView.getTarget().rootEntityID == rootEntityID) {
 			gameView.releaseTarget();
 		}
-		undoRedoManager.removeSceneFromStack(sceneIndex);
+		undoRedoManager.removeEntityFromStack(rootEntityID);
 		projectSettings.removeOpenScene(scenePath);
 	}
 }
@@ -524,22 +536,12 @@ bool LevelEditor::reloadEngine(std::wstring path) {
 		std::cout << "LevelEditor::reloadEngine::ERROR Unable to reload Engine DLL before one has been loaded" << std::endl;
 		return false;
 	}
-	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
 	std::cout << "Reloading dll" << std::endl;
 	// Save state
-	std::size_t sceneCount = engineDLL.getSceneCount();
-	std::vector<std::pair<std::string, std::string>> tempScenes(sceneCount);
-	for (std::size_t i = 0; i < sceneCount; i++) {
-		std::wstring scenePath = tempEditorDirectory + std::to_wstring(i) + SCENE_FILE_TYPE;
-		std::string encodedScenePath = utf8_encode(scenePath);
-		std::string destScenePath = engineDLL.getSceneFilePath(i);
-		if (!engineDLL.saveSceneBackup(i, encodedScenePath.c_str())) {
-			std::wcout << L"Failed to save scene backup. Path: " << scenePath << L". Canceling reload of Engine DLL..." << std::endl;
-			return false;
-		}
-		tempScenes[i] = std::make_pair(encodedScenePath, destScenePath);
+	if (!saveGameState()) {
+		std::wcout << L"Failed to save game state. Canceling reload of Engine DLL..." << std::endl;
+		return false;
 	}
-	std::string targetName = gameView.getTarget().entityName;
 	ImVec2 cameraPosition = engineDLL.getCameraPosition();
 	// End of save state
 	unloadEngine();
@@ -548,15 +550,7 @@ bool LevelEditor::reloadEngine(std::wstring path) {
 	engineDLL.setCameraScale(1.0f / gameView.getZoom());
 	engineDLL.setCameraPosition(cameraPosition.x, cameraPosition.y);
 
-	projectSettings.clearOpenScenes();
-	for (auto scene : tempScenes) {
-		engineDLL.loadSceneBackup(scene.first.c_str(), scene.second.c_str());
-		if (!std::filesystem::remove(scene.first.c_str())) {
-			std::cout << "Failed to cleanup temp scene file: " << scene.first << std::endl;
-		}
-	}
-	EntityID targetID = engineDLL.getEntityFromName(targetName.c_str());
-	gameView.setTarget(targetID);
+	return loadGameState();
 	// End of load state
 }
 
@@ -568,13 +562,23 @@ bool LevelEditor::buildGame() {
 
 bool LevelEditor::saveAll() {
 	if (!isInEditMode()) return false;
-	std::size_t loadedSceneCount = engineDLL.getSceneCount();
-	for (std::size_t i = 0; i < loadedSceneCount; i++) {
-		engineDLL.saveScene(i);
-		undoRedoManager.resetStepsSinceSave(i);
+	for (const EntityID& entityID : engineDLL.getAllEntities()) {
+		if (!engineDLL.hasEntityParent(entityID)) {
+			if (undoRedoManager.isUnsaved(entityID)) {
+				auto path = engineDLL.getPrefabFilePath(entityID);
+				if (engineDLL.savePrefab(entityID, path.c_str())) {
+					undoRedoManager.resetStepsSinceSave(entityID);
+					undoRedoManager.setDirty(entityID, false);
+				}
+				else {
+					std::cout << "Failed to save scene " << entityID << " to path: " << path << std::endl;
+				}
+			}
+		}
 	}
 	projectSettings.save();
 	editorSettings.save();
+	return true;
 }
 
 bool LevelEditor::isInEditMode() const {
@@ -587,16 +591,11 @@ void LevelEditor::setEditMode(bool value) {
 	// TODO: EditMode = false, disable save, disable UndoRedoStack
 	if (value) {
 		gameView.releaseTarget();
-		std::size_t sceneCount = engineDLL.getSceneCount();
-		for (std::size_t i = 0; i < sceneCount; i++) {
-			engineDLL.unloadScene(0);
-		}
-		projectSettings.clearOpenScenes();
-		loadPreviousScenesFromBackups();
+		loadGameState();
 		undoRedoManager.enable();
 	}
 	else {
-		saveCurrentScenesAsBackups();
+		saveGameState();
 		undoRedoManager.disable();
 	}
 }
@@ -629,33 +628,23 @@ PopupManager* LevelEditor::getPopupManager() {
 	return &popupManager;
 }
 
-bool LevelEditor::saveCurrentScenesAsBackups() {
+bool LevelEditor::saveGameState() {
 	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
-	std::size_t sceneCount = engineDLL.getSceneCount();
-	tempScenes.resize(sceneCount);
-	for (std::size_t i = 0; i < sceneCount; i++) {
-		std::wstring scenePath = tempEditorDirectory + std::wstring(L"Backup_") + std::to_wstring(i) + SCENE_FILE_TYPE;
-		std::string encodedScenePath = utf8_encode(scenePath);
-		std::string destScenePath = engineDLL.getSceneFilePath(i);
-		if (!engineDLL.saveSceneBackup(i, encodedScenePath.c_str())) {
-			std::wcout << L"Failed to save scene backup. Path: " << scenePath << std::endl;
-			return false;
-		}
-		tempScenes[i] = std::make_pair(scenePath, utf8_decode(destScenePath));
-	}
-	return true;
+	std::wstring decodedPath = tempEditorDirectory + L"temp" + SCENE_FILE_TYPE;
+	std::string path = utf8_encode(decodedPath);
+	return engineDLL.saveGameState(path.c_str());
 }
 
-bool LevelEditor::loadPreviousScenesFromBackups() {
-	bool success = true;
-	for (auto scene : tempScenes) {
-		if (!openSceneFromBackup(scene.first.c_str(), scene.second.c_str())) {
-			std::wcout << L"Failed to load backup at path: " << scene.first << std::endl;
-			success = false;
-		}
-		if (!std::filesystem::remove(scene.first.c_str())) {
-			std::wcout << L"Failed to cleanup temp scene file: " << scene.first << std::endl;
-		}
+bool LevelEditor::loadGameState() {
+	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
+	std::wstring decodedPath = tempEditorDirectory + L"temp" + SCENE_FILE_TYPE;
+	std::string path = utf8_encode(decodedPath);
+	if (!engineDLL.loadGameState(path.c_str())) {
+		std::cout << "Failed to load game state temp scene file: " << std::endl;
+		return false;
 	}
-	return success;
+	if (!std::filesystem::remove(path)) {
+		std::cout << "Failed to cleanup temp scene file: " << path << std::endl;
+	}
+	return true;
 }

@@ -2,14 +2,15 @@
 #define ENTITY_HANDLE_H
 
 #include "Handle.h"
-#include "scene/Scene.h"
+#include "entity/EntityManager.h"
 #include <string>
 
 namespace Core {
 	/* An Entity handle with additional functionality. */
 	class EntityHandle : public Handle {
 	public:
-		EntityHandle(Entity entity, Scene* scene);
+		EntityHandle(Entity entity, EntityManager* entityManager);
+		EntityHandle(Entity entity, EntityManager* entityManager, EntityLocationDetailed location);
 		EntityHandle(const Handle& handle);
 		EntityHandle();
 		~EntityHandle();
@@ -24,6 +25,15 @@ namespace Core {
 		template<typename T>
 		void removeComponent();
 
+		template<typename Archetype>
+		void serialize(Archetype& ar) const {
+			ar(entity);
+		}
+		template<typename Archetype>
+		void deserialize(Archetype& ar) {
+			ar(entity);
+		}
+
 		bool operator==(const EntityHandle& other) const;
 		bool operator!=(const EntityHandle& other) const;
 	};
@@ -31,20 +41,28 @@ namespace Core {
 	// --------------------------- Template Function Definitions --------------------------------
 	template<typename T, class... Args>
 	T* EntityHandle::addComponent(Args&&... args) {
-		T component(args...);
-		T* temp = scene->addComponentQueued(entity, component);
-		return temp;
+		if (refresh()) {
+			T component(args...);
+			T* temp = entityManager->addComponentQueued(entity, component);
+			return temp;
+		}
+		return nullptr;
 	}
 
 	template<typename T>
 	T* EntityHandle::addComponent(T component) {
-		T* temp = scene->addComponentQueued(entity, component);
-		return temp;
+		if (refresh()) {
+			T* temp = entityManager->addComponentQueued(entity, component);
+			return temp;
+		}
+		return nullptr;
 	}
 
 	template<typename T>
 	void EntityHandle::removeComponent() {
-		scene->removeComponentQueued<T>(entity);
+		if (refresh()) {
+			entityManager->removeComponentQueued<T>(entity);
+		}
 	}
 }
 #endif

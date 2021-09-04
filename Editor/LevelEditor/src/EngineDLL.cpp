@@ -55,6 +55,22 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, setViewportSizeFun, "setViewportSize")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setAssetDirPathFun, "setAssetDirPath")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, loadGameStateFun, "loadGameState")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, saveGameStateFun, "saveGameState")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, setCameraPositionFun, "setCameraPosition")) {
         unload();
         return false;
@@ -76,22 +92,6 @@ bool EngineDLL::load(const wchar_t* path) {
         return false;
     }
     if (!loadFunctionFromDLL(handle, getCameraScaleFun, "getCameraScale")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setViewportSizeFun, "setViewportSize")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setAssetDirPathFun, "setAssetDirPath")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, createEntityFun, "createEntity")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getEntityAtPosFun, "getEntityAtPos")) {
         unload();
         return false;
     }
@@ -143,6 +143,10 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, getPrefabComponentTypeIDFun, "getPrefabComponentTypeID")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, getDerivedTypeIDsCountFun, "getDerivedTypeIDsCount")) {
         unload();
         return false;
@@ -155,19 +159,7 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, getPropertyTypeFun, "getPropertyType")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getPropertyTypeSizeFun, "getPropertyTypeSize")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getPropertyFieldCountFun, "getPropertyFieldCount")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getPropertyFieldsFun, "getPropertyFields")) {
+    if (!loadFunctionFromDLL(handle, getPropertyIndexFun, "getPropertyIndex")) {
         unload();
         return false;
     }
@@ -175,87 +167,135 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, getPropertyTypeNameFun, "getPropertyTypeName")) {
+    if (!loadFunctionFromDLL(handle, getPropertyInspectorDataFun, "getPropertyInspectorData")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, loadSceneFun, "loadScene")) {
+    if (!loadFunctionFromDLL(handle, setPropertyFieldValueFun, "setPropertyFieldValue")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, loadSceneBackupFun, "loadSceneBackup")) {
+    if (!loadFunctionFromDLL(handle, unpackPrefabFun, "unpackPrefab")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, unloadSceneFun, "unloadScene")) {
+    if (!loadFunctionFromDLL(handle, savePrefabFun, "savePrefab")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, saveSceneFun, "saveScene")) {
+    if (!loadFunctionFromDLL(handle, updatePrefabsFun, "updatePrefabs")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, saveSceneBackupFun, "saveSceneBackup")) {
+    if (!loadFunctionFromDLL(handle, updatePrefabFun, "updatePrefab")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, createSceneFun, "createScene")) {
+    if (!loadFunctionFromDLL(handle, createPrefabFromEntityFun, "createPrefabFromEntity")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, createPrefabEntityFun, "createPrefabEntity")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, createEntityFromPrefabFun, "createEntityFromPrefab")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, overridePropertyFun, "overrideProperty")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, removePropertyOverrideFun, "removePropertyOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, overrideComponentFun, "overrideComponent")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, removeComponentOverrideFun, "removeComponentOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, isEntityPrefabRootFun, "isEntityPrefabRoot")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, isEntityAnOverrideFun, "isEntityAnOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPropertyOverridesFun, "getPropertyOverrides")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPropertyOverridesAtFun, "getPropertyOverridesAt")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getComponentOverridesFun, "getComponentOverrides")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getComponentOverridesAtFun, "getComponentOverridesAt")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, clearOverridesFun, "clearOverrides")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPrefabFilePathFun, "getPrefabFilePath")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPrefabOverrideReceiverFun, "getPrefabOverrideReceiver")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPropertyOverridesCountFun, "getPropertyOverridesCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getPropertyOverridesAtCountFun, "getPropertyOverridesAtCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getComponentOverridesCountFun, "getComponentOverridesCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getComponentOverridesAtCountFun, "getComponentOverridesAtCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, loadPropertyFromBufferFun, "loadPropertyFromBuffer")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, loadComponentFromBufferFun, "loadComponentFromBuffer")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, loadEntityFromBufferFun, "loadEntityFromBuffer")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, writePropertyToBufferFun, "writePropertyToBuffer")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, writeComponentToBufferFun, "writeComponentToBuffer")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, writeEntityToBufferFun, "writeEntityToBuffer")) {
         unload();
         return false;
     }
     if (!loadFunctionFromDLL(handle, destroyEntityFun, "destroyEntity")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getAllEntitiesFun, "getAllEntities")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getSceneNameFun, "getSceneName")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getSceneFilePathFun, "getSceneFilePath")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, hasSceneChangedFun, "hasSceneChanged")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getSceneCountFun, "getSceneCount")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getAllEntitiesCountFun, "getAllEntitiesCount")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setSceneAddedCallbackFun, "setSceneAddedCallback")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setSceneRemovedCallbackFun, "setSceneRemovedCallback")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setEntityRenamedCallbackFun, "setEntityRenamedCallback")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setCallbackPtrFun, "setCallbackPtr")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getComponentsFun, "getComponents")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, isEntityChildFun, "isEntityChild")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, setEntityParentFun, "setEntityParent")) {
         unload();
         return false;
     }
@@ -267,11 +307,19 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, renameEntityFun, "renameEntity")) {
+    if (!loadFunctionFromDLL(handle, setEntityNameFun, "setEntityName")) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, isEntityNameAvailableFun, "isEntityNameAvailable")) {
+    if (!loadFunctionFromDLL(handle, hasComponentFun, "hasComponent")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, isEntityChildFun, "isEntityChild")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setEntityParentFun, "setEntityParent")) {
         unload();
         return false;
     }
@@ -283,19 +331,19 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, setEntityNameFun, "setEntityName")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getAllEntitiesFun, "getAllEntities")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getComponentsFun, "getComponents")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, getEntityNameFun, "getEntityName")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getEntityParentFun, "getEntityParent")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getEntityFromNameFun, "getEntityFromName")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getEntityChildFun, "getEntityChild")) {
         unload();
         return false;
     }
@@ -308,6 +356,34 @@ bool EngineDLL::load(const wchar_t* path) {
         return false;
     }
     if (!loadFunctionFromDLL(handle, getEntityImmediateChildCountFun, "getEntityImmediateChildCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getAllEntitiesCountFun, "getAllEntitiesCount")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getEntityParentFun, "getEntityParent")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getEntityChildFun, "getEntityChild")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, createEntityFun, "createEntity")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getEntityAtPosFun, "getEntityAtPos")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setEntitiesChangedCallbackFun, "setEntitiesChangedCallback")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, setCallbackPtrFun, "setCallbackPtr")) {
         unload();
         return false;
     }
@@ -334,16 +410,16 @@ bool EngineDLL::unload() {
     engineInitFun = nullptr;
     engineTickFun = nullptr;
     engineEditorTickFun = nullptr;
+    setViewportSizeFun = nullptr;
+    setAssetDirPathFun = nullptr;
+    loadGameStateFun = nullptr;
+    saveGameStateFun = nullptr;
     setCameraPositionFun = nullptr;
     setCameraRotationFun = nullptr;
     setCameraScaleFun = nullptr;
     getCameraPositionFun = nullptr;
     getCameraRotationFun = nullptr;
     getCameraScaleFun = nullptr;
-    setViewportSizeFun = nullptr;
-    setAssetDirPathFun = nullptr;
-    createEntityFun = nullptr;
-    getEntityAtPosFun = nullptr;
     getRectSizeFun = nullptr;
     getMinRectScreenPositionFun = nullptr;
     getWorldPositionFun = nullptr;
@@ -356,48 +432,67 @@ bool EngineDLL::unload() {
     getDerivedTypeIDsFun = nullptr;
     getAllReflectedTypesFun = nullptr;
     getTypeIDFromNameFun = nullptr;
+    getPrefabComponentTypeIDFun = nullptr;
     getDerivedTypeIDsCountFun = nullptr;
     getAllReflectedTypesCountFun = nullptr;
     getPropertiesCountFun = nullptr;
-    getPropertyTypeFun = nullptr;
-    getPropertyTypeSizeFun = nullptr;
-    getPropertyFieldCountFun = nullptr;
-    getPropertyFieldsFun = nullptr;
+    getPropertyIndexFun = nullptr;
     getPropertyNameFun = nullptr;
-    getPropertyTypeNameFun = nullptr;
-    loadSceneFun = nullptr;
-    loadSceneBackupFun = nullptr;
-    unloadSceneFun = nullptr;
-    saveSceneFun = nullptr;
-    saveSceneBackupFun = nullptr;
-    createSceneFun = nullptr;
+    getPropertyInspectorDataFun = nullptr;
+    setPropertyFieldValueFun = nullptr;
+    unpackPrefabFun = nullptr;
+    savePrefabFun = nullptr;
+    updatePrefabsFun = nullptr;
+    updatePrefabFun = nullptr;
+    createPrefabFromEntityFun = nullptr;
+    createPrefabEntityFun = nullptr;
+    createEntityFromPrefabFun = nullptr;
+    overridePropertyFun = nullptr;
+    removePropertyOverrideFun = nullptr;
+    overrideComponentFun = nullptr;
+    removeComponentOverrideFun = nullptr;
+    isEntityPrefabRootFun = nullptr;
+    isEntityAnOverrideFun = nullptr;
+    getPropertyOverridesFun = nullptr;
+    getPropertyOverridesAtFun = nullptr;
+    getComponentOverridesFun = nullptr;
+    getComponentOverridesAtFun = nullptr;
+    clearOverridesFun = nullptr;
+    getPrefabFilePathFun = nullptr;
+    getPrefabOverrideReceiverFun = nullptr;
+    getPropertyOverridesCountFun = nullptr;
+    getPropertyOverridesAtCountFun = nullptr;
+    getComponentOverridesCountFun = nullptr;
+    getComponentOverridesAtCountFun = nullptr;
+    loadPropertyFromBufferFun = nullptr;
+    loadComponentFromBufferFun = nullptr;
+    loadEntityFromBufferFun = nullptr;
+    writePropertyToBufferFun = nullptr;
+    writeComponentToBufferFun = nullptr;
+    writeEntityToBufferFun = nullptr;
     destroyEntityFun = nullptr;
-    getAllEntitiesFun = nullptr;
-    getSceneNameFun = nullptr;
-    getSceneFilePathFun = nullptr;
-    hasSceneChangedFun = nullptr;
-    getSceneCountFun = nullptr;
-    getAllEntitiesCountFun = nullptr;
-    setSceneAddedCallbackFun = nullptr;
-    setSceneRemovedCallbackFun = nullptr;
-    setEntityRenamedCallbackFun = nullptr;
-    setCallbackPtrFun = nullptr;
     addComponentFun = nullptr;
     removeComponentFun = nullptr;
-    renameEntityFun = nullptr;
-    getComponentsFun = nullptr;
+    setEntityNameFun = nullptr;
+    hasComponentFun = nullptr;
     isEntityChildFun = nullptr;
     setEntityParentFun = nullptr;
-    isEntityNameAvailableFun = nullptr;
     hasEntityParentFun = nullptr;
     detachEntityParentFun = nullptr;
+    setEntityNameFun = nullptr;
+    getAllEntitiesFun = nullptr;
+    getComponentsFun = nullptr;
     getEntityNameFun = nullptr;
-    getEntityParentFun = nullptr;
-    getEntityFromNameFun = nullptr;
-    getEntityChildFun = nullptr;
     getComponentsCountFun = nullptr;
     getEntityChildCountFun = nullptr;
     getEntityImmediateChildCountFun = nullptr;
+    getAllEntitiesCountFun = nullptr;
+    getEntityParentFun = nullptr;
+    getEntityChildFun = nullptr;
+    createEntityFun = nullptr;
+    getEntityAtPosFun = nullptr;
+    setEntitiesChangedCallbackFun = nullptr;
+    setCallbackPtrFun = nullptr;
     // End of reset function ptrs
     FreeLibrary(handle);
     handle = NULL;
@@ -406,19 +501,6 @@ bool EngineDLL::unload() {
 
 bool EngineDLL::isLoaded() const {
     return handle != NULL;
-}
-
-std::size_t EngineDLL::getEntitySceneIndex(EntityID entityID) {
-    if (!isLoaded() || entityID == 0) return 0;
-    std::size_t sceneCount = getSceneCount();
-    for (std::size_t i = 0; i < sceneCount; i++) {
-        std::vector<EntityID> entities = getAllEntities(i);
-        for (EntityID& id : entities) {
-            if (id == entityID) return i;
-        }
-    }
-    std::cout << "EngineDLL::getEntitySceneIndex::ERROR Failed to find sceneIndex of Entity with ID: " << entityID << std::endl;
-    return 0;
 }
 
 std::wstring EngineDLL::getNextDLLName() {

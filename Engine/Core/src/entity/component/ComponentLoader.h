@@ -1,6 +1,7 @@
-#ifndef LEVEL_LOADER_H
-#define LEVEL_LOADER_H
+#ifndef COMPONENT_LOADER_H
+#define COMPONENT_LOADER_H
 
+#include "engine/Serializer.h"
 #include "entity/handle/EntityHandle.h"
 #include "ComponentTypeInfo.h"
 #include "ComponentType.h"
@@ -21,17 +22,24 @@ namespace Core {
 		~ComponentLoader();
 
 		/* Loads Component from the given instream and adds it to the given EntityHandle. */
-		static void addComponentFromFile(std::istream& is, std::string componentTypeName, EntityHandle& go);
+		static void addComponentFromFile(DeserializerArchive& ar, std::string componentTypeName, EntityHandle& go);
+		static void updateComponentFromFile(PrefabDeserializerArchive& ar, std::string componentTypeName, EntityHandle& go);
 		template<typename T> static void registerComponent();
 
 	private:
-		template<typename T> static void addComponentFromFile_impl(std::istream& is, EntityHandle& go);
+		template<typename T> static void addComponentFromFile_impl(DeserializerArchive& archive, EntityHandle& go);
+		template<typename T> static void updateComponentFromFile_impl(PrefabDeserializerArchive& archive, EntityHandle& go);
 
 	private:
-		typedef void(*LoaderFunc)(std::istream&, EntityHandle&);
+		typedef void(*LoaderFunc)(DeserializerArchive&, EntityHandle&);
 		static std::map<std::string, LoaderFunc>& getLoaderMap() {
 			static std::map<std::string, LoaderFunc> loaderMap;
 			return loaderMap;
+		}
+		typedef void(*UpdaterFunc)(PrefabDeserializerArchive&, EntityHandle&);
+		static std::map<std::string, UpdaterFunc>& getUpdaterMap() {
+			static std::map<std::string, UpdaterFunc> updaterMap;
+			return updaterMap;
 		}
 	};
 
@@ -39,12 +47,14 @@ namespace Core {
 
 	template<typename T>
 	void ComponentLoader::registerComponent() {
-		LoaderFunc fun = &ComponentLoader::addComponentFromFile_impl<T>;
-		getLoaderMap()[nameof(T)] = fun;
+		LoaderFunc addFun = &ComponentLoader::addComponentFromFile_impl<T>;
+		getLoaderMap()[nameof(T)] = addFun;
+		UpdaterFunc updateFun = &ComponentLoader::updateComponentFromFile_impl<T>;
+		getUpdaterMap()[nameof(T)] = updateFun;
 	}
 	
 	template<typename T>
-	void ComponentLoader::addComponentFromFile_impl(std::istream& is, EntityHandle& go) {
+	void ComponentLoader::addComponentFromFile_impl(DeserializerArchive& ar, EntityHandle& go) {
 		if (!go.refresh()) {
 			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!\n";
 			throw std::invalid_argument("ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!");
@@ -53,12 +63,30 @@ namespace Core {
 		T loadedComponent;
 
 		try {
-			loadedComponent.deserialize(is);
-			if (typeof(ParentEntity) != typeof(T)) // ParentEntity Component is loaded differently
-				go.addComponent(loadedComponent);	// Add
+			loadedComponent.deserialize(ar);
+			go.addComponent(loadedComponent);
 		}
 		catch (std::exception& e) {
 			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
+			std::cout << "Exception: " << e.what() << "\n";
+			throw;
+		}
+	}
+
+	template<typename T>
+	void ComponentLoader::updateComponentFromFile_impl(PrefabDeserializerArchive& ar, EntityHandle& go) {
+		if (!go.refresh()) {
+			std::cout << "ComponentLoader::updateComponentFromFile_impl<T>::ERROR Could not update component of invalid EntityHandle!\n";
+			throw std::invalid_argument("ComponentLoader::updateComponentFromFile_impl<T>::ERROR Could not update component of invalid EntityHandle!");
+		}
+
+		T* component = go.getComponent<T>();
+
+		try {
+			component->deserialize(ar);
+		}
+		catch (std::exception& e) {
+			std::cout << "ComponentLoader::updateComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
 			std::cout << "Exception: " << e.what() << "\n";
 			throw;
 		}
