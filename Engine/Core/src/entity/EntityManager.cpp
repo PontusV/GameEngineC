@@ -91,19 +91,21 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 	if (entity.getID() == Entity::INVALID_ID) {
 		return false;
 	}
+	Handle entityHandle = Handle(entity, this, location);
 	EntityDestroyEvent preEvent;
 	preEvent.entityHandle = Handle(entity, this, location);
 	eventSystem->dispatchEvent(preEvent);
 
-	location.chunk.lock()->remove(location.index);
-	auto archetype = location.archetype.lock();
-
-	if (archetype->isEmpty()) {
-		removeArchetype(archetype);
+	// Destroy immediate children (will chain down)
+	std::size_t childCount = entityHandle.getImmediateChildCount();
+	std::cout << "Destroying " << entity.getID() << ", immediate child count: " << childCount << std::endl;
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = entityHandle.getChild(i);
+		std::cout << "destroying child " << child.getEntity().getID() << ", refreshed: " << child.refresh() << ", exists: " << getLocation(child.getEntity()).isValid() << std::endl;
+		child.destroyImmediate();
 	}
 
 	// Check for parent & call onChildDestroyed
-	Handle entityHandle = Handle(entity, this, location);
 	Handle parent = entityHandle.getParent();
 	if (parent.refresh()) {
 		for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
@@ -115,13 +117,14 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 			parent.removeComponent(ChildManager::getClassTypeID());
 		}
 	}
-	// Destroy immediate children (will chain down)
-	std::size_t childCount = entityHandle.getImmediateChildCount();
-	for (std::size_t i = 0; i < childCount; i++) {
-		Handle child = entityHandle.getChild(i);
-		child.destroyImmediate();
+
+	// Remove Entity from chunk
+	location.chunk.lock()->remove(location.index);
+	auto archetype = location.archetype.lock();
+
+	if (archetype->isEmpty()) {
+		removeArchetype(archetype);
 	}
-	// -----------
 
 	EntityDestroyedEvent postEvent;
 	postEvent.entity = entity;
@@ -418,10 +421,11 @@ void EntityManager::setParent(EntityLocationDetailed location, Entity parent, bo
 			behaviour->onChildRemoved(entityHandle);
 		}
 
-		ChildManager* childManager = currentParent.getComponent<ChildManager>();
-		childManager->onChildRemoved(entityHandle);
-		if (childManager->getChildCount() == 0)
-			removeComponent<ChildManager>(currentParent.getEntity());
+		if (ChildManager* childManager = currentParent.getComponent<ChildManager>()) {
+			childManager->onChildRemoved(entityHandle);
+			if (childManager->getChildCount() == 0)
+				removeComponent<ChildManager>(currentParent.getEntity());
+		}
 	}
 
 	if (parent.getID() != Entity::INVALID_ID) {

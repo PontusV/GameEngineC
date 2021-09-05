@@ -12,6 +12,8 @@
 #include <algorithm>
 using namespace Core;
 
+constexpr const char* PREFAB_ROOT_GUID = "PREFAB_ROOT";
+
 
 PrefabManager::PrefabManager(EntityManager* entityManager) : entityManager(entityManager){}
 PrefabManager::~PrefabManager() {}
@@ -21,7 +23,7 @@ EntityRemapSaveInfo reverseEntityRemapInfo(EntityRemapLoadInfo entityRemapInfo) 
 	EntityRemapSaveInfo result;
 	std::for_each(entityRemapInfo.begin(), entityRemapInfo.end(),
 		[&result](const std::pair<std::string, std::size_t>& p) {
-			result.insert(std::make_pair(p.second, p.first));
+			result.push_back(std::make_pair(p.second, p.first));
 		});
 	return result;
 }
@@ -30,12 +32,12 @@ EntityRemapLoadInfo reverseEntityRemapInfo(EntityRemapSaveInfo entityRemapInfo) 
 	EntityRemapLoadInfo result;
 	std::for_each(entityRemapInfo.begin(), entityRemapInfo.end(),
 		[&result](const std::pair<std::size_t, std::string>& p) {
-			result.insert(std::make_pair(p.second, p.first));
+			result.push_back(std::make_pair(p.second, p.first));
 		});
 	return result;
 }
 
-std::string createGUID(const std::map<std::size_t, std::string>& map) {
+std::string createGUID(const std::vector<std::pair<std::size_t, std::string>>& map) {
 	std::string guid = GUID::create();
 	if (std::find_if(map.begin(), map.end(), [&guid](const std::pair<std::size_t, std::string>& pair) { return pair.second == guid; }) == map.end()) {
 		return guid;
@@ -44,10 +46,10 @@ std::string createGUID(const std::map<std::size_t, std::string>& map) {
 }
 
 /* Ensures validation of EntityRemapSaveInfo for the given Entity IDs. Creates new GUID for new Entities and removes unused remaps */
-void ensureEntityRemapInfo(EntityRemapSaveInfo& entityRemapInfo, const std::vector<std::size_t>& entityIDs) {
+void ensureEntityRemapInfo(EntityRemapSaveInfo& entityRemapInfo, std::size_t rootEntityID, const std::vector<std::size_t>& entityIDs) {
 	// Removes unused remaps
 	for (auto it = entityRemapInfo.begin(); it != entityRemapInfo.end();) {
-		if (std::find(entityIDs.begin(), entityIDs.end(), it->first) == entityIDs.end()) {
+		if (it->first != rootEntityID && std::find(entityIDs.begin(), entityIDs.end(), it->first) == entityIDs.end()) {
 			it = entityRemapInfo.erase(it);
 		}
 		else {
@@ -55,10 +57,15 @@ void ensureEntityRemapInfo(EntityRemapSaveInfo& entityRemapInfo, const std::vect
 		}
 	}
 	// Add new remaps
+	bool containsRootEntityID = std::find_if(entityRemapInfo.begin(), entityRemapInfo.end(), [&rootEntityID](const std::pair<std::size_t, std::string>& pair) { return pair.first == rootEntityID; }) != entityRemapInfo.end();
+	if (!containsRootEntityID) {
+		entityRemapInfo.push_back(std::pair<std::size_t, std::string>(rootEntityID, std::string(PREFAB_ROOT_GUID)));
+	}
 	for (const std::size_t& entityID : entityIDs) {
-		if (!entityRemapInfo.contains(entityID)) {
+		bool containsEntityID = std::find_if(entityRemapInfo.begin(), entityRemapInfo.end(), [&entityID](const std::pair<std::size_t, std::string>& pair) { return pair.first == entityID; }) != entityRemapInfo.end();
+		if (!containsEntityID) {
 			std::string entityGUID = createGUID(entityRemapInfo);
-			entityRemapInfo.insert(std::pair<std::size_t, std::string>(entityID, entityGUID));
+			entityRemapInfo.push_back(std::pair<std::size_t, std::string>(entityID, entityGUID));
 		}
 	}
 }
@@ -72,15 +79,15 @@ bool serializeEntityRemapInfo(Handle rootHandle, EntityRemapSaveInfo& entityRema
 	// Ensures valid entityRemapInfo
 	std::size_t childCount = rootHandle.getChildCount();
 	std::vector<std::size_t> entityIDs;
-	entityIDs.reserve(childCount);
+	entityIDs.reserve(childCount + 1);
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = rootHandle.getChild(i);
 		entityIDs.push_back(child.getEntity().getID());
 	}
-	ensureEntityRemapInfo(entityRemapInfo, entityIDs);
+	ensureEntityRemapInfo(entityRemapInfo, rootHandle.getEntity().getID(), entityIDs);
 	// Saves child count
 	std::size_t mapSize = entityRemapInfo.size();
-	if (mapSize != childCount) {
+	if (mapSize != childCount + 1) {
 		std::cout << "PrefabManager::serializeEntityRemapInfo::ERROR Mapsize does not match childCount" << std::endl;
 		throw std::runtime_error("PrefabManager::serializeEntityRemapInfo::ERROR Mapsize does not match childCount");
 	}
@@ -99,10 +106,11 @@ EntityRemapLoadInfo deserializeEntityRemapInfo(Archive& archive) {
 	std::size_t mapSize;
 	archive(mapSize);
 	// Loads GUIDs
+	entityRemapInfo.reserve(mapSize);
 	for (std::size_t i = 0; i < mapSize; i++) {
 		std::string entityGUID;
 		archive(entityGUID);
-		entityRemapInfo.insert(std::pair<std::string, std::size_t>(entityGUID, 0)); // 0 is temp
+		entityRemapInfo.push_back(std::pair<std::string, std::size_t>(entityGUID, 0)); // 0 is temp
 	}
 	return entityRemapInfo;
 }
@@ -135,7 +143,7 @@ bool PrefabManager::updatePrefab(Handle prefabHandle) {
 		std::cout << "PrefabManager::updatePrefab::ERROR Failed to load file: " << filePath << ". File open failed" << std::endl;
 		return false;
 	}
-	PrefabDeserializerArchive archive(file);
+	PrefabDeserializerArchive archive(file, entityManager);
 	auto newEntityRemapInfo = updatePrefabFromRoot(prefabHandle, *prefabComponent, archive);
 	prefabComponent->setEntityRemapInfo(newEntityRemapInfo);
 	prefabComponent->removeDanglingOverrides(); // cleanup
@@ -160,7 +168,7 @@ bool PrefabManager::updatePrefab(std::string filePath) {
 		std::cout << "PrefabManager::updatePrefab::ERROR Failed to load file: " << filePath << ". File open failed" << std::endl;
 		return false;
 	}
-	PrefabDeserializerArchive archive(file);
+	PrefabDeserializerArchive archive(file, entityManager);
 	for (std::size_t i = 0; i < size; i++) {
 		PrefabComponent& prefabComponent = prefabEntities.get<PrefabComponent>(i);
 		Handle prefabHandle = prefabEntities.createHandle(i, entityManager);
@@ -212,14 +220,21 @@ bool PrefabManager::createPrefabFromEntity(Handle handle, std::string filePath) 
 }
 
 Handle PrefabManager::createEntityFromPrefab(std::string filePath, float x, float y) {
-	PrefabContent contentData = loadPrefab(filePath);
+	Entity root = entityManager->createEntity(
+		Transform(x, y)
+	);
+	PrefabContent contentData = loadPrefab(filePath, root);
+	if (!contentData.success) {
+		std::cout << "PrefabManger::createEntityFromPrefab::ERROR Failed to load prefab at path: " << filePath << std::endl;
+		if (!entityManager->destroyEntity(root)) {
+			std::cout << "PrefabManger::createEntityFromPrefab::ERROR Failed to cleanup root" << std::endl;
+		}
+		return Handle(); // Invalid handle
+	}
 	PrefabComponent prefabComponent(filePath);
 	prefabComponent.setEntityRemapInfo(contentData.entityRemapInfo);
-	Entity root = entityManager->createEntity(
-		Transform(x, y),
-		prefabComponent
-	);
-	Handle rootHandle(root, entityManager);
+	auto location = entityManager->addComponent(root, prefabComponent);
+	Handle rootHandle(root, entityManager, location);
 	for (Handle& immediateChild : contentData.content) {
 		immediateChild.setParent(rootHandle);
 	}
@@ -351,8 +366,7 @@ bool PrefabManager::savePrefab(std::string filePath, Handle rootHandle, EntityRe
 	return true;
 }
 
-PrefabContent PrefabManager::loadPrefab(std::string filePath) {
-	std::cout << "Loading prefab: " << filePath << std::endl;
+PrefabContent PrefabManager::loadPrefab(std::string filePath, Entity rootEntity) {
 	PrefabContent result;
 	std::vector<Handle>& content = result.content;
 	std::ifstream file;
@@ -367,14 +381,19 @@ PrefabContent PrefabManager::loadPrefab(std::string filePath) {
 		std::cout << "PrefabManager::loadPrefab::ERROR Failed to load file: " << filePath << ". File open failed" << std::endl;
 		return result;
 	}
-	DeserializerArchive archive(file);
+	DeserializerArchive archive(file, entityManager);
 	// Loads EntityRemapInfo and assigns new EntityIDs
 	auto entityRemapInfo = deserializeEntityRemapInfo(archive);
 	std::queue<EntityHandle> handles;
 	for (auto& map : entityRemapInfo) {
-		Entity entity = entityManager->createEntity();
-		handles.push(EntityHandle(entity, entityManager));
-		map.second = entity.getID();
+		if (map.first == PREFAB_ROOT_GUID) {
+			map.second = rootEntity.getID();
+		}
+		else {
+			Entity entity = entityManager->createEntity();
+			handles.push(EntityHandle(entity, entityManager));
+			map.second = entity.getID();
+		}
 	}
 	archive.setEntityRemapInfo(entityRemapInfo);
 	result.entityRemapInfo = entityRemapInfo;
@@ -388,6 +407,7 @@ PrefabContent PrefabManager::loadPrefab(std::string filePath) {
 		content.push_back(handle);
 	}
 	file.close();
+	result.success = true;
 	return result;
 }
 
@@ -400,25 +420,30 @@ EntityRemapLoadInfo PrefabManager::updatePrefabFromRoot(Handle rootHandle, Prefa
 	std::queue<EntityHandle> handles;
 	std::vector<Handle> newEntities;
 	for (auto& map : newEntityRemapInfo) {
-		auto it = prevEntityRemapInfo.find(map.first);
-		Entity entity;
-		if (it == prevEntityRemapInfo.end()) {
-			entity = entityManager->createEntity();
-			newEntities.push_back(EntityHandle(entity, entityManager));
+		if (map.first == PREFAB_ROOT_GUID) {
+			map.second = rootHandle.getEntity().getID();
 		}
 		else {
-			entity = Entity(it->second);
-			if (!rootHandle.isChild(entity)) {
-				entity = Entity(0); // Invalid Entity in case the Entity has been overriden as destroyed. Any references to the destroyed Enti
+			auto it = std::find_if(prevEntityRemapInfo.begin(), prevEntityRemapInfo.end(), [&map](const std::pair<std::string, std::size_t>& pair) { return pair.first == map.first; });
+			Entity entity;
+			if (it == prevEntityRemapInfo.end()) {
+				entity = entityManager->createEntity();
+				newEntities.push_back(EntityHandle(entity, entityManager));
 			}
+			else {
+				entity = Entity(it->second);
+				if (!rootHandle.isChild(entity)) {
+					entity = Entity(0); // Entity has been overriden and destroyed
+				}
+			}
+			handles.push(EntityHandle(entity, entityManager));
+			map.second = entity.getID();
 		}
-		handles.push(EntityHandle(entity, entityManager));
-		map.second = entity.getID();
 	}
 	archive.setEntityRemapInfo(newEntityRemapInfo);
 	// Destroys Entities which have been removed in the prefab
 	for (auto& map : prevEntityRemapInfo) {
-		auto it = newEntityRemapInfo.find(map.first);
+		auto it = std::find_if(newEntityRemapInfo.begin(), newEntityRemapInfo.end(), [&map](const std::pair<std::string, std::size_t>& pair) { return pair.first == map.first; });
 		if (it == newEntityRemapInfo.end()) {
 			entityManager->destroyEntity(Entity(map.second)); // Note: May chain and destroy children but attempting to destroy a nonexistent Entity does not throw an error, at the time of writing this
 		}
@@ -545,7 +570,7 @@ Handle PrefabManager::deserializeAndUpdate(PrefabDeserializerArchive& archive, s
 		std::string typeName;												// TODO: Use SerializationID instead
 		archive(typeName);													// Component Type name
 		std::size_t typeID = Mirror::getTypeID(typeName);
-		if (std::find(overridenComponentTypeIDs.begin(), overridenComponentTypeIDs.end(), typeID) == overridenComponentTypeIDs.end()) {
+		if (entityHandle.isValid() && std::find(overridenComponentTypeIDs.begin(), overridenComponentTypeIDs.end(), typeID) == overridenComponentTypeIDs.end()) {
 			std::vector<std::string> overridenProperties;
 			if (entityHandle.hasComponent(typeID)) {
 				// Updates component

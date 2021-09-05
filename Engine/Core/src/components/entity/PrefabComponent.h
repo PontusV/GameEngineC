@@ -7,7 +7,6 @@
 #include <vector>
 #include <memory>
 #include <utility>
-#include <map>
 #include "PrefabComponent.generated.h"
 
 namespace Core {
@@ -72,8 +71,8 @@ namespace Core {
 		bool removeComponentOverride(PrefabComponentOverride prefabComponentOverride);
 		std::vector<PrefabComponentOverride> getComponentOverrides() const;
 
-		void setEntityRemapInfo(std::map<std::string, std::size_t> entityRemapInfo);
-		std::map<std::string, std::size_t> getEntityRemapInfo() const;
+		void setEntityRemapInfo(std::vector<std::pair<std::string, std::size_t>> entityRemapInfo);
+		std::vector<std::pair<std::string, std::size_t>> getEntityRemapInfo() const;
 
 		/* Removes all overrides which no longer have a valid target */
 		void removeDanglingOverrides();
@@ -87,7 +86,7 @@ namespace Core {
 		PROPERTY()
 		std::vector<PrefabComponentOverride> prefabComponentOverrides; // Blocks load of component from prefab
 		PROPERTY()
-		std::map<std::string, Entity> entityRemapInfo;
+		std::vector<std::pair<std::string, Entity>> entityRemapInfo;
 	};
 }
 #endif

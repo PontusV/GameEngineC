@@ -143,16 +143,23 @@ std::vector<std::string> PropertyTypeParser::getTemplateParameters(std::string s
 	std::size_t endIndex = spelling.find_last_of('>');
 	if (startIndex != std::string::npos) {
 		std::string parameterString = spelling.substr(startIndex + 1, endIndex - startIndex - 1);
-		// Splits the string into the array with a comma as the delimiter
-		std::stringstream ss(parameterString);
-		std::string item;
-		while (std::getline(ss, item, ',')) {
-			std::size_t itemStartIndex = 0;
-			while (item.at(itemStartIndex) == ' ') { // Removes any whitespace before the actually spelling of the type
-				itemStartIndex++;
+		// Test
+		std::string parameterBuffer;
+		std::size_t templateCount = 0;
+		for (const char& c : parameterString) {
+			parameterBuffer.push_back(c);
+			if (c == '<') {
+				templateCount++;
 			}
-			parameters.push_back(item.substr(itemStartIndex));
+			else if (c == '>'){
+				templateCount--;
+			}
+			else if (templateCount == 0 && c == ',') {
+				parameterBuffer.pop_back();
+				parameters.push_back(parameterBuffer);
+			}
 		}
+		parameters.push_back(parameterBuffer);
 	}
 	return parameters;
 }

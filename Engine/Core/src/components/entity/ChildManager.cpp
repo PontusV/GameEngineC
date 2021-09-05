@@ -14,7 +14,7 @@ bool ChildManager::onChildAdded(Handle entity) {
 
 bool ChildManager::onChildRemoved(Handle entity) {
 	for (auto it = children.begin(); it != children.end(); it++) {
-		if (*it == entity) {
+		if (it->getEntity() == entity.getEntity()) {
 			children.erase(it);
 			return true;
 		}

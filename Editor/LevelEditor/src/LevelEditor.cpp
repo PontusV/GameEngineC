@@ -230,11 +230,6 @@ int LevelEditor::start() {
 		ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0, 0));
 
-		// Note: OpenPopup does not work inside BeginMenuBar
-		bool open_create_entity_popup = false;
-		bool open_create_project_popup = false;
-		bool open_create_scene_popup = false;
-
 		if (isInEditMode()) {
 			if (ImGui::IsKeyPressed(GLFW_KEY_Z) && ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
 				undoRedoManager.undo();

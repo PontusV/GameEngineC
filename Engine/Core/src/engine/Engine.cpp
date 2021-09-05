@@ -200,6 +200,7 @@ void Engine::tick(float deltaTime) {
 }
 
 void Engine::editorTick(float deltaTime) {
+	entityManager.processQueue();
 	physics.update(deltaTime);
 	graphics.render(deltaTime);
 }

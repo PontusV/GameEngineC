@@ -27,7 +27,7 @@ namespace Core {
 		void serialize<Entity>(const Entity& value, SerializationDetails& details) {
 			std::size_t entityID = value.getID();
 			if (details.entityRemapInfo) {
-				auto it = details.entityRemapInfo->find(entityID);
+				auto it = std::find_if(details.entityRemapInfo->begin(), details.entityRemapInfo->end(), [&entityID](const std::pair<std::size_t, std::string>& pair) { return pair.first == entityID; });
 				if (it != details.entityRemapInfo->end()) {
 					bool entityMapped = true;
 					serialize(entityMapped, details);
@@ -91,18 +91,22 @@ namespace Core {
 			if (!entityMapped) {
 				std::size_t entityID;
 				deserialize(entityID, details);
+				std::cout << "Not mapped. Loaded EntityID " << entityID << std::endl;
 				value.setID(entityID);
 				return;
 			}
 			std::string entityGUID;
 			deserialize(entityGUID, details);
 			if (details.entityRemapInfo) {
-				auto it = details.entityRemapInfo->find(entityGUID);
+				std::cout << "Searching: " << entityGUID << std::endl;
+				auto it = std::find_if(details.entityRemapInfo->begin(), details.entityRemapInfo->end(), [&entityGUID](const std::pair<std::string, std::size_t>& pair) { return pair.first == entityGUID; });
 				if (it != details.entityRemapInfo->end()) {
 					std::size_t entityID = it->second;
+					std::cout << "Found " << entityID << std::endl;
 					value.setID(entityID);
 				}
 				else {
+					std::cout << "Not found" << std::endl;
 					value.setID(0);
 					//std::cout << "Serializer::deserialize::ERROR Failed to load Entity with GUID: '" << entityGUID << "'. Expected remap but none was found for the Entity" << std::endl;
 					//throw std::invalid_argument("Serializer::deserialize::ERROR Failed to load Entity due to missing remap in EntityRemapLoadInfo");

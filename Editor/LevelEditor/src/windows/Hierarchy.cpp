@@ -173,8 +173,8 @@ void Hierarchy::update() {
 			}
 		}
 	}*/
-	EngineDLL* engineDLL = editor->getEngineDLL();
 	if (isDirty()) {
+		EngineDLL* engineDLL = editor->getEngineDLL();
 		scenes = getScenes(engineDLL);
 		gameView->updateTargetData();
 		setDirty(false);

@@ -102,20 +102,28 @@ void PopupManager::tick(LevelEditor* editor) {
 			static char buffer[64] = "";
 			ImGui::InputText("Name", buffer, 64);
 
-			EntityID activeScene = hierarchy.getActiveScene();
 			if (ImGui::Button("Create", ImVec2(120, 0))) {
-				if (activeScene != 0) {
+				EntityID parentID = createEntityParentID == 0 ? hierarchy.getActiveScene() : createEntityParentID;
+				if (parentID != 0) {
 					std::string name = std::string(buffer);
-					std::size_t sceneIndex = createEntitySceneIndex == -1 ? hierarchy.getActiveScene() : createEntitySceneIndex;
 					ImVec2 cameraPosition = engineDLL.getCameraPosition();
 					float width = 350;
 					float height = 350;
 					EntityID entityID = engineDLL.createTemplateEntity(name.c_str(), cameraPosition.x, cameraPosition.y, width, height);
-					engineDLL.setEntityParent(entityID, activeScene);
-					undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(activeScene, entityID)));
+					if (!engineDLL.setEntityParent(entityID, parentID)) {
+						std::cout << "PopupManager::create_entity_popup::ERROR Failed to set Entity parent. Cleaning up..." << std::endl;
+						if (!engineDLL.destroyEntity(entityID)) {
+							std::cout << "PopupManager::create_entity_popup::ERROR Failed to cleanup Entity" << std::endl;
+						}
+					}
+					EntityID rootEntityID = engineDLL.getRootEntityID(parentID);
+					undoRedoManager.registerUndo(std::make_unique<DestroyEntityAction>(DestroyEntityAction(rootEntityID, entityID)));
 					errorMessage = "";
 					memset(buffer, 0, 64);
 					ImGui::CloseCurrentPopup();
+				}
+				else {
+					std::cout << "PopupManager::create_entity_popup::ERROR Failed to create Entity. No valid parent given" << std::endl;
 				}
 			}
 			ImGui::SetItemDefaultFocus();
@@ -213,7 +221,7 @@ void PopupManager::openCreateProject() {
 
 void PopupManager::openCreateEntity(std::size_t sceneIndex) {
 	open_create_entity_popup = true;
-	createEntitySceneIndex = sceneIndex;
+	createEntityParentID = sceneIndex;
 }
 
 void PopupManager::openDeleteEntity(std::size_t entityID) {

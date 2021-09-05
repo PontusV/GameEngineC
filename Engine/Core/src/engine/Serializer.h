@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <map>
 #include <iostream>
 #include <algorithm>
 #include <type_traits>
@@ -21,8 +20,10 @@
 
 namespace Core {
 
-	typedef std::map<std::string, std::size_t> EntityRemapLoadInfo;
-	typedef std::map<std::size_t, std::string> EntityRemapSaveInfo;
+	typedef std::vector<std::pair<std::string, std::size_t>> EntityRemapLoadInfo;
+	typedef std::vector<std::pair<std::size_t, std::string>> EntityRemapSaveInfo;
+
+	class EntityManager;
 
 	template<typename, typename T>
 	struct has_serialize {
@@ -273,6 +274,7 @@ namespace Core {
 		void deserialize(std::vector<T>& vector, Archive& ar) {
 			std::size_t arraySize;
 			deserialize(arraySize, ar);
+			vector.resize(arraySize);
 			for (std::size_t i = 0; i < arraySize; i++) {
 				deserialize(vector[i], ar);
 			}
@@ -396,7 +398,7 @@ namespace Core {
 
 	class DeserializerArchive {
 	public:
-		DeserializerArchive(std::istream& is) : is(is) {}
+		DeserializerArchive(std::istream& is, EntityManager* entityManager) : is(is), entityManager(entityManager) {}
 		virtual ~DeserializerArchive() {}
 		void setEntityRemapInfo(EntityRemapLoadInfo entityRemapInfo) {
 			this->entityRemapInfo = entityRemapInfo;
@@ -406,6 +408,9 @@ namespace Core {
 		}
 		details::DeserializationDetails getDetails() {
 			return details::DeserializationDetails(is, &entityRemapInfo);
+		}
+		EntityManager* getEntityManager() {
+			return entityManager;
 		}
 		void resetToStart() {
 			is.clear();
@@ -426,12 +431,13 @@ namespace Core {
 		}
 	protected:
 		EntityRemapLoadInfo entityRemapInfo;
+		EntityManager* entityManager;
 		std::istream& is;
 	};
 
 	class PrefabDeserializerArchive : public DeserializerArchive {
 	public:
-		PrefabDeserializerArchive(std::istream& is) : DeserializerArchive(is) {}
+		PrefabDeserializerArchive(std::istream& is, EntityManager* entityManager) : DeserializerArchive(is, entityManager) {}
 		~PrefabDeserializerArchive() {}
 		void setOverridenProperties(std::vector<std::string> properties) {
 			overridenProperties = properties;

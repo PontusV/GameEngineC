@@ -22,7 +22,7 @@ namespace Editor {
 			open_create_entity_popup,
 			open_delete_entity_popup,
 			open_save_changes_popup;
-		std::size_t createEntitySceneIndex;
+		std::size_t createEntityParentID;
 		std::size_t deleteEntityID;
 	};
 }

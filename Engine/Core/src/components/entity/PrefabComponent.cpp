@@ -78,18 +78,18 @@ std::vector<PrefabComponentOverride> PrefabComponent::getComponentOverrides() co
 	return prefabComponentOverrides;
 }
 
-void PrefabComponent::setEntityRemapInfo(std::map<std::string, std::size_t> entityRemapInfo) {
-	std::map<std::string, Entity> newValue;
+void PrefabComponent::setEntityRemapInfo(std::vector<std::pair<std::string, std::size_t>> entityRemapInfo) {
+	std::vector<std::pair<std::string, Entity>> newValue;
 	for (const auto& pair : entityRemapInfo) {
-		newValue.insert(std::pair<std::string, Entity>(pair.first, Entity(pair.second)));
+		newValue.push_back(std::pair<std::string, Entity>(pair.first, Entity(pair.second)));
 	}
 	this->entityRemapInfo = newValue;
 }
 
-std::map<std::string, std::size_t> PrefabComponent::getEntityRemapInfo() const {
-	std::map<std::string, std::size_t> result;
+std::vector<std::pair<std::string, std::size_t>> PrefabComponent::getEntityRemapInfo() const {
+	std::vector<std::pair<std::string, std::size_t>> result;
 	for (const auto& pair : entityRemapInfo) {
-		result.insert(std::pair<std::string, std::size_t>(pair.first, pair.second.getID()));
+		result.push_back(std::pair<std::string, std::size_t>(pair.first, pair.second.getID()));
 	}
 	return result;
 }

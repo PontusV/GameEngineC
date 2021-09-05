@@ -22,12 +22,13 @@ namespace Core {
 	class SerializerArchive;
 	class DeserializerArchive;
 	class PrefabDeserializerArchive;
-	typedef std::map<std::string, std::size_t> EntityRemapLoadInfo;
-	typedef std::map<std::size_t, std::string> EntityRemapSaveInfo;
+	typedef std::vector<std::pair<std::string, std::size_t>> EntityRemapLoadInfo;
+	typedef std::vector<std::pair<std::size_t, std::string>> EntityRemapSaveInfo;
 
 	struct PrefabContent {
 		EntityRemapLoadInfo entityRemapInfo;
 		std::vector<Handle> content; // Handles to the immediate children of the prefab root
+		bool success = false;
 	};
 
 	class PrefabManager {
@@ -73,7 +74,7 @@ namespace Core {
 
 	private:
 		/* Loads the prefab at the specified file path */
-		PrefabContent loadPrefab(std::string filePath);
+		PrefabContent loadPrefab(std::string filePath, Entity rootEntity);
 		/* Serializes the prefab and all its children to ostream */
 		static void serialize(Handle rootEntity, SerializerArchive& archive);
 		/* Deserializes the prefab and all children from istream*/

@@ -841,7 +841,7 @@ bool loadPropertyFromBuffer(Core::Engine* engine, EntityID entityID, TypeID type
 	EntityManager& entityManager = engine->getEntityManager();
 	istreambuf sbuf(serializedData, dataSize);
 	std::istream is(&sbuf);
-	DeserializerArchive ar(is);
+	DeserializerArchive ar(is, &entityManager);
 	std::string propertyName;
 	ar(propertyName);
 	Entity entity(entityID);
@@ -856,7 +856,7 @@ bool loadComponentFromBuffer(Core::Engine* engine, EntityID entityID, char* seri
 	EntityManager& entityManager = engine->getEntityManager();
 	istreambuf sbuf(serializedData, dataSize);
 	std::istream is(&sbuf);
-	DeserializerArchive ar(is);
+	DeserializerArchive ar(is, &entityManager);
 	std::string typeName;
 	ar(typeName);
 
@@ -874,7 +874,7 @@ bool loadEntityFromBuffer(Core::Engine* engine, char* serializedData, std::size_
 	EntityManager& entityManager = engine->getEntityManager();
 	istreambuf sbuf(serializedData, dataSize);
 	std::istream is(&sbuf);
-	DeserializerArchive archive(is);
+	DeserializerArchive archive(is, &entityManager);
 	std::size_t entityAmount;
 	archive(entityAmount);
 
@@ -984,7 +984,7 @@ bool loadGameState(Core::Engine* engine, const char* path) {
 		std::cout << "loadGameState::ERROR Failed to load file: " << path << ". File open failed" << std::endl;
 		return false;
 	}
-	DeserializerArchive archive(file);
+	DeserializerArchive archive(file, &entityManager);
 	std::size_t entityIDCounter;
 	archive(entityIDCounter);
 
@@ -1156,24 +1156,16 @@ EntityID getEntityChild(Core::Engine* engine, EntityID entityID, std::size_t ind
 	if (entityID == Entity::INVALID_ID) return Entity::INVALID_ID;
 	EntityManager& entityManager = engine->getEntityManager();
 	Entity entity = Entity(entityID);
-	ChildManager* component = entityManager.getComponent<ChildManager>(entity);
-	if (component == nullptr) return 0;
-	return component->getChild(index).getEntity().getID();
+	Handle handle = Handle(entity, &entityManager);
+	return handle.getChild(index).getEntity().getID();
 }
 
 std::size_t getEntityChildCount(Core::Engine* engine, EntityID entityID) {
 	if (entityID == Entity::INVALID_ID) return 0;
 	EntityManager& entityManager = engine->getEntityManager();
 	Entity entity = Entity(entityID);
-	ChildManager* component = entityManager.getComponent<ChildManager>(entity);
-	if (component == nullptr) return 0;
-	std::size_t immediateChildCount = component->getChildCount();
-
-	std::size_t childCount = immediateChildCount;
-	for (std::size_t i = 0; i < immediateChildCount; i++) {
-		childCount += component->getChild(i).getChildCount();
-	}
-	return childCount;
+	Handle handle = Handle(entity, &entityManager);
+	return handle.getChildCount();
 }
 
 std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID) {

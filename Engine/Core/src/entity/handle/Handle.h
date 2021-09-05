@@ -146,6 +146,7 @@ namespace Core {
 		template<typename Archetype>
 		void deserialize(Archetype& ar) {
 			ar(entity);
+			entityManager = ar.getEntityManager();
 		}
 
 	protected:
