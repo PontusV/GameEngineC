@@ -42,9 +42,7 @@ namespace Editor {
 		void closeProject();
 		/* Returns true if successful */
 		bool openScene(std::wstring path);
-		/* Returns true if successful */
-		bool openSceneFromBackup(std::wstring srcPath, std::wstring destPath);
-		void closeScene(std::size_t sceneIndex);
+		void closeScene(EntityID rootEntityID);
 		/* Saves everything */
 		bool saveAll();
 

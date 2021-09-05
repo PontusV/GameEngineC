@@ -13,7 +13,7 @@ namespace Editor {
 
 		void openCreateScene();
 		void openCreateProject();
-		void openCreateEntity(std::size_t sceneIndex = -1);
+		void openCreateEntity(std::size_t rootEntityID = 0);
 		void openDeleteEntity(std::size_t entityID);
 		void openSaveChanges();
 	private:

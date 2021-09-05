@@ -219,9 +219,9 @@ void PopupManager::openCreateProject() {
 	open_create_project_popup = true;
 }
 
-void PopupManager::openCreateEntity(std::size_t sceneIndex) {
+void PopupManager::openCreateEntity(std::size_t rootEntityID){
 	open_create_entity_popup = true;
-	createEntityParentID = sceneIndex;
+	createEntityParentID = rootEntityID;
 }
 
 void PopupManager::openDeleteEntity(std::size_t entityID) {
