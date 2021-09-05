@@ -114,6 +114,8 @@ void Hierarchy::tick(EntityID target) {
 				if (editor->isInEditMode() && engineDLL->isLoaded()) {
 					engineDLL->savePrefab(scene.entityID, scene.filePath.c_str());
 					engineDLL->updatePrefabs(scene.filePath.c_str());
+					undoRedoManager->setDirty(rootEntityID, false);
+					undoRedoManager->resetStepsSinceSave(rootEntityID);
 				}
 			}
 			if (ImGui::Selectable("Save and Close", false)) {

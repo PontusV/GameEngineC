@@ -38,15 +38,15 @@ enum class PropertyFieldValueType {
 
 enum class InspectorFieldType {
 	NONE = 0,
-	BOOL,
-	DECIMAL,
-	SIGNED_NUMBER,
-	UNSIGNED_NUMBER,
-	STRING,
-	WIDE_STRING,
-	IMAGE_PATH,
-	SHADER_PATH,
-	FONT_PATH
+	BOOL = 1,
+	DECIMAL = 2,
+	SIGNED_NUMBER = 3,
+	UNSIGNED_NUMBER = 4,
+	STRING = 5,
+	WIDE_STRING = 6,
+	IMAGE_PATH = 7,
+	SHADER_PATH = 8,
+	FONT_PATH = 9
 };
 
 struct PropertyField {
@@ -239,7 +239,7 @@ void createFieldsRecursive(std::vector<PropertyField>& data, FieldValue<T>& arg,
 template<std::size_t I, typename... Ts>
 void createFieldsRecursive(std::vector<PropertyField>& data, FieldValue<std::string>& arg, FieldValue<Ts>&... args) {
 	data[I].name = arg.name;
-	data[I].valuePtr = (void*)arg.value.c_str();
+	data[I].valuePtr = (void*)arg.value.data();
 	data[I].ptr = &arg.value;
 	data[I].typeSize = arg.value.size();
 	data[I].valueType = getFieldValueType<std::string>();
@@ -250,7 +250,7 @@ void createFieldsRecursive(std::vector<PropertyField>& data, FieldValue<std::str
 template<std::size_t I, typename... Ts>
 void createFieldsRecursive(std::vector<PropertyField>& data, FieldValue<std::wstring>& arg, FieldValue<Ts>&... args) {
 	data[I].name = arg.name;
-	data[I].valuePtr = (void*)arg.value.c_str();
+	data[I].valuePtr = (void*)arg.value.data();
 	data[I].ptr = &arg.value;
 	data[I].typeSize = arg.value.size() * sizeof(wchar_t);
 	data[I].valueType = getFieldValueType<std::wstring>();
@@ -285,8 +285,8 @@ std::vector<PropertyField> getFields(std::string propName, const Mirror::Variabl
 	else if (type.name == "Core::Font") {
 		Font* font = static_cast<Font*>(ptr);
 		return createFields(
-			FieldValue("File path", font->fileName, InspectorFieldType::FONT_PATH),
-			FieldValue("Font size", font->size)
+			FieldValue("File_path", font->fileName, InspectorFieldType::FONT_PATH),
+			FieldValue("Font_size", font->size)
 		);
 	}
 	else if (type.name == "std::string") {
@@ -1182,7 +1182,7 @@ bool addComponent(Core::Engine* engine, EntityID entityID, TypeID typeID) {
 	if (entityID == Entity::INVALID_ID) return false;
 	EntityManager& entityManager = engine->getEntityManager();
 	Entity entity = Entity(entityID);
-	EntityLocationDetailed location = entityManager.addComponent(entity, typeID); // TODO: Check if successful
+	EntityLocationDetailed location = entityManager.addComponent(entity, typeID);
 	return location.isValid();
 }
 
@@ -1190,7 +1190,7 @@ bool removeComponent(Core::Engine* engine, EntityID entityID, TypeID typeID) {
 	if (entityID == Entity::INVALID_ID) return false;
 	EntityManager& entityManager = engine->getEntityManager();
 	Entity entity = Entity(entityID);
-	EntityLocationDetailed location = entityManager.removeComponent(entity, typeID); // TODO: Check if successful
+	EntityLocationDetailed location = entityManager.removeComponent(entity, typeID);
 	return location.isValid();
 }
 

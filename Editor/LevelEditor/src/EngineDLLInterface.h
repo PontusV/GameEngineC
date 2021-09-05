@@ -123,15 +123,15 @@ typedef void (*SetCallbackPtrFun)(EnginePtr, void*);
 namespace Editor {
 	enum class InspectorFieldType {
 		NONE = 0,
-		BOOL,
-		DECIMAL,
-		SIGNED_NUMBER,
-		UNSIGNED_NUMBER,
-		STRING,
-		WIDE_STRING,
-		IMAGE_PATH,
-		SHADER_PATH,
-		FONT_PATH
+		BOOL = 1,
+		DECIMAL = 2,
+		SIGNED_NUMBER = 3,
+		UNSIGNED_NUMBER = 4,
+		STRING = 5,
+		WIDE_STRING = 6,
+		IMAGE_PATH = 7,
+		SHADER_PATH = 8,
+		FONT_PATH = 9
 	};
 	struct ReflectedTypeData {
 		std::size_t typeID;

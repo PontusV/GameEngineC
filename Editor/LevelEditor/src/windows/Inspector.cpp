@@ -81,10 +81,18 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 			}
 			else {
 				std::size_t fieldCount = prop.fields.size();
+				if (fieldCount > 1) {
+					ImGui::Text(prop.name.c_str());
+					ImGui::Indent(10.0f);
+				}
 				for (std::size_t i = 0; i < fieldCount; i++) {
-					std::string labelString = std::string(prop.name) + "##" + std::to_string(index) + "_" + std::to_string(i);
-					const char* label = labelString.c_str();
 					auto& field = prop.fields[i];
+					std::string labelString = std::string(field.name) + "##" + prop.name + "_" + std::to_string(index) + "_" + std::to_string(i);
+					const char* label = labelString.c_str();
+					if (field.ptr == nullptr) {
+						ImGui::Text(label); // TODO: Display nullptr error
+						continue;
+					}
 					if (field.type == InspectorFieldType::BOOL) {
 						bool value = 0;
 						memcpy_s(&value, sizeof(value), field.ptr, field.typeSize);
@@ -344,6 +352,9 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 					else {
 						ImGui::Text(label);
 					}
+				}
+				if (fieldCount > 1) {
+					ImGui::Unindent(10.0f);
 				}
 			}
 		}
