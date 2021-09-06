@@ -41,7 +41,7 @@ namespace Editor {
 		/* Closes the current project. Unloads Engine / Game.dll. Cleans up temp Editor directory */
 		void closeProject();
 		/* Returns true if successful */
-		bool openScene(std::wstring path);
+		bool openPrefabAsScene(std::wstring path);
 		void closeScene(EntityID rootEntityID);
 		/* Saves everything */
 		bool saveAll();

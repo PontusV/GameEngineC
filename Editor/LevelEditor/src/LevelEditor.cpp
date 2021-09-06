@@ -19,7 +19,7 @@
 
 using namespace Editor;
 
-constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
+constexpr wchar_t PREFAB_FILE_TYPE[] = L".prefab";
 ImVec2 resolutionDefault = ImVec2(600, 480);
 
 LevelEditor::LevelEditor() : undoRedoManager(&engineDLL), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager, &popupManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
@@ -384,11 +384,11 @@ void LevelEditor::openProject(std::wstring path) {
 	std::vector<std::wstring> scenes = projectSettings.getOpenScenes();
 	projectSettings.getOpenScenes().clear();
 	for (std::wstring& scenePath : scenes) {
-		openScene(scenePath);
+		openPrefabAsScene(scenePath);
 	}
 }
 
-bool LevelEditor::openScene(std::wstring path) {
+bool LevelEditor::openPrefabAsScene(std::wstring path) {
 	if (!isInEditMode()) return false;
 	if (!engineDLL.isLoaded()) {
 		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
@@ -625,14 +625,14 @@ PopupManager* LevelEditor::getPopupManager() {
 
 bool LevelEditor::saveGameState() {
 	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
-	std::wstring decodedPath = tempEditorDirectory + L"temp" + SCENE_FILE_TYPE;
+	std::wstring decodedPath = tempEditorDirectory + L"temp" + PREFAB_FILE_TYPE;
 	std::string path = utf8_encode(decodedPath);
 	return engineDLL.saveGameState(path.c_str());
 }
 
 bool LevelEditor::loadGameState() {
 	std::wstring tempEditorDirectory = projectSettings.getPath() + TEMP_EDITOR_BUILD_PATH + L"/";
-	std::wstring decodedPath = tempEditorDirectory + L"temp" + SCENE_FILE_TYPE;
+	std::wstring decodedPath = tempEditorDirectory + L"temp" + PREFAB_FILE_TYPE;
 	std::string path = utf8_encode(decodedPath);
 	if (!engineDLL.loadGameState(path.c_str())) {
 		std::cout << "Failed to load game state temp scene file: " << std::endl;

@@ -35,8 +35,8 @@ void FileView::openFile(const std::filesystem::directory_entry& entry) {
 	if (fileName.ends_with(".proj")) {
 		editor->openProject(entry.path().wstring());
 	}
-	else if (fileName.ends_with(".scene")) {
-		editor->openScene(entry.path().wstring());
+	else if (fileName.ends_with(".prefab")) {
+		editor->openPrefabAsScene(entry.path().wstring());
 	}
 }
 
