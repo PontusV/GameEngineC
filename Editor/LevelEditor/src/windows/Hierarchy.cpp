@@ -31,7 +31,13 @@ void entityNode(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager, std::siz
 	if (childCount == 0) {
 		flags |= ImGuiTreeNodeFlags_Leaf;
 	}
+	if (node.isPrefabRoot) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 1, 1));
+	}
 	bool nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags, label.c_str());
+	if (node.isPrefabRoot) {
+		ImGui::PopStyleColor();
+	}
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
 		gameView->setTarget(node.entityID);
 	}
@@ -78,7 +84,13 @@ void Hierarchy::tick(EntityID target) {
 			sceneLabel.append("*");
 		}
 		std::string scenePopupId = std::string("scene_popup_").append(sceneName);
+		if (scene.isPrefabRoot) {
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 1, 1));
+		}
 		bool nodeOpened = ImGui::TreeNodeEx(sceneLabel.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen | (activeScene == rootEntityID ? ImGuiTreeNodeFlags_Selected : 0));
+		if (scene.isPrefabRoot) {
+			ImGui::PopStyleColor();
+		}
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
 			openPopup = true;
 		}
@@ -136,6 +148,7 @@ void Hierarchy::tick(EntityID target) {
 EntityHierarchyNode createEntityHierarchyFrom(EngineDLL* engineDLL, EntityID entityID) {
 	EntityHierarchyNode node;
 	node.entityID = entityID;
+	node.isPrefabRoot = engineDLL->isEntityPrefabRoot(entityID);
 	node.name = engineDLL->getEntityName(entityID);
 	std::size_t count = engineDLL->getEntityImmediateChildCount(entityID);
 	std::vector<EntityHierarchyNode>& children = node.children;
@@ -218,6 +231,22 @@ void Hierarchy::setActiveScene(EntityID rootEntityID) {
 	this->activeScene = rootEntityID;
 }
 
-std::size_t Hierarchy::getSceneCount() {
+std::size_t Hierarchy::getSceneCount() const {
 	return scenes.size();
+}
+
+std::vector<EntityID> Hierarchy::getSceneRootIDs() const {
+	std::vector<EntityID> rootEntityIDs(scenes.size());
+	for (std::size_t i = 0; i < rootEntityIDs.size(); i++) {
+		rootEntityIDs[i] = scenes[i].entityID;
+	}
+	return rootEntityIDs;
+}
+
+std::vector<std::string> Hierarchy::getSceneNames() const {
+	std::vector<std::string> names(scenes.size());
+	for (std::size_t i = 0; i < names.size(); i++) {
+		names[i] = scenes[i].name;
+	}
+	return names;
 }

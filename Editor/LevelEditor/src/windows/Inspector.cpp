@@ -59,15 +59,15 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 					}
 					if (ImGui::IsItemEdited()) {
 						// Assign value
-						float newR = color.x * 255.0f;
-						float newG = color.y * 255.0f;
-						float newB = color.z * 255.0f;
-						float newA = color.w * 255.0f;
+						unsigned char newR = color.x * 255.0f;
+						unsigned char newG = color.y * 255.0f;
+						unsigned char newB = color.z * 255.0f;
+						unsigned char newA = color.w * 255.0f;
 						serializedPropertyData = engineDLL->writePropertyToBuffer(entityID, typeID, prop.index);
-						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 0, (char*)&newR, sizeof(color.x));
-						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 1, (char*)&newG, sizeof(color.x));
-						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 2, (char*)&newB, sizeof(color.x));
-						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 3, (char*)&newA, sizeof(color.x));
+						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 0, (char*)&newR, sizeof(newR));
+						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 1, (char*)&newG, sizeof(newG));
+						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 2, (char*)&newB, sizeof(newB));
+						engineDLL->setPropertyFieldValue(typeID, prop.index, component, i + 3, (char*)&newA, sizeof(newA));
 						engineDLL->onUpdate(component, typeID, prop.index);
 					}
 					bool colorHasChanged = *rPtr != colorEditOldValue.x || *gPtr != colorEditOldValue.y || *bPtr != colorEditOldValue.z || *aPtr != colorEditOldValue.w;
@@ -87,7 +87,7 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 				}
 				for (std::size_t i = 0; i < fieldCount; i++) {
 					auto& field = prop.fields[i];
-					std::string labelString = std::string(field.name) + "##" + prop.name + "_" + std::to_string(index) + "_" + std::to_string(i);
+					std::string labelString = std::string(field.name) + (prop.overriden ? " (overriden)" : "") + "##" + prop.name + "_" + std::to_string(index) + "_" + std::to_string(i);
 					const char* label = labelString.c_str();
 					if (field.ptr == nullptr) {
 						ImGui::Text(label); // TODO: Display nullptr error

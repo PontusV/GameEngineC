@@ -26,6 +26,7 @@
 #include <ostream>
 #include <streambuf>
 #include "maths/MatrixTransform.h"
+#include "maths/Vector2.h"
 #include "utils/string.h"
 using namespace Core;
 
@@ -849,7 +850,8 @@ bool loadPropertyFromBuffer(Core::Engine* engine, EntityID entityID, TypeID type
 	if (instance == nullptr) {
 		return false;
 	}
-	return Mirror::serializeProperty(ar, instance, typeID, propertyName);
+	std::cout << "Loading property entityID " << entityID << ", typeID " << typeID << ", propertyName " << propertyName << std::endl;
+	return Mirror::deserializeProperty(ar, instance, typeID, propertyName);
 }
 
 bool loadComponentFromBuffer(Core::Engine* engine, EntityID entityID, char* serializedData, std::size_t dataSize) {
@@ -1102,11 +1104,12 @@ bool isEntityChild(Core::Engine* engine, EntityID entityID, EntityID parentID) {
 }
 
 bool setEntityParent(Core::Engine* engine, EntityID entityID, EntityID parentID) {
-	if (entityID == Entity::INVALID_ID) return false;
+	if (entityID == Entity::INVALID_ID || entityID == parentID) return false;
 	EntityManager& entityManager = engine->getEntityManager();
 	Entity entity = Entity(entityID);
 	Entity parentEntity = Entity(parentID);
 	Handle handle = Handle(entity, &entityManager);
+	if (parentID != Entity::INVALID_ID && handle.isChild(parentEntity)) return false;
 	Handle parentHandle = Handle(parentEntity, &entityManager);
 	handle.setParent(parentEntity, true);
 	return true;

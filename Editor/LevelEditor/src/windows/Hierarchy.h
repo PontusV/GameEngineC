@@ -12,6 +12,7 @@ namespace Editor {
 		EntityHierarchyNode() {}
 		EntityHierarchyNode(EntityID entityID, std::string name, std::vector<EntityHierarchyNode> children) : entityID(entityID), name(name), children(children) {}
 		EntityID entityID = 0;
+		bool isPrefabRoot = false;
 		std::string name;
 		std::vector<EntityHierarchyNode> children;
 	};
@@ -46,7 +47,9 @@ namespace Editor {
 
 		void onEntitiesChanged(EntityID entityID);
 
-		std::size_t getSceneCount();
+		std::size_t getSceneCount() const;
+		std::vector<EntityID> getSceneRootIDs() const;
+		std::vector<std::string> getSceneNames() const;
 	private:
 		LevelEditor* editor;
 		GameView* gameView;

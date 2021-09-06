@@ -5,7 +5,7 @@
 #include "utils/file.h"
 using namespace Editor;
 
-constexpr wchar_t SCENE_FILE_TYPE[] = L".scene";
+constexpr wchar_t PREFAB_FILE_TYPE[] = L".prefab";
 
 PopupManager::PopupManager() {}
 PopupManager::~PopupManager() {}
@@ -21,10 +21,11 @@ void PopupManager::tick(LevelEditor* editor) {
 
 	if (open_create_scene_popup && engineDLL.isLoaded() && projectSettings.isLoaded()) {
 		open_create_scene_popup = false;
-		std::wstring path = getSaveFileName(L"Choose scene location", L"Scene\0*.scene;\0", 1, projectSettings.getPath().c_str());
+		std::wstring filter = L"Prefab\0*" + std::wstring(PREFAB_FILE_TYPE) + L";\0";
+		std::wstring path = getSaveFileName(L"Choose prefab location", filter.c_str(), 1, projectSettings.getPath().c_str());
 		if (!path.empty()) {
-			if (!path.ends_with(SCENE_FILE_TYPE)) {
-				path.append(SCENE_FILE_TYPE);
+			if (!path.ends_with(PREFAB_FILE_TYPE)) {
+				path.append(PREFAB_FILE_TYPE);
 			}
 			std::size_t nameStartIndex = path.find_last_of(L"\\");
 			std::wstring fileName = path.substr(nameStartIndex == std::wstring::npos ? 0 : nameStartIndex + 1);
@@ -177,8 +178,6 @@ void PopupManager::tick(LevelEditor* editor) {
 	}
 
 	if (ImGui::BeginPopupModal("Save_unsaved_changes", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		auto entityName = engineDLL.getEntityName(deleteEntityID);
-		auto rootEntityID = engineDLL.getRootEntityID(deleteEntityID);
 		EngineDLL* engineDLL = editor->getEngineDLL();
 		UndoRedoManager* undoRedoManager = editor->getUndoRedoManager();
 		GameView* gameView = editor->getGameView();
@@ -186,9 +185,7 @@ void PopupManager::tick(LevelEditor* editor) {
 		ImGui::Text("Save changes before exiting the application?");
 		ImGui::Separator();
 
-		std::size_t sceneCount = hierarchy->getSceneCount();
-		for (std::size_t i = 0; i < sceneCount; i++) {
-			std::string sceneName = engineDLL->getEntityName(rootEntityID);
+		for (const std::string& sceneName : hierarchy->getSceneNames()) {
 			ImGui::Text("%s*", sceneName);
 		}
 

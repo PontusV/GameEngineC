@@ -412,6 +412,7 @@ PrefabContent PrefabManager::loadPrefab(std::string filePath, Entity rootEntity)
 }
 
 EntityRemapLoadInfo PrefabManager::updatePrefabFromRoot(Handle rootHandle, PrefabComponent& prefabComponent, PrefabDeserializerArchive& archive) {
+	std::cout << "Updating prefab with EntityID " << rootHandle.getEntity().getID() << " at path " << prefabComponent.getFilePath() << std::endl;
 	EntityRemapLoadInfo prevEntityRemapInfo = prefabComponent.getEntityRemapInfo();
 	auto propertyOverrides = getPropertyOverridesAt(rootHandle);
 	auto componentOverrides = getComponentOverridesAt(rootHandle);

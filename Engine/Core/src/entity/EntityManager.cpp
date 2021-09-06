@@ -98,10 +98,8 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 
 	// Destroy immediate children (will chain down)
 	std::size_t childCount = entityHandle.getImmediateChildCount();
-	std::cout << "Destroying " << entity.getID() << ", immediate child count: " << childCount << std::endl;
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = entityHandle.getChild(i);
-		std::cout << "destroying child " << child.getEntity().getID() << ", refreshed: " << child.refresh() << ", exists: " << getLocation(child.getEntity()).isValid() << std::endl;
 		child.destroyImmediate();
 	}
 
@@ -411,8 +409,16 @@ void EntityManager::setParent(EntityLocationDetailed location, Entity parent, bo
 		return;
 	}
 	Entity entity = location.chunk.lock()->getEntity(location.index);
+	if (entity == parent) {
+		std::cout << "EntityManager::setParent::ERROR Unable to self as parent" << std::endl;
+		return;
+	}
 	Handle entityHandle = Handle(entity, this, location);
 	Handle parentHandle = Handle(parent, this);
+	if (entityHandle.isChild(parent)) {
+		std::cout << "EntityManager::setParent::ERROR Unable to set a child as parent" << std::endl;
+		return;
+	}
 
 	// Notify previous parent of removal & remove
 	Handle currentParent = entityHandle.getParent();

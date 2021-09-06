@@ -96,7 +96,7 @@ namespace Core {
 
 		//-----------------------------------------SERIALIZE-----------------------------------------------
 		template<typename T>
-		std::enable_if_t<!std::is_arithmetic<T>::value, void> serialize(const T&, SerializationDetails& details) {
+		std::enable_if_t<!std::is_arithmetic<T>::value, void> serialize(const T&, SerializationDetails&) {
 			std::cout << "Serializer::serialize::ERROR Failed to serialize given value type" << std::endl;
 			throw std::invalid_argument("Failed to serialize given value type");
 		}
@@ -184,7 +184,7 @@ namespace Core {
 		//---------------------------------------DESERIALIZE-----------------------------------------------
 
 		template<typename T>
-		std::enable_if_t<!std::is_arithmetic<T>::value, void> deserialize(T&, DeserializationDetails& details) {
+		std::enable_if_t<!std::is_arithmetic<T>::value, void> deserialize(T&, DeserializationDetails&) {
 			std::cout << "Serializer::deserialize::ERROR Failed to deserialize given value type" << std::endl;
 			throw std::invalid_argument("Failed to deserialize given value type");
 		}
@@ -310,7 +310,6 @@ namespace Core {
 			if (details.entityRemapInfo) {
 				bufferArchive.setEntityRemapInfo(*details.entityRemapInfo);
 			}
-			std::cout << "Serializing " << properties[I].name << " of type " << properties[I].type.name << std::endl;
 			details::serialize(arg, bufferArchive);
 			std::size_t dataSize = dataBuffer.tellp();
 			details::serialize(dataSize, ar);
@@ -322,7 +321,6 @@ namespace Core {
 		void deserializePropertiesImpl(Archive& ar, const std::vector<Mirror::Property>& properties, SerializedPropertyDetails prop, T& arg, Ts&... args) {
 			if (properties[I].name.compare(prop.name) == 0 && properties[I].type.name.compare(prop.typeName) == 0 && properties[I].type.size == prop.typeSize) {
 				// Found match
-				std::cout << "Deserializing " << prop.name << " of type " << prop.typeName << std::endl;
 				details::deserialize(arg, ar);
 			}
 			else {
@@ -352,7 +350,7 @@ namespace Core {
 		}
 
 		template<typename Archive, typename... Ts>
-		void deserializeProperties(Archive& ar, const std::vector<Mirror::Property>& properties, Ts&... args) {
+		void deserializePropertiesWithOverrides(Archive& ar, const std::vector<std::string>& overrides, const std::vector<Mirror::Property>& properties, Ts&... args) {
 			assert(sizeof...(args) == properties.size());
 			std::size_t count = 0;
 			details::deserialize(count, ar);
@@ -362,8 +360,21 @@ namespace Core {
 				details::deserialize(prop.typeName, ar);
 				details::deserialize(prop.typeSize, ar);
 				details::deserialize(prop.dataSize, ar);
-				details::deserializePropertiesImpl(ar, properties, prop, args...);
+				bool overriden = std::find_if(overrides.begin(), overrides.end(), [&prop](const std::string& propertyName) { return prop.name == propertyName; }) != overrides.end();
+				if (overriden) {
+					auto details = ar.getDetails();
+					details.is.seekg(prop.dataSize, std::ios::cur); // Skip property
+				}
+				else {
+					details::deserializePropertiesImpl(ar, properties, prop, args...);
+				}
 			}
+		}
+
+		template<typename Archive, typename... Ts>
+		void deserializeProperties(Archive& ar, const std::vector<Mirror::Property>& properties, Ts&... args) {
+			std::vector<std::string> overrides;
+			deserializePropertiesWithOverrides(ar, overrides, properties, args...);
 		}
 
 		/* Expects the upcoming part of the given istream to be serialized properties for a component. The skip will chain down to all base its classes */
@@ -447,14 +458,9 @@ namespace Core {
 			details::deserializeAll(*this, args...);
 		}
 		template<typename... Ts>
-		void operator()(const std::vector<Mirror::Property>& properties, Ts&... args) {
-			std::vector<Mirror::Property> filteredProperties;
-			for (const Mirror::Property& prop : properties) {
-				if (std::find(overridenProperties.begin(), overridenProperties.end(), prop.name == overridenProperties.end())) {
-					filteredProperties.push_back(prop);
-				}
-			}
-			details::deserializeProperties(*this, filteredProperties, args...);
+		void operator()(std::vector<Mirror::Property>& properties, Ts&... args) {
+			assert(sizeof...(args) == properties.size());
+			details::deserializePropertiesWithOverrides(*this, overridenProperties, properties, args...);
 		}
 	private:
 		std::vector<std::string> overridenProperties;

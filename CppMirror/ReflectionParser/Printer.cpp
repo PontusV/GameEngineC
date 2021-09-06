@@ -506,6 +506,22 @@ void Printer::printClass(const ClassInfo& currentClass, const std::vector<ClassI
 	}
 	fileInput << printTabs(1) << "return false;" << endml;
 	fileInput << "}" << endml;
+	// deserializeProperty
+	fileInput << "template<typename Archive>" << endml;
+	fileInput << "bool deserializeProperty(Archive& ar, std::string propertyName) {" << endml;
+	for (const Property& prop : currentClass.properties) {
+		fileInput << printTabs(1) << "if (propertyName == \"" << prop.name << "\") {" << endml;
+		fileInput << printTabs(2) << "ar(" << prop.name << ");" << endml;
+		fileInput << printTabs(2) << "return true;" << endml;
+		fileInput << printTabs(1) << "}" << endml;
+	}
+	for (const ClassInfo& baseClass : directBaseClasses) {
+		fileInput << printTabs(1) << "if (" << baseClass.fullName << "::deserializeProperty(ar, propertyName)) {" << endml;
+		fileInput << printTabs(2) << "return true;" << endml;
+		fileInput << printTabs(1) << "}" << endml;
+	}
+	fileInput << printTabs(1) << "return false;" << endml;
+	fileInput << "}" << endml;
 	// serialize
 	fileInput << "template<typename Archive>" << endml;
 	fileInput << "void serialize(Archive& ar) const {" << endml;
@@ -817,6 +833,18 @@ void Printer::printReflectionPolymorph(const std::vector<ClassInfo>& classes) {
 			fileInput << "else ";
 		fileInput << "if (typeID == " + std::to_string(classes[i].typeID) + ")" << std::endl;
 		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->serializeProperty(ar, propertyName);" << std::endl;
+	}
+	fileInput << "\t" << "return false;" << std::endl;
+	fileInput << "}" << std::endl;
+	// deserializeProperty
+	fileInput << "template<typename Archive>" << std::endl;
+	fileInput << "bool deserializeProperty(Archive& ar, void* instance, std::size_t typeID, std::string propertyName) {" << std::endl;
+	for (std::size_t i = 0; i < classes.size(); i++) {
+		fileInput << "\t";
+		if (i != 0)
+			fileInput << "else ";
+		fileInput << "if (typeID == " + std::to_string(classes[i].typeID) + ")" << std::endl;
+		fileInput << "\t" << "\t" << "return reinterpret_cast<" + classes[i].fullName + "*>(instance)->deserializeProperty(ar, propertyName);" << std::endl;
 	}
 	fileInput << "\t" << "return false;" << std::endl;
 	fileInput << "}" << std::endl;

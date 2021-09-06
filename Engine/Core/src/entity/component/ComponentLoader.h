@@ -82,6 +82,11 @@ namespace Core {
 
 		T* component = go.getComponent<T>();
 
+		if (component == nullptr) {
+			std::cout << "ComponentLoader::updateComponentFromFile_impl<T>::ERROR Cannot update non-existant component!" << std::endl;
+			throw "ComponentLoader::updateComponentFromFile_impl<T>::ERROR Cannot update non-existant component!";
+		}
+
 		try {
 			component->deserialize(ar);
 		}

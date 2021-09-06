@@ -326,12 +326,16 @@ std::unique_ptr<DoAction> PropertyAssignAction::call(EngineDLL* engineDLL) {
 			std::cout << "PropertyAssignAction::call::ERROR Failed to update prefab" << std::endl;
 		}
 		// TODO: Set rootEntityID as dirty
+		auto component = engineDLL->getComponent(entityID, typeID);
+		engineDLL->onUpdate(component.instance, typeID, propIndex);
 		return std::make_unique<PropertyAssignAction>(rootEntityID, entityID, typeName, propertyName, std::move(prevSerializedPropertyData), overriden);
 	} else if (engineDLL->loadPropertyFromBuffer(entityID, typeID, serializedPropertyData.c_str(), serializedPropertyData.size())) {
 		if (!overriden && !engineDLL->overrideProperty(entityID, typeID, propIndex)) {
 			std::cout << "PropertyAssignAction::call::ERROR Failed to override property" << std::endl;
 			return nullptr;
 		}
+		auto component = engineDLL->getComponent(entityID, typeID);
+		engineDLL->onUpdate(component.instance, typeID, propIndex);
 		return std::make_unique<PropertyAssignAction>(rootEntityID, entityID, typeName, propertyName, std::move(prevSerializedPropertyData), overriden);
 	}
 	return nullptr;
