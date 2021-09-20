@@ -202,6 +202,12 @@ std::unique_ptr<DoAction> AddComponentAction::call(EngineDLL* engineDLL) {
 		return nullptr;
 	}
 	if (engineDLL->loadComponentFromBuffer(entityID, serializedComponentData.c_str(), serializedComponentData.size())) {
+		for (auto& propertyOverride : propertyOverrides) {
+			std::size_t propertyIndex = engineDLL->getPropertyIndex(propertyOverride.typeID, propertyOverride.propertyName.c_str());
+			if (!engineDLL->overrideProperty(propertyOverride.entityID, propertyOverride.typeID, propertyIndex)) {
+				std::cout << "AddComponentAction::call::ERROR Failed to override property. EntityID: " << propertyOverride.entityID << ", TypeID: " << propertyOverride.typeID << ", propertyIndex: " << propertyIndex << std::endl;
+			}
+		}
 		return std::make_unique<RemoveComponentAction>(rootEntityID, entityID, typeName);
 	}
 	std::cout << "AddComponentAction::call::ERROR Failed to load component from buffer" << std::endl;
@@ -224,8 +230,10 @@ std::unique_ptr<DoAction> RemoveComponentAction::call(EngineDLL* engineDLL) {
 		std::cout << "RemoveComponentAction::call::ERROR Failed to retrieve serialized component data" << std::endl;
 		return nullptr;
 	}
+	auto propertyOverrides = engineDLL->getPropertyOverrides(entityID, typeID);
 	if (engineDLL->removeComponent(entityID, typeID)) {
-		return std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData));
+		engineDLL->clearPropertyOverrides(entityID, typeID);
+		return std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData), propertyOverrides);
 	}
 	std::cout << "RemoveComponentAction::call::ERROR Failed to remove component" << std::endl;
 	return nullptr;

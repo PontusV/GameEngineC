@@ -64,6 +64,8 @@ namespace Core {
 		/* Sets property as an override. This means the property will not be loaded from prefab. Returns true if the given property exists and was successfully added as an override */
 		bool addPropertyOverride(PrefabPropertyOverride prefabPropertyOverride);
 		bool removePropertyOverride(PrefabPropertyOverride prefabPropertyOverride);
+		void clearPropertyOverrides();
+		void clearPropertyOverrides(Entity entity, std::size_t typeID);
 		std::vector<PrefabPropertyOverride> getPropertyOverrides() const;
 
 		void setConnectedEntities(std::vector<ConnectedEntity> value);

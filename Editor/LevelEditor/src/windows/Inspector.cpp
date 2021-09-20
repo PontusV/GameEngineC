@@ -373,9 +373,11 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 			// Remove component
 			ComponentData componentData = engineDLL->getComponent(entityID, typeID);
 			std::string serializedComponentData = engineDLL->writeComponentToBuffer(entityID, typeID);
+			auto propertyOverrides = engineDLL->getPropertyOverrides(entityID, typeID);
 			if (engineDLL->removeComponent(entityID, typeID)) {
+				engineDLL->clearPropertyOverrides(entityID, typeID);
 				std::string typeName = engineDLL->getTypeName(typeID);
-				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData)));
+				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData), propertyOverrides));
 			}
 			else {
 				std::cout << "Inspector::renderComponent::ERROR Failed to remove component" << std::endl;
@@ -429,7 +431,18 @@ void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager
 		if (!filterComponentType(engineDLL, filter, type.typeID)) {
 			if (ImGui::Selectable(type.typeName.c_str(), false)) {
 				// Adding component
+				bool overriden = engineDLL->isComponentOverriden(target.entityID, type.typeID);
 				if (engineDLL->addComponent(target.entityID, type.typeID)) {
+					if (overriden) {
+						// TODO: Only load/update component
+						EntityID prefabRootEntityID = engineDLL->getNearestPrefabRootEntityID(target.entityID);
+						if (engineDLL->updatePrefab(prefabRootEntityID)) {
+							undoRedoManager->setDirty(target.rootEntityID, true);
+						}
+						else {
+							std::cout << "Inspector::renderComponentCombo:ERROR Failed to update prefab " << prefabRootEntityID << " after adding component (" << type.typeName << ") which was previously overriden as removed" << std::endl;
+						}
+					}
 					undoRedoManager->registerUndo(std::make_unique<RemoveComponentAction>(target.rootEntityID, target.entityID, type.typeName));
 				}
 				else {

@@ -829,6 +829,17 @@ void getComponentOverrides(Core::Engine* engine, EntityID entityID, TypeID* out,
 	}
 }
 
+bool clearPropertyOverrides(Core::Engine* engine, EntityID entityID, TypeID typeID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	for (PrefabComponent* prefabComponent : handle.getComponentsInParents<PrefabComponent>()) {
+		prefabComponent->clearPropertyOverrides(Entity(entityID), typeID);
+		return true;
+	}
+	return false;
+}
+
 bool revertPrefab(Core::Engine* engine, EntityID entityID) {
 	EntityManager& entityManager = engine->getEntityManager();
 	PrefabManager& prefabManager = engine->getPrefabManager();

@@ -673,10 +673,19 @@ std::vector<std::size_t> PrefabManager::getComponentOverrides(Handle handle) {
 		auto connectedEntities = prefabComponent->getConnectedEntities();
 		auto it = std::find_if(connectedEntities.begin(), connectedEntities.end(), [&handle](const ConnectedEntity& connectedEntity) { return connectedEntity.entity == handle.getEntity(); });
 		if (it != connectedEntities.end()) {
-			for (const auto& componentType : handle.getComponentTypes()) {
+			auto componentTypes = handle.getComponentTypes();
+			// Adds add component overrides
+			for (const auto& componentType : componentTypes) {
 				bool overriden = std::find_if(it->componentTypeIDs.begin(), it->componentTypeIDs.end(), [&componentType](const std::size_t& componentTypeID) { return componentTypeID == componentType.type.getTypeID(); }) == it->componentTypeIDs.end();
 				if (overriden) {
 					result.push_back(componentType.type.getTypeID());
+				}
+			}
+			// Adds remove component overrides
+			for (auto& componentTypeID : it->componentTypeIDs) {
+				bool overriden = std::find_if(componentTypes.begin(), componentTypes.end(), [&componentTypeID](const IComponentTypeInfo& componentType) { return componentTypeID == componentType.type.getTypeID(); }) == componentTypes.end();
+				if (overriden) {
+					result.push_back(componentTypeID);
 				}
 			}
 		}

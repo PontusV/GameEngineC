@@ -203,6 +203,10 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, clearPropertyOverridesFun, "clearPropertyOverrides")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, createPrefabFromEntityFun, "createPrefabFromEntity")) {
         unload();
         return false;
@@ -443,6 +447,7 @@ bool EngineDLL::unload() {
     savePrefabFun = nullptr;
     updatePrefabsFun = nullptr;
     updatePrefabFun = nullptr;
+    clearPropertyOverridesFun = nullptr;
     createPrefabFromEntityFun = nullptr;
     createPrefabEntityFun = nullptr;
     createEntityFromPrefabFun = nullptr;

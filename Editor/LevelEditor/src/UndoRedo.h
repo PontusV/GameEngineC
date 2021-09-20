@@ -93,13 +93,14 @@ namespace Editor {
 
 	class AddComponentAction : public DoAction {
 	public:
-		AddComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string&& serializedComponentData) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), serializedComponentData(serializedComponentData) {}
+		AddComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string&& serializedComponentData, std::vector<PropertyOverride> propertyOverrides) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), serializedComponentData(serializedComponentData), propertyOverrides(propertyOverrides) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
 		std::string typeName;
 		std::string serializedComponentData;
+		std::vector<PropertyOverride> propertyOverrides;
 	};
 
 	class RemoveComponentAction : public DoAction {

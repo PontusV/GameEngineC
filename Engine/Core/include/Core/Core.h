@@ -66,8 +66,10 @@ extern "C" {
 	// Prefab
 	DLLEXPORT bool unpackPrefab(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT bool savePrefab(Core::Engine* engine, EntityID entityID, const char* path);
+	DLLEXPORT bool revertPrefab(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT bool updatePrefabs(Core::Engine* engine, const char* path);
 	DLLEXPORT bool updatePrefab(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool clearPropertyOverrides(Core::Engine* engine, EntityID entityID, TypeID typeID);
 	DLLEXPORT bool createPrefabFromEntity(Core::Engine* engine, EntityID entityID, const char* path);
 	DLLEXPORT bool overrideProperty(Core::Engine* engine, EntityID entityID, std::size_t typeID, std::size_t propIndex);
 	DLLEXPORT bool removePropertyOverride(Core::Engine* engine, EntityID entityID, std::size_t typeID, std::size_t propIndex);
@@ -77,7 +79,6 @@ extern "C" {
 	DLLEXPORT void getPropertyOverrides(Core::Engine* engine, EntityID entityID, TypeID typeID, std::size_t* out, std::size_t outSize);
 	DLLEXPORT void getPropertyOverridesAt(Core::Engine* engine, EntityID entityID, EntityID* entityIDOut, TypeID* typeIDOut, std::size_t* propIndexOut, std::size_t outSize);
 	DLLEXPORT void getComponentOverrides(Core::Engine* engine, EntityID entityID, TypeID* out, std::size_t outSize);
-	DLLEXPORT bool revertPrefab(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT EntityID createPrefabEntity(Core::Engine* engine, const char* path, float x, float y);
 	DLLEXPORT EntityID createEntityFromPrefab(Core::Engine* engine, const char* path, float x, float y);
 	DLLEXPORT EntityID getPrefabOverrideReceiver(Core::Engine* engine, EntityID entityID);

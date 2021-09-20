@@ -485,6 +485,14 @@ bool EngineDLLInterface::updatePrefab(EntityID entityID) {
     return updatePrefabFun(engine, entityID);
 }
 
+bool EngineDLLInterface::clearPropertyOverrides(EntityID entityID, TypeID typeID) {
+    if (clearPropertyOverridesFun == nullptr) {
+        std::cout << "EngineDLLInterface::clearPropertyOverrides::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::clearPropertyOverrides::ERROR The function ptr is nullptr";
+    }
+    return clearPropertyOverridesFun(engine, entityID, typeID);
+}
+
 bool EngineDLLInterface::createPrefabFromEntity(EntityID entityID, const char* path) {
     if (createPrefabFromEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::createPrefabFromEntity::ERROR The function ptr is nullptr" << std::endl;

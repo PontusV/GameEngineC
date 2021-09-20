@@ -68,6 +68,7 @@ typedef bool (*UnpackPrefabFun)(EnginePtr, EntityID);
 typedef bool (*SavePrefabFun)(EnginePtr, EntityID, const char*);
 typedef bool (*UpdatePrefabsFun)(EnginePtr, const char*);
 typedef bool (*UpdatePrefabFun)(EnginePtr, EntityID);
+typedef bool (*ClearPropertyOverridesFun)(EnginePtr, EntityID, TypeID);
 typedef bool (*CreatePrefabFromEntityFun)(EnginePtr, EntityID, const char*);
 typedef bool (*OverridePropertyFun)(EnginePtr, EntityID, std::size_t, std::size_t);
 typedef bool (*RemovePropertyOverrideFun)(EnginePtr, EntityID, std::size_t, std::size_t);
@@ -222,6 +223,7 @@ namespace Editor {
 		bool savePrefab(EntityID entityID, const char* path);
 		bool updatePrefabs(const char* path);
 		bool updatePrefab(EntityID entityID);
+		bool clearPropertyOverrides(EntityID entityID, TypeID typeID);
 		bool createPrefabFromEntity(EntityID entityID, const char* path);
 		bool overrideProperty(EntityID entityID, std::size_t typeID, std::size_t propIndex);
 		bool removePropertyOverride(EntityID entityID, std::size_t typeID, std::size_t propIndex);
@@ -333,6 +335,7 @@ namespace Editor {
 		SavePrefabFun savePrefabFun;
 		UpdatePrefabsFun updatePrefabsFun;
 		UpdatePrefabFun updatePrefabFun;
+		ClearPropertyOverridesFun clearPropertyOverridesFun;
 		CreatePrefabFromEntityFun createPrefabFromEntityFun;
 		CreatePrefabEntityFun createPrefabEntityFun;
 		CreateEntityFromPrefabFun createEntityFromPrefabFun;

@@ -49,6 +49,21 @@ bool PrefabComponent::removePropertyOverride(PrefabPropertyOverride prefabProper
 	return false;
 }
 
+void PrefabComponent::clearPropertyOverrides() {
+	prefabPropertyOverrides.clear();
+}
+
+void PrefabComponent::clearPropertyOverrides(Entity entity, std::size_t typeID) {
+	for (auto it = prefabPropertyOverrides.begin(); it != prefabPropertyOverrides.end();) {
+		if (it->targetComponent.getComponentTypeID() == typeID && it->targetComponent.getOwner().getEntity() == entity) {
+			it = prefabPropertyOverrides.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+}
+
 std::vector<PrefabPropertyOverride> PrefabComponent::getPropertyOverrides() const {
 	return prefabPropertyOverrides;
 }
@@ -62,15 +77,14 @@ std::vector<ConnectedEntity> PrefabComponent::getConnectedEntities() const {
 }
 
 void PrefabComponent::removeDanglingOverrides() {
-	auto& propertyOverrides = prefabPropertyOverrides;
 	// Property
-	for (auto it = propertyOverrides.begin(); it != propertyOverrides.end();) {
+	for (auto it = prefabPropertyOverrides.begin(); it != prefabPropertyOverrides.end();) {
 		IComponentData* component = it->targetComponent.getComponent();
 		if (it->targetComponent.isValid() && !component->getType().getProperty(it->targetPropertyName).name.empty()) {
 			it++;
 		}
 		else {
-			it = propertyOverrides.erase(it);
+			it = prefabPropertyOverrides.erase(it);
 		}
 	}
 }
