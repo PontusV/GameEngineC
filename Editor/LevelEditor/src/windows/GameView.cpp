@@ -121,7 +121,13 @@ void GameView::tick(float deltaTime, bool editMode, std::size_t fpsCount) {
 		pressed = false;
 		targetPressed = false;
 		if (draggingTarget) {
-			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y));
+			bool positionOverriden = engineDLL->isPositionOverriden(target.entityID);
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y, positionOverriden));
+			if (!positionOverriden) {
+				if (!engineDLL->overridePosition(target.entityID)) {
+					std::cout << "GameView::tick::ERROR Failed to override position after move" << std::endl;
+				}
+			}
 			draggingTarget = false;
 		}
 	}
@@ -156,15 +162,22 @@ EntityTargetData GameView::getTarget() {
 }
 
 void GameView::setTarget(EntityID entityID) {
+	EngineDLL* engineDLL = editor->getEngineDLL();
 	if (targetPressed) {
 		targetPressed = false;
 		pressed = false;
 		if (draggingTarget) {
-			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y));
+
+			bool positionOverriden = engineDLL->isPositionOverriden(target.entityID);
+			undoRedoManager->registerUndo(std::make_unique<MoveEntityAction>(target.rootEntityID, target.entityID, targetPressedPosition.x, targetPressedPosition.y, positionOverriden));
+			if (!positionOverriden) {
+				if (!engineDLL->overridePosition(target.entityID)) {
+					std::cout << "GameView::tick::ERROR Failed to override position after move" << std::endl;
+				}
+			}
 			draggingTarget = false;
 		}
 	}
-	EngineDLL* engineDLL = editor->getEngineDLL();
 	target.entityID = entityID;
 	target.rootEntityID = engineDLL->getRootEntityID(entityID);
 	target.entityName = engineDLL->getEntityName(entityID);

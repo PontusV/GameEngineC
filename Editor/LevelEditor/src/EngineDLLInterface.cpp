@@ -267,6 +267,30 @@ bool EngineDLLInterface::setWorldPosition(EntityID entityID, float x, float y) {
     return setWorldPositionFun(engine, entityID, x, y);
 }
 
+bool EngineDLLInterface::overridePosition(EntityID entityID) {
+    if (overridePositionFun == nullptr) {
+        std::cout << "EngineDLLInterface::overridePosition::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::overridePosition::ERROR The function ptr is nullptr";
+    }
+    return overridePositionFun(engine, entityID);
+}
+
+bool EngineDLLInterface::removePositionOverride(EntityID entityID) {
+    if (removePositionOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::removePositionOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::removePositionOverride::ERROR The function ptr is nullptr";
+    }
+    return removePositionOverrideFun(engine, entityID);
+}
+
+bool EngineDLLInterface::isPositionOverriden(EntityID entityID) {
+    if (isPositionOverridenFun == nullptr) {
+        std::cout << "EngineDLLInterface::isPositionOverriden::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::isPositionOverriden::ERROR The function ptr is nullptr";
+    }
+    return isPositionOverridenFun(engine, entityID);
+}
+
 bool EngineDLLInterface::hasAnnotation(TypeID typeID, const char* annotation) {
     if (hasAnnotationFun == nullptr) {
         std::cout << "EngineDLLInterface::hasAnnotation::ERROR The function ptr is nullptr" << std::endl;
@@ -514,22 +538,6 @@ bool EngineDLLInterface::removePropertyOverride(EntityID entityID, std::size_t t
     return removePropertyOverrideFun(engine, entityID, typeID, propIndex);
 }
 
-bool EngineDLLInterface::overrideComponent(EntityID entityID, std::size_t typeID) {
-    if (overrideComponentFun == nullptr) {
-        std::cout << "EngineDLLInterface::overrideComponent::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::overrideComponent::ERROR The function ptr is nullptr";
-    }
-    return overrideComponentFun(engine, entityID, typeID);
-}
-
-bool EngineDLLInterface::removeComponentOverride(EntityID entityID, std::size_t typeID) {
-    if (removeComponentOverrideFun == nullptr) {
-        std::cout << "EngineDLLInterface::removeComponentOverride::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::removeComponentOverride::ERROR The function ptr is nullptr";
-    }
-    return removeComponentOverrideFun(engine, entityID, typeID);
-}
-
 bool EngineDLLInterface::isEntityPrefabRoot(EntityID entityID) {
     if (isEntityPrefabRootFun == nullptr) {
         std::cout << "EngineDLLInterface::isEntityPrefabRoot::ERROR The function ptr is nullptr" << std::endl;
@@ -614,30 +622,12 @@ std::vector<ComponentOverride> EngineDLLInterface::getComponentOverrides(EntityI
     return overrides;
 }
 
-std::vector<ComponentOverride> EngineDLLInterface::getComponentOverridesAt(EntityID entityID) {
-    if (getComponentOverridesAtFun == nullptr) {
-        std::cout << "EngineDLLInterface::getComponentOverridesAt::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getComponentOverridesAt::ERROR The function ptr is nullptr";
+bool EngineDLLInterface::revertPrefab(EntityID entityID) {
+    if (revertPrefabFun == nullptr) {
+        std::cout << "EngineDLLInterface::revertPrefab::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::revertPrefab::ERROR The function ptr is nullptr";
     }
-    std::size_t overrideCount = getComponentOverridesAtCount(entityID);
-    std::vector<std::size_t> entityIDs(overrideCount); // TODO
-    std::vector<std::size_t> typeIDs(overrideCount);
-    getComponentOverridesAtFun(engine, entityID, &entityIDs[0], &typeIDs[0], overrideCount);
-    std::vector<ComponentOverride> overrides(overrideCount);
-    for (std::size_t i = 0; i < overrideCount; i++) {
-        ComponentOverride& override = overrides[i];
-        override.entityID = entityIDs[i];
-        override.typeID = typeIDs[i];
-    }
-    return overrides;
-}
-
-bool EngineDLLInterface::clearOverrides(EntityID entityID) {
-    if (clearOverridesFun == nullptr) {
-        std::cout << "EngineDLLInterface::clearOverrides::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::clearOverrides::ERROR The function ptr is nullptr";
-    }
-    return clearOverridesFun(engine, entityID);
+    return revertPrefabFun(engine, entityID);
 }
 
 std::string EngineDLLInterface::getPrefabFilePath(EntityID entityID) {
@@ -679,14 +669,6 @@ std::size_t EngineDLLInterface::getComponentOverridesCount(EntityID entityID) {
         throw "EngineDLLInterface::getComponentOverridesCount::ERROR The function ptr is nullptr";
     }
     return getComponentOverridesCountFun(engine, entityID);
-}
-
-std::size_t EngineDLLInterface::getComponentOverridesAtCount(EntityID entityID) {
-    if (getComponentOverridesAtCountFun == nullptr) {
-        std::cout << "EngineDLLInterface::getComponentOverridesAtCount::ERROR The function ptr is nullptr" << std::endl;
-        throw "EngineDLLInterface::getComponentOverridesAtCount::ERROR The function ptr is nullptr";
-    }
-    return getComponentOverridesAtCountFun(engine, entityID);
 }
 
 bool EngineDLLInterface::loadPropertyFromBuffer(EntityID entityID, TypeID typeID, const char* serializedData, std::size_t dataSize) {

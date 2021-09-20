@@ -41,6 +41,9 @@ typedef bool (*GetWorldPositionFun)(EnginePtr, EntityID, float*);
 typedef bool (*GetLocalPositionFun)(EnginePtr, EntityID, float*);
 typedef bool (*SetLocalPositionFun)(EnginePtr, EntityID, float, float);
 typedef bool (*SetWorldPositionFun)(EnginePtr, EntityID, float, float);
+typedef bool (*OverridePositionFun)(EnginePtr, EntityID);
+typedef bool (*RemovePositionOverrideFun)(EnginePtr, EntityID);
+typedef bool (*IsPositionOverridenFun)(EnginePtr, EntityID);
 
 // Reflection general
 typedef bool (*HasAnnotationFun)(TypeID, const char*);
@@ -68,23 +71,19 @@ typedef bool (*UpdatePrefabFun)(EnginePtr, EntityID);
 typedef bool (*CreatePrefabFromEntityFun)(EnginePtr, EntityID, const char*);
 typedef bool (*OverridePropertyFun)(EnginePtr, EntityID, std::size_t, std::size_t);
 typedef bool (*RemovePropertyOverrideFun)(EnginePtr, EntityID, std::size_t, std::size_t);
-typedef bool (*OverrideComponentFun)(EnginePtr, EntityID, std::size_t);
-typedef bool (*RemoveComponentOverrideFun)(EnginePtr, EntityID, std::size_t);
 typedef bool (*IsEntityPrefabRootFun)(EnginePtr, EntityID);
 typedef bool (*IsEntityAnOverrideFun)(EnginePtr, EntityID);
-typedef bool (*ClearOverridesFun)(EnginePtr, EntityID);
+typedef bool (*RevertPrefabFun)(EnginePtr, EntityID);
 typedef void (*GetPrefabFilePathFun)(EnginePtr, EntityID, char*, std::size_t);
 typedef void (*GetPropertyOverridesFun)(EnginePtr, EntityID, TypeID, std::size_t*, std::size_t);
 typedef void (*GetPropertyOverridesAtFun)(EnginePtr, EntityID, EntityID*, TypeID*, std::size_t*, std::size_t);
 typedef void (*GetComponentOverridesFun)(EnginePtr, EntityID, TypeID*, std::size_t);
-typedef void (*GetComponentOverridesAtFun)(EnginePtr, EntityID, EntityID*, TypeID*, std::size_t);
 typedef EntityID (*CreatePrefabEntityFun)(EnginePtr, const char*, float, float);
 typedef EntityID (*CreateEntityFromPrefabFun)(EnginePtr, const char*, float, float);
 typedef EntityID (*GetPrefabOverrideReceiverFun)(EnginePtr, EntityID);
 typedef std::size_t (*GetPropertyOverridesCountFun)(EnginePtr, EntityID, TypeID);
 typedef std::size_t (*GetPropertyOverridesAtCountFun)(EnginePtr, EntityID);
 typedef std::size_t (*GetComponentOverridesCountFun)(EnginePtr, EntityID);
-typedef std::size_t (*GetComponentOverridesAtCountFun)(EnginePtr, EntityID);
 
 // Serialization
 typedef bool (*LoadPropertyFromBufferFun)(EnginePtr, EntityID, TypeID, const char*, std::size_t);
@@ -195,6 +194,9 @@ namespace Editor {
 		ImVec2 getLocalPosition(EntityID entityID);
 		bool setLocalPosition(EntityID entityID, float x, float y);
 		bool setWorldPosition(EntityID entityID, float x, float y);
+		bool overridePosition(EntityID entityID);
+		bool removePositionOverride(EntityID entityID);
+		bool isPositionOverriden(EntityID entityID);
 
 		// Reflection general
 		bool hasAnnotation(TypeID typeID, const char* annotation);
@@ -223,18 +225,15 @@ namespace Editor {
 		bool createPrefabFromEntity(EntityID entityID, const char* path);
 		bool overrideProperty(EntityID entityID, std::size_t typeID, std::size_t propIndex);
 		bool removePropertyOverride(EntityID entityID, std::size_t typeID, std::size_t propIndex);
-		bool overrideComponent(EntityID entityID, std::size_t typeID);
-		bool removeComponentOverride(EntityID entityID, std::size_t typeID);
 		bool isEntityPrefabRoot(EntityID entityID);
 		bool isEntityAnOverride(EntityID entityID);
 		bool isComponentOverriden(EntityID entityID, TypeID typeID);
 		bool isPropertyOverriden(EntityID entityID, TypeID typeID, std::string propertyName);
-		bool clearOverrides(EntityID entityID);
+		bool revertPrefab(EntityID entityID);
 		std::string getPrefabFilePath(EntityID entityID);
 		std::vector<PropertyOverride> getPropertyOverrides(EntityID entityID, TypeID typeID);
 		std::vector<PropertyOverride> getPropertyOverridesAt(EntityID entityID);
 		std::vector<ComponentOverride> getComponentOverrides(EntityID entityID);
-		std::vector<ComponentOverride> getComponentOverridesAt(EntityID entityID);
 		EntityID getNearestPrefabRootEntityID(EntityID entityID);
 		EntityID createPrefabEntity(const char* path, float x, float y);
 		EntityID createEntityFromPrefab(const char* path, float x, float y);
@@ -242,7 +241,6 @@ namespace Editor {
 		std::size_t getPropertyOverridesCount(EntityID entityID, TypeID typeID);
 		std::size_t getPropertyOverridesAtCount(EntityID entityID);
 		std::size_t getComponentOverridesCount(EntityID entityID);
-		std::size_t getComponentOverridesAtCount(EntityID entityID);
 
 		// Serialization
 		bool loadPropertyFromBuffer(EntityID entityID, TypeID typeID, const char* serializedData, std::size_t dataSize);
@@ -308,6 +306,9 @@ namespace Editor {
 		GetLocalPositionFun getLocalPositionFun;
 		SetLocalPositionFun setLocalPositionFun;
 		SetWorldPositionFun setWorldPositionFun;
+		OverridePositionFun overridePositionFun;
+		RemovePositionOverrideFun removePositionOverrideFun;
+		IsPositionOverridenFun isPositionOverridenFun;
 
 		// Reflection general
 		HasAnnotationFun hasAnnotationFun;
@@ -337,21 +338,17 @@ namespace Editor {
 		CreateEntityFromPrefabFun createEntityFromPrefabFun;
 		OverridePropertyFun overridePropertyFun;
 		RemovePropertyOverrideFun removePropertyOverrideFun;
-		OverrideComponentFun overrideComponentFun;
-		RemoveComponentOverrideFun removeComponentOverrideFun;
 		IsEntityPrefabRootFun isEntityPrefabRootFun;
 		IsEntityAnOverrideFun isEntityAnOverrideFun;
 		GetPropertyOverridesFun getPropertyOverridesFun;
 		GetPropertyOverridesAtFun getPropertyOverridesAtFun;
 		GetComponentOverridesFun getComponentOverridesFun;
-		GetComponentOverridesAtFun getComponentOverridesAtFun;
-		ClearOverridesFun clearOverridesFun;
+		RevertPrefabFun revertPrefabFun;
 		GetPrefabFilePathFun getPrefabFilePathFun;
 		GetPrefabOverrideReceiverFun getPrefabOverrideReceiverFun;
 		GetPropertyOverridesCountFun getPropertyOverridesCountFun;
 		GetPropertyOverridesAtCountFun getPropertyOverridesAtCountFun;
 		GetComponentOverridesCountFun getComponentOverridesCountFun;
-		GetComponentOverridesAtCountFun getComponentOverridesAtCountFun;
 
 		// Serialization
 		LoadPropertyFromBufferFun loadPropertyFromBufferFun;

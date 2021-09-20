@@ -158,7 +158,12 @@ void PopupManager::tick(LevelEditor* editor) {
 			if (deleteEntityID != 0) {
 				auto serializedEntityData = engineDLL->writeEntityToBuffer(deleteEntityID);
 				if (engineDLL->destroyEntity(deleteEntityID)) {
-					undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(rootEntityID, deleteEntityID, std::move(serializedEntityData)));
+					if (serializedEntityData.size() != 0) {
+						undoRedoManager->registerUndo(std::make_unique<CreateEntityAction>(rootEntityID, deleteEntityID, std::move(serializedEntityData)));
+					}
+					else {
+						std::cout << "Failed to register undo for deletion of Entity. Failed to serialize entity data" << std::endl;
+					}
 					gameView->releaseTarget();
 				}
 			}
@@ -185,8 +190,11 @@ void PopupManager::tick(LevelEditor* editor) {
 		ImGui::Text("Save changes before exiting the application?");
 		ImGui::Separator();
 
-		for (const std::string& sceneName : hierarchy->getSceneNames()) {
-			ImGui::Text("%s*", sceneName);
+		for (const EntityID& sceneRootEntityID : hierarchy->getSceneRootIDs()) {
+			std::string sceneName = engineDLL->getEntityName(sceneRootEntityID);
+			if (undoRedoManager->isUnsaved(sceneRootEntityID)) {
+				ImGui::Text("%s*", sceneName);
+			}
 		}
 
 		if (ImGui::Button("Save", ImVec2(120, 0))) {

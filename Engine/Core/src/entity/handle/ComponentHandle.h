@@ -43,6 +43,9 @@ namespace Core {
 		Handle getOwner() const {
 			return owner;
 		}
+		const Handle& getOwnerRef() const {
+			return owner;
+		}
 		ComponentTypeID getComponentTypeID() const {
 			return typeID;
 		}

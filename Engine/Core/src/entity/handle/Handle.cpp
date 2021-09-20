@@ -153,6 +153,14 @@ bool Handle::isParent(Entity entity) {
 	return false;
 }
 
+bool Handle::isImmediateParent(Entity entity) {
+	Handle parent = getParent();
+	if (parent.refresh()) {
+		return parent.getEntity() == entity;
+	}
+	return false;
+}
+
 bool Handle::isImmediateChild(Entity entity) {
 	std::size_t childCount = getImmediateChildCount();
 	for (std::size_t i = 0; i < childCount; i++) {
@@ -370,6 +378,7 @@ IComponentData* Handle::addComponentImmediate(ComponentTypeID componentTypeID) {
 		updateLocation(newLocation);
 		return getComponent(componentTypeID);
 	}
+	return nullptr;
 }
 
 void Handle::removeComponent(ComponentTypeID componentTypeID) {
@@ -384,6 +393,7 @@ bool Handle::removeComponentImmediate(ComponentTypeID componentTypeID) {
 		updateLocation(newLocation);
 		return !hasComponent(componentTypeID);
 	}
+	return false;
 }
 
 void Handle::destroy() {

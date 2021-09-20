@@ -391,7 +391,22 @@ void LevelEditor::openProject(std::wstring path) {
 bool LevelEditor::openPrefabAsScene(std::wstring path) {
 	if (!isInEditMode()) return false;
 	if (!engineDLL.isLoaded()) {
-		std::cout << "Unable to open scene because the Engine has not been loaded" << std::endl;
+		std::cout << "LevelEditor::openPrefabAsScene::ERROR Unable to open scene because the Engine has not been loaded" << std::endl;
+		return false;
+	}
+	bool isAlreadyOpen = false;
+	for (const EntityID& entityID : engineDLL.getAllEntities()) {
+		if (engineDLL.isEntityPrefabRoot(entityID) && engineDLL.getEntityParent(entityID) == 0) {
+			std::string filePath = engineDLL.getPrefabFilePath(entityID);
+			std::wstring decodedFilepath = utf8_decode(filePath);
+			if (path == decodedFilepath) {
+				isAlreadyOpen = true;
+				break;
+			}
+		}
+	}
+	if (isAlreadyOpen) {
+		std::cout << "LevelEditor::openPrefabAsScene::ERROR Unable to open prefab as scene because it is already open" << std::endl;
 		return false;
 	}
 	std::string encodedPath = utf8_encode(path);
@@ -402,9 +417,9 @@ bool LevelEditor::openPrefabAsScene(std::wstring path) {
 	// Create scene root node
 	EntityID entityID = engineDLL.createEntityFromPrefab(encodedPath.c_str(), 0, 0);
 	if (!engineDLL.setEntityName(entityID, sceneName.c_str())) {
-		std::cout << "LevelEditor::openScene::ERROR Failed to name the scene at path: " << encodedPath << std::endl;
+		std::cout << "LevelEditor::openPrefabAsScene::ERROR Failed to name the scene at path: " << encodedPath << std::endl;
 		if (!engineDLL.destroyEntity(entityID)) {
-			std::cout << "LevelEditor::openScene::ERROR Failed to remove scene at path: " << encodedPath << std::endl;
+			std::cout << "LevelEditor::openPrefabAsScene::ERROR Failed to remove scene at path: " << encodedPath << std::endl;
 		}
 		return false;
 	}
@@ -558,15 +573,18 @@ bool LevelEditor::buildGame() {
 bool LevelEditor::saveAll() {
 	if (!isInEditMode()) return false;
 	for (const EntityID& entityID : engineDLL.getAllEntities()) {
-		if (!engineDLL.hasEntityParent(entityID)) {
+		if (!engineDLL.hasEntityParent(entityID) && engineDLL.isEntityPrefabRoot(entityID)) {
 			if (undoRedoManager.isUnsaved(entityID)) {
 				auto path = engineDLL.getPrefabFilePath(entityID);
 				if (engineDLL.savePrefab(entityID, path.c_str())) {
 					undoRedoManager.resetStepsSinceSave(entityID);
 					undoRedoManager.setDirty(entityID, false);
+					if (!engineDLL.updatePrefabs(path.c_str())) {
+						std::cout << "LevelEditor::saveAll::ERROR Failed to update prefabs connected to path: " << path << std::endl;
+					}
 				}
 				else {
-					std::cout << "Failed to save scene " << entityID << " to path: " << path << std::endl;
+					std::cout << "LevelEditor::saveAll::ERROR Failed to save scene " << entityID << " to path: " << path << std::endl;
 				}
 			}
 		}

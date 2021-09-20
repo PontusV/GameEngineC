@@ -60,15 +60,23 @@ namespace Core {
 			throw std::invalid_argument("ComponentLoader::addComponentFromFile_impl<T>::ERROR Could not add component to invalid EntityHandle!");
 		}
 
-		T loadedComponent;
 
 		try {
-			loadedComponent.deserialize(ar);
-			go.addComponent(loadedComponent);
+			T* component = static_cast<T*>(go.addComponentImmediate(T::getClassTypeID()));
+			if (component == nullptr) {
+				std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR Failed to load component! Add component returned nullptr" << std::endl;
+				throw "ComponentLoader::addComponentFromFile_impl<T>::ERROR Failed to load component! Add component returned nullptr";
+			}
+			component->deserialize(ar);
 		}
 		catch (std::exception& e) {
 			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
 			std::cout << "Exception: " << e.what() << "\n";
+			throw;
+		}
+		catch (...) {
+			std::cout << "ComponentLoader::addComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
+			std::cout << "Exception: Unknown\n";
 			throw;
 		}
 	}
@@ -93,6 +101,11 @@ namespace Core {
 		catch (std::exception& e) {
 			std::cout << "ComponentLoader::updateComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
 			std::cout << "Exception: " << e.what() << "\n";
+			throw;
+		}
+		catch (...) {
+			std::cout << "ComponentLoader::updateComponentFromFile_impl<T>::ERROR An Exception was thrown when loading a component!\n";
+			std::cout << "Exception: Unknown\n";
 			throw;
 		}
 	}

@@ -28,6 +28,8 @@ namespace Core {
 		bool isChild(Entity entity);
 		/* Returns true if the given Entity is a parent of the Entity this instance points to. */
 		bool isParent(Entity entity);
+		/* Returns true if the given Entity is an immediate parent of the Entity this instance points to. */
+		bool isImmediateParent(Entity entity);
 		/* Returns true if the given Entity is an immediate child of the Entity this instance points to. */
 		bool isImmediateChild(Entity entity);
 
@@ -139,12 +141,12 @@ namespace Core {
 		void setSiblingIndexQueued(std::size_t index);
 		std::size_t getSiblingIndex();
 
-		template<typename Archetype>
-		void serialize(Archetype& ar) const {
+		template<typename Archive>
+		void serialize(Archive& ar) const {
 			ar(entity);
 		}
-		template<typename Archetype>
-		void deserialize(Archetype& ar) {
+		template<typename Archive>
+		void deserialize(Archive& ar) {
 			ar(entity);
 			entityManager = ar.getEntityManager();
 		}

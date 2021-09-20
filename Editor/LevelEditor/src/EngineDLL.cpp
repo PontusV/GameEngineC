@@ -119,6 +119,18 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, overridePositionFun, "overridePosition")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, removePositionOverrideFun, "removePositionOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, isPositionOverridenFun, "isPositionOverriden")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, hasAnnotationFun, "hasAnnotation")) {
         unload();
         return false;
@@ -211,14 +223,6 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, overrideComponentFun, "overrideComponent")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, removeComponentOverrideFun, "removeComponentOverride")) {
-        unload();
-        return false;
-    }
     if (!loadFunctionFromDLL(handle, isEntityPrefabRootFun, "isEntityPrefabRoot")) {
         unload();
         return false;
@@ -239,11 +243,7 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
-    if (!loadFunctionFromDLL(handle, getComponentOverridesAtFun, "getComponentOverridesAt")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, clearOverridesFun, "clearOverrides")) {
+    if (!loadFunctionFromDLL(handle, revertPrefabFun, "revertPrefab")) {
         unload();
         return false;
     }
@@ -264,10 +264,6 @@ bool EngineDLL::load(const wchar_t* path) {
         return false;
     }
     if (!loadFunctionFromDLL(handle, getComponentOverridesCountFun, "getComponentOverridesCount")) {
-        unload();
-        return false;
-    }
-    if (!loadFunctionFromDLL(handle, getComponentOverridesAtCountFun, "getComponentOverridesAtCount")) {
         unload();
         return false;
     }
@@ -426,6 +422,9 @@ bool EngineDLL::unload() {
     getLocalPositionFun = nullptr;
     setLocalPositionFun = nullptr;
     setWorldPositionFun = nullptr;
+    overridePositionFun = nullptr;
+    removePositionOverrideFun = nullptr;
+    isPositionOverridenFun = nullptr;
     hasAnnotationFun = nullptr;
     getTypeNameFun = nullptr;
     onUpdateFun = nullptr;
@@ -449,21 +448,17 @@ bool EngineDLL::unload() {
     createEntityFromPrefabFun = nullptr;
     overridePropertyFun = nullptr;
     removePropertyOverrideFun = nullptr;
-    overrideComponentFun = nullptr;
-    removeComponentOverrideFun = nullptr;
     isEntityPrefabRootFun = nullptr;
     isEntityAnOverrideFun = nullptr;
     getPropertyOverridesFun = nullptr;
     getPropertyOverridesAtFun = nullptr;
     getComponentOverridesFun = nullptr;
-    getComponentOverridesAtFun = nullptr;
-    clearOverridesFun = nullptr;
+    revertPrefabFun = nullptr;
     getPrefabFilePathFun = nullptr;
     getPrefabOverrideReceiverFun = nullptr;
     getPropertyOverridesCountFun = nullptr;
     getPropertyOverridesAtCountFun = nullptr;
     getComponentOverridesCountFun = nullptr;
-    getComponentOverridesAtCountFun = nullptr;
     loadPropertyFromBufferFun = nullptr;
     loadComponentFromBufferFun = nullptr;
     loadEntityFromBufferFun = nullptr;

@@ -93,34 +93,33 @@ namespace Editor {
 
 	class AddComponentAction : public DoAction {
 	public:
-		AddComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string&& serializedComponentData, bool overriden) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), serializedComponentData(serializedComponentData), prevOverriden(overriden) {}
+		AddComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string&& serializedComponentData) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), serializedComponentData(serializedComponentData) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
 		std::string typeName;
 		std::string serializedComponentData;
-		bool prevOverriden;
 	};
 
 	class RemoveComponentAction : public DoAction {
 	public:
-		RemoveComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, bool overriden) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), prevOverriden(overriden) {}
+		RemoveComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName) : DoAction(rootEntityID), entityID(entityID), typeName(typeName) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
 		std::string typeName;
-		bool prevOverriden;
 	};
 
 	class MoveEntityAction : public DoAction {
 	public:
-		MoveEntityAction(std::size_t rootEntityID, std::size_t entityID, float x, float y) : DoAction(rootEntityID), entityID(entityID), x(x), y(y) {}
+		MoveEntityAction(std::size_t rootEntityID, std::size_t entityID, float x, float y, bool overriden) : DoAction(rootEntityID), entityID(entityID), x(x), y(y), prevOverriden(overriden) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
+		bool prevOverriden;
 		float x;
 		float y;
 	};
@@ -169,33 +168,12 @@ namespace Editor {
 
 	class RepackPrefabAction : public DoAction { // WIP
 	public:
-		RepackPrefabAction(std::size_t rootEntityID, std::size_t entityID, std::string&& serializedComponentData, std::vector<PropertyOverride> propertyOverrides, std::vector<ComponentOverride> componentOverrides) : DoAction(rootEntityID), entityID(entityID), serializedComponentData(serializedComponentData), propertyOverrides(propertyOverrides), componentOverrides(componentOverrides) {}
+		RepackPrefabAction(std::size_t rootEntityID, std::size_t entityID, std::string&& serializedComponentData, std::vector<PropertyOverride> propertyOverrides) : DoAction(rootEntityID), entityID(entityID), serializedComponentData(serializedComponentData), propertyOverrides(propertyOverrides) {}
 		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
 		std::string serializedComponentData;
 		std::vector<PropertyOverride> propertyOverrides;
-		std::vector<ComponentOverride> componentOverrides;
-	};
-
-	class RevertPrefabAction : public DoAction { // WIP
-	public:
-		RevertPrefabAction(std::size_t rootEntityID, std::size_t entityID) : DoAction(rootEntityID), entityID(entityID) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
-		bool isValid(EngineDLL* engineDLL) override;
-	private:
-		std::size_t entityID;
-	};
-
-	class UndoRevertPrefabAction : public DoAction { // WIP
-	public:
-		UndoRevertPrefabAction(std::size_t rootEntityID, std::size_t entityID, std::vector<SerializedProperty> serializedProperties, std::vector<SerializedComponent> serializedComponents) : DoAction(rootEntityID), entityID(entityID), serializedProperties(serializedProperties), serializedComponents(serializedComponents) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
-		bool isValid(EngineDLL* engineDLL) override;
-	private:
-		std::size_t entityID;
-		std::vector<SerializedProperty> serializedProperties;
-		std::vector<SerializedComponent> serializedComponents;
 	};
 }

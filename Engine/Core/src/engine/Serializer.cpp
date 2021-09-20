@@ -52,14 +52,6 @@ namespace Core {
 		}
 
 		template<>
-		void serialize<ComponentHandle>(const ComponentHandle& value, SerializationDetails& details) {
-			serialize(value.getOwner(), details);
-			// Serializes name of component instead of typeID
-			std::string typeName = Mirror::getName(value.getComponentTypeID());
-			serialize(typeName, details);
-		}
-
-		template<>
 		void deserialize<std::string>(std::string& value, DeserializationDetails& details) {
 			std::size_t size;
 			deserialize(size, details);
@@ -112,18 +104,6 @@ namespace Core {
 				std::cout << "Serializer::deserialize::ERROR Unable to deserialize Entity without EntityRemapLoadInfo" << std::endl;
 				throw std::invalid_argument("Serializer::serialize::ERROR Unable to serialize Entity without EntityRemapLoadInfo");
 			}
-		}
-
-		template<>
-		void deserialize<ComponentHandle>(ComponentHandle& value, DeserializationDetails& details) {
-			Handle handle;
-			std::string typeName;
-			deserialize(handle, details);
-			deserialize(typeName, details);
-			std::size_t typeID = Mirror::getTypeID(typeName);
-
-			value.setOwner(handle);
-			value.setComponentTypeID(typeID);
 		}
 
 		void skipPropertiesImpl(DeserializationDetails& details) {

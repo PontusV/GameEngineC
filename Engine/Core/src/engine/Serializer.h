@@ -129,10 +129,6 @@ namespace Core {
 		template<>
 		void serialize<Entity>(const Entity& value, SerializationDetails& details);
 
-		// ComponentHandle
-		template<>
-		void serialize<ComponentHandle>(const ComponentHandle& value, SerializationDetails& details);
-
 		// Non literal type, assumed to have compatible serialize function
 		template<typename T, typename Archive>
 		std::enable_if_t<is_serializeable<T, Archive>::value, void> serialize(const T& value, Archive& ar) {
@@ -143,6 +139,15 @@ namespace Core {
 		std::enable_if_t<!is_serializeable<T, Archive>::value, void> serialize(const T& value, Archive& ar) {
 			SerializationDetails details = ar.getDetails();
 			serialize(value, details);
+		}
+
+		// ComponentHandle
+		template<typename Archive>
+		void serialize(const ComponentHandle& value, Archive& ar) {
+			serialize(value.getOwnerRef(), ar);
+			// Serializes name of component instead of typeID
+			std::string typeName = Mirror::getName(value.getComponentTypeID());
+			serialize(typeName, ar);
 		}
 
 		// std::pair
@@ -217,10 +222,6 @@ namespace Core {
 		template<>
 		void deserialize<Entity>(Entity& value, DeserializationDetails& details);
 
-		// ComponentHandle
-		template<>
-		void deserialize<ComponentHandle>(ComponentHandle& value, DeserializationDetails& details);
-
 		// Non literal type, assumed to have compatible deserialize function
 		template<typename T, typename Archive>
 		std::enable_if_t<is_deserializeable<T, Archive>::value, void> deserialize(T& value, Archive& ar) {
@@ -231,6 +232,19 @@ namespace Core {
 		std::enable_if_t<!is_deserializeable<T, Archive>::value, void> deserialize(T& value, Archive& ar) {
 			DeserializationDetails details = ar.getDetails();
 			deserialize(value, details);
+		}
+
+		// ComponentHandle
+		template<typename Archive>
+		void deserialize(ComponentHandle& value, Archive& ar) {
+			Handle handle;
+			std::string typeName;
+			deserialize(handle, ar);
+			deserialize(typeName, ar);
+			std::size_t typeID = Mirror::getTypeID(typeName);
+
+			value.setOwner(handle);
+			value.setComponentTypeID(typeID);
 		}
 
 		// std::pair
@@ -362,6 +376,7 @@ namespace Core {
 				details::deserialize(prop.dataSize, ar);
 				bool overriden = std::find_if(overrides.begin(), overrides.end(), [&prop](const std::string& propertyName) { return prop.name == propertyName; }) != overrides.end();
 				if (overriden) {
+					std::cout << prop.name << " overriden" << std::endl;
 					auto details = ar.getDetails();
 					details.is.seekg(prop.dataSize, std::ios::cur); // Skip property
 				}

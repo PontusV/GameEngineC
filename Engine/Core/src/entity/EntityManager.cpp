@@ -28,7 +28,6 @@ std::vector<Entity> EntityManager::getAllEntities() {
 
 Entity EntityManager::generateEntity() {
 	Entity entity(entityIDCounter++);
-	entityHideFlags[entity] = HideFlags::None;
 	return entity;
 }
 
@@ -87,7 +86,9 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 		//throw std::invalid_argument("EntityManager::removeEntity::ERROR The entity does not exist in this manager!");
 	}
 
-	Entity entity = location.chunk.lock()->getEntity(location.index);
+	auto chunkPtr = location.chunk.lock();
+	auto archetypePtr = location.archetype.lock();
+	Entity entity = chunkPtr->getEntity(location.index);
 	if (entity.getID() == Entity::INVALID_ID) {
 		return false;
 	}
@@ -109,19 +110,18 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 		for (Behaviour* behaviour : parent.getComponentsUpwards<Behaviour>()) {
 			behaviour->onChildRemoved(entityHandle);
 		}
-		ChildManager* childManager = parent.getComponent<ChildManager>();
-		childManager->onChildRemoved(entityHandle);
-		if (childManager->getChildCount() == 0) {
-			parent.removeComponent(ChildManager::getClassTypeID());
+		if (ChildManager* childManager = parent.getComponent<ChildManager>()) {
+			childManager->onChildRemoved(entityHandle);
+			if (childManager->getChildCount() == 0) {
+				parent.removeComponentImmediate(ChildManager::getClassTypeID());
+			}
 		}
 	}
 
 	// Remove Entity from chunk
-	location.chunk.lock()->remove(location.index);
-	auto archetype = location.archetype.lock();
-
-	if (archetype->isEmpty()) {
-		removeArchetype(archetype);
+	chunkPtr->remove(location.index);
+	if (archetypePtr->isEmpty()) {
+		removeArchetype(archetypePtr);
 	}
 
 	EntityDestroyedEvent postEvent;
@@ -162,7 +162,10 @@ EntityLocationDetailed EntityManager::removeComponent(EntityLocationDetailed loc
 	std::vector<IComponentTypeInfo> srcTypes = src->getTypes();
 
 	auto it = std::find(srcTypes.begin(), srcTypes.end(), typeID);
-	if (it == srcTypes.end()) throw std::invalid_argument("EntityManager::removeComponent::ERROR Cannot remove component");
+	if (it == srcTypes.end()) {
+		std::cout << "EntityManager::removeComponent::ERROR Cannot remove component of type " << typeID << " from Entity " << entity.getID() << std::endl;
+		throw std::invalid_argument("EntityManager::removeComponent::ERROR Cannot remove component");
+	}
 
 	srcTypes.erase(it);
 	std::shared_ptr<Archetype> dest = getArchetype(srcTypes);

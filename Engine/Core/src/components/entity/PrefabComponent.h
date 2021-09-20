@@ -11,40 +11,40 @@
 
 namespace Core {
 
+	/* Holds data for Entity connected to a prefab*/
+	struct ConnectedEntity {
+		template<typename Archive>
+		void serialize(Archive& ar) const {
+			ar(guid, entity, componentTypeIDs);
+		}
+
+		template<typename Archive>
+		void deserialize(Archive& ar) {
+			ar(guid, entity, componentTypeIDs);
+		}
+
+		std::string guid; // The GUID used when loading
+		Entity entity;
+		std::vector<std::size_t> componentTypeIDs; // Components connected to the prefab
+	};
+
 	struct PrefabPropertyOverride {
+	public:
 		PrefabPropertyOverride() {}
 		PrefabPropertyOverride(ComponentHandle handle, std::string propertyName) : targetComponent(handle), targetPropertyName(propertyName) {}
 
 		template<typename Archive>
-		void serialize(Archive& archive) const {
-			archive(targetComponent, targetPropertyName);
+		void serialize(Archive& ar) const {
+			ar(targetComponent, targetPropertyName);
 		}
 
 		template<typename Archive>
-		void deserialize(Archive& archive) {
-			archive(targetComponent, targetPropertyName);
+		void deserialize(Archive& ar) {
+			ar(targetComponent, targetPropertyName);
 		}
 
 		ComponentHandle targetComponent;
 		std::string targetPropertyName;
-	};
-
-	struct PrefabComponentOverride {
-		PrefabComponentOverride() {}
-		PrefabComponentOverride(Handle handle, std::size_t typeID) : targetEntity(handle), typeID(typeID) {}
-
-		template<typename Archive>
-		void serialize(Archive& archive) const {
-			archive(targetEntity, typeID);
-		}
-
-		template<typename Archive>
-		void deserialize(Archive& archive) {
-			archive(targetEntity, typeID);
-		}
-
-		Handle targetEntity;
-		std::size_t typeID;
 	};
 
 	/* Gives an Entity a reference to a Prefab. Identifies a Prefab */
@@ -56,7 +56,7 @@ namespace Core {
 		~PrefabComponent();
 
 		bool isDirty() const;
-		bool setDirty(bool value);
+		void setDirty(bool value);
 
 		void setFilePath(std::string filePath);
 		std::string getFilePath();
@@ -66,13 +66,8 @@ namespace Core {
 		bool removePropertyOverride(PrefabPropertyOverride prefabPropertyOverride);
 		std::vector<PrefabPropertyOverride> getPropertyOverrides() const;
 
-		/* Sets property as an override. This means the component will not be loaded from prefab. Returns true if the override was successfully added */
-		bool addComponentOverride(PrefabComponentOverride prefabComponentOverride);
-		bool removeComponentOverride(PrefabComponentOverride prefabComponentOverride);
-		std::vector<PrefabComponentOverride> getComponentOverrides() const;
-
-		void setEntityRemapInfo(std::vector<std::pair<std::string, std::size_t>> entityRemapInfo);
-		std::vector<std::pair<std::string, std::size_t>> getEntityRemapInfo() const;
+		void setConnectedEntities(std::vector<ConnectedEntity> value);
+		std::vector<ConnectedEntity> getConnectedEntities() const;
 
 		/* Removes all overrides which no longer have a valid target */
 		void removeDanglingOverrides();
@@ -81,12 +76,10 @@ namespace Core {
 		bool dirty = true; // Determines if the prefab requires an update or not
 		PROPERTY(Category=PrefabPath)
 		std::string filePath;
-		PROPERTY()
+		PROPERTY(alwaysOverriden)
 		std::vector<PrefabPropertyOverride> prefabPropertyOverrides; // Blocks load of property from prefab
-		PROPERTY()
-		std::vector<PrefabComponentOverride> prefabComponentOverrides; // Blocks load of component from prefab
-		PROPERTY()
-		std::vector<std::pair<std::string, Entity>> entityRemapInfo;
+		PROPERTY(alwaysOverriden)
+		std::vector<ConnectedEntity> connectedEntities;
 	};
 }
 #endif

@@ -5,7 +5,6 @@
 #include "entity/handle/Handle.h"
 #include "entity/component/IComponentData.h"
 #include "entity/component/ComponentGroup.h"
-#include "components/RectTransform.h"
 #include "components/entity/PrefabComponent.h"
 #include <cstddef>
 #include <vector>
@@ -27,6 +26,7 @@ namespace Core {
 
 	struct PrefabContent {
 		EntityRemapLoadInfo entityRemapInfo;
+		std::vector<ConnectedEntity> connectedEntities;
 		std::vector<Handle> content; // Handles to the immediate children of the prefab root
 		bool success = false;
 	};
@@ -43,6 +43,8 @@ namespace Core {
 		bool updatePrefab(std::string filePath);
 		/* Updates the given prefab. Returns true if successful */
 		bool updatePrefab(Handle rootPrefabHandle);
+		/* Removes all overrides for the children of the given root prefab handle */
+		bool revertPrefab(Handle rootHandle);
 		/* Removes the given entities connection to the prefab */
 		bool unpackPrefab(Handle rootPrefabHandle);
 		/* Saves the Entity to the specified file path as the root of a prefab. Note: Will not convert the specified Entity to a prefab */
@@ -52,12 +54,8 @@ namespace Core {
 		/* Creates an Entity from prefab. By default gives the root Entity a transform. */
 		Handle createEntityFromPrefab(std::string filePath, float x = 0, float y = 0);
 
-		/* Removes all overrides for the children of the given root handle */
-		bool clearOverrides(Handle rootHandle);
 		bool overrideProperty(Handle owner, std::size_t typeID, std::string propertyName);
 		bool removePropertyOverride(Handle owner, std::size_t typeID, std::string propertyName);
-		bool overrideComponent(Handle owner, std::size_t typeID);
-		bool removeComponentOverride(Handle owner, std::size_t typeID);
 
 		Handle getPrefabOverrideReceiver(Handle entity);
 		bool isEntityPrefabRoot(Handle entity);
@@ -66,30 +64,25 @@ namespace Core {
 		/* Returns all property overrides for the given Entity. Retrieves overrides from PrefabComponents from the whole parent chain */
 		std::vector<PrefabPropertyOverride> getPropertyOverrides(Handle entity, std::size_t typeID);
 		/* Returns all component overrides for the given Entity. Retrieves overrides from PrefabComponents from the whole parent chain */
-		std::vector<PrefabComponentOverride> getComponentOverrides(Handle entity);
-		/* Returns all property overrides at the level of the given Entity. Retrieves overrides from PrefabComponents upwards through the whole parent chain */
+		std::vector<std::size_t> getComponentOverrides(Handle entity);
+		/* Returns all property overrides at the level of the given Entity. Retrieves overrides from PrefabComponents through the whole parent chain */
 		std::vector<PrefabPropertyOverride> getPropertyOverridesAt(Handle handle);
-		/* Returns all component overrides at the level of the given Entity. Retrieves overrides from PrefabComponents upwards through the whole parent chain */
-		std::vector<PrefabComponentOverride> getComponentOverridesAt(Handle handle);
 
 	private:
 		/* Loads the prefab at the specified file path */
 		PrefabContent loadPrefab(std::string filePath, Entity rootEntity);
-		/* Serializes the prefab and all its children to ostream */
-		static void serialize(Handle rootEntity, SerializerArchive& archive);
-		/* Deserializes the prefab and all children from istream*/
-		static Handle deserialize(DeserializerArchive& archive, std::queue<EntityHandle>& entityHandles);
-		Handle deserializeAndUpdate(PrefabDeserializerArchive& archive, std::queue<EntityHandle>& entityHandles, std::vector<PrefabPropertyOverride>& propertyOverrides, std::vector<PrefabComponentOverride>& componentOverrides);
+		/* Returns connected component type IDs */
+		static std::vector<std::size_t> deserializeAndUpdate(PrefabDeserializerArchive& archive, EntityHandle& entityHandles, std::vector<PrefabPropertyOverride>& propertyOverrides, const std::vector<ConnectedEntity>& connectedEntities);
 
 		/*
 		* @param rootHandle - an entity handle to the root of the prefab
 		* @param prevEntityRemapInfo - previous remap info since last update
 		* @param archive - deserializer archive
 		*/
-		EntityRemapLoadInfo updatePrefabFromRoot(Handle rootPrefabHandle, PrefabComponent& prefabComponent, PrefabDeserializerArchive& archive);
+		std::vector<ConnectedEntity> updatePrefabFromRoot(Handle rootPrefabHandle, PrefabComponent& prefabComponent, PrefabDeserializerArchive& archive);
 
 	private:
-		ComponentGroup<RectTransform, PrefabComponent> prefabEntities;
+		ComponentGroup<PrefabComponent> prefabEntities;
 		EntityManager* entityManager;
 	};
 }

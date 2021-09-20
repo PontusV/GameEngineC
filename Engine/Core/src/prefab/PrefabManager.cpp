@@ -19,6 +19,26 @@ PrefabManager::PrefabManager(EntityManager* entityManager) : entityManager(entit
 PrefabManager::~PrefabManager() {}
 
 
+/* Returns entities from root as Entities connected to a prefab. All components will count as connected. A child will not be added to the vector if it does not have a remap in the given entityRemapInfo */
+std::vector<ConnectedEntity> getEntitiesFromRootAsConnected(Handle rootHandle, EntityRemapSaveInfo entityRemapInfo) {
+	std::vector<ConnectedEntity> connectedEntities;
+	std::size_t childCount = rootHandle.getChildCount();
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = rootHandle.getChild(i);
+		auto it = std::find_if(entityRemapInfo.begin(), entityRemapInfo.end(), [&child](const std::pair<std::size_t, std::string>& pair) { return child.getEntity().getID() == pair.first; });
+		if (it == entityRemapInfo.end()) continue;
+		ConnectedEntity& connectedEntity = connectedEntities.emplace_back();
+		auto componentTypes = child.getComponentTypes();
+		connectedEntity.entity = child.getEntity();
+		connectedEntity.guid = it->second;
+		connectedEntity.componentTypeIDs.reserve(componentTypes.size());
+		for (auto componentType : componentTypes) {
+			connectedEntity.componentTypeIDs.push_back(componentType.type.getTypeID());
+		}
+	}
+	return connectedEntities;
+}
+
 EntityRemapSaveInfo reverseEntityRemapInfo(EntityRemapLoadInfo entityRemapInfo) {
 	EntityRemapSaveInfo result;
 	std::for_each(entityRemapInfo.begin(), entityRemapInfo.end(),
@@ -68,6 +88,21 @@ void ensureEntityRemapInfo(EntityRemapSaveInfo& entityRemapInfo, std::size_t roo
 			entityRemapInfo.push_back(std::pair<std::size_t, std::string>(entityID, entityGUID));
 		}
 	}
+	// Reorder the vector to match the order of the given entityIDs
+	assert(entityRemapInfo.size() == entityIDs.size() + 1);
+	auto rootIt = std::find_if(entityRemapInfo.begin(), entityRemapInfo.end(), [&rootEntityID](const std::pair<std::size_t, std::string>& pair) { return pair.first == rootEntityID; });
+	if (rootIt != entityRemapInfo.end() && rootIt != entityRemapInfo.begin()) {
+		std::iter_swap(rootIt, entityRemapInfo.begin());
+	}
+	if (entityIDs.size() > 1) {
+		for (std::size_t i = 0; i < entityIDs.size() - 1; i++) {
+			const std::size_t& entityID = entityIDs[i];
+			auto it = std::find_if(entityRemapInfo.begin() + i + 2, entityRemapInfo.end(), [&entityID](const std::pair<std::size_t, std::string>& pair) { return pair.first == entityID; });
+			if (it != entityRemapInfo.end()) {
+				std::iter_swap(entityRemapInfo.begin() + i + 1, it);
+			}
+		}
+	}
 }
 
 template<typename Archive>
@@ -79,7 +114,7 @@ bool serializeEntityRemapInfo(Handle rootHandle, EntityRemapSaveInfo& entityRema
 	// Ensures valid entityRemapInfo
 	std::size_t childCount = rootHandle.getChildCount();
 	std::vector<std::size_t> entityIDs;
-	entityIDs.reserve(childCount + 1);
+	entityIDs.reserve(childCount);
 	for (std::size_t i = 0; i < childCount; i++) {
 		Handle child = rootHandle.getChild(i);
 		entityIDs.push_back(child.getEntity().getID());
@@ -88,8 +123,8 @@ bool serializeEntityRemapInfo(Handle rootHandle, EntityRemapSaveInfo& entityRema
 	// Saves child count
 	std::size_t mapSize = entityRemapInfo.size();
 	if (mapSize != childCount + 1) {
-		std::cout << "PrefabManager::serializeEntityRemapInfo::ERROR Mapsize does not match childCount" << std::endl;
-		throw std::runtime_error("PrefabManager::serializeEntityRemapInfo::ERROR Mapsize does not match childCount");
+		std::cout << "PrefabManager::serializeEntityRemapInfo::ERROR mapsize does not match childCount" << std::endl;
+		throw std::runtime_error("PrefabManager::serializeEntityRemapInfo::ERROR mapsize does not match childCount");
 	}
 	archive(mapSize);
 	// Saves GUIDs
@@ -128,7 +163,10 @@ void PrefabManager::tick() {
 
 bool PrefabManager::updatePrefab(Handle prefabHandle) {
 	PrefabComponent* prefabComponent = prefabHandle.getComponent<PrefabComponent>();
-	if (prefabComponent == nullptr) return false;
+	if (prefabComponent == nullptr) {
+		std::cout << "PrefabManager::updatePrefab::ERROR Entity " << prefabHandle.getEntity().getID() << " is not a prefab root" << std::endl;
+		return false;
+	}
 
 	auto filePath = prefabComponent->getFilePath();
 	std::ifstream file;
@@ -144,9 +182,14 @@ bool PrefabManager::updatePrefab(Handle prefabHandle) {
 		return false;
 	}
 	PrefabDeserializerArchive archive(file, entityManager);
-	auto newEntityRemapInfo = updatePrefabFromRoot(prefabHandle, *prefabComponent, archive);
-	prefabComponent->setEntityRemapInfo(newEntityRemapInfo);
-	prefabComponent->removeDanglingOverrides(); // cleanup
+	auto connectedEntities = updatePrefabFromRoot(prefabHandle, *prefabComponent, archive);
+	if (prefabComponent = prefabHandle.getComponent<PrefabComponent>()) {
+		prefabComponent->setConnectedEntities(connectedEntities);
+		prefabComponent->removeDanglingOverrides(); // cleanup
+	}
+	else {
+		std::cout << "PrefabManager::updatePrefab::ERROR Failed to find PrefabComponent for Entity " << prefabHandle.getEntity().getID() << " after update" << std::endl;
+	}
 
 	file.close();
 	return true;
@@ -175,9 +218,14 @@ bool PrefabManager::updatePrefab(std::string filePath) {
 		if (prefabComponent.getFilePath() == filePath) {
 			// WIP: Update
 			// Update property values
-			auto newEntityRemapInfo = updatePrefabFromRoot(prefabHandle, prefabComponent, archive);
-			prefabComponent.setEntityRemapInfo(newEntityRemapInfo);
-			prefabComponent.removeDanglingOverrides(); // cleanup
+			auto connectedEntities = updatePrefabFromRoot(prefabHandle, prefabComponent, archive);
+			if (PrefabComponent* component = prefabHandle.getComponent<PrefabComponent>()) {
+				component->setConnectedEntities(connectedEntities);
+				component->removeDanglingOverrides(); // cleanup
+			}
+			else {
+				std::cout << "PrefabManager::updatePrefab::ERROR Failed to find PrefabComponent for Entity " << prefabHandle.getEntity().getID() << " after update" << std::endl;
+			}
 			archive.resetToStart();
 		}
 	}
@@ -194,8 +242,7 @@ bool PrefabManager::unpackPrefab(Handle prefabHandle) {
 		std::cout << "PrefabManager::unpackPrefab::ERROR Failed to unpack prefab. The given entity handle is not a prefab" << std::endl;
 		return false;
 	}
-	prefabHandle.removeComponent(PrefabComponent::getClassTypeID());
-	return true;
+	return prefabHandle.removeComponentImmediate(PrefabComponent::getClassTypeID());
 }
 
 bool PrefabManager::createPrefabFromEntity(Handle handle, std::string filePath) {
@@ -214,7 +261,7 @@ bool PrefabManager::createPrefabFromEntity(Handle handle, std::string filePath) 
 	if (!savePrefab(filePath, entityHandle, entityRemapInfo)) {
 		return false;
 	}
-	component.setEntityRemapInfo(reverseEntityRemapInfo(entityRemapInfo));
+	component.setConnectedEntities(getEntitiesFromRootAsConnected(handle, entityRemapInfo));
 	entityHandle.addComponent(component);
 	return true;
 }
@@ -232,7 +279,7 @@ Handle PrefabManager::createEntityFromPrefab(std::string filePath, float x, floa
 		return Handle(); // Invalid handle
 	}
 	PrefabComponent prefabComponent(filePath);
-	prefabComponent.setEntityRemapInfo(contentData.entityRemapInfo);
+	prefabComponent.setConnectedEntities(contentData.connectedEntities);
 	auto location = entityManager->addComponent(root, prefabComponent);
 	Handle rootHandle(root, entityManager, location);
 	for (Handle& immediateChild : contentData.content) {
@@ -254,29 +301,81 @@ bool createPropertyOverride(Handle ownerHandle, std::size_t typeID, std::string 
 	return true;
 }
 
-bool PrefabManager::clearOverrides(Handle rootHandle) {
-	std::vector<Entity> allChildEntities;
-	std::size_t childCount = rootHandle.getChildCount();
-	allChildEntities.reserve(childCount);
-	for (std::size_t i = 0; i < childCount; i++) {
-		allChildEntities.push_back(rootHandle.getChild(i).getEntity());
+bool PrefabManager::revertPrefab(Handle rootHandle) {
+	std::cout << "Reverting prefab with EntityID " << rootHandle.getEntity().getID() << std::endl;
+	std::vector<Entity> childEntities;
+	std::vector<Entity> newEntities;
+	PrefabComponent* prefabComponent = rootHandle.getComponent<PrefabComponent>();
+	if (prefabComponent == nullptr) {
+		std::cout << "PrefabManager::revertPrefab::ERROR Unable to revert given Entity since it is not a prefab root" << std::endl;
+		return false;
 	}
-	std::vector<PrefabComponent*> prefabComponents = rootHandle.getComponentsUpwards<PrefabComponent>();
-	for (PrefabComponent* prefabComponent : prefabComponents) {
-		// Clears property overrides
+	std::size_t childCount = rootHandle.getChildCount();
+	childCount = rootHandle.getChildCount();
+	auto connectedEntities = prefabComponent->getConnectedEntities();
+	// Clears Entity add overrides
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle child = rootHandle.getChild(i);
+		Entity entity = child.getEntity();
+		bool overriden = std::find_if(connectedEntities.begin(), connectedEntities.end(), [&entity](const ConnectedEntity& connectedEntity) { return connectedEntity.entity == entity; }) == connectedEntities.end();
+		if (!overriden) {
+			childEntities.push_back(entity);
+		}
+		else {
+			child.destroy(); // Note: Destroying immediately may break iteration of children
+		}
+	}
+	// Clears Entity remove overrides
+	for (auto it = connectedEntities.begin(); it != connectedEntities.end();) {
+		if (it->guid == PREFAB_ROOT_GUID) {
+			it++;
+			continue;
+		}
+		bool overriden = std::find_if(childEntities.begin(), childEntities.end(), [&it](const Entity& entity) { return entity == it->entity; }) == childEntities.end();
+		if (overriden) {
+			it = connectedEntities.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+	// Clears Component add overrides
+	for (const auto& connectedEntity : connectedEntities) {
+		if (connectedEntity.guid == PREFAB_ROOT_GUID) continue;
+		auto location = entityManager->getLocationDetailed(connectedEntity.entity);
+		for (auto& componentType : entityManager->getComponentTypes(connectedEntity.entity)) {
+			bool overriden = std::find(connectedEntity.componentTypeIDs.begin(), connectedEntity.componentTypeIDs.end(), componentType.type.getTypeID()) == connectedEntity.componentTypeIDs.end();
+			if (overriden) {
+				// TODO: Removes childManager which disrupts update later. The children will be seen as overriden as destroyed if they are connected
+				location = entityManager->removeComponent(location, componentType.type.getTypeID());
+			}
+		}
+	}
+	// Clears Component remove overrides
+	for (const auto& connectedEntity : connectedEntities) {
+		if (connectedEntity.guid == PREFAB_ROOT_GUID) continue;
+		auto location = entityManager->getLocationDetailed(connectedEntity.entity);
+		auto componentTypes = entityManager->getComponentTypes(connectedEntity.entity);
+		for (auto& componentTypeID : connectedEntity.componentTypeIDs) {
+			bool overriden = std::find_if(componentTypes.begin(), componentTypes.end(), [&componentTypeID](const IComponentTypeInfo& componentType) { return componentType.type.getTypeID() == componentTypeID; }) == componentTypes.end();
+			if (overriden) {
+				location = entityManager->addComponent(location, componentTypeID);
+			}
+		}
+	}
+	// Clears property overrides
+	for (PrefabComponent* prefabComponent : rootHandle.getComponentsUpwards<PrefabComponent>()) {
+		prefabComponent->removeDanglingOverrides();
 		auto propertyOverrides = prefabComponent->getPropertyOverrides();
 		for (auto& propertyOverride : propertyOverrides) {
-			if (std::find(allChildEntities.begin(), allChildEntities.end(), propertyOverride.targetComponent.getOwner().getEntity()) != allChildEntities.end()) {
+			if (std::find(childEntities.begin(), childEntities.end(), propertyOverride.targetComponent.getOwner().getEntity()) != childEntities.end()) {
 				prefabComponent->removePropertyOverride(propertyOverride);
 			}
 		}
-		// Clear component overrides
-		auto componentOverrides = prefabComponent->getComponentOverrides();
-		for (auto& componentOverride : componentOverrides) {
-			if (std::find(allChildEntities.begin(), allChildEntities.end(), componentOverride.targetEntity.getEntity()) != allChildEntities.end()) {
-				prefabComponent->removeComponentOverride(componentOverride);
-			}
-		} 
+	}
+	prefabComponent->setConnectedEntities(connectedEntities);
+	if (!updatePrefab(rootHandle)) {
+		std::cout << "PrefabManager::revertPrefab::ERROR Failed to update prefab after revert" << std::endl;
 	}
 	return true;
 }
@@ -304,29 +403,13 @@ bool PrefabManager::removePropertyOverride(Handle ownerHandle, std::size_t typeI
 	return true;
 }
 
-bool PrefabManager::overrideComponent(Handle ownerHandle, std::size_t typeID) {
-	Handle receiver = getPrefabOverrideReceiver(ownerHandle);
-	PrefabComponent* prefabComponent = receiver.getComponent<PrefabComponent>();
-	if (prefabComponent == nullptr) return false;
-
-	return prefabComponent->addComponentOverride(PrefabComponentOverride(ownerHandle, typeID));
-}
-
-bool PrefabManager::removeComponentOverride(Handle ownerHandle, std::size_t typeID) {
-	std::vector<PrefabComponent*> prefabComponents = ownerHandle.getComponentsInParents<PrefabComponent>();
-	for (PrefabComponent* prefabComponent : prefabComponents) {
-		prefabComponent->removeComponentOverride(PrefabComponentOverride(ownerHandle, typeID));
-	}
-	return true;
-}
-
 bool PrefabManager::isEntityAnOverride(Handle entity) {
 	PrefabComponent* prefabComponent = entity.getComponentInParents<PrefabComponent>();
 	if (prefabComponent == nullptr) {
 		return false;
 	}
-	auto entityRemapInfo = prefabComponent->getEntityRemapInfo();
-	return std::find_if(entityRemapInfo.begin(), entityRemapInfo.end(), [&entity](const std::pair<std::string, std::size_t>& pair) { return pair.second == entity.getEntity().getID(); }) == entityRemapInfo.end();
+	auto connectedEntities = prefabComponent->getConnectedEntities();
+	return std::find_if(connectedEntities.begin(), connectedEntities.end(), [&entity](const ConnectedEntity& connectedEntity) { return connectedEntity.entity.getID() == entity.getEntity().getID(); }) == connectedEntities.end();
 }
 
 bool PrefabManager::savePrefab(std::string filePath, Handle rootHandle, EntityRemapSaveInfo& entityRemapInfo) {
@@ -353,14 +436,19 @@ bool PrefabManager::savePrefab(std::string filePath, Handle rootHandle, EntityRe
 	serializeEntityRemapInfo(rootHandle, entityRemapInfo, archive);
 	archive.setEntityRemapInfo(entityRemapInfo);
 	// Save content
+	std::size_t childCount = rootHandle.getChildCount();
 	std::size_t immediateChildCount = rootHandle.getImmediateChildCount();
+	archive(childCount);
 	archive(immediateChildCount);
-	for (std::size_t i = 0; i < immediateChildCount; i++) {
-		Handle immediateChild = rootHandle.getChild(i);
-		serialize(immediateChild, archive);
+	for (std::size_t i = 0; i < childCount; i++) {
+		EntityHandle child = rootHandle.getChild(i);
+		serializeEntity(child, archive);
 	}
 	file.close();
-	clearOverrides(rootHandle);
+	if (PrefabComponent* component = rootHandle.getComponent<PrefabComponent>()) {
+		component->setConnectedEntities(getEntitiesFromRootAsConnected(rootHandle, entityRemapInfo));
+	}
+	revertPrefab(rootHandle); // Note: Called to remove property overrides
 
 	std::wcout << L"Successfully saved prefab" << std::endl;
 	return true;
@@ -384,14 +472,15 @@ PrefabContent PrefabManager::loadPrefab(std::string filePath, Entity rootEntity)
 	DeserializerArchive archive(file, entityManager);
 	// Loads EntityRemapInfo and assigns new EntityIDs
 	auto entityRemapInfo = deserializeEntityRemapInfo(archive);
-	std::queue<EntityHandle> handles;
+	std::vector<EntityHandle> handles;
+	handles.reserve(entityRemapInfo.size());
 	for (auto& map : entityRemapInfo) {
 		if (map.first == PREFAB_ROOT_GUID) {
 			map.second = rootEntity.getID();
 		}
 		else {
 			Entity entity = entityManager->createEntity();
-			handles.push(EntityHandle(entity, entityManager));
+			handles.push_back(EntityHandle(entity, entityManager));
 			map.second = entity.getID();
 		}
 	}
@@ -399,76 +488,154 @@ PrefabContent PrefabManager::loadPrefab(std::string filePath, Entity rootEntity)
 	result.entityRemapInfo = entityRemapInfo;
 
 	// Load content
+	std::size_t childCount = 0;
 	std::size_t immediateChildCount = 0;
+	archive(childCount);
 	archive(immediateChildCount);
 	content.reserve(immediateChildCount);
 	for (std::size_t i = 0; i < immediateChildCount; i++) {
-		Handle handle = deserialize(archive, handles);
-		content.push_back(handle);
+		deserializeEntity(handles[i], archive);
+		content.push_back(handles[i]);
+	}
+	for (std::size_t i = immediateChildCount; i < childCount; i++) {
+		deserializeEntity(handles[i], archive);
 	}
 	file.close();
+	for (auto& remap : entityRemapInfo) {
+		ConnectedEntity connectedEntity;
+		connectedEntity.entity = Entity(remap.second);
+		connectedEntity.guid = remap.first;
+		for (auto& componentType : entityManager->getComponentTypes(Entity(remap.second))) {
+			connectedEntity.componentTypeIDs.push_back(componentType.type.getTypeID());
+		}
+		result.connectedEntities.push_back(connectedEntity);
+	}
 	result.success = true;
 	return result;
 }
 
-EntityRemapLoadInfo PrefabManager::updatePrefabFromRoot(Handle rootHandle, PrefabComponent& prefabComponent, PrefabDeserializerArchive& archive) {
+/* Remove child references that are invalid or have parent set to something else */
+void cleanChildRefs(Handle& handle) {
+	if (ChildManager* component = handle.getComponent<ChildManager>()) {
+		while (component->onChildRemoved(Handle()));
+		std::size_t immediateChildCount = component->getChildCount();
+		for (std::size_t i = 0; i < immediateChildCount;) {
+			Handle child = component->getChild(i);
+			if (child.isImmediateParent(handle.getEntity())) {
+				i++;
+			}
+			else {
+				component->onChildRemoved(child);
+				immediateChildCount--;
+			}
+		}
+		if (immediateChildCount == 0) {
+			handle.removeComponentImmediate(ChildManager::getClassTypeID());
+		}
+	}
+}
+
+std::vector<ConnectedEntity> PrefabManager::updatePrefabFromRoot(Handle rootHandle, PrefabComponent& prefabComponent, PrefabDeserializerArchive& archive) {
 	std::cout << "Updating prefab with EntityID " << rootHandle.getEntity().getID() << " at path " << prefabComponent.getFilePath() << std::endl;
-	EntityRemapLoadInfo prevEntityRemapInfo = prefabComponent.getEntityRemapInfo();
+	std::vector<ConnectedEntity> result;
+	std::vector<ConnectedEntity> connectedEntities = prefabComponent.getConnectedEntities();
 	auto propertyOverrides = getPropertyOverridesAt(rootHandle);
-	auto componentOverrides = getComponentOverridesAt(rootHandle);
 	// Creates new remap and creates new Entities from prefab
 	auto newEntityRemapInfo = deserializeEntityRemapInfo(archive);
-	std::queue<EntityHandle> handles;
+	std::vector<EntityHandle> handles;
 	std::vector<Handle> newEntities;
 	for (auto& map : newEntityRemapInfo) {
 		if (map.first == PREFAB_ROOT_GUID) {
 			map.second = rootHandle.getEntity().getID();
 		}
 		else {
-			auto it = std::find_if(prevEntityRemapInfo.begin(), prevEntityRemapInfo.end(), [&map](const std::pair<std::string, std::size_t>& pair) { return pair.first == map.first; });
-			Entity entity;
-			if (it == prevEntityRemapInfo.end()) {
-				entity = entityManager->createEntity();
-				newEntities.push_back(EntityHandle(entity, entityManager));
+			auto it = std::find_if(connectedEntities.begin(), connectedEntities.end(), [&map](const ConnectedEntity& connectedEntity) { return connectedEntity.guid == map.first; });
+			EntityHandle handle;
+			if (it == connectedEntities.end()) {
+				Entity entity = entityManager->createEntity();
+				handle = EntityHandle(entity, entityManager);
+				newEntities.push_back(handle);
 			}
 			else {
-				entity = Entity(it->second);
-				if (!rootHandle.isChild(entity)) {
-					entity = Entity(0); // Entity has been overriden and destroyed
+				Entity& entity = it->entity;
+				handle = EntityHandle(entity, entityManager);
+				if (!handle.isParent(rootHandle.getEntity())) {
+					handle = Handle(Entity(0), entityManager);
 				}
 			}
-			handles.push(EntityHandle(entity, entityManager));
-			map.second = entity.getID();
+			handles.push_back(handle);
+			map.second = handle.getEntity().getID();
 		}
 	}
 	archive.setEntityRemapInfo(newEntityRemapInfo);
-	// Destroys Entities which have been removed in the prefab
-	for (auto& map : prevEntityRemapInfo) {
-		auto it = std::find_if(newEntityRemapInfo.begin(), newEntityRemapInfo.end(), [&map](const std::pair<std::string, std::size_t>& pair) { return pair.first == map.first; });
-		if (it == newEntityRemapInfo.end()) {
-			entityManager->destroyEntity(Entity(map.second)); // Note: May chain and destroy children but attempting to destroy a nonexistent Entity does not throw an error, at the time of writing this
-		}
-	}
 
 	// Load or update content
+	std::size_t childCount = 0;
 	std::size_t immediateChildCount = 0;
+	archive(childCount);
 	archive(immediateChildCount);
-	for (std::size_t i = 0; i < immediateChildCount; i++) {
-		deserializeAndUpdate(archive, handles, propertyOverrides, componentOverrides);
+	if (childCount + 1 != newEntityRemapInfo.size()) {
+		std::cout << "PrefabManager::updatePrefabFromRoot::ERROR Loaded childcount + 1 does not match loaded entityRemapInfo size" << std::endl;
+		throw std::runtime_error("PrefabManager::updatePrefabFromRoot::ERROR Loaded childcount + 1 does not match loaded entityRemapInfo size");
+	}
+	for (std::size_t i = 0; i < childCount; i++) {
+		auto connectedComponents = deserializeAndUpdate(archive, handles[i], propertyOverrides, connectedEntities);
+		ConnectedEntity& connectedEntity = result.emplace_back();
+		connectedEntity.entity = handles[i].getEntity();
+		connectedEntity.componentTypeIDs = connectedComponents;
+		auto it = std::find_if(newEntityRemapInfo.begin(), newEntityRemapInfo.end(), [&connectedEntity](const std::pair<std::string, std::size_t>& pair) { return pair.second == connectedEntity.entity.getID(); });
+		connectedEntity.guid = it->first;
 	}
 
-	// Destroys all new Entities with an invalid parent
-	for (auto& handle : newEntities) {
-		if (!handle.getParent().isValid()) {
-			handle.destroy();
+	// Destroys all Entities with an invalid parent and ensures parents have all their child references set
+	childCount = rootHandle.getChildCount();
+	for (std::size_t i = 0; i < childCount;) {
+		Handle handle = rootHandle.getChild(i);
+		Handle parentHandle = handle.getParent();
+		if (!parentHandle.refresh()) {
+			handle.destroyImmediate();
+			childCount--;
+			continue;
+		}
+		if (!parentHandle.isImmediateChild(handle.getEntity())) {
+			ChildManager* childManager = parentHandle.getComponent<ChildManager>();
+			if (childManager == nullptr) {
+				childManager = static_cast<ChildManager*>(parentHandle.addComponentImmediate(ChildManager::getClassTypeID()));
+			}
+			childManager->onChildAdded(handle);
+		}
+		i++;
+	}
+
+	// Remove child reference to Entity which have been overriden as destroyed or have parent set to something else
+	childCount = rootHandle.getChildCount();
+	cleanChildRefs(rootHandle);
+	for (std::size_t i = 0; i < childCount; i++) {
+		Handle handle = rootHandle.getChild(i);
+		cleanChildRefs(handle);
+	}
+
+	// Destroys Entities which have been removed in the prefab
+	for (const auto& connectedEntity : connectedEntities) {
+		auto it = std::find_if(newEntityRemapInfo.begin(), newEntityRemapInfo.end(), [&connectedEntity](const std::pair<std::string, std::size_t>& pair) { return pair.first == connectedEntity.guid; });
+		if (it == newEntityRemapInfo.end()) {
+			entityManager->destroyEntity(connectedEntity.entity); // Note: May chain and destroy children but attempting to destroy a nonexistent Entity does not throw an error, at the time of writing this
 		}
 	}
 
-	return newEntityRemapInfo;
+	return result;
 }
 
 Handle PrefabManager::getPrefabOverrideReceiver(Handle handle) {
 	Handle parent = handle.getParent();
+	while (parent.refresh()) {
+		if (parent.hasComponent<PrefabComponent>()) {
+			return parent;
+		}
+		parent = parent.getParent();
+	}
+	return Handle();
+	/*Handle parent = handle.getParent();
 	Handle receiver;
 	while (parent.isValid()) {
 		if (parent.hasComponent<PrefabComponent>()) {
@@ -482,7 +649,7 @@ Handle PrefabManager::getPrefabOverrideReceiver(Handle handle) {
 			parent = Handle();
 		}
 	}
-	return receiver;
+	return receiver;*/
 }
 
 bool PrefabManager::isEntityPrefabRoot(Handle entity) {
@@ -500,12 +667,18 @@ std::vector<PrefabPropertyOverride> PrefabManager::getPropertyOverrides(Handle h
 	return result;
 }
 
-std::vector<PrefabComponentOverride> PrefabManager::getComponentOverrides(Handle handle) {
-	std::vector<PrefabComponentOverride> overrides = getComponentOverridesAt(handle);
-	std::vector<PrefabComponentOverride> result;
-	for (const PrefabComponentOverride& override : overrides) {
-		if (override.targetEntity.getEntity() == handle.getEntity()) {
-			result.push_back(override);
+std::vector<std::size_t> PrefabManager::getComponentOverrides(Handle handle) {
+	std::vector<std::size_t> result;
+	if (PrefabComponent* prefabComponent = handle.getComponentInParents<PrefabComponent>()) {
+		auto connectedEntities = prefabComponent->getConnectedEntities();
+		auto it = std::find_if(connectedEntities.begin(), connectedEntities.end(), [&handle](const ConnectedEntity& connectedEntity) { return connectedEntity.entity == handle.getEntity(); });
+		if (it != connectedEntities.end()) {
+			for (const auto& componentType : handle.getComponentTypes()) {
+				bool overriden = std::find_if(it->componentTypeIDs.begin(), it->componentTypeIDs.end(), [&componentType](const std::size_t& componentTypeID) { return componentTypeID == componentType.type.getTypeID(); }) == it->componentTypeIDs.end();
+				if (overriden) {
+					result.push_back(componentType.type.getTypeID());
+				}
+			}
 		}
 	}
 	return result;
@@ -521,63 +694,43 @@ std::vector<PrefabPropertyOverride> PrefabManager::getPropertyOverridesAt(Handle
 	return result;
 }
 
-std::vector<PrefabComponentOverride> PrefabManager::getComponentOverridesAt(Handle handle) {
-	std::vector<PrefabComponentOverride> result;
-	for (PrefabComponent* prefabComponent : handle.getComponentsUpwards<PrefabComponent>()) {
-		prefabComponent->removeDanglingOverrides(); // Cleanup
-		auto overrides = prefabComponent->getComponentOverrides();
-		result.insert(result.end(), overrides.begin(), overrides.end());
-	}
-	return result;
-}
-
-void PrefabManager::serialize(Handle handle, SerializerArchive& archive) {
-	serializeEntity(handle, archive);
-
-	std::size_t childAmount = handle.getImmediateChildCount();
-	archive(childAmount);										// Child amount
-	for (std::size_t i = 0; i < childAmount; i++) {				// Loop through Children
-		Handle child = handle.getChild(i);
-		serialize(child, archive);								// Chain serialize
-	}
-}
-
-Handle PrefabManager::deserialize(DeserializerArchive& archive, std::queue<EntityHandle>& entityHandles) {
-	EntityHandle entityHandle = entityHandles.front();
-	deserializeEntity(entityHandle, archive);
-	entityHandles.pop();
-
-	std::size_t childAmount;
-	archive(childAmount);													// Child amount
-	for (std::size_t i = 0; i < childAmount; i++) {							// Loop through Children
-		deserialize(archive, entityHandles);								// Chain deserialize
-	}
-	return entityHandle;
-}
-
-Handle PrefabManager::deserializeAndUpdate(PrefabDeserializerArchive& archive, std::queue<EntityHandle>& entityHandles, std::vector<PrefabPropertyOverride>& propertyOverrides, std::vector<PrefabComponentOverride>& componentOverrides) {
-	EntityHandle entityHandle = entityHandles.front();
-
+std::vector<std::size_t> PrefabManager::deserializeAndUpdate(PrefabDeserializerArchive& archive, EntityHandle& entityHandle, std::vector<PrefabPropertyOverride>& propertyOverrides, const std::vector<ConnectedEntity>& connectedEntities) {
+	std::vector<std::size_t> result;
 	std::size_t componentAmount;
 	archive(componentAmount);												// Component amount
 
 	std::vector<std::size_t> overridenComponentTypeIDs;
-	for (const auto& override : componentOverrides) {
-		if (override.targetEntity.getEntity() == entityHandle.getEntity()) {
-			overridenComponentTypeIDs.push_back(override.typeID);
+	auto it = std::find_if(connectedEntities.begin(), connectedEntities.end(), [&entityHandle](const ConnectedEntity& connectedEntity) { return connectedEntity.entity == entityHandle.getEntity(); });
+	if (it != connectedEntities.end()) {
+		for (const auto& componentType : entityHandle.getComponentTypes()) {
+			bool overriden = std::find_if(it->componentTypeIDs.begin(), it->componentTypeIDs.end(), [&componentType](const std::size_t& componentTypeID) { return componentTypeID == componentType.type.getTypeID(); }) == it->componentTypeIDs.end();
+			if (overriden) {
+				overridenComponentTypeIDs.push_back(componentType.type.getTypeID());
+			}
 		}
 	}
 	for (std::size_t i = 0; i < componentAmount; i++) {						// Loop through Components
 		std::string typeName;												// TODO: Use SerializationID instead
 		archive(typeName);													// Component Type name
-		std::size_t typeID = Mirror::getTypeID(typeName);
-		if (entityHandle.isValid() && std::find(overridenComponentTypeIDs.begin(), overridenComponentTypeIDs.end(), typeID) == overridenComponentTypeIDs.end()) {
+		auto type = Mirror::getType(typeName);
+		std::size_t typeID = type.typeID;
+		if (entityHandle.isValid() && !type.hasAnnotation("alwaysOverriden") && std::find(overridenComponentTypeIDs.begin(), overridenComponentTypeIDs.end(), typeID) == overridenComponentTypeIDs.end()) {
+			result.push_back(typeID);
 			std::vector<std::string> overridenProperties;
 			if (entityHandle.hasComponent(typeID)) {
 				// Updates component
-				for (const auto & override : propertyOverrides) {
+				for (const auto& override : propertyOverrides) {
 					if (override.targetComponent.getOwner().getEntity() == entityHandle.getEntity() && override.targetComponent.getComponentTypeID() == typeID) {
 						overridenProperties.push_back(override.targetPropertyName);
+					}
+				}
+				for (auto& prop : type.properties) {
+					if (!prop.hasAnnotation("alwaysOverriden")) continue;
+					auto it = std::find_if(propertyOverrides.begin(), propertyOverrides.end(), [&prop](const PrefabPropertyOverride& override) { return override.targetPropertyName == prop.name; });
+					if (it == propertyOverrides.end()) {
+						PrefabPropertyOverride propOverride;
+						createPropertyOverride(entityHandle, typeID, prop.name, propOverride);
+						propertyOverrides.push_back(propOverride);
 					}
 				}
 				archive.setOverridenProperties(overridenProperties);
@@ -590,16 +743,10 @@ Handle PrefabManager::deserializeAndUpdate(PrefabDeserializerArchive& archive, s
 			}
 		}
 		else {
+			std::cout << "Skipping component" << std::endl;
 			// Skips component
 			archive.skipProperties();
 		}
 	}
-	entityHandles.pop();
-
-	std::size_t childAmount;
-	archive(childAmount);													// Child amount
-	for (std::size_t i = 0; i < childAmount; i++) {							// Loop through Children
-		deserializeAndUpdate(archive, entityHandles, propertyOverrides, componentOverrides);	// Chain deserialize
-	}
-	return entityHandle;
+	return result;
 }

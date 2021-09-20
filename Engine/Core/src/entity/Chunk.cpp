@@ -274,6 +274,7 @@ std::size_t Chunk::getIndex(Entity entity) {
 		if (getEntity(i) == entity)
 			return i;
 	}
+	std::cout << "Chunk::getIndex::ERROR Entity is not contained in this chunk!" << std::endl;
 	throw std::invalid_argument("Entity is not contained in this chunk!");
 }
 
@@ -307,6 +308,7 @@ void Chunk::setComponent(std::size_t index, ComponentTypeID componentTypeID) {
 		IComponentData* newComponent = Mirror::createInstance<IComponentData>(componentTypeID, dest);
 	}
 	else {
-		throw std::invalid_argument("Chunk::setComponent invalid component type! It does not exist in this chunk.");
+		std::cout << "Chunk::setComponent::ERROR invalid component type! It does not exist in this chunk." << std::endl;
+		throw std::invalid_argument("Chunk::setComponent::ERROR invalid component type! It does not exist in this chunk.");
 	}
 }

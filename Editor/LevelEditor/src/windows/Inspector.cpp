@@ -373,19 +373,12 @@ void Inspector::renderComponent(EntityID rootEntityID, EntityID entityID, std::s
 			// Remove component
 			ComponentData componentData = engineDLL->getComponent(entityID, typeID);
 			std::string serializedComponentData = engineDLL->writeComponentToBuffer(entityID, typeID);
-			bool overriden = engineDLL->isComponentOverriden(entityID, typeID);
-			if (overriden) {
-				if (!engineDLL->removeComponentOverride(entityID, typeID)) {
-					std::cout << "Inspector::renderComponent::ERROR Failed to remove component override when attempting to remove component" << std::endl;
-				}
-				engineDLL->updatePrefab(entityID);
-				// TODO: Set rootEntityID as dirty
-			} else if (engineDLL->removeComponent(entityID, typeID)) {
-				if (!engineDLL->overrideComponent(entityID, typeID)) {
-					std::cout << "Inspector::renderComponent::ERROR Failed to override component after removing component" << std::endl;
-				}
+			if (engineDLL->removeComponent(entityID, typeID)) {
 				std::string typeName = engineDLL->getTypeName(typeID);
-				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData), overriden));
+				undoRedoManager->registerUndo(std::make_unique<AddComponentAction>(rootEntityID, entityID, typeName, std::move(serializedComponentData)));
+			}
+			else {
+				std::cout << "Inspector::renderComponent::ERROR Failed to remove component" << std::endl;
 			}
 			ImGui::CloseCurrentPopup();
 		}
@@ -436,18 +429,11 @@ void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager
 		if (!filterComponentType(engineDLL, filter, type.typeID)) {
 			if (ImGui::Selectable(type.typeName.c_str(), false)) {
 				// Adding component
-				bool overriden = engineDLL->isComponentOverriden(target.entityID, type.typeID);
-				if (overriden) {
-					if (!engineDLL->removeComponentOverride(target.entityID, type.typeID)) {
-						std::cout << "Inspector::renderComponentCombo::ERROR Failed to remove component override when attempting to add component" << std::endl;
-					}
-					engineDLL->updatePrefab(target.entityID);
-					// TODO: Set rootEntityID as dirty
-				} else if (engineDLL->addComponent(target.entityID, type.typeID)) {
-					if (!engineDLL->overrideComponent(target.entityID, type.typeID)) {
-						std::cout << "Inspector::renderComponentCombo::ERROR Failed to override component after adding component" << std::endl;
-					}
-					undoRedoManager->registerUndo(std::make_unique<RemoveComponentAction>(target.rootEntityID, target.entityID, type.typeName, overriden));
+				if (engineDLL->addComponent(target.entityID, type.typeID)) {
+					undoRedoManager->registerUndo(std::make_unique<RemoveComponentAction>(target.rootEntityID, target.entityID, type.typeName));
+				}
+				else {
+					std::cout << "Inspector::renderComponentCombo::ERROR Failed to add component" << std::endl;
 				}
 			}
 		}

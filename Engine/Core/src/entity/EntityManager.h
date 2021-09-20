@@ -211,6 +211,7 @@ namespace Core {
 	template <typename... Ts>
 	EntityLocationDetailed EntityManager::addEntity(Entity entity, Ts&... components) {
 		// Call implementation
+		entityHideFlags[entity] = HideFlags::None;
 		try {
 			std::shared_ptr<Archetype> archetype = getArchetype<Ts...>();
 			EntityLocation location = archetype->addEntity(entity, components...);

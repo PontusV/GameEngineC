@@ -30,6 +30,8 @@
 #include "utils/string.h"
 using namespace Core;
 
+constexpr const char* TRANSFORM_POSITION_PROPERTY_NAME = "position";
+
 enum class PropertyFieldValueType {
 	NONE = 0,
 	ARITHMETIC_TYPE,
@@ -524,6 +526,43 @@ bool setWorldPosition(Core::Engine* engine, EntityID entityID, float x, float y)
 	return false;
 }
 
+bool overridePosition(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	if (handle.hasComponent<RectTransform>()) {
+		std::size_t constexpr typeID = RectTransform::getClassTypeID();
+		return prefabManager.overrideProperty(Handle(Entity(entityID), &entityManager), typeID, TRANSFORM_POSITION_PROPERTY_NAME);
+	}
+	return false;
+}
+
+bool removePositionOverride(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	if (handle.hasComponent<RectTransform>()) {
+		std::size_t constexpr typeID = RectTransform::getClassTypeID();
+		return prefabManager.removePropertyOverride(handle, typeID, TRANSFORM_POSITION_PROPERTY_NAME);
+	}
+	return false;
+}
+
+bool isPositionOverriden(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	std::size_t constexpr typeID = RectTransform::getClassTypeID();
+	auto propertyOverrides = prefabManager.getPropertyOverrides(Handle(Entity(entityID), &entityManager), typeID);
+	auto type = Mirror::getType(typeID);
+	for (const auto& propertyOverride : propertyOverrides) {
+		auto it = std::find_if(type.properties.begin(), type.properties.end(), [&](const Mirror::Property& prop) { return prop.name == TRANSFORM_POSITION_PROPERTY_NAME; });
+		if (it != type.properties.end()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 bool hasAnnotation(TypeID typeID, const char* annotation) {
 	Mirror::Class type = Mirror::getType(typeID);
 	return type.hasAnnotation(annotation);
@@ -658,10 +697,22 @@ bool savePrefab(Core::Engine* engine, EntityID entityID, const char* path) {
 	EntityManager& entityManager = engine->getEntityManager();
 	Handle prefabHandle = Handle(Entity(entityID), &entityManager);
 	EntityRemapSaveInfo entityRemapInfo;
+	if (PrefabComponent* prefabComponent = prefabHandle.getComponent<PrefabComponent>()) {
+		auto connectedEntities = prefabComponent->getConnectedEntities();
+		std::for_each(connectedEntities.begin(), connectedEntities.end(),
+			[&entityRemapInfo](const ConnectedEntity& e) {
+				entityRemapInfo.push_back(std::make_pair(e.entity.getID(), e.guid));
+			});
+	}
 	try {
 		return prefabManager.savePrefab(path, prefabHandle, entityRemapInfo);
 	}
+	catch (std::exception& e) {
+		std::cout << "savePrefab::ERROR Failed to save prefab. Error: " << e.what() << std::endl;
+		return false;
+	}
 	catch (...) {
+		std::cout << "savePrefab::ERROR Failed to save prefab" << std::endl;
 		return false;
 	}
 }
@@ -713,18 +764,6 @@ bool removePropertyOverride(Core::Engine* engine, EntityID entityID, std::size_t
 	PrefabManager& prefabManager = engine->getPrefabManager();
 	std::string propertyName = getPropertyName(typeID, propIndex);
 	return prefabManager.removePropertyOverride(Handle(Entity(entityID), &entityManager), typeID, propertyName);
-}
-
-bool overrideComponent(Core::Engine* engine, EntityID entityID, std::size_t typeID) {
-	EntityManager& entityManager = engine->getEntityManager();
-	PrefabManager& prefabManager = engine->getPrefabManager();
-	return prefabManager.overrideComponent(Handle(Entity(entityID), &entityManager), typeID);
-}
-
-bool removeComponentOverride(Core::Engine* engine, EntityID entityID, std::size_t typeID) {
-	EntityManager& entityManager = engine->getEntityManager();
-	PrefabManager& prefabManager = engine->getPrefabManager();
-	return prefabManager.removeComponentOverride(Handle(Entity(entityID), &entityManager), typeID);
 }
 
 bool isEntityPrefabRoot(Core::Engine* engine, EntityID entityID) {
@@ -786,25 +825,14 @@ void getComponentOverrides(Core::Engine* engine, EntityID entityID, TypeID* out,
 	auto componentOverrides = prefabManager.getComponentOverrides(Handle(Entity(entityID), &entityManager));
 	std::size_t size = std::min(componentOverrides.size(), outSize);
 	for (std::size_t i = 0; i < size; i++) {
-		out[i] = componentOverrides[i].typeID;
+		out[i] = componentOverrides[i];
 	}
 }
 
-void getComponentOverridesAt(Core::Engine* engine, EntityID entityID, EntityID* entityIDOut, TypeID* typeIDOut, std::size_t outSize) {
+bool revertPrefab(Core::Engine* engine, EntityID entityID) {
 	EntityManager& entityManager = engine->getEntityManager();
 	PrefabManager& prefabManager = engine->getPrefabManager();
-	auto componentOverrides = prefabManager.getComponentOverridesAt(Handle(Entity(entityID), &entityManager));
-	std::size_t size = std::min(componentOverrides.size(), outSize);
-	for (std::size_t i = 0; i < size; i++) {
-		entityIDOut[i] = componentOverrides[i].targetEntity.getEntity().getID();
-		typeIDOut[i] = componentOverrides[i].typeID;
-	}
-}
-
-bool clearOverrides(Core::Engine* engine, EntityID entityID) {
-	EntityManager& entityManager = engine->getEntityManager();
-	PrefabManager& prefabManager = engine->getPrefabManager();
-	prefabManager.clearOverrides(Handle(Entity(entityID), &entityManager));
+	prefabManager.revertPrefab(Handle(Entity(entityID), &entityManager));
 	return true;
 }
 
@@ -818,12 +846,6 @@ std::size_t getComponentOverridesCount(Core::Engine* engine, EntityID entityID) 
 	EntityManager& entityManager = engine->getEntityManager();
 	PrefabManager& prefabManager = engine->getPrefabManager();
 	return prefabManager.getComponentOverrides(Handle(Entity(entityID), &entityManager)).size();
-}
-
-std::size_t getComponentOverridesAtCount(Core::Engine* engine, EntityID entityID) {
-	EntityManager& entityManager = engine->getEntityManager();
-	PrefabManager& prefabManager = engine->getPrefabManager();
-	return prefabManager.getComponentOverridesAt(Handle(Entity(entityID), &entityManager)).size();
 }
 
 std::size_t getPropertyOverridesCount(Core::Engine* engine, EntityID entityID, TypeID typeID) {
@@ -942,7 +964,6 @@ std::size_t writeComponentToBuffer(Core::Engine* engine, EntityID entityID, Type
 }
 
 std::size_t writeEntityToBuffer(Core::Engine* engine, EntityID entityID, char* bufferPtr, std::size_t bufferSize) {
-	// TODO
 	EntityManager& entityManager = engine->getEntityManager();
 	ostreambuf sbuf(bufferPtr, bufferSize);
 	std::ostream os(&sbuf);
@@ -969,7 +990,7 @@ std::size_t writeEntityToBuffer(Core::Engine* engine, EntityID entityID, char* b
 	for (const Handle& entity : entities) {
 		serializeEntity(entity, archive);
 	}
-	return 0;
+	return os.tellp();
 }
 
 bool loadGameState(Core::Engine* engine, const char* path) {

@@ -152,7 +152,8 @@ namespace Core {
 			T* newComponent = new(dest) T(component);
 		}
 		else {
-			throw std::invalid_argument("Chunk::setComponent invalid component type! It does not exist in this chunk.");
+			std::cout << "Chunk::setComponent::ERROR invalid component type! It does not exist in this chunk." << std::endl;
+			throw std::invalid_argument("Chunk::setComponent::ERROR invalid component type! It does not exist in this chunk.");
 		}
 	}
 

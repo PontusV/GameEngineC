@@ -50,7 +50,8 @@ namespace Core {
 				if (textureIDs[i] == id)
 					return i+1;
 			}
-			throw std::invalid_argument("This TextureID is not contained in the TextureSlot array (textureIDs).");
+			//std::cout << "BatchConfig::getTextureSlot::ERROR This TextureID is not contained in the TextureSlot array (textureIDs)." << std::endl;
+			throw std::invalid_argument("BatchConfig::getTextureSlot::ERROR This TextureID is not contained in the TextureSlot array (textureIDs).");
 		}
 
 		unsigned int				shaderID;
