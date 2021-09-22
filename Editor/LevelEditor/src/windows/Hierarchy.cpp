@@ -74,8 +74,16 @@ void entityNode(LevelEditor* editor, Hierarchy* hierarchy, EngineDLL* engineDLL,
 			EntityID* data = static_cast<EntityID*>(payload->Data);
 			EntityID& entityID = *data;
 			EntityID prevParentID = engineDLL->getEntityParent(entityID);
+			bool parentComponentOverriden = engineDLL->isParentComponentOverriden(entityID);
 			if (engineDLL->setEntityParent(entityID, node.entityID)) {
-				undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(rootEntityID, entityID, prevParentID));
+				if (!parentComponentOverriden && !engineDLL->overrideParentComponent(entityID)) {
+					std::cout << "Hierarchy::entityNode::ERROR Failed to overriden parent component" << std::endl;
+				}
+				bool positionOverriden = engineDLL->isPositionOverriden(entityID);
+				if (!positionOverriden && !engineDLL->overridePosition(entityID)) {
+					std::cout << "Hierarchy::entityNode::ERROR Failed to overriden position after set parent" << std::endl;
+				}
+				undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(rootEntityID, entityID, prevParentID, positionOverriden, parentComponentOverriden));
 			}
 		}
 		ImGui::EndDragDropTarget();
@@ -121,6 +129,7 @@ void entityNode(LevelEditor* editor, Hierarchy* hierarchy, EngineDLL* engineDLL,
 				if (path.empty()) {
 					std::cout << "Failed to save prefab since the given Entity does not have a path" << std::endl;
 				} else if (engineDLL->savePrefab(node.entityID, path.c_str())) {
+					//undoRedoManager->setAllAsDirty();
 					engineDLL->updatePrefabs(path.c_str());
 					hierarchy->setDirty(true);
 				}
@@ -140,6 +149,7 @@ void entityNode(LevelEditor* editor, Hierarchy* hierarchy, EngineDLL* engineDLL,
 			}
 			if (ImGui::Selectable("Update all connected Prefabs", false)) {
 				std::string path = engineDLL->getPrefabFilePath(node.entityID);
+				//undoRedoManager->setAllAsDirty();
 				if (path.empty()) {
 					std::cout << "Failed to update prefab since the given Entity does not have a path" << std::endl;
 				} else if (engineDLL->updatePrefabs(path.c_str())) {
@@ -168,7 +178,7 @@ void Hierarchy::tick(EntityID target) {
 		bool openPopup = false;
 		std::string sceneName = scene.name;
 		std::string sceneLabel = (scene.isPrefabRoot ? ICON_FA_CUBES : ICON_FA_MALE) + (" " + sceneName);
-		if (undoRedoManager->getStepsSinceSave(rootEntityID) != 0) {
+		if (undoRedoManager->isUnsaved(rootEntityID)) {
 			sceneLabel.append("*");
 		}
 		std::string scenePopupId = std::string("scene_popup_").append(sceneName).append(std::to_string(rootEntityID));
@@ -182,8 +192,16 @@ void Hierarchy::tick(EntityID target) {
 				EntityID* data = static_cast<EntityID*>(payload->Data);
 				EntityID& entityID = *data;
 				EntityID prevParentID = engineDLL->getEntityParent(entityID);
+				bool parentComponentOverriden = engineDLL->isParentComponentOverriden(entityID);
 				if (engineDLL->setEntityParent(entityID, scene.entityID)) {
-					undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(rootEntityID, entityID, prevParentID));
+					if (!parentComponentOverriden && !engineDLL->overrideParentComponent(entityID)) {
+						std::cout << "Hierarchy::tick::ERROR Failed to overriden parent component" << std::endl;
+					}
+					bool positionOverriden = engineDLL->isPositionOverriden(entityID);
+					if (!positionOverriden && !engineDLL->overridePosition(entityID)) {
+						std::cout << "Hierarchy::entityNode::ERROR Failed to overriden position after set parent" << std::endl;
+					}
+					undoRedoManager->registerUndo(std::make_unique<SetEntityParentAction>(rootEntityID, entityID, prevParentID, positionOverriden, parentComponentOverriden));
 				}
 			}
 			ImGui::EndDragDropTarget();
@@ -208,8 +226,9 @@ void Hierarchy::tick(EntityID target) {
 				if (ImGui::Selectable("Save", false)) {
 					if (editor->isInEditMode() && engineDLL->isLoaded()) {
 						engineDLL->savePrefab(scene.entityID, scene.filePath.c_str());
+						undoRedoManager->setAllAsDirty();
+						//undoRedoManager->setDirty(rootEntityID, false);
 						engineDLL->updatePrefabs(scene.filePath.c_str());
-						undoRedoManager->setDirty(rootEntityID, false);
 						undoRedoManager->resetStepsSinceSave(rootEntityID);
 					}
 				}
@@ -225,6 +244,7 @@ void Hierarchy::tick(EntityID target) {
 				}
 				if (ImGui::Selectable("Update all connected Prefabs", false)) {
 					std::string path = engineDLL->getPrefabFilePath(scene.entityID);
+					//undoRedoManager->setAllAsDirty();
 					if (path.empty()) {
 						std::cout << "Failed to update prefab since the given Entity does not have a path" << std::endl;
 					}
@@ -239,6 +259,7 @@ void Hierarchy::tick(EntityID target) {
 					if (editor->isInEditMode()) {
 						if (engineDLL->isLoaded()) {
 							engineDLL->savePrefab(scene.entityID, scene.filePath.c_str());
+							//undoRedoManager->setAllAsDirty();
 							engineDLL->updatePrefabs(scene.filePath.c_str());
 						}
 						editor->closeScene(scene.entityID);

@@ -95,6 +95,9 @@ extern "C" {
 	DLLEXPORT std::size_t writeEntityToBuffer(Core::Engine* engine, EntityID entityID, char* bufferPtr, std::size_t bufferSize);
 	
 	// Entity
+	DLLEXPORT bool overrideParentComponent(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool removeParentComponentOverride(Core::Engine* engine, EntityID entityID);
+	DLLEXPORT bool isParentComponentOverriden(Core::Engine* engine, EntityID entityID);
 	DLLEXPORT bool addComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);
 	DLLEXPORT bool removeComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);
 	DLLEXPORT bool hasComponent(Core::Engine* engine, EntityID entityID, TypeID typeID);

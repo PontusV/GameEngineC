@@ -295,6 +295,18 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, overrideParentComponentFun, "overrideParentComponent")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, removeParentComponentOverrideFun, "removeParentComponentOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, isParentComponentOverridenFun, "isParentComponentOverriden")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, destroyEntityFun, "destroyEntity")) {
         unload();
         return false;
@@ -470,6 +482,9 @@ bool EngineDLL::unload() {
     writePropertyToBufferFun = nullptr;
     writeComponentToBufferFun = nullptr;
     writeEntityToBufferFun = nullptr;
+    overrideParentComponentFun = nullptr;
+    removeParentComponentOverrideFun = nullptr;
+    isParentComponentOverridenFun = nullptr;
     destroyEntityFun = nullptr;
     addComponentFun = nullptr;
     removeComponentFun = nullptr;

@@ -436,10 +436,8 @@ void renderComponentCombo(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager
 					if (overriden) {
 						// TODO: Only load/update component
 						EntityID prefabRootEntityID = engineDLL->getNearestPrefabRootEntityID(target.entityID);
-						if (engineDLL->updatePrefab(prefabRootEntityID)) {
-							undoRedoManager->setDirty(target.rootEntityID, true);
-						}
-						else {
+						undoRedoManager->setDirty(prefabRootEntityID, true);
+						if (!engineDLL->updatePrefab(prefabRootEntityID)) {
 							std::cout << "Inspector::renderComponentCombo:ERROR Failed to update prefab " << prefabRootEntityID << " after adding component (" << type.typeName << ") which was previously overriden as removed" << std::endl;
 						}
 					}

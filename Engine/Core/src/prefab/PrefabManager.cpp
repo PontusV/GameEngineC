@@ -344,9 +344,9 @@ bool PrefabManager::revertPrefab(Handle rootHandle) {
 		if (connectedEntity.guid == PREFAB_ROOT_GUID) continue;
 		auto location = entityManager->getLocationDetailed(connectedEntity.entity);
 		for (auto& componentType : entityManager->getComponentTypes(connectedEntity.entity)) {
+			//if (componentType.type.getTypeID() == ChildManager::getClassTypeID()) continue; // Note: ChildManager component needs to be removed by update instead to ensure a clean update
 			bool overriden = std::find(connectedEntity.componentTypeIDs.begin(), connectedEntity.componentTypeIDs.end(), componentType.type.getTypeID()) == connectedEntity.componentTypeIDs.end();
 			if (overriden) {
-				// TODO: Removes childManager which disrupts update later. The children will be seen as overriden as destroyed if they are connected
 				location = entityManager->removeComponent(location, componentType.type.getTypeID());
 			}
 		}
@@ -365,7 +365,6 @@ bool PrefabManager::revertPrefab(Handle rootHandle) {
 	}
 	// Clears property overrides
 	for (PrefabComponent* prefabComponent : rootHandle.getComponentsUpwards<PrefabComponent>()) {
-		prefabComponent->removeDanglingOverrides();
 		auto propertyOverrides = prefabComponent->getPropertyOverrides();
 		for (auto& propertyOverride : propertyOverrides) {
 			if (std::find(childEntities.begin(), childEntities.end(), propertyOverride.targetComponent.getOwner().getEntity()) != childEntities.end()) {
@@ -377,6 +376,21 @@ bool PrefabManager::revertPrefab(Handle rootHandle) {
 	if (!updatePrefab(rootHandle)) {
 		std::cout << "PrefabManager::revertPrefab::ERROR Failed to update prefab after revert" << std::endl;
 	}
+	/*
+	// Clears Component add overrides
+	if (PrefabComponent* prefabComponent = rootHandle.getComponent<PrefabComponent>()) {
+		for (const auto& connectedEntity : prefabComponent->getConnectedEntities()) {
+			if (connectedEntity.guid == PREFAB_ROOT_GUID) continue;
+			auto location = entityManager->getLocationDetailed(connectedEntity.entity);
+			for (auto& componentType : entityManager->getComponentTypes(connectedEntity.entity)) {
+				bool overriden = std::find(connectedEntity.componentTypeIDs.begin(), connectedEntity.componentTypeIDs.end(), componentType.type.getTypeID()) == connectedEntity.componentTypeIDs.end();
+				if (overriden) {
+					location = entityManager->removeComponent(location, componentType.type.getTypeID());
+				}
+			}
+		}
+	}
+	*/
 	return true;
 }
 
@@ -394,13 +408,15 @@ bool PrefabManager::overrideProperty(Handle ownerHandle, std::size_t typeID, std
 
 bool PrefabManager::removePropertyOverride(Handle ownerHandle, std::size_t typeID, std::string propertyName) {
 	std::vector<PrefabComponent*> prefabComponents = ownerHandle.getComponentsInParents<PrefabComponent>();
+	bool success = false;
 	for (PrefabComponent* prefabComponent : prefabComponents) {
 		PrefabPropertyOverride propertyOverride;
 		if (createPropertyOverride(ownerHandle, typeID, propertyName, propertyOverride)) {
-			return prefabComponent->removePropertyOverride(propertyOverride);
+			bool result = prefabComponent->removePropertyOverride(propertyOverride);
+			success = success || result;
 		}
 	}
-	return true;
+	return success;
 }
 
 bool PrefabManager::isEntityAnOverride(Handle entity) {
@@ -522,6 +538,7 @@ void cleanChildRefs(Handle& handle) {
 		for (std::size_t i = 0; i < immediateChildCount;) {
 			Handle child = component->getChild(i);
 			if (child.isImmediateParent(handle.getEntity())) {
+				cleanChildRefs(child);
 				i++;
 			}
 			else {
@@ -586,17 +603,15 @@ std::vector<ConnectedEntity> PrefabManager::updatePrefabFromRoot(Handle rootHand
 		auto it = std::find_if(newEntityRemapInfo.begin(), newEntityRemapInfo.end(), [&connectedEntity](const std::pair<std::string, std::size_t>& pair) { return pair.second == connectedEntity.entity.getID(); });
 		connectedEntity.guid = it->first;
 	}
-
-	// Destroys all Entities with an invalid parent and ensures parents have all their child references set
-	childCount = rootHandle.getChildCount();
-	for (std::size_t i = 0; i < childCount;) {
-		Handle handle = rootHandle.getChild(i);
+	// Destroys all new Entities with an invalid parent and ensures new Entities are a child ref to their parent
+	for (auto& handle : handles) {
+		// Destroys new Entity if parent is invalid
 		Handle parentHandle = handle.getParent();
 		if (!parentHandle.refresh()) {
 			handle.destroyImmediate();
-			childCount--;
 			continue;
 		}
+		// Adds child ref if parent doesn't have ref
 		if (!parentHandle.isImmediateChild(handle.getEntity())) {
 			ChildManager* childManager = parentHandle.getComponent<ChildManager>();
 			if (childManager == nullptr) {
@@ -604,16 +619,10 @@ std::vector<ConnectedEntity> PrefabManager::updatePrefabFromRoot(Handle rootHand
 			}
 			childManager->onChildAdded(handle);
 		}
-		i++;
 	}
 
 	// Remove child reference to Entity which have been overriden as destroyed or have parent set to something else
-	childCount = rootHandle.getChildCount();
 	cleanChildRefs(rootHandle);
-	for (std::size_t i = 0; i < childCount; i++) {
-		Handle handle = rootHandle.getChild(i);
-		cleanChildRefs(handle);
-	}
 
 	// Destroys Entities which have been removed in the prefab
 	for (const auto& connectedEntity : connectedEntities) {

@@ -730,6 +730,30 @@ std::string EngineDLLInterface::writeEntityToBuffer(EntityID entityID) {
     return std::string(readBuffer.data(), size);
 }
 
+bool EngineDLLInterface::overrideParentComponent(EntityID entityID) {
+    if (overrideParentComponentFun == nullptr) {
+        std::cout << "EngineDLLInterface::overrideParentComponent::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::overrideParentComponent::ERROR The function ptr is nullptr";
+    }
+    return overrideParentComponentFun(engine, entityID);
+}
+
+bool EngineDLLInterface::removeParentComponentOverride(EntityID entityID) {
+    if (removeParentComponentOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::removeParentComponentOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::removeParentComponentOverride::ERROR The function ptr is nullptr";
+    }
+    return removeParentComponentOverrideFun(engine, entityID);
+}
+
+bool EngineDLLInterface::isParentComponentOverriden(EntityID entityID) {
+    if (isParentComponentOverridenFun == nullptr) {
+        std::cout << "EngineDLLInterface::isParentComponentOverriden::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::isParentComponentOverriden::ERROR The function ptr is nullptr";
+    }
+    return isParentComponentOverridenFun(engine, entityID);
+}
+
 bool EngineDLLInterface::destroyEntity(EntityID entityID) {
     if (destroyEntityFun == nullptr) {
         std::cout << "EngineDLLInterface::destroyEntity::ERROR The function ptr is nullptr" << std::endl;

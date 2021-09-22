@@ -95,6 +95,9 @@ typedef std::size_t(*WriteComponentToBufferFun)(EnginePtr, EntityID, TypeID, cha
 typedef std::size_t(*WriteEntityToBufferFun)(EnginePtr, EntityID, char*, std::size_t);
 
 // Entity
+typedef bool (*OverrideParentComponentFun)(EnginePtr, EntityID);
+typedef bool (*RemoveParentComponentOverrideFun)(EnginePtr, EntityID);
+typedef bool (*IsParentComponentOverridenFun)(EnginePtr, EntityID);
 typedef bool (*DestroyEntityFun)(EnginePtr, EntityID);
 typedef bool (*AddComponentFun)(EnginePtr, EntityID, TypeID);
 typedef bool (*RemoveComponentFun)(EnginePtr, EntityID, TypeID);
@@ -253,6 +256,9 @@ namespace Editor {
 		std::string writeEntityToBuffer(EntityID entityID);
 
 		// Entity
+		bool overrideParentComponent(EntityID entityID);
+		bool removeParentComponentOverride(EntityID entityID);
+		bool isParentComponentOverriden(EntityID entityID);
 		bool destroyEntity(EntityID entityID);
 		bool addComponent(EntityID entityID, TypeID typeID);
 		bool removeComponent(EntityID entityID, TypeID typeID);
@@ -362,6 +368,9 @@ namespace Editor {
 		WriteEntityToBufferFun writeEntityToBufferFun;
 
 		// Entity
+		OverrideParentComponentFun overrideParentComponentFun;
+		RemoveParentComponentOverrideFun removeParentComponentOverrideFun;
+		IsParentComponentOverridenFun isParentComponentOverridenFun;
 		DestroyEntityFun destroyEntityFun;
 		AddComponentFun addComponentFun;
 		RemoveComponentFun removeComponentFun;

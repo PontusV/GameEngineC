@@ -31,6 +31,7 @@
 using namespace Core;
 
 constexpr const char* TRANSFORM_POSITION_PROPERTY_NAME = "position";
+constexpr const char* PARENT_PROPERTY_NAME = "parent";
 
 enum class PropertyFieldValueType {
 	NONE = 0,
@@ -1212,6 +1213,34 @@ std::size_t getEntityImmediateChildCount(Core::Engine* engine, EntityID entityID
 	return component->getChildCount();
 }
 
+bool overrideParentComponent(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	return prefabManager.overrideProperty(handle, ParentEntity::getClassTypeID(), PARENT_PROPERTY_NAME);
+}
+
+bool removeParentComponentOverride(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	return prefabManager.removePropertyOverride(handle, ParentEntity::getClassTypeID(), PARENT_PROPERTY_NAME);
+}
+
+bool isParentComponentOverriden(Core::Engine* engine, EntityID entityID) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	std::size_t constexpr typeID = ParentEntity::getClassTypeID();
+	auto propertyOverrides = prefabManager.getPropertyOverrides(Handle(Entity(entityID), &entityManager), typeID);
+	auto type = Mirror::getType(typeID);
+	for (const auto& propertyOverride : propertyOverrides) {
+		auto it = std::find_if(type.properties.begin(), type.properties.end(), [&](const Mirror::Property& prop) { return prop.name == PARENT_PROPERTY_NAME; });
+		if (it != type.properties.end()) {
+			return true;
+		}
+	}
+	return false;
+}
 
 bool addComponent(Core::Engine* engine, EntityID entityID, TypeID typeID) {
 	if (entityID == Entity::INVALID_ID) return false;

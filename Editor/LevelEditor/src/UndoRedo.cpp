@@ -1,5 +1,6 @@
 #include "UndoRedo.h"
 #include "EngineDLL.h"
+#include "windows/Hierarchy.h"
 #include <iostream>
 
 using namespace Editor;
@@ -23,12 +24,13 @@ bool UndoRedoManager::undo() {
 	if (undoStack.empty()) {
 		return false;
 	}
-	auto nextAction = undoStack.back()->call(engineDLL);
+	auto nextAction = undoStack.back()->call(engineDLL, this);
 	if (nextAction != nullptr) {
 		std::size_t rootEntityID = undoStack.back()->getRootEntityID();
 		stepsSinceSave[rootEntityID]--;
 		undoStack.pop_back();
 		redoStack.push_back(std::move(nextAction));
+		hierarchy->setDirty(true);
 		return true;
 	}
 	std::cout << "UndoRedoManager::undo::ERROR Failed to undo" << std::endl;
@@ -48,7 +50,7 @@ bool UndoRedoManager::redo() {
 	if (redoStack.empty()) {
 		return false;
 	}
-	auto nextAction = redoStack.back()->call(engineDLL);
+	auto nextAction = redoStack.back()->call(engineDLL, this);
 	if (nextAction != nullptr) {
 		std::size_t rootEntityID = redoStack.back()->getRootEntityID();
 		stepsSinceSave[rootEntityID]++;
@@ -150,6 +152,10 @@ bool UndoRedoManager::isUnsaved(std::size_t rootEntityID) {
 }
 
 void UndoRedoManager::setDirty(std::size_t rootEntityID, bool value) {
+	if (engineDLL->hasEntityParent(rootEntityID) || !engineDLL->isEntityPrefabRoot(rootEntityID)) {
+		std::cout << "UndoRedoManager::setDirty::ERROR Given entityID is not of a root Entity" << std::endl;
+		return;
+	}
 	auto it = std::find(dirtyRootEntityIDs.begin(), dirtyRootEntityIDs.end(), rootEntityID);
 	if (value && it == dirtyRootEntityIDs.end()) {
 		dirtyRootEntityIDs.push_back(rootEntityID);
@@ -159,13 +165,28 @@ void UndoRedoManager::setDirty(std::size_t rootEntityID, bool value) {
 	}
 }
 
+void UndoRedoManager::setAllAsDirty() {
+	std::vector<EntityID> entityIDs = engineDLL->getAllEntities();
+	std::vector<EntityID> rootEntityIDs;
+	for (auto& entityID : entityIDs) {
+		if (!engineDLL->hasEntityParent(entityID) && engineDLL->isEntityPrefabRoot(entityID)) {
+			auto it = std::find(dirtyRootEntityIDs.begin(), dirtyRootEntityIDs.end(), entityID);
+			if (it == dirtyRootEntityIDs.end()) {
+				dirtyRootEntityIDs.push_back(entityID);
+			}
+		}
+	}
+}
+
 // -- Actions --
 
-std::unique_ptr<DoAction> CreateEntityAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> CreateEntityAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	if (engineDLL->loadEntityFromBuffer(serializedEntityData.c_str(), serializedEntityData.size())) {
 		std::size_t parentID = engineDLL->getEntityParent(entityID);
 		if (parentID != 0) {
-			engineDLL->setEntityParent(entityID, parentID);
+			if (engineDLL->setEntityParent(entityID, parentID)) {
+				engineDLL->overrideParentComponent(entityID);
+			}
 		}
 		return std::make_unique<DestroyEntityAction>(rootEntityID, entityID);
 	}
@@ -179,7 +200,7 @@ bool CreateEntityAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && !serializedEntityData.empty() && !entityExists(engineDLL, entityID);
 }
 
-std::unique_ptr<DoAction> DestroyEntityAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> DestroyEntityAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	std::string serializedEntityData = engineDLL->writeEntityToBuffer(entityID);
 	if (serializedEntityData.empty()) {
 		std::cout << "DestroyEntityAction::call::ERROR Failed to retrieve serialized entity data" << std::endl;
@@ -195,7 +216,7 @@ bool DestroyEntityAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && entityExists(engineDLL, entityID);
 }
 
-std::unique_ptr<DoAction> AddComponentAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> AddComponentAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	auto typeID = engineDLL->getTypeIDFromName(typeName.c_str());
 	if (typeID == 0) {
 		std::cout << "AddComponentAction::call::ERROR Failed to retrieve TypeID with name " << typeName << std::endl;
@@ -219,7 +240,7 @@ bool AddComponentAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && typeID != 0 && !serializedComponentData.empty() && entityExists(engineDLL, entityID);
 }
 
-std::unique_ptr<DoAction> RemoveComponentAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> RemoveComponentAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	auto typeID = engineDLL->getTypeIDFromName(typeName.c_str());
 	if (typeID == 0) {
 		std::cout << "RemoveComponentAction::call::ERROR Failed to retrieve TypeID with name " << typeName << std::endl;
@@ -244,7 +265,7 @@ bool RemoveComponentAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && typeID != 0 && entityExists(engineDLL, entityID);
 }
 
-std::unique_ptr<DoAction> MoveEntityAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> MoveEntityAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	ImVec2 currentPosition = engineDLL->getWorldPosition(entityID);
 	if (engineDLL->setWorldPosition(entityID, x, y)) {
 		bool overriden = engineDLL->isPositionOverriden(entityID);
@@ -257,7 +278,6 @@ std::unique_ptr<DoAction> MoveEntityAction::call(EngineDLL* engineDLL) {
 			if (!engineDLL->updatePrefab(rootPrefabEntityID)) {
 				std::cout << "MoveEntityAction::call::ERROR Failed to update prefab" << std::endl;
 			}
-			// TODO: Set rootEntityID as dirty
 		}
 		else {
 			if (!overriden && !engineDLL->overridePosition(entityID)) {
@@ -274,7 +294,7 @@ bool MoveEntityAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && entityExists(engineDLL, entityID); // TODO: Check if entity has transform (low prio)
 }
 
-std::unique_ptr<DoAction> RenameEntityAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> RenameEntityAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	if (engineDLL->setEntityName(entityID, name.c_str())) {
 		return std::make_unique<RenameEntityAction>(rootEntityID, entityID, name);
 	}
@@ -285,10 +305,36 @@ bool RenameEntityAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && entityExists(engineDLL, entityID); // TODO: Check if entity has name (low prio)
 }
 
-std::unique_ptr<DoAction> SetEntityParentAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> SetEntityParentAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	auto currentParentEntityID = engineDLL->getEntityParent(entityID);
-	if (engineDLL->setEntityParent(entityID, parentEntityID)) {
-		return std::make_unique<SetEntityParentAction>(rootEntityID, entityID, currentParentEntityID);
+	bool overriden = engineDLL->isParentComponentOverriden(entityID);
+	bool positionOverriden = engineDLL->isPositionOverriden(entityID);
+	if (prevPositionOverriden && !positionOverriden && !engineDLL->overridePosition(entityID)) {
+		std::cout << "SetEntityParentAction::call::ERROR Failed to overriden position before set parent" << std::endl;
+	}
+	if (!prevPositionOverriden && positionOverriden && !engineDLL->removePositionOverride(entityID)) {
+		std::cout << "SetEntityParentAction::call::ERROR Failed to remove position override before set parent" << std::endl;
+	}
+	if (!prevOverriden) {
+		if (overriden && !engineDLL->removeParentComponentOverride(entityID)) {
+			std::cout << "SetEntityParentAction::call::ERROR Failed to remove parent component override" << std::endl;
+			return nullptr;
+		}
+		EntityID prefabRootEntityID = engineDLL->getNearestPrefabRootEntityID(entityID);
+		if (!engineDLL->updatePrefab(prefabRootEntityID)) {
+			std::cout << "PropertyAssignAction::call::ERROR Failed to update prefab" << std::endl;
+		}
+		return std::make_unique<SetEntityParentAction>(rootEntityID, entityID, currentParentEntityID, positionOverriden, overriden);
+	} else if (engineDLL->setEntityParent(entityID, parentEntityID)) {
+		if (!overriden && !engineDLL->overrideParentComponent(entityID)) {
+			std::cout << "SetEntityParentAction::call::ERROR Failed to override parent component" << std::endl;
+			return nullptr;
+		}
+		EntityID prefabRootEntityID = engineDLL->getNearestPrefabRootEntityID(entityID);
+		if (!engineDLL->updatePrefab(prefabRootEntityID)) {
+			std::cout << "PropertyAssignAction::call::ERROR Failed to update prefab" << std::endl;
+		}
+		return std::make_unique<SetEntityParentAction>(rootEntityID, entityID, currentParentEntityID, positionOverriden, overriden);
 	}
 	return nullptr;
 }
@@ -297,7 +343,7 @@ bool SetEntityParentAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && parentEntityID == 0 && entityExists(engineDLL, entityID) || entityID != 0 && parentEntityID != 0 && entityExists(engineDLL, entityID) && entityExists(engineDLL, parentEntityID);
 }
 
-std::unique_ptr<DoAction> PropertyAssignAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> PropertyAssignAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	auto typeID = engineDLL->getTypeIDFromName(typeName.c_str());
 	if (typeID == 0) {
 		std::cout << "PropertyAssignAction::call::ERROR Failed to retrieve TypeID with name " << typeName << std::endl;
@@ -324,7 +370,6 @@ std::unique_ptr<DoAction> PropertyAssignAction::call(EngineDLL* engineDLL) {
 		if (!engineDLL->updatePrefab(rootPrefabEntityID)) {
 			std::cout << "PropertyAssignAction::call::ERROR Failed to update prefab" << std::endl;
 		}
-		// TODO: Set rootEntityID as dirty
 		auto component = engineDLL->getComponent(entityID, typeID);
 		engineDLL->onUpdate(component.instance, typeID, propIndex);
 		return std::make_unique<PropertyAssignAction>(rootEntityID, entityID, typeName, propertyName, std::move(prevSerializedPropertyData), overriden);
@@ -346,7 +391,7 @@ bool PropertyAssignAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && typeID != 0 && propIndex != -1 && !serializedPropertyData.empty() && entityExists(engineDLL, entityID);
 }
 
-std::unique_ptr<DoAction> UnpackPrefabAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> UnpackPrefabAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	auto propertyOverrides = engineDLL->getPropertyOverridesAt(entityID);
 	auto prefabTypeID = engineDLL->getPrefabComponentTypeID();
 	auto serializedComponentData = engineDLL->writeComponentToBuffer(entityID, prefabTypeID);
@@ -361,7 +406,7 @@ bool UnpackPrefabAction::isValid(EngineDLL* engineDLL) {
 	return entityID != 0 && isPrefabRoot; // Note: isPrefabRoot will be false if entityID does not exist
 }
 
-std::unique_ptr<DoAction> RepackPrefabAction::call(EngineDLL* engineDLL) {
+std::unique_ptr<DoAction> RepackPrefabAction::call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) {
 	if (!engineDLL->loadComponentFromBuffer(entityID, serializedComponentData.c_str(), serializedComponentData.size())) {
 		std::cout << "RepackPrefabAction::call::ERROR Failed to load component from buffer" << std::endl;
 		return nullptr;
@@ -378,7 +423,6 @@ std::unique_ptr<DoAction> RepackPrefabAction::call(EngineDLL* engineDLL) {
 	}
 	EntityID rootPrefabEntityID = engineDLL->getNearestPrefabRootEntityID(entityID);
 	engineDLL->updatePrefab(rootPrefabEntityID);
-	// TODO: Set rootEntityID as dirty
 	return std::make_unique<UnpackPrefabAction>(rootEntityID, entityID);
 }
 

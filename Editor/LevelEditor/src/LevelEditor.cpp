@@ -22,7 +22,7 @@ using namespace Editor;
 constexpr wchar_t PREFAB_FILE_TYPE[] = L".prefab";
 ImVec2 resolutionDefault = ImVec2(600, 480);
 
-LevelEditor::LevelEditor() : undoRedoManager(&engineDLL), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager, &popupManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
+LevelEditor::LevelEditor() : undoRedoManager(&engineDLL, &hierarchy), gameView(this, &undoRedoManager), inspector(&engineDLL, &gameView, &undoRedoManager, &popupManager), hierarchy(this, &gameView, &undoRedoManager), fileView(this) {
 }
 
 
@@ -579,6 +579,7 @@ bool LevelEditor::saveAll() {
 				if (engineDLL.savePrefab(entityID, path.c_str())) {
 					undoRedoManager.resetStepsSinceSave(entityID);
 					undoRedoManager.setDirty(entityID, false);
+					//undoRedoManager.setAllAsDirty();
 					if (!engineDLL.updatePrefabs(path.c_str())) {
 						std::cout << "LevelEditor::saveAll::ERROR Failed to update prefabs connected to path: " << path << std::endl;
 					}

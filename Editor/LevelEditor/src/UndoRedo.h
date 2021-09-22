@@ -24,10 +24,13 @@ namespace Editor {
 		std::string serializedData;
 	};
 
+	class UndoRedoManager;
+	class Hierarchy;
+
 	class DoAction {
 	public:
 		virtual ~DoAction() = 0;
-		virtual std::unique_ptr<DoAction> call(EngineDLL* engineDLL) = 0;
+		virtual std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) = 0;
 		std::size_t getRootEntityID() { return rootEntityID; }
 		virtual bool isValid(EngineDLL* engineDLL) = 0;
 	protected:
@@ -38,7 +41,7 @@ namespace Editor {
 	/* Manages the Undo and Redo stacks of root prefabs */
 	class UndoRedoManager {
 	public:
-		UndoRedoManager(EngineDLL* engineDLL) : engineDLL(engineDLL) {}
+		UndoRedoManager(EngineDLL* engineDLL, Hierarchy* hierarchy) : engineDLL(engineDLL), hierarchy(hierarchy) {}
 		~UndoRedoManager() {}
 
 		bool undo();
@@ -60,12 +63,14 @@ namespace Editor {
 
 		bool isUnsaved(std::size_t rootEntityID);
 		void setDirty(std::size_t rootEntityID, bool value);
+		void setAllAsDirty();
 
 	private:
 		bool enabled = true;
 		std::vector<std::unique_ptr<DoAction>> undoStack;
 		std::vector<std::unique_ptr<DoAction>> redoStack;
 		EngineDLL* engineDLL;
+		Hierarchy* hierarchy;
 		std::map<std::size_t, int> stepsSinceSave; // EntityID, steps
 		std::vector<std::size_t> dirtyRootEntityIDs; // Marked as unsaved until next save
 	};
@@ -75,7 +80,7 @@ namespace Editor {
 	class CreateEntityAction : public DoAction {
 	public:
 		CreateEntityAction(std::size_t rootEntityID, std::size_t entityID, std::string&& serializedEntityData) : DoAction(rootEntityID), entityID(entityID), serializedEntityData(serializedEntityData) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -85,7 +90,7 @@ namespace Editor {
 	class DestroyEntityAction : public DoAction {
 	public:
 		DestroyEntityAction(std::size_t rootEntityID, std::size_t entityID) : DoAction(rootEntityID), entityID(entityID) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -94,7 +99,7 @@ namespace Editor {
 	class AddComponentAction : public DoAction {
 	public:
 		AddComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string&& serializedComponentData, std::vector<PropertyOverride> propertyOverrides) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), serializedComponentData(serializedComponentData), propertyOverrides(propertyOverrides) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -106,7 +111,7 @@ namespace Editor {
 	class RemoveComponentAction : public DoAction {
 	public:
 		RemoveComponentAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName) : DoAction(rootEntityID), entityID(entityID), typeName(typeName) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -116,7 +121,7 @@ namespace Editor {
 	class MoveEntityAction : public DoAction {
 	public:
 		MoveEntityAction(std::size_t rootEntityID, std::size_t entityID, float x, float y, bool overriden) : DoAction(rootEntityID), entityID(entityID), x(x), y(y), prevOverriden(overriden) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -128,7 +133,7 @@ namespace Editor {
 	class RenameEntityAction : public DoAction {
 	public:
 		RenameEntityAction(std::size_t rootEntityID, std::size_t entityID, std::string newName) : DoAction(rootEntityID), entityID(entityID), name(newName) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -137,18 +142,20 @@ namespace Editor {
 
 	class SetEntityParentAction : public DoAction {
 	public:
-		SetEntityParentAction(std::size_t rootEntityID, std::size_t entityID, std::size_t parentEntityID) : DoAction(rootEntityID), entityID(entityID), parentEntityID(parentEntityID) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		SetEntityParentAction(std::size_t rootEntityID, std::size_t entityID, std::size_t parentEntityID, bool positionOverriden, bool overriden) : DoAction(rootEntityID), entityID(entityID), parentEntityID(parentEntityID), prevPositionOverriden(positionOverriden), prevOverriden(overriden) {}
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
 		std::size_t parentEntityID;
+		bool prevOverriden;
+		bool prevPositionOverriden;
 	};
 
 	class PropertyAssignAction : public DoAction {
 	public:
 		PropertyAssignAction(std::size_t rootEntityID, std::size_t entityID, std::string typeName, std::string propertyName, std::string&& serializedPropertyData, bool overriden) : DoAction(rootEntityID), entityID(entityID), typeName(typeName), propertyName(propertyName), serializedPropertyData(serializedPropertyData), prevOverriden(overriden) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -161,7 +168,7 @@ namespace Editor {
 	class UnpackPrefabAction : public DoAction { // WIP
 	public:
 		UnpackPrefabAction(std::size_t rootEntityID, std::size_t entityID) : DoAction(rootEntityID), entityID(entityID) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;
@@ -170,7 +177,7 @@ namespace Editor {
 	class RepackPrefabAction : public DoAction { // WIP
 	public:
 		RepackPrefabAction(std::size_t rootEntityID, std::size_t entityID, std::string&& serializedComponentData, std::vector<PropertyOverride> propertyOverrides) : DoAction(rootEntityID), entityID(entityID), serializedComponentData(serializedComponentData), propertyOverrides(propertyOverrides) {}
-		std::unique_ptr<DoAction> call(EngineDLL* engineDLL) override;
+		std::unique_ptr<DoAction> call(EngineDLL* engineDLL, UndoRedoManager* undoRedoManager) override;
 		bool isValid(EngineDLL* engineDLL) override;
 	private:
 		std::size_t entityID;

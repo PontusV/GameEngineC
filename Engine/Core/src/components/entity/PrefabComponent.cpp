@@ -33,7 +33,7 @@ bool PrefabComponent::addPropertyOverride(PrefabPropertyOverride prefabPropertyO
 	auto is_equal = [&prefabPropertyOverride](PrefabPropertyOverride& override) { return override.targetComponent == prefabPropertyOverride.targetComponent && override.targetPropertyName == prefabPropertyOverride.targetPropertyName; };
 	if (std::find_if(prefabPropertyOverrides.begin(), prefabPropertyOverrides.end(), is_equal) != prefabPropertyOverrides.end()) {
 		//std::cout << "PrefabComponent::addPropertyOverride::ERROR A matching override already exists" << std::endl;
-		return false;
+		return true;
 	}
 	prefabPropertyOverrides.push_back(prefabPropertyOverride);
 	return true;

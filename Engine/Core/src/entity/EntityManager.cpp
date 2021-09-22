@@ -103,6 +103,12 @@ bool EntityManager::destroyEntity(EntityLocationDetailed location) {
 		Handle child = entityHandle.getChild(i);
 		child.destroyImmediate();
 	}
+	// Getting new location. Location will have changed
+	if (childCount > 0) {
+		location = getLocationDetailed(entity);
+		chunkPtr = location.chunk.lock();
+		archetypePtr = location.archetype.lock();
+	}
 
 	// Check for parent & call onChildDestroyed
 	Handle parent = entityHandle.getParent();
