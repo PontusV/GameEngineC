@@ -259,6 +259,14 @@ bool EngineDLL::load(const wchar_t* path) {
         unload();
         return false;
     }
+    if (!loadFunctionFromDLL(handle, removeDestroyedEntityOverrideFun, "removeDestroyedEntityOverride")) {
+        unload();
+        return false;
+    }
+    if (!loadFunctionFromDLL(handle, getDestroyedEntityOverridesFun, "getDestroyedEntityOverrides")) {
+        unload();
+        return false;
+    }
     if (!loadFunctionFromDLL(handle, getPropertyOverridesCountFun, "getPropertyOverridesCount")) {
         unload();
         return false;
@@ -473,6 +481,8 @@ bool EngineDLL::unload() {
     revertPrefabFun = nullptr;
     getPrefabFilePathFun = nullptr;
     getPrefabOverrideReceiverFun = nullptr;
+    removeDestroyedEntityOverrideFun = nullptr;
+    getDestroyedEntityOverridesFun = nullptr;
     getPropertyOverridesCountFun = nullptr;
     getPropertyOverridesAtCountFun = nullptr;
     getComponentOverridesCountFun = nullptr;

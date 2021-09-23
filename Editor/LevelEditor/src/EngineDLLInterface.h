@@ -72,6 +72,7 @@ typedef bool (*ClearPropertyOverridesFun)(EnginePtr, EntityID, TypeID);
 typedef bool (*CreatePrefabFromEntityFun)(EnginePtr, EntityID, const char*);
 typedef bool (*OverridePropertyFun)(EnginePtr, EntityID, std::size_t, std::size_t);
 typedef bool (*RemovePropertyOverrideFun)(EnginePtr, EntityID, std::size_t, std::size_t);
+typedef bool (*RemoveDestroyedEntityOverrideFun)(EnginePtr, EntityID, const char*);
 typedef bool (*IsEntityPrefabRootFun)(EnginePtr, EntityID);
 typedef bool (*IsEntityAnOverrideFun)(EnginePtr, EntityID);
 typedef bool (*RevertPrefabFun)(EnginePtr, EntityID);
@@ -82,6 +83,7 @@ typedef void (*GetComponentOverridesFun)(EnginePtr, EntityID, TypeID*, std::size
 typedef EntityID (*CreatePrefabEntityFun)(EnginePtr, const char*, float, float);
 typedef EntityID (*CreateEntityFromPrefabFun)(EnginePtr, const char*, float, float);
 typedef EntityID (*GetPrefabOverrideReceiverFun)(EnginePtr, EntityID);
+typedef std::size_t (*GetDestroyedEntityOverridesFun)(EnginePtr, EntityID, char*, std::size_t);
 typedef std::size_t (*GetPropertyOverridesCountFun)(EnginePtr, EntityID, TypeID);
 typedef std::size_t (*GetPropertyOverridesAtCountFun)(EnginePtr, EntityID);
 typedef std::size_t (*GetComponentOverridesCountFun)(EnginePtr, EntityID);
@@ -230,6 +232,7 @@ namespace Editor {
 		bool createPrefabFromEntity(EntityID entityID, const char* path);
 		bool overrideProperty(EntityID entityID, std::size_t typeID, std::size_t propIndex);
 		bool removePropertyOverride(EntityID entityID, std::size_t typeID, std::size_t propIndex);
+		bool removeDestroyedEntityOverride(EntityID entityID, const char* guid);
 		bool isEntityPrefabRoot(EntityID entityID);
 		bool isEntityAnOverride(EntityID entityID);
 		bool isComponentOverriden(EntityID entityID, TypeID typeID);
@@ -239,6 +242,7 @@ namespace Editor {
 		std::vector<PropertyOverride> getPropertyOverrides(EntityID entityID, TypeID typeID);
 		std::vector<PropertyOverride> getPropertyOverridesAt(EntityID entityID);
 		std::vector<ComponentOverride> getComponentOverrides(EntityID entityID);
+		std::vector<std::string> getDestroyedEntityOverrides(EntityID entityID);
 		EntityID getNearestPrefabRootEntityID(EntityID entityID);
 		EntityID createPrefabEntity(const char* path, float x, float y);
 		EntityID createEntityFromPrefab(const char* path, float x, float y);
@@ -355,6 +359,8 @@ namespace Editor {
 		RevertPrefabFun revertPrefabFun;
 		GetPrefabFilePathFun getPrefabFilePathFun;
 		GetPrefabOverrideReceiverFun getPrefabOverrideReceiverFun;
+		RemoveDestroyedEntityOverrideFun removeDestroyedEntityOverrideFun;
+		GetDestroyedEntityOverridesFun getDestroyedEntityOverridesFun;
 		GetPropertyOverridesCountFun getPropertyOverridesCountFun;
 		GetPropertyOverridesAtCountFun getPropertyOverridesAtCountFun;
 		GetComponentOverridesCountFun getComponentOverridesCountFun;

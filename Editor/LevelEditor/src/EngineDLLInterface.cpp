@@ -546,6 +546,14 @@ bool EngineDLLInterface::removePropertyOverride(EntityID entityID, std::size_t t
     return removePropertyOverrideFun(engine, entityID, typeID, propIndex);
 }
 
+bool EngineDLLInterface::removeDestroyedEntityOverride(EntityID entityID, const char* guid) {
+    if (removeDestroyedEntityOverrideFun == nullptr) {
+        std::cout << "EngineDLLInterface::removeDestroyedEntityOverride::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::removeDestroyedEntityOverride::ERROR The function ptr is nullptr";
+    }
+    return removeDestroyedEntityOverrideFun(engine, entityID, guid);
+}
+
 bool EngineDLLInterface::isEntityPrefabRoot(EntityID entityID) {
     if (isEntityPrefabRootFun == nullptr) {
         std::cout << "EngineDLLInterface::isEntityPrefabRoot::ERROR The function ptr is nullptr" << std::endl;
@@ -626,6 +634,23 @@ std::vector<ComponentOverride> EngineDLLInterface::getComponentOverrides(EntityI
         ComponentOverride& override = overrides[i];
         override.entityID = entityID;
         override.typeID = typeIDs[i];
+    }
+    return overrides;
+}
+
+std::vector<std::string> EngineDLLInterface::getDestroyedEntityOverrides(EntityID entityID) {
+    if (getDestroyedEntityOverridesFun == nullptr) {
+        std::cout << "EngineDLLInterface::getDestroyedEntityOverrides::ERROR The function ptr is nullptr" << std::endl;
+        throw "EngineDLLInterface::getDestroyedEntityOverrides::ERROR The function ptr is nullptr";
+    }
+    std::size_t size = getDestroyedEntityOverridesFun(engine, entityID, readBuffer.data(), sizeof(readBuffer));
+    std::vector<std::string> overrides;
+    overrides.reserve(size);
+    char* bufferPtr = readBuffer.data();
+    for (std::size_t i = 0; i < size; i++) {
+        std::string guid(bufferPtr);
+        overrides.push_back(guid);
+        bufferPtr += guid.size() + 1;
     }
     return overrides;
 }

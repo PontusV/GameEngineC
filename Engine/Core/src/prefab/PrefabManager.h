@@ -61,6 +61,9 @@ namespace Core {
 		bool isEntityPrefabRoot(Handle entity);
 		/* Checks the closest PrefabComponent in the parent chain. Returns true if Entity is not connected/managed by the prefab. */
 		bool isEntityAnOverride(Handle entity);
+		/* Returns a vector of guids of entities which have been overriden as destroyed */
+		std::vector<std::string> getDestroyedEntityOverrides(Handle rootPrefabHandle);
+		bool removeDestroyedEntityOverride(Handle rootPrefabHandle, std::string guid);
 		/* Returns all property overrides for the given Entity. Retrieves overrides from PrefabComponents from the whole parent chain */
 		std::vector<PrefabPropertyOverride> getPropertyOverrides(Handle entity, std::size_t typeID);
 		/* Returns all component overrides for the given Entity. Retrieves overrides from PrefabComponents from the whole parent chain */

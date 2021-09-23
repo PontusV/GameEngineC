@@ -830,6 +830,26 @@ void getComponentOverrides(Core::Engine* engine, EntityID entityID, TypeID* out,
 	}
 }
 
+bool removeDestroyedEntityOverride(Core::Engine* engine, EntityID entityID, const char* guid) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	return prefabManager.removeDestroyedEntityOverride(handle, guid);
+}
+
+std::size_t getDestroyedEntityOverrides(Core::Engine* engine, EntityID entityID, char* bufferPtr, std::size_t bufferSize) {
+	EntityManager& entityManager = engine->getEntityManager();
+	PrefabManager& prefabManager = engine->getPrefabManager();
+	Handle handle(Entity(entityID), &entityManager);
+	auto overrides = prefabManager.getDestroyedEntityOverrides(handle);
+	for (const auto& entityOverride : overrides) {
+		copyString(entityOverride, bufferPtr, bufferSize);
+		bufferPtr += entityOverride.size() + 1;
+		bufferSize -= entityOverride.size() + 1;
+	}
+	return overrides.size();
+}
+
 bool clearPropertyOverrides(Core::Engine* engine, EntityID entityID, TypeID typeID) {
 	EntityManager& entityManager = engine->getEntityManager();
 	PrefabManager& prefabManager = engine->getPrefabManager();

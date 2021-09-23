@@ -428,6 +428,40 @@ bool PrefabManager::isEntityAnOverride(Handle entity) {
 	return std::find_if(connectedEntities.begin(), connectedEntities.end(), [&entity](const ConnectedEntity& connectedEntity) { return connectedEntity.entity.getID() == entity.getEntity().getID(); }) == connectedEntities.end();
 }
 
+std::vector<std::string> PrefabManager::getDestroyedEntityOverrides(Handle rootPrefabHandle) {
+	std::vector<std::string> result;
+	PrefabComponent* prefabComponent = rootPrefabHandle.getComponent<PrefabComponent>();
+	if (prefabComponent == nullptr) {
+		std::cout << "PrefabManager::getRemovedEntityOverrides::ERROR Unable to retrieve destroyed entity overrides from non prefab root" << std::endl;
+		return result;
+	}
+	for (auto& connectedEntity : prefabComponent->getConnectedEntities()) {
+		if (connectedEntity.entity.getID() == Entity::INVALID_ID) {
+			result.push_back(connectedEntity.guid);
+		}
+	}
+	return result;
+}
+
+bool PrefabManager::removeDestroyedEntityOverride(Handle rootPrefabHandle, std::string guid) {
+	PrefabComponent* prefabComponent = rootPrefabHandle.getComponent<PrefabComponent>();
+	if (prefabComponent == nullptr) {
+		std::cout << "PrefabManager::removeDestroyedEntityOverride::ERROR Unable to remove destroyed entity override from non prefab root" << std::endl;
+		return false;
+	}
+	auto connectedEntities = prefabComponent->getConnectedEntities();
+	for (auto it = connectedEntities.begin(); it != connectedEntities.end(); it++) {
+		if (it->entity.getID() == Entity::INVALID_ID && it->guid == guid) {
+			connectedEntities.erase(it);
+			if (!updatePrefab(rootPrefabHandle)) {
+				std::cout << "PrefabManager::removeDestroyedEntityOverride::ERROR Failed to update prefab after removing the override" << std::endl;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
 bool PrefabManager::savePrefab(std::string filePath, Handle rootHandle, EntityRemapSaveInfo& entityRemapInfo) {
 	if (!rootHandle.isValid()) {
 		std::cout << "PrefabManager::savePrefab::ERROR Failed to save prefab. Invalid handle to prefab" << std::endl;
